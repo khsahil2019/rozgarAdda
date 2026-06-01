@@ -505,7 +505,8 @@ Future<void> _showLanguageDialogAndContinue(
 ) async {
   final l10n = context.l10n;
   final currentCode = Localizations.localeOf(context).languageCode;
-  String selectedCode = currentCode == 'hi' ? 'hi' : 'en';
+  String selectedCode =
+      (currentCode == 'hi' || currentCode == 'mr') ? currentCode : 'en';
 
   await showDialog<void>(
     context: context,
@@ -535,6 +536,15 @@ Future<void> _showLanguageDialogAndContinue(
                     RadioListTile<String>(
                       title: Text(l10n.text('language_hindi')),
                       value: 'hi',
+                      groupValue: selectedCode,
+                      onChanged: (v) {
+                        if (v == null) return;
+                        setState(() => selectedCode = v);
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: const Text('मराठी (Marathi)'),
+                      value: 'mr',
                       groupValue: selectedCode,
                       onChanged: (v) {
                         if (v == null) return;

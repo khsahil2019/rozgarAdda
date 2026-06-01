@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:rojgar/localization/app_localizations.dart';
-import 'package:rojgar/services/api_services.dart';
+import 'package:rojgar/core/network/api_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'services/storage_service.dart';

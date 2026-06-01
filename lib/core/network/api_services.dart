@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 
-import '../common/exceptions.dart';
+import '../exceptions/exceptions.dart';
 
 /// Base API service class that handles all HTTP requests using Dio
 class ApiService {
@@ -41,7 +41,6 @@ class ApiService {
     Duration? timeout,
   }) async {
     try {
-      
       final options = Options(
         method: method.toUpperCase(),
         headers: {

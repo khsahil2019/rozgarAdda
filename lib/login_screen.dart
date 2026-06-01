@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
+import 'package:rojgar/core/network/api_routes.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/ragistartion_screen.dart';
 import 'package:rojgar/select_state_screen.dart';
@@ -82,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final uri = Uri.parse('https://rozgaradda.com/api/candidate/login');
+      final uri = Uri.parse(ApiRoutes.login);
       final response = await http
           .post(
             uri,

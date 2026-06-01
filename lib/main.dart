@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get/get.dart';
+import 'package:rojgar/core/bindings/initial_bindings.dart';
+import 'package:rojgar/features/app/app_controller.dart';
 import 'package:rojgar/floating_navbar.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/splash_screen.dart';
@@ -44,14 +47,18 @@ class _MyAppState extends State<MyApp> {
     });
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('language_code', locale.languageCode);
+    if (Get.isRegistered<AppController>()) {
+      AppController.to.updateLocale(locale);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'RozgarAdda',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true),
+      initialBinding: InitialBinding(),
       locale: _locale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: [

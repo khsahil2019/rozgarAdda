@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rojgar/home.dart';
 import 'package:rojgar/kyc_screen.dart';
 import 'package:rojgar/localization/app_localizations.dart';
+import 'package:rojgar/main.dart';
 import 'package:rojgar/modules/product_screens/product_screen_list.dart';
 import 'package:rojgar/modules/sell_product/sell_product_category.dart';
 
@@ -97,17 +98,18 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _showRegistrationSuccessDialog(String email) {
+    final l10n = AppLocalizations.of(context);
     showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) {
         return AlertDialog(
-          title: const Text('Registration Successful'),
-          content: Text('You registered successfully with this email: $email'),
+          title: Text(l10n.text('registration_success_title')),
+          content: Text('${l10n.text('registration_success_message')}$email'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('OK'),
+              child: Text(l10n.text('ok')),
             ),
           ],
         );
@@ -350,7 +352,23 @@ class _HomeScreenState extends State<HomeScreen>
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: [_langBtn('EN', true), _langBtn('HI', false)],
+              children: [
+                _langBtn(
+                  'EN',
+                  'en',
+                  Localizations.localeOf(context).languageCode == 'en',
+                ),
+                _langBtn(
+                  'HI',
+                  'hi',
+                  Localizations.localeOf(context).languageCode == 'hi',
+                ),
+                _langBtn(
+                  'MR',
+                  'mr',
+                  Localizations.localeOf(context).languageCode == 'mr',
+                ),
+              ],
             ),
           ),
 
@@ -375,19 +393,32 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _langBtn(String label, bool active) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(
-        color: active ? AC.primaryPurple : Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: active ? Colors.white : AC.greyText,
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
+  Widget _langBtn(String label, String code, bool active) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () async {
+        debugPrint('Language button tapped: $code');
+        final appState = MyApp.of(context);
+        if (appState != null) {
+          debugPrint('Setting locale in MyAppState to: $code');
+          await appState.setLocale(Locale(code));
+        } else {
+          debugPrint('MyAppState is null!');
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        decoration: BoxDecoration(
+          color: active ? AC.primaryPurple : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: active ? Colors.white : AC.greyText,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
     );
@@ -592,7 +623,9 @@ class _QuickLinkCard extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                link.label,
+                AppLocalizations.of(
+                  context,
+                ).text(link.label.toLowerCase().replaceAll(' ', '_')),
                 style: const TextStyle(
                   color: AC.darkText,
                   fontSize: 14,
@@ -1082,9 +1115,9 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      const Text(
-                        'Rojgar',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context).text('app_logo_text'),
+                        style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
                           color: AC.darkText,
@@ -1147,9 +1180,9 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Rahul Sharma',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context).text('sidebar_username'),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -1165,9 +1198,11 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Text(
-                          'Worker • KYC Verified',
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(
+                            context,
+                          ).text('worker_kyc_verified'),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
@@ -1186,7 +1221,7 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'MENU',
+                AppLocalizations.of(context).text('menu'),
                 style: TextStyle(
                   color: AC.greyText.withOpacity(0.6),
                   fontSize: 11,
@@ -1274,7 +1309,12 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                               const SizedBox(width: 14),
                               Expanded(
                                 child: Text(
-                                  item.label,
+                                  AppLocalizations.of(context).text(
+                                    item.label.toLowerCase().replaceAll(
+                                      ' ',
+                                      '_',
+                                    ),
+                                  ),
                                   style: TextStyle(
                                     color: isActive
                                         ? AC.primaryPurple
@@ -1319,17 +1359,17 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                     color: const Color(0xFFFFEBEB),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.logout_rounded,
                         color: Color(0xFFDD3344),
                         size: 22,
                       ),
-                      SizedBox(width: 14),
+                      const SizedBox(width: 14),
                       Text(
-                        'Logout',
-                        style: TextStyle(
+                        AppLocalizations.of(context).text('logout'),
+                        style: const TextStyle(
                           color: Color(0xFFDD3344),
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
