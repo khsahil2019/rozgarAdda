@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:rojgar/localization/app_localizations.dart';
+import 'package:rojgar/services/api_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'services/storage_service.dart';
+
+const String _applyJobEndpoint = 'https://rozgaradda.com/api/apply-job';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────
 class AppColors {
@@ -44,14 +51,141 @@ class JobApplicationApp extends StatelessWidget {
 }
 
 class JobApplicationScreen extends StatefulWidget {
-  const JobApplicationScreen({super.key});
+  final int jobId;
+  final String jobTitle;
+
+  const JobApplicationScreen({
+    super.key,
+    this.jobId = 1,
+    this.jobTitle = 'Senior Product Designer',
+  });
 
   @override
   State<JobApplicationScreen> createState() => _JobApplicationScreenState();
 }
 
 class _JobApplicationScreenState extends State<JobApplicationScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _firstNameCtrl = TextEditingController();
+  final _lastNameCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
+  final _experienceYearsCtrl = TextEditingController();
+  final _experienceMonthsCtrl = TextEditingController();
+  final _expectedSalaryCtrl = TextEditingController();
+  final _noticePeriodCtrl = TextEditingController();
+  final _educationLevelCtrl = TextEditingController();
+  final _educationDetailsCtrl = TextEditingController();
+  final _keySkillsCtrl = TextEditingController();
+
+  PlatformFile? _resumeFile;
   bool _agreed = false;
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _firstNameCtrl.dispose();
+    _lastNameCtrl.dispose();
+    _emailCtrl.dispose();
+    _phoneCtrl.dispose();
+    _experienceYearsCtrl.dispose();
+    _experienceMonthsCtrl.dispose();
+    _expectedSalaryCtrl.dispose();
+    _noticePeriodCtrl.dispose();
+    _educationLevelCtrl.dispose();
+    _educationDetailsCtrl.dispose();
+    _keySkillsCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickResume() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['pdf', 'doc', 'docx'],
+      withData: false,
+    );
+
+    if (result == null || result.files.isEmpty) return;
+    final file = result.files.single;
+    if (file.path == null || file.path!.isEmpty) {
+      _showSnackBar('Unable to read selected file.', isError: true);
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      _showSnackBar('Resume must be under 10MB.', isError: true);
+      return;
+    }
+    setState(() => _resumeFile = file);
+  }
+
+  Future<void> _submitApplication() async {
+    final _pref = await SharedPreferences.getInstance();
+    if (!_formKey.currentState!.validate()) return;
+    if (_resumeFile?.path == null) {
+      _showSnackBar('Please upload your resume.', isError: true);
+      return;
+    }
+    if (!_agreed) {
+      _showSnackBar('Please accept terms to continue.', isError: true);
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString(StorageService.keyAccessToken);
+
+      if (token == null || token.isEmpty) {
+        _showSnackBar(
+          'Login token not found. Please login again.',
+          isError: true,
+        );
+        return;
+      }
+
+      final fullName =
+          '${_firstNameCtrl.text.trim()} ${_lastNameCtrl.text.trim()}'.trim();
+
+      await ApiService.uploadFiles(
+        method: 'POST',
+        url: '$_applyJobEndpoint/${widget.jobId}',
+        accessToken: token,
+        fields: {
+          'full_name': fullName,
+          'email': _emailCtrl.text.trim(),
+          'phone': _phoneCtrl.text.trim(),
+          'experience_years': _experienceYearsCtrl.text.trim(),
+          'experience_months': _experienceMonthsCtrl.text.trim(),
+          'expected_salary': _expectedSalaryCtrl.text.trim(),
+          'notice_period': _noticePeriodCtrl.text.trim().toString(),
+          'education_level': _educationLevelCtrl.text.trim(),
+          'education_details': _educationDetailsCtrl.text.trim(),
+          'key_skills': _keySkillsCtrl.text.trim(),
+        },
+        files: {'resume': _resumeFile!.path!},
+      );
+
+      if (!mounted) return;
+      _showSnackBar('Application submitted successfully.');
+      Navigator.maybePop(context);
+    } catch (e) {
+      if (!mounted) return;
+      _showSnackBar(e.toString(), isError: true);
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  void _showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : AppColors.primaryBlue,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,69 +201,111 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 24),
-                  _buildProgressSection(l10n),
-                  const SizedBox(height: 32),
-                  _buildSectionTitle(
-                    Icons.person_outline_rounded,
-                    l10n.text('apply_personal_info'),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildLabeledField(
-                    l10n.text('apply_first_name'),
-                    'John',
-                  ),
-                  const SizedBox(height: 16),
-                  _buildLabeledField(
-                    l10n.text('apply_last_name'),
-                    'Doe',
-                  ),
-                  const SizedBox(height: 16),
-                  _buildLabeledField(
-                    l10n.text('apply_email'),
-                    'john.doe@example.com',
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 32),
-                  _buildSectionTitle(
-                    Icons.work_outline_rounded,
-                    l10n.text('apply_professional_details'),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildLabeledField(
-                    l10n.text('apply_current_position'),
-                    'UI/UX Designer',
-                  ),
-                  const SizedBox(height: 16),
-                  _buildLabeledField(
-                    l10n.text('apply_linkedin'),
-                    'linkedin.com/in/username',
-                  ),
-                  const SizedBox(height: 32),
-                  _buildSectionTitle(
-                    Icons.upload_file_outlined,
-                    l10n.text('apply_resume_upload'),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildUploadBox(),
-                  const SizedBox(height: 32),
-                  _buildSectionTitle(
-                    Icons.edit_note_rounded,
-                    l10n.text('apply_why_hire'),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextArea(l10n),
-                  const SizedBox(height: 28),
-                  _buildAgreementRow(l10n),
-                  const SizedBox(height: 24),
-                  _buildSubmitButton(l10n),
-                  const SizedBox(height: 28),
-                  _buildFooter(l10n),
-                  SizedBox(height: bottomPad + 16),
-                ],
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 24),
+                    _buildProgressSection(l10n),
+                    const SizedBox(height: 32),
+                    _buildSectionTitle(
+                      Icons.person_outline_rounded,
+                      l10n.text('apply_personal_info'),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildLabeledField(
+                      l10n.text('apply_first_name'),
+                      'John',
+                      controller: _firstNameCtrl,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildLabeledField(
+                      l10n.text('apply_last_name'),
+                      'Doe',
+                      controller: _lastNameCtrl,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildLabeledField(
+                      l10n.text('apply_email'),
+                      'john.doe@example.com',
+                      controller: _emailCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildLabeledField(
+                      'Phone',
+                      '9876543210',
+                      controller: _phoneCtrl,
+                      keyboardType: TextInputType.phone,
+                    ),
+                    const SizedBox(height: 32),
+                    _buildSectionTitle(
+                      Icons.work_outline_rounded,
+                      l10n.text('apply_professional_details'),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildLabeledField(
+                      'Experience Years',
+                      '2',
+                      controller: _experienceYearsCtrl,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildLabeledField(
+                      'Experience Months',
+                      '6',
+                      controller: _experienceMonthsCtrl,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildLabeledField(
+                      'Expected Salary',
+                      '35000',
+                      controller: _expectedSalaryCtrl,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildLabeledField(
+                      'Notice Period',
+                      '30days',
+                      controller: _noticePeriodCtrl,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildLabeledField(
+                      'Education Level',
+                      'B.Tech',
+                      controller: _educationLevelCtrl,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildTextArea(
+                      label: 'Education Details',
+                      hint:
+                          'B.Tech in Computer Science from Rajasthan University',
+                      controller: _educationDetailsCtrl,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildTextArea(
+                      label: 'Key Skills',
+                      hint: 'Laravel, PHP, MySQL, JavaScript, jQuery',
+                      controller: _keySkillsCtrl,
+                    ),
+                    const SizedBox(height: 32),
+                    _buildSectionTitle(
+                      Icons.upload_file_outlined,
+                      l10n.text('apply_resume_upload'),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildUploadBox(),
+                    const SizedBox(height: 12),
+                    _buildAgreementRow(l10n),
+                    const SizedBox(height: 24),
+                    _buildSubmitButton(l10n),
+                    const SizedBox(height: 28),
+                    _buildFooter(l10n),
+                    SizedBox(height: bottomPad + 16),
+                  ],
+                ),
               ),
             ),
           ),
@@ -144,16 +320,21 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
       padding: EdgeInsets.fromLTRB(16, topPad + 12, 16, 14),
       child: Row(
         children: [
-          const Icon(
-            Icons.arrow_back_rounded,
-            size: 22,
-            color: AppColors.darkText,
+          IconButton(
+            onPressed: () => Navigator.maybePop(context),
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              size: 22,
+              color: AppColors.darkText,
+            ),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Senior Product Designer',
-              style: TextStyle(
+              widget.jobTitle,
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: AppColors.darkText,
@@ -247,6 +428,7 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
   Widget _buildLabeledField(
     String label,
     String hint, {
+    required TextEditingController controller,
     TextInputType keyboardType = TextInputType.text,
   }) {
     return Column(
@@ -274,9 +456,22 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
               ),
             ],
           ),
-          child: TextField(
+          child: TextFormField(
+            controller: controller,
             keyboardType: keyboardType,
             style: const TextStyle(fontSize: 14, color: AppColors.darkText),
+            validator: (value) {
+              if ((value ?? '').trim().isEmpty) {
+                return 'Required';
+              }
+              if (keyboardType == TextInputType.emailAddress &&
+                  !RegExp(
+                    r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                  ).hasMatch(value!.trim())) {
+                return 'Enter a valid email';
+              }
+              return null;
+            },
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: const TextStyle(
@@ -296,82 +491,113 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
   }
 
   Widget _buildUploadBox() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
-      decoration: BoxDecoration(
-        color: AppColors.uploadBg,
+    final fileName = _resumeFile?.name;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: _pickResume,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: AppColors.uploadBorder,
-          width: 1.5,
-          // Flutter doesn't natively support dashed borders, so we use a solid
-          // light border which closely matches the reference's dashed effect.
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
+          decoration: BoxDecoration(
+            color: AppColors.uploadBg,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: _resumeFile == null
+                  ? AppColors.uploadBorder
+                  : AppColors.primaryBlue,
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.uploadIconBg,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.cloud_upload_outlined,
+                  color: AppColors.primaryBlue,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                fileName ?? 'Click to upload resume',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.darkText,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                fileName == null
+                    ? 'PDF, DOC, DOCX up to 10MB'
+                    : 'Tap to change file',
+                style: const TextStyle(fontSize: 12, color: AppColors.greyText),
+              ),
+            ],
+          ),
         ),
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: AppColors.uploadIconBg,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.cloud_upload_outlined,
-              color: AppColors.primaryBlue,
-              size: 28,
-            ),
-          ),
-          const SizedBox(height: 14),
-          const Text(
-            'Click to upload or drag and drop',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: AppColors.darkText,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'PDF, DOCX up to 10MB',
-            style: TextStyle(fontSize: 12, color: AppColors.greyText),
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildTextArea(AppLocalizations l10n) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.inputBorder, width: 1.2),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 6,
-            offset: Offset(0, 2),
+  Widget _buildTextArea({
+    required String label,
+    required String hint,
+    required TextEditingController controller,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.darkText,
           ),
-        ],
-      ),
-      child: TextField(
-        maxLines: 5,
-        style: const TextStyle(fontSize: 14, color: AppColors.darkText),
-        decoration: InputDecoration(
-          hintText: l10n.text('apply_why_hire_hint'),
-          hintStyle: const TextStyle(
-            color: AppColors.greyText,
-            fontSize: 14,
-            height: 1.5,
-          ),
-          contentPadding: const EdgeInsets.all(16),
-          border: InputBorder.none,
         ),
-      ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.inputBorder, width: 1.2),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.cardShadow,
+                blurRadius: 6,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: TextFormField(
+            controller: controller,
+            maxLines: 4,
+            style: const TextStyle(fontSize: 14, color: AppColors.darkText),
+            validator: (value) =>
+                (value ?? '').trim().isEmpty ? 'Required' : null,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: const TextStyle(
+                color: AppColors.greyText,
+                fontSize: 14,
+                height: 1.5,
+              ),
+              contentPadding: const EdgeInsets.all(16),
+              border: InputBorder.none,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -438,7 +664,7 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryBlue.withOpacity(0.35),
+            color: AppColors.primaryBlue.withValues(alpha: 0.35),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -448,25 +674,36 @@ class _JobApplicationScreenState extends State<JobApplicationScreen> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(30),
-          onTap: () {},
+          onTap: _isSubmitting ? null : _submitApplication,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                l10n.text('apply_submit'),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  letterSpacing: 0.3,
+              if (_isSubmitting)
+                const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.4,
+                    color: Colors.white,
+                  ),
+                )
+              else ...[
+                Text(
+                  l10n.text('apply_submit'),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: 0.3,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              const Icon(
-                Icons.arrow_forward_rounded,
-                color: Color(0xFFFFCC00),
-                size: 20,
-              ),
+                const SizedBox(width: 10),
+                const Icon(
+                  Icons.arrow_forward_rounded,
+                  color: Color(0xFFFFCC00),
+                  size: 20,
+                ),
+              ],
             ],
           ),
         ),

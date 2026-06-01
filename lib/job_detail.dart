@@ -39,7 +39,22 @@ class JobDetailApp extends StatelessWidget {
 }
 
 class JobDetailScreen extends StatelessWidget {
-  const JobDetailScreen({super.key});
+  final int jobId;
+  final String jobTitle;
+  final String company;
+  final String location;
+  final String salary;
+  final String jobType;
+
+  const JobDetailScreen({
+    super.key,
+    this.jobId = 1,
+    this.jobTitle = 'Senior Product Designer',
+    this.company = 'TechFlow Inc.',
+    this.location = 'San Francisco, CA (Remote Friendly)',
+    this.salary = '\$140k - \$180k',
+    this.jobType = 'Full-time',
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +94,8 @@ class JobDetailScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const JobApplicationScreen(),
+                builder: (context) =>
+                    JobApplicationScreen(jobId: jobId, jobTitle: jobTitle),
               ),
             );
           }),
@@ -144,9 +160,9 @@ class JobDetailScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         // Job title
-        const Text(
-          'Senior Product Designer',
-          style: TextStyle(
+        Text(
+          jobTitle,
+          style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w800,
             color: AppColors.titleBlue,
@@ -156,16 +172,16 @@ class JobDetailScreen extends StatelessWidget {
         const SizedBox(height: 6),
         // Company + type
         Row(
-          children: const [
+          children: [
             Text(
-              'TechFlow Inc.',
-              style: TextStyle(
+              company,
+              style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.greyText,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.symmetric(horizontal: 6),
               child: Text(
                 '·',
@@ -173,8 +189,8 @@ class JobDetailScreen extends StatelessWidget {
               ),
             ),
             Text(
-              'Full-time',
-              style: TextStyle(
+              jobType,
+              style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.greyText,
                 fontWeight: FontWeight.w500,
@@ -185,16 +201,18 @@ class JobDetailScreen extends StatelessWidget {
         const SizedBox(height: 8),
         // Location
         Row(
-          children: const [
-            Icon(
+          children: [
+            const Icon(
               Icons.location_on_outlined,
               size: 15,
               color: AppColors.locationPin,
             ),
-            SizedBox(width: 4),
-            Text(
-              'San Francisco, CA (Remote Friendly)',
-              style: TextStyle(fontSize: 13, color: AppColors.greyText),
+            const SizedBox(width: 4),
+            Expanded(
+              child: Text(
+                location,
+                style: const TextStyle(fontSize: 13, color: AppColors.greyText),
+              ),
             ),
           ],
         ),
@@ -205,7 +223,7 @@ class JobDetailScreen extends StatelessWidget {
   Widget _buildInfoCards() {
     return Column(
       children: [
-        _infoCard('ANNUAL SALARY', '\$140k - \$180k', isBlue: true),
+        _infoCard('ANNUAL SALARY', salary, isBlue: true),
         const SizedBox(height: 12),
         _infoCard('EXPERIENCE', '5+ years', isBlue: false),
         const SizedBox(height: 12),
@@ -482,7 +500,7 @@ class _MapPainter extends CustomPainter {
 
     // Road grid lines
     final road = Paint()
-      ..color = Colors.white.withOpacity(0.25)
+      ..color = Colors.white.withValues(alpha: 0.25)
       ..strokeWidth = 1.2
       ..style = PaintingStyle.stroke;
 
@@ -497,7 +515,7 @@ class _MapPainter extends CustomPainter {
 
     // Highlight main roads
     final mainRoad = Paint()
-      ..color = Colors.white.withOpacity(0.5)
+      ..color = Colors.white.withValues(alpha: 0.5)
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke;
 
@@ -514,7 +532,7 @@ class _MapPainter extends CustomPainter {
 
     // City blocks (rectangles)
     final block = Paint()
-      ..color = Colors.white.withOpacity(0.12)
+      ..color = Colors.white.withValues(alpha: 0.12)
       ..style = PaintingStyle.fill;
 
     final blockPositions = [
@@ -537,7 +555,7 @@ class _MapPainter extends CustomPainter {
     final cx = size.width * 0.45;
     final cy = size.height * 0.6;
 
-    final pinShadow = Paint()..color = Colors.black.withOpacity(0.2);
+    final pinShadow = Paint()..color = Colors.black.withValues(alpha: 0.2);
     canvas.drawCircle(
       Offset(cx, cy + 18),
       10,

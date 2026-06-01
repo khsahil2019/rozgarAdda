@@ -787,7 +787,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: AC.primaryBlue.withOpacity(0.1),
+              color: AC.primaryBlue.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -938,7 +938,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
                 (_isRegistrationEnabled
                         ? AC.primaryBlue
                         : const Color(0xFFB8BCCD))
-                    .withOpacity(0.35),
+                    .withValues(alpha: 0.35),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -1054,6 +1054,15 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
           if (candidateId != null) {
             await prefs.setInt('candidate_id', candidateId);
           }
+          final dynamic rawToken =
+              json['token'] ??
+              json['access_token'] ??
+              json['auth_token'] ??
+              json['data']?['token'] ??
+              json['data']?['access_token'];
+          if (rawToken != null && rawToken.toString().isNotEmpty) {
+            await prefs.setString('access_token', rawToken.toString());
+          }
 
           if (!mounted) return;
           if (mounted) {
@@ -1092,7 +1101,6 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
       ),
     );
   }
-
 }
 
 class _DropdownItem {

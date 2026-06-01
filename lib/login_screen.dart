@@ -119,6 +119,15 @@ class _LoginScreenState extends State<LoginScreen> {
             if (candidateId != null) {
               await prefs.setInt('candidate_id', candidateId);
             }
+            final dynamic rawToken =
+                json['token'] ??
+                json['access_token'] ??
+                json['auth_token'] ??
+                json['data']?['token'] ??
+                json['data']?['access_token'];
+            if (rawToken != null && rawToken.toString().isNotEmpty) {
+              await prefs.setString('access_token', rawToken.toString());
+            }
           } catch (_) {
             // Ignore persistence errors and continue navigation
           }
@@ -331,20 +340,27 @@ class _LoginScreenState extends State<LoginScreen> {
               Row(
                 children: [
                   GestureDetector(
-                    onTap: () => setState(() => _acceptedTerms = !_acceptedTerms),
+                    onTap: () =>
+                        setState(() => _acceptedTerms = !_acceptedTerms),
                     child: Container(
                       width: 22,
                       height: 22,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _acceptedTerms ? primaryBlue : Colors.transparent,
+                        color: _acceptedTerms
+                            ? primaryBlue
+                            : Colors.transparent,
                         border: Border.all(
                           color: _acceptedTerms ? primaryBlue : greyText,
                           width: 1.5,
                         ),
                       ),
                       child: _acceptedTerms
-                          ? const Icon(Icons.check, size: 14, color: Colors.white)
+                          ? const Icon(
+                              Icons.check,
+                              size: 14,
+                              color: Colors.white,
+                            )
                           : null,
                     ),
                   ),
