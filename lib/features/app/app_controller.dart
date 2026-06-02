@@ -1,12 +1,13 @@
-// features/app/controllers/app_controller.dart
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rojgar/features/app/entity/user_entiity.dart';
+import 'package:rojgar/features/auth/data/data_source/model/auth_response.dart';
+import 'package:rojgar/services/storage_service.dart';
 
 class AppController extends GetxController {
   static AppController get to => Get.find();
+
+  final StorageService _storageService = Get.find<StorageService>();
 
   final _isLoggedIn = false.obs;
   final _user = Rxn<UserEntity>();
@@ -21,37 +22,52 @@ class AppController extends GetxController {
     if (rxLocale.value == newLocale) return;
     rxLocale.value = newLocale;
     Get.updateLocale(newLocale);
+    _storageService.saveLanguageCode(newLocale.languageCode);
   }
 
   @override
   void onInit() {
     super.onInit();
     _loadSavedLocale();
+    _checkLoginState();
   }
 
-  Future<void> _loadSavedLocale() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final savedCode = prefs.getString('language_code') ?? 'en';
-      rxLocale.value = Locale(savedCode);
-    } catch (_) {
-      // ignore preferences read error
+  void _loadSavedLocale() {
+    final savedCode = _storageService.getLanguageCode() ?? 'en';
+    rxLocale.value = Locale(savedCode);
+  }
+
+  void _checkLoginState() {
+    final candidateId = _storageService.getCandidateId();
+    final token = _storageService.getAccessToken();
+    if (candidateId != null && token != null) {
+      _isLoggedIn.value = true;
+      _user.value = UserEntity(
+        id: candidateId,
+        username: '',
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+        state: '',
+        country: '',
+        zipCode: '',
+        profileImage: '',
+      );
     }
   }
 
-  // void setUser(UserEntity user) {
-  //   _user.value = user;
-  //   _isLoggedIn.value = true;
-  // }
+  void login(AuthResponse authResponse) {
+    _storageService.saveCandidateId(authResponse.id);
+    _storageService.saveAccessToken(authResponse.token);
+    _isLoggedIn.value = true;
+    _user.value = authResponse.user.toEntity();
+  }
 
-  // void clearUser() {
-  //   _user.value = null;
-  //   _isLoggedIn.value = false;
-  // }
-
-  // void _checkSession() {
-  //   // check token from storage
-  //   final token = GetStorage().read('token');
-  //   if (token != null) _isLoggedIn.value = true;
-  // }
+  void logout() {
+    _storageService.clear();
+    _isLoggedIn.value = false;
+    _user.value = null;
+  }
 }

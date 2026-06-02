@@ -418,11 +418,17 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
                       ),
                     )
                   else
-                    ListView.separated(
+                    GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: filteredStates.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                            childAspectRatio: 0.85,
+                          ),
                       itemBuilder: (context, index) {
                         final state = filteredStates[index];
                         final selected = state.id == _selectedStateId;
@@ -505,8 +511,9 @@ Future<void> _showLanguageDialogAndContinue(
 ) async {
   final l10n = context.l10n;
   final currentCode = Localizations.localeOf(context).languageCode;
-  String selectedCode =
-      (currentCode == 'hi' || currentCode == 'mr') ? currentCode : 'en';
+  String selectedCode = (currentCode == 'hi' || currentCode == 'mr')
+      ? currentCode
+      : 'en';
 
   await showDialog<void>(
     context: context,
@@ -596,6 +603,37 @@ Future<void> _showLanguageDialogAndContinue(
 // ─────────────────────────────────────────────
 // STATE CARD
 // ─────────────────────────────────────────────
+class LandmarkData {
+  final String stateKey;
+  final Color skyColor;
+
+  const LandmarkData({required this.stateKey, required this.skyColor});
+}
+
+LandmarkData _getLandmarkData(String stateName) {
+  final name = stateName.toLowerCase();
+  if (name.contains('uttar pradesh')) {
+    return const LandmarkData(stateKey: 'taj', skyColor: Color(0xFF87CEEB));
+  } else if (name.contains('maharashtra')) {
+    return const LandmarkData(stateKey: 'gateway', skyColor: Color(0xFF6B9BD2));
+  } else if (name.contains('bihar')) {
+    return const LandmarkData(stateKey: 'nalanda', skyColor: Color(0xFFC8860A));
+  } else if (name.contains('rajasthan')) {
+    return const LandmarkData(stateKey: 'hawa', skyColor: Color(0xFFE8A95C));
+  } else if (name.contains('west bengal')) {
+    return const LandmarkData(
+      stateKey: 'victoria',
+      skyColor: Color(0xFF4A8C5C),
+    );
+  } else if (name.contains('madhya pradesh')) {
+    return const LandmarkData(
+      stateKey: 'khajuraho',
+      skyColor: Color(0xFF8B6914),
+    );
+  }
+  return const LandmarkData(stateKey: 'gateway', skyColor: Color(0xFF6B9BD2));
+}
+
 class _StateCard extends StatelessWidget {
   final ApiState state;
   final bool selected;
@@ -604,98 +642,127 @@ class _StateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lData = _getLandmarkData(state.name);
+
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      height: 80,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      transform: Matrix4.diagonal3Values(
+        selected ? 1.03 : 1.0,
+        selected ? 1.03 : 1.0,
+        1.0,
+      ),
+      transformAlignment: Alignment.center,
       decoration: BoxDecoration(
         color: AC.cardBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: selected ? AC.yellow : AC.lightGrey,
-          width: selected ? 2.5 : 1.2,
+          color: selected ? AC.primaryBlue : AC.lightGrey,
+          width: selected ? 2.2 : 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: selected
+                ? AC.primaryBlue.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.04),
+            blurRadius: selected ? 16 : 8,
+            offset: selected ? const Offset(0, 6) : const Offset(0, 2),
           ),
         ],
       ),
-      child: Row(
+      child: Stack(
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.horizontal(
-              left: Radius.circular(16),
-            ),
-            child: SizedBox(
-              width: 80,
-              height: 80,
-              child: state.imageUrl.isEmpty
-                  ? const _LandmarkIllustration(
-                      stateKey: 'taj',
-                      skyColor: AC.primaryBlue,
-                    )
-                  : Image.network(
-                      state.imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const _LandmarkIllustration(
-                          stateKey: 'gateway',
-                          skyColor: AC.primaryBlue,
-                        );
-                      },
-                    ),
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    state.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AC.darkText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(14),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    state.language,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AC.hindiBlue,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: Container(
+                    color: lData.skyColor.withValues(alpha: 0.2),
+                    child: state.imageUrl.isEmpty
+                        ? _LandmarkIllustration(
+                            stateKey: lData.stateKey,
+                            skyColor: lData.skyColor,
+                          )
+                        : Image.network(
+                            state.imageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return _LandmarkIllustration(
+                                stateKey: lData.stateKey,
+                                skyColor: lData.skyColor,
+                              );
+                            },
+                          ),
                   ),
-                ],
+                ),
               ),
-            ),
+              Container(height: 1.0, color: AC.lightGrey.withValues(alpha: 0.6)),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      state.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AC.darkText,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      state.language,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AC.hindiBlue,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: selected ? 1 : 0,
+          Positioned(
+            top: 8,
+            right: 8,
+            child: AnimatedScale(
+              scale: selected ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutBack,
               child: Container(
-                width: 28,
-                height: 28,
-                decoration: const BoxDecoration(
-                  color: AC.yellow,
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: AC.primaryBlue,
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AC.primaryBlue.withValues(alpha: 0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: const Icon(
                   Icons.check_rounded,
                   color: Colors.white,
-                  size: 18,
+                  size: 15,
                 ),
               ),
             ),
@@ -749,19 +816,21 @@ class _LandmarkPainter extends CustomPainter {
       case 'gateway':
         _drawGateway(canvas, size);
         break;
-      // Currently unused on this page.
-      // case 'nalanda':
-      //   _drawNalanda(canvas, size);
-      //   break;
-      // case 'hawa':
-      //   _drawHawa(canvas, size);
-      //   break;
-      // case 'victoria':
-      //   _drawVictoria(canvas, size);
-      //   break;
-      // case 'khajuraho':
-      //   _drawKhajuraho(canvas, size);
-      //   break;
+      case 'nalanda':
+        _drawNalanda(canvas, size);
+        break;
+      case 'hawa':
+        _drawHawa(canvas, size);
+        break;
+      case 'victoria':
+        _drawVictoria(canvas, size);
+        break;
+      case 'khajuraho':
+        _drawKhajuraho(canvas, size);
+        break;
+      default:
+        _drawGateway(canvas, size);
+        break;
     }
   }
 
@@ -930,9 +999,7 @@ class _LandmarkPainter extends CustomPainter {
     }
   }
 
-  /*
   // ── NALANDA (Bihar) ──
-  // Currently unused on this page.
   void _drawNalanda(Canvas canvas, Size s) {
     final brick = Paint()..color = const Color(0xFFB5651D);
     final dark = Paint()..color = const Color(0xFF8B4513);
@@ -998,11 +1065,8 @@ class _LandmarkPainter extends CustomPainter {
       dark,
     );
   }
-  */
 
-  /*
   // ── HAWA MAHAL (Rajasthan) ──
-  // Currently unused on this page.
   void _drawHawa(Canvas canvas, Size s) {
     final pink = Paint()..color = const Color(0xFFE8836A);
     final dark = Paint()..color = const Color(0xFFC0603A);
@@ -1067,11 +1131,8 @@ class _LandmarkPainter extends CustomPainter {
       canvas.drawPath(kp, dark);
     }
   }
-  */
 
-  /*
   // ── VICTORIA MEMORIAL (West Bengal) ──
-  // Currently unused on this page.
   void _drawVictoria(Canvas canvas, Size s) {
     final white = Paint()..color = const Color(0xFFF8F4EC);
     final grey = Paint()..color = const Color(0xFFD0C8B8);
@@ -1167,11 +1228,8 @@ class _LandmarkPainter extends CustomPainter {
       );
     }
   }
-  */
 
-  /*
   // ── KHAJURAHO (MP) ──
-  // Currently unused on this page.
   void _drawKhajuraho(Canvas canvas, Size s) {
     final sand = Paint()..color = const Color(0xFFD4AA70);
     final dark = Paint()..color = const Color(0xFF8B6914);
@@ -1238,7 +1296,6 @@ class _LandmarkPainter extends CustomPainter {
       dark,
     );
   }
-  */
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;

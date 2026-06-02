@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:rojgar/localization/app_localizations.dart';
-import 'package:rojgar/login_screen.dart';
+import 'package:rojgar/features/auth/presentation/screens/login_screen.dart';
 import 'package:rojgar/news_screen.dart';
-import 'package:rojgar/ragistartion_screen.dart';
+import 'package:rojgar/features/auth/presentation/screens/registration_screen.dart';
 import 'package:rojgar/floating_navbar.dart';
 import 'package:rojgar/modules/product_screens/product_screen_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,7 +20,6 @@ class _SplashScreenState extends State<SplashScreen> {
   static const Color whiteColor = Colors.white;
   static const Color lightWhite = Color(0xAAFFFFFF);
   static const Color innerBlue = Color(0xFF1400EE);
-  static const Color progressBg = Color(0xFF3333CC);
 
   Future<bool> _isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
@@ -76,42 +75,21 @@ class _SplashScreenState extends State<SplashScreen> {
                     clipBehavior: Clip.none,
                     children: [
                       // White outer rounded square
-                      Container(
-                        width: logoSize + 20,
-                        height: logoSize + 20,
-                        decoration: BoxDecoration(
-                          color: whiteColor,
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              blurRadius: 20,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: innerBlue,
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.work_rounded,
-                                color: yellowColor,
-                                size: logoSize * 0.45,
-                              ),
-                            ),
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: innerBlue,
+                            borderRadius: BorderRadius.circular(18),
                           ),
+                          child: Image.asset('assets/icons/logo.png'),
                         ),
                       ),
 
                       // Lightning badge bottom-right
                       Positioned(
-                        bottom: 0,
-                        right: 0,
+                        bottom: 5,
+                        right: 20,
                         child: Container(
                           width: 44,
                           height: 44,

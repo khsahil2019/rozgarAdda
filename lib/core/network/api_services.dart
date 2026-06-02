@@ -15,8 +15,12 @@ class ApiService {
     ),
   );
 
-  /// Configure base URL and interceptors
-  static void configure({String? baseUrl, List<Interceptor>? interceptors}) {
+  /// Configure base URL, interceptors, and HTTP client adapter
+  static void configure({
+    String? baseUrl,
+    List<Interceptor>? interceptors,
+    HttpClientAdapter? adapter,
+  }) {
     if (baseUrl != null) {
       _dio.options.baseUrl = baseUrl;
     }
@@ -25,10 +29,9 @@ class ApiService {
       _dio.interceptors.addAll(interceptors);
     }
 
-    // // Add logging interceptor in debug mode
-    // _dio.interceptors.add(
-    //   LogInterceptor(requestBody: true, responseBody: true, error: true),
-    // );
+    if (adapter != null) {
+      _dio.httpClientAdapter = adapter;
+    }
   }
 
   /// Make HTTP request with proper error handling
@@ -60,9 +63,11 @@ class ApiService {
       );
 
       if (response.data is Map<String, dynamic>) {
-        return response.data as Map<String, dynamic>;
+        final data = Map<String, dynamic>.from(response.data as Map);
+        data['statusCode'] = response.statusCode;
+        return data;
       } else {
-        return {'data': response.data};
+        return {'data': response.data, "statusCode": response.statusCode};
       }
     } on DioException catch (e) {
       throw _handleDioError(e);
@@ -119,9 +124,11 @@ class ApiService {
       );
 
       if (response.data is Map<String, dynamic>) {
-        return response.data as Map<String, dynamic>;
+        final data = Map<String, dynamic>.from(response.data as Map);
+        data['statusCode'] = response.statusCode;
+        return data;
       } else {
-        return {'data': response.data};
+        return {'data': response.data, "statusCode": response.statusCode};
       }
     } on DioException catch (e) {
       throw _handleDioError(e);

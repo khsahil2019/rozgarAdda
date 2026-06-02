@@ -2,6 +2,7 @@
 import 'package:get/get.dart';
 
 import '../../features/app/app_controller.dart';
+import '../../features/auth/presentation/bindings/auth_binding.dart';
 import '../../features/auth/presentation/controller/auth_controller.dart';
 
 class InitialBinding extends Bindings {
@@ -9,7 +10,12 @@ class InitialBinding extends Bindings {
   void dependencies() {
     // Always alive — global controllers
     Get.put(AppController(), permanent: true);
-    Get.put(AuthController(), permanent: true);
+
+    // Reuse AuthBinding to register auth dependencies lazily
+    AuthBinding().dependencies();
+
+    // Promote AuthController to permanent
+    Get.put<AuthController>(Get.find<AuthController>(), permanent: true);
   }
 }
 

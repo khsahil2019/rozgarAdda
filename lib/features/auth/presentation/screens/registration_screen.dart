@@ -1,0 +1,956 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:rojgar/core/exceptions/exceptions.dart';
+import 'package:rojgar/core/theme/theme.extension.dart';
+import 'package:rojgar/localization/app_localizations.dart';
+import 'package:rojgar/features/auth/presentation/controller/register_controller.dart';
+import 'package:rojgar/dashboard_screen.dart';
+
+// ─────────────────────────────────────────────
+// MAIN SCREEN
+// ─────────────────────────────────────────────
+class RegistrationFormScreen extends GetView<RegisterController> {
+  const RegistrationFormScreen({super.key});
+
+  Future<void> _submitRegistration(BuildContext context) async {
+    final l10n = context.l10n;
+    final fullName = controller.fullName.value.trim();
+    final phone = controller.phone.value.trim();
+    final email = controller.email.value.trim();
+    final username = controller.username.value.trim();
+    final password = controller.password.value;
+    final locality = controller.locality.value.trim();
+    final pincode = controller.pincode.value.trim();
+    final address = controller.address.value.trim();
+
+    if (fullName.isEmpty ||
+        phone.isEmpty ||
+        email.isEmpty ||
+        username.isEmpty ||
+        password.isEmpty ||
+        locality.isEmpty ||
+        pincode.isEmpty ||
+        address.isEmpty) {
+      _showMessage(context, l10n.text('registration_error_fields'));
+      return;
+    }
+
+    if (controller.selectedStateId.value == null) {
+      _showMessage(context, l10n.text('registration_error_state'));
+      return;
+    }
+
+    if (controller.selectedDistrictId.value == null) {
+      _showMessage(context, l10n.text('registration_error_district'));
+      return;
+    }
+    if (!controller.acceptedTerms.value) {
+      _showMessage(context, l10n.text('registration_error_terms'));
+      return;
+    }
+
+    try {
+      await controller.register();
+      if (!context.mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => HomeScreen(successMessage: email)),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      final errorMessage = e is Failure
+          ? e.message
+          : 'Something went wrong. Please try again.';
+      _showMessage(context, errorMessage);
+    }
+  }
+
+  void _showMessage(
+    BuildContext context,
+    String message, {
+    bool isSuccess = false,
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isSuccess ? Colors.green : Colors.red,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = context.l10n;
+    final size = MediaQuery.of(context).size;
+    final hPad = size.width * 0.05;
+
+    return Scaffold(
+      backgroundColor: colors.background,
+      // ── AppBar ──────────────────────────────
+      appBar: AppBar(
+        backgroundColor: colors.brandColor,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
+        centerTitle: true,
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l10n.text('app_title'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                height: 1.2,
+              ),
+            ),
+            Text(
+              l10n.text('registration_join_tagline'),
+              style: const TextStyle(
+                color: Color(0xCCFFFFFF),
+                fontSize: 11,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // ── Progress bar row ───────────────
+            Container(
+              color: colors.surface,
+              padding: EdgeInsets.fromLTRB(hPad, 14, hPad, 14),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.text('registration_progress'),
+                        style: TextStyle(
+                          color: colors.textPrimary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 3,
+                        ),
+                        child: Text(
+                          l10n.text('registration_step'),
+                          style: TextStyle(
+                            color: colors.brandColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      height: 6,
+                      width: double.infinity,
+                      color: colors.divider,
+                      child: FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: 0.33,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: colors.warning,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: hPad),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ════════════════════════════
+                  // PERSONAL INFO
+                  // ════════════════════════════
+                  _sectionHeader(
+                    context,
+                    Icons.person_outline,
+                    l10n.text('registration_personal_info'),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Full Name
+                  _fieldLabel(context, l10n.text('registration_full_name')),
+                  const SizedBox(height: 6),
+                  _inputField(
+                    context,
+                    hint: l10n.text('registration_full_name_hint'),
+                    controller: controller.fullNameController,
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // Phone Number
+                  _fieldLabel(context, l10n.text('registration_phone_number')),
+                  const SizedBox(height: 6),
+                  _phoneField(context),
+
+                  const SizedBox(height: 10),
+
+                  // OTP Box
+                  _otpSection(context, size),
+
+                  const SizedBox(height: 14),
+
+                  // Email
+                  _fieldLabel(context, l10n.text('registration_email')),
+                  const SizedBox(height: 6),
+                  _inputField(
+                    context,
+                    hint: l10n.text('registration_email_hint'),
+                    keyboard: TextInputType.emailAddress,
+                    controller: controller.emailController,
+                  ),
+
+                  const SizedBox(height: 22),
+
+                  // ════════════════════════════
+                  // ADDRESS DETAILS
+                  // ════════════════════════════
+                  _sectionHeader(
+                    context,
+                    Icons.location_on_outlined,
+                    l10n.text('registration_address_details'),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // State + District
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _fieldLabel(
+                              context,
+                              l10n.text('registration_state'),
+                            ),
+                            const SizedBox(height: 6),
+                            _stateDropdown(context),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _fieldLabel(
+                              context,
+                              l10n.text('registration_district'),
+                            ),
+                            const SizedBox(height: 6),
+                            _districtDropdown(context),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // Area + Pincode
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _fieldLabel(
+                              context,
+                              l10n.text('registration_area'),
+                            ),
+                            const SizedBox(height: 6),
+                            _inputField(
+                              context,
+                              hint: l10n.text('registration_area_hint'),
+                              controller: controller.localityController,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _fieldLabel(
+                              context,
+                              l10n.text('registration_pincode'),
+                            ),
+                            const SizedBox(height: 6),
+                            _inputField(
+                              context,
+                              hint: l10n.text('registration_pincode_hint'),
+                              keyboard: TextInputType.number,
+                              controller: controller.pincodeController,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // Full Address
+                  _fieldLabel(context, l10n.text('registration_full_address')),
+                  const SizedBox(height: 6),
+                  _multilineField(
+                    context,
+                    l10n.text('registration_full_address_hint'),
+                    controller: controller.addressController,
+                  ),
+
+                  const SizedBox(height: 22),
+
+                  // ════════════════════════════
+                  // IDENTITY VERIFICATION
+                  // ════════════════════════════
+                  _sectionHeader(
+                    context,
+                    Icons.badge_outlined,
+                    l10n.text('registration_identity_verification'),
+                  ),
+                  const SizedBox(height: 14),
+
+                  _uploadBox(context),
+
+                  const SizedBox(height: 22),
+
+                  // ════════════════════════════
+                  // ACCOUNT CREDENTIALS
+                  // ════════════════════════════
+                  _sectionHeader(
+                    context,
+                    Icons.lock_outline_rounded,
+                    l10n.text('registration_account_credentials'),
+                  ),
+                  const SizedBox(height: 14),
+
+                  _fieldLabel(context, l10n.text('registration_username')),
+                  const SizedBox(height: 6),
+                  _inputField(
+                    context,
+                    hint: l10n.text('registration_username_hint'),
+                    controller: controller.usernameController,
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  _fieldLabel(context, l10n.text('registration_password')),
+                  const SizedBox(height: 6),
+                  _passwordField(context),
+
+                  const SizedBox(height: 16),
+
+                  // Terms checkbox
+                  _termsRow(context),
+
+                  const SizedBox(height: 20),
+
+                  // Create Account button
+                  _createAccountBtn(context),
+
+                  const SizedBox(height: 14),
+
+                  // Bottom login text
+                  Center(
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: l10n.text('registration_already_account'),
+                            style: TextStyle(
+                              color: colors.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
+                          TextSpan(
+                            text: l10n.text('registration_login'),
+                            style: TextStyle(
+                              color: colors.brandColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Helpers ─────────────────────────────────
+
+  Widget _sectionHeader(BuildContext context, IconData icon, String title) {
+    final colors = context.colors;
+    return Row(
+      children: [
+        Icon(icon, color: colors.brandColor, size: 20),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: TextStyle(
+            color: colors.brandColor,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _fieldLabel(BuildContext context, String label) {
+    final colors = context.colors;
+    return Text(
+      label,
+      style: TextStyle(
+        color: colors.textPrimary,
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
+  Widget _inputField(
+    BuildContext context, {
+    required String hint,
+    TextInputType keyboard = TextInputType.text,
+    Widget? suffix,
+    Widget? prefix,
+    TextEditingController? controller,
+  }) {
+    final colors = context.colors;
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.fieldBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.border, width: 1.2),
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboard,
+        style: TextStyle(color: colors.textPrimary, fontSize: 14),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(color: colors.textSecondary, fontSize: 14),
+          prefixIcon: prefix,
+          suffixIcon: suffix,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _phoneField(BuildContext context) {
+    final colors = context.colors;
+    final l10n = context.l10n;
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.fieldBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.border, width: 1.2),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              border: Border(
+                right: BorderSide(color: colors.border, width: 1.2),
+              ),
+            ),
+            child: Text(
+              '+91',
+              style: TextStyle(
+                color: colors.textPrimary,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Expanded(
+            child: TextField(
+              controller: controller.phoneController,
+              keyboardType: TextInputType.phone,
+              style: TextStyle(color: colors.textPrimary, fontSize: 14),
+              decoration: const InputDecoration(
+                hintText: '00000 00000',
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 14,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colors.warning,
+                foregroundColor: colors.textPrimary,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                l10n.text('registration_verify_otp'),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: colors.textPrimary,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _otpSection(BuildContext context, Size size) {
+    final colors = context.colors;
+    final l10n = context.l10n;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: colors.fieldBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.border, width: 1.2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.text('registration_otp_hint'),
+            style: TextStyle(
+              color: colors.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: List.generate(4, (i) {
+              return Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(right: i < 3 ? 10 : 0),
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: colors.border, width: 1.2),
+                  ),
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
+                    maxLength: 1,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: colors.textPrimary,
+                    ),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      counterText: '',
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _stateDropdown(BuildContext context) {
+    final colors = context.colors;
+    final l10n = context.l10n;
+    return Obx(
+      () => Container(
+        decoration: BoxDecoration(
+          color: colors.fieldBg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colors.border, width: 1.2),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<int>(
+            value: controller.selectedStateId.value,
+            isExpanded: true,
+            hint: Text(
+              controller.isStatesLoading.value
+                  ? 'Loading states...'
+                  : l10n.text('registration_select_state'),
+              style: TextStyle(color: colors.textSecondary, fontSize: 14),
+            ),
+            items: controller.states
+                .map(
+                  (state) => DropdownMenuItem<int>(
+                    value: state.id,
+                    child: Text(state.name, overflow: TextOverflow.ellipsis),
+                  ),
+                )
+                .toList(),
+            onChanged: controller.isStatesLoading.value
+                ? null
+                : (value) => controller.selectState(value),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _districtDropdown(BuildContext context) {
+    final colors = context.colors;
+    return Obx(
+      () => Container(
+        decoration: BoxDecoration(
+          color: colors.fieldBg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colors.border, width: 1.2),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<int>(
+            value: controller.selectedDistrictId.value,
+            isExpanded: true,
+            hint: Text(
+              controller.selectedStateId.value == null
+                  ? 'Select state first'
+                  : controller.isDistrictsLoading.value
+                  ? 'Loading districts...'
+                  : 'Select District',
+              style: TextStyle(color: colors.textSecondary, fontSize: 14),
+            ),
+            items: controller.districts
+                .map(
+                  (district) => DropdownMenuItem<int>(
+                    value: district.id,
+                    child: Text(district.name, overflow: TextOverflow.ellipsis),
+                  ),
+                )
+                .toList(),
+            onChanged:
+                (controller.selectedStateId.value == null ||
+                    controller.isDistrictsLoading.value)
+                ? null
+                : (value) => controller.selectDistrict(value),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _multilineField(
+    BuildContext context,
+    String hint, {
+    TextEditingController? controller,
+  }) {
+    final colors = context.colors;
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.fieldBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.border, width: 1.2),
+      ),
+      child: TextField(
+        controller: controller,
+        maxLines: 4,
+        style: TextStyle(color: colors.textPrimary, fontSize: 14),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(color: colors.textSecondary, fontSize: 14),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _uploadBox(BuildContext context) {
+    final colors = context.colors;
+    final l10n = context.l10n;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+      decoration: BoxDecoration(
+        color: colors.fieldBg,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: colors.brandColor, width: 1.5),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: colors.brandColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.cloud_upload_outlined,
+              color: colors.brandColor,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.text('registration_upload_title'),
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.text('registration_upload_hint'),
+            style: TextStyle(color: colors.textSecondary, fontSize: 12),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton(
+            onPressed: () {},
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: colors.brandColor, width: 1.5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+            ),
+            child: Text(
+              l10n.text('registration_choose_file'),
+              style: TextStyle(
+                color: colors.brandColor,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _passwordField(BuildContext context) {
+    final colors = context.colors;
+    final l10n = context.l10n;
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.fieldBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colors.border, width: 1.2),
+      ),
+      child: TextField(
+        controller: controller.passwordController,
+        obscureText: true,
+        style: TextStyle(color: colors.textPrimary, fontSize: 14),
+        decoration: InputDecoration(
+          hintText: l10n.text('registration_password_hint'),
+          hintStyle: TextStyle(color: colors.textSecondary, fontSize: 14),
+          suffixIcon: Icon(
+            Icons.remove_red_eye_outlined,
+            color: colors.textSecondary,
+            size: 20,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _termsRow(BuildContext context) {
+    final colors = context.colors;
+    final l10n = context.l10n;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: controller.toggleTermsAcceptance,
+          child: Obx(
+            () => Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: controller.acceptedTerms.value
+                    ? colors.brandColor
+                    : Colors.transparent,
+                border: Border.all(
+                  color: controller.acceptedTerms.value
+                      ? colors.brandColor
+                      : colors.textSecondary,
+                  width: 1.5,
+                ),
+              ),
+              child: controller.acceptedTerms.value
+                  ? const Icon(Icons.check, color: Colors.white, size: 13)
+                  : null,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: 12,
+                height: 1.5,
+              ),
+              children: [
+                TextSpan(text: l10n.text('registration_terms_prefix')),
+                TextSpan(
+                  text: l10n.text('registration_terms_link'),
+                  style: TextStyle(
+                    color: colors.brandColor,
+                    decoration: TextDecoration.underline,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                TextSpan(text: l10n.text('registration_terms_and')),
+                TextSpan(
+                  text: l10n.text('registration_terms_privacy'),
+                  style: TextStyle(
+                    color: colors.brandColor,
+                    decoration: TextDecoration.underline,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                TextSpan(text: l10n.text('registration_terms_suffix')),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _createAccountBtn(BuildContext context) {
+    final colors = context.colors;
+    final l10n = context.l10n;
+    return Obx(
+      () => Container(
+        width: double.infinity,
+        height: 56,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          gradient: LinearGradient(
+            colors: controller.isRegistrationEnabled
+                ? [colors.brandColor, const Color(0xFF6644FF), colors.warning]
+                : const [Color(0xFFB8BCCD), Color(0xFFB8BCCD)],
+            stops: controller.isRegistrationEnabled
+                ? const [0.0, 0.6, 1.0]
+                : const [0.0, 1.0],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color:
+                  (controller.isRegistrationEnabled
+                          ? colors.brandColor
+                          : const Color(0xFFB8BCCD))
+                      .withValues(alpha: 0.35),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(30),
+            onTap: controller.isRegistrationEnabled
+                ? () => _submitRegistration(context)
+                : null,
+            child: Center(
+              child: controller.isLoading.value
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.4,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      l10n.text('registration_create_account'),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

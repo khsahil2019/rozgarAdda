@@ -1,23 +1,15 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:logger/logger.dart';
-import 'package:rojgar/core/network/api_routes.dart';
+import 'package:get/get.dart';
+import 'package:rojgar/core/exceptions/exceptions.dart';
+import 'package:rojgar/features/auth/presentation/controller/login_controller.dart';
 import 'package:rojgar/localization/app_localizations.dart';
-import 'package:rojgar/ragistartion_screen.dart';
+import 'package:rojgar/features/auth/presentation/screens/registration_screen.dart';
 import 'package:rojgar/select_state_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rojgar/splash_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends GetView<LoginController> {
   const LoginScreen({super.key});
 
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
   // Color constants
   static const Color primaryBlue = Color(0xFF1400FF);
   static const Color accentYellow = Color(0xFFFFCC00);
@@ -28,144 +20,40 @@ class _LoginScreenState extends State<LoginScreen> {
   static const Color fieldBg = Color(0xFFF7F8FF);
   static const Color scaffoldBg = Color(0xFFFFFFFF);
 
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  bool _isLoading = false;
-  bool _isPasswordObscured = true;
-  bool _acceptedTerms = false;
-  final Logger _logger = Logger();
-
-  bool get _isLoginEnabled {
-    return _usernameController.text.trim().isNotEmpty &&
-        _passwordController.text.isNotEmpty &&
-        _acceptedTerms &&
-        !_isLoading;
-  }
-
-  void _onFormChanged() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _usernameController.addListener(_onFormChanged);
-    _passwordController.addListener(_onFormChanged);
-  }
-
-  @override
-  void dispose() {
-    _usernameController.removeListener(_onFormChanged);
-    _passwordController.removeListener(_onFormChanged);
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _login() async {
-    final username = _usernameController.text.trim();
-    final password = _passwordController.text;
+  Future<void> _login(BuildContext context) async {
+    final username = controller.username.value.trim();
+    final password = controller.password.value;
 
     if (username.isEmpty || password.isEmpty) {
-      _showErrorDialog(context.l10n.text('login_error_empty'));
+      _showErrorDialog(context, context.l10n.text('login_error_empty'));
       return;
     }
-    if (!_acceptedTerms) {
-      _showErrorDialog('Please accept Terms and Privacy Policy to continue.');
+    if (!controller.acceptedTerms.value) {
+      _showErrorDialog(
+        context,
+        'Please accept Terms and Privacy Policy to continue.',
+      );
       return;
     }
-
-    setState(() {
-      _isLoading = true;
-    });
 
     try {
-      final uri = Uri.parse(ApiRoutes.login);
-      final response = await http
-          .post(
-            uri,
-            headers: const {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-            body: jsonEncode({'username': username, 'password': password}),
-          )
-          .timeout(const Duration(seconds: 25));
-
-      _logger.i('Login response (${response.statusCode}): ${response.body}');
-
-      if (!mounted) return;
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> json =
-            jsonDecode(response.body) as Map<String, dynamic>;
-
-        final bool status = json['status'] == true;
-
-        if (status) {
-          // Persist candidate id if present for later KYC updates
-          try {
-            final prefs = await SharedPreferences.getInstance();
-            final dynamic rawId =
-                json['candidate_id'] ?? json['id'] ?? json['data']?['id'];
-            int? candidateId;
-            if (rawId is int) {
-              candidateId = rawId;
-            } else if (rawId != null) {
-              candidateId = int.tryParse(rawId.toString());
-            }
-            if (candidateId != null) {
-              await prefs.setInt('candidate_id', candidateId);
-            }
-            final dynamic rawToken =
-                json['token'] ??
-                json['access_token'] ??
-                json['auth_token'] ??
-                json['data']?['token'] ??
-                json['data']?['access_token'];
-            if (rawToken != null && rawToken.toString().isNotEmpty) {
-              await prefs.setString('access_token', rawToken.toString());
-            }
-          } catch (_) {
-            // Ignore persistence errors and continue navigation
-          }
-
-          if (!mounted) return;
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => SelectStateScreen(successMessage: username),
-            ),
-          );
-        } else {
-          final message =
-              json['message']?.toString() ??
-              'Invalid username or password. Please try again.';
-          _showErrorDialog(message);
-        }
-      } else {
-        _showErrorDialog(
-          'Login failed with status code ${response.statusCode}. Please try again.',
-        );
-      }
-    } catch (e) {
-      if (!mounted) return;
-      final details = kDebugMode ? '\n\n$e' : '';
-      _showErrorDialog(
-        'Something went wrong. Please check your internet connection and try again.$details',
+      await controller.login();
+      if (!context.mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => SelectStateScreen(successMessage: username),
+        ),
       );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    } catch (e) {
+      if (!context.mounted) return;
+      final errorMessage = e is Failure
+          ? e.message
+          : 'Something went wrong. Please try again.';
+      _showErrorDialog(context, errorMessage);
     }
   }
 
-  void _showErrorDialog(String message) {
+  void _showErrorDialog(BuildContext context, String message) {
     final l10n = context.l10n;
     showDialog<void>(
       context: context,
@@ -200,7 +88,11 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.only(left: 16),
           child: IconButton(
             icon: const Icon(Icons.arrow_back, color: primaryBlue, size: 24),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const SplashScreen()),
+              );
+            },
           ),
         ),
         centerTitle: true,
@@ -286,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
               // Email Field
               _buildInputField(
                 hintText: l10n.text('login_email_hint'),
-                controller: _usernameController,
+                controller: controller.usernameController,
                 prefixIcon: Icons.mail_outline_rounded,
                 obscureText: false,
               ),
@@ -322,17 +214,15 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 8),
 
               // Password Field
-              _buildInputField(
-                hintText: '••••••••',
-                controller: _passwordController,
-                prefixIcon: Icons.lock_outline_rounded,
-                obscureText: _isPasswordObscured,
-                showSuffix: true,
-                onSuffixTap: () {
-                  setState(() {
-                    _isPasswordObscured = !_isPasswordObscured;
-                  });
-                },
+              Obx(
+                () => _buildInputField(
+                  hintText: '••••••••',
+                  controller: controller.passwordController,
+                  prefixIcon: Icons.lock_outline_rounded,
+                  obscureText: controller.isPasswordObscured.value,
+                  showSuffix: true,
+                  onSuffixTap: controller.togglePasswordObscurity,
+                ),
               ),
 
               const SizedBox(height: 16),
@@ -341,28 +231,31 @@ class _LoginScreenState extends State<LoginScreen> {
               Row(
                 children: [
                   GestureDetector(
-                    onTap: () =>
-                        setState(() => _acceptedTerms = !_acceptedTerms),
-                    child: Container(
-                      width: 22,
-                      height: 22,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _acceptedTerms
-                            ? primaryBlue
-                            : Colors.transparent,
-                        border: Border.all(
-                          color: _acceptedTerms ? primaryBlue : greyText,
-                          width: 1.5,
+                    onTap: controller.toggleTermsAcceptance,
+                    child: Obx(
+                      () => Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: controller.acceptedTerms.value
+                              ? primaryBlue
+                              : Colors.transparent,
+                          border: Border.all(
+                            color: controller.acceptedTerms.value
+                                ? primaryBlue
+                                : greyText,
+                            width: 1.5,
+                          ),
                         ),
+                        child: controller.acceptedTerms.value
+                            ? const Icon(
+                                Icons.check,
+                                size: 14,
+                                color: Colors.white,
+                              )
+                            : null,
                       ),
-                      child: _acceptedTerms
-                          ? const Icon(
-                              Icons.check,
-                              size: 14,
-                              color: Colors.white,
-                            )
-                          : null,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -382,10 +275,14 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: size.height * 0.032),
 
               // Sign In Button
-              _createAccountBtn(
-                onTap: _isLoginEnabled ? _login : null,
-                isEnabled: _isLoginEnabled,
-                isLoading: _isLoading,
+              Obx(
+                () => _signInBtn(
+                  onTap: controller.isLoginEnabled
+                      ? () => _login(context)
+                      : null,
+                  isEnabled: controller.isLoginEnabled,
+                  isLoading: controller.isLoading.value,
+                ),
               ),
 
               SizedBox(height: size.height * 0.032),
@@ -593,7 +490,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  static Widget _createAccountBtn({
+  static Widget _signInBtn({
     required VoidCallback? onTap,
     required bool isEnabled,
     bool isLoading = false,
