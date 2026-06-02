@@ -5,8 +5,12 @@ import 'package:rojgar/features/auth/domain/repository/auth_repository.dart';
 class AuthController extends GetxController {
   final AuthRepository authRepository = Get.find<AuthRepository>();
 
-  Future<AuthResponse> login(String email, String password) {
-    return authRepository.login(email, password);
+  Future<AuthResponse> login(String email, String password) async {
+    final either = await authRepository.login(email, password);
+    return either.fold(
+      (failure) => throw failure,
+      (res) => res,
+    );
   }
 
   Future<AuthResponse> register({
@@ -20,8 +24,8 @@ class AuthController extends GetxController {
     required String locality,
     required String pincode,
     required String address,
-  }) {
-    return authRepository.register(
+  }) async {
+    final either = await authRepository.register(
       fullName: fullName,
       phone: phone,
       email: email,
@@ -32,6 +36,10 @@ class AuthController extends GetxController {
       locality: locality,
       pincode: pincode,
       address: address,
+    );
+    return either.fold(
+      (failure) => throw failure,
+      (res) => res,
     );
   }
 }

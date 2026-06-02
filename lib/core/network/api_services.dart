@@ -204,10 +204,27 @@ class ApiService {
         );
 
       case DioExceptionType.badResponse:
-        final message =
-            error.response?.data?['message'] ??
-            error.response?.statusMessage ??
-            'Server error';
+        String? message;
+        final data = error.response?.data;
+
+        if (data is Map<String, dynamic>) {
+          if (data.containsKey('errors') && data['errors'] is Map) {
+            final errors = data['errors'] as Map;
+            final List<String> messages = [];
+            for (final value in errors.values) {
+              if (value is List && value.isNotEmpty) {
+                messages.add(value.first.toString());
+              } else if (value is String) {
+                messages.add(value);
+              }
+            }
+            if (messages.isNotEmpty) {
+              message = messages.join('\n');
+            }
+          }
+          message ??= data['message']?.toString();
+        }
+        message ??= error.response?.statusMessage ?? 'Server error';
         return Failure(message);
 
       case DioExceptionType.cancel:

@@ -17,9 +17,16 @@ abstract class AuthRemoteDataSource {
     required String locality,
     required String pincode,
     required String address,
+    String? identityProofPath,
   });
   Future<List<DropdownItem>> getStates();
   Future<List<DropdownItem>> getDistricts(int stateId);
+
+  /// Sends an OTP to [phone]. Throws [Failure] on error.
+  Future<void> sendOtp(String phone);
+
+  /// Verifies [otp] for [phone]. Throws [Failure] on error.
+  Future<void> verifyOtp(String phone, String otp);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -54,23 +61,37 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String locality,
     required String pincode,
     required String address,
+    String? identityProofPath,
   }) async {
     try {
-      final res = await ApiService.post(
-        ApiRoutes.register,
-        body: {
-          'full_name': fullName,
-          'phone': phone,
-          'email': email,
-          'username': username,
-          'password': password,
-          'state': state,
-          'district': district,
-          'locality': locality,
-          'pincode': pincode,
-          'address': address,
-        },
-      );
+      final fields = {
+        'full_name': fullName,
+        'phone': phone,
+        'email': email,
+        'username': username,
+        'password': password,
+        'state': state,
+        'district': district,
+        'locality': locality,
+        'pincode': pincode,
+        'address': address,
+      };
+
+      Map<String, dynamic> res;
+      if (identityProofPath != null && identityProofPath.isNotEmpty) {
+        res = await ApiService.uploadFiles(
+          method: 'POST',
+          url: ApiRoutes.register,
+          fields: fields,
+          files: {'identity_proof': identityProofPath},
+        );
+      } else {
+        res = await ApiService.post(
+          ApiRoutes.register,
+          body: fields,
+        );
+      }
+
       if ((res['statusCode'] == 200 || res['statusCode'] == 201) &&
           res['status'] == true) {
         return AuthResponse.fromJson(res);
@@ -118,6 +139,38 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       if (e is Failure) rethrow;
       throw Failure("Failed to fetch districts");
+    }
+  }
+
+  @override
+  Future<void> sendOtp(String phone) async {
+    try {
+      final res = await ApiService.post(
+        ApiRoutes.sendOtp,
+        body: {'phone': int.tryParse(phone) ?? phone},
+      );
+      if (res['status'] == false) {
+        throw Failure(res['message'] ?? 'Failed to send OTP');
+      }
+    } catch (e) {
+      if (e is Failure) rethrow;
+      throw Failure('Failed to send OTP. Please try again.');
+    }
+  }
+
+  @override
+  Future<void> verifyOtp(String phone, String otp) async {
+    try {
+      final res = await ApiService.post(
+        ApiRoutes.verifyOtp,
+        body: {'phone': phone, 'otp': otp},
+      );
+      if (res['status'] == false) {
+        throw Failure(res['message'] ?? 'Invalid OTP. Please try again.');
+      }
+    } catch (e) {
+      if (e is Failure) rethrow;
+      throw Failure('OTP verification failed. Please try again.');
     }
   }
 }

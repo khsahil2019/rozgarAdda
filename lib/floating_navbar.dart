@@ -51,7 +51,7 @@ class _FloatingNavbarScreenState extends State<FloatingNavbarScreen> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: _fabColor.withOpacity(0.4),
+              color: _fabColor.withValues(alpha: 0.4),
               blurRadius: 15,
               spreadRadius: 2,
               offset: const Offset(0, 8),
@@ -201,26 +201,30 @@ class _ProfileScreenState extends State<_ProfileScreen> {
   }
 
   Future<void> _logout(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text(
-          'Logout',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          l10n.text('logout_confirm_title'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
-        content: const Text('Are you sure you want to logout?'),
+        content: Text(l10n.text('logout_confirm_message')),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel',
-                style: TextStyle(color: _greyText)),
+            onPressed: () => Navigator.pop(dialogCtx, false),
+            child: Text(
+              l10n.text('cancel'),
+              style: const TextStyle(color: _greyText),
+            ),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Logout',
-                style: TextStyle(
-                    color: _red, fontWeight: FontWeight.w700)),
+            onPressed: () => Navigator.pop(dialogCtx, true),
+            child: Text(
+              l10n.text('logout'),
+              style: const TextStyle(color: _red, fontWeight: FontWeight.w700),
+            ),
           ),
         ],
       ),
@@ -251,7 +255,9 @@ class _ProfileScreenState extends State<_ProfileScreen> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
-                    vertical: 28, horizontal: 20),
+                  vertical: 28,
+                  horizontal: 20,
+                ),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xFF1400FF), Color(0xFF4433FF)],
@@ -266,18 +272,20 @@ class _ProfileScreenState extends State<_ProfileScreen> {
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
-                        border: Border.all(
-                            color: Colors.white, width: 2.5),
+                        border: Border.all(color: Colors.white, width: 2.5),
                       ),
-                      child: const Icon(Icons.person_rounded,
-                          color: Colors.white, size: 44),
+                      child: const Icon(
+                        Icons.person_rounded,
+                        color: Colors.white,
+                        size: 44,
+                      ),
                     ),
                     const SizedBox(height: 14),
-                    const Text(
-                      'My Profile',
-                      style: TextStyle(
+                    Text(
+                      context.l10n.text('profile_my_profile'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -287,13 +295,15 @@ class _ProfileScreenState extends State<_ProfileScreen> {
                       const SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 5),
+                          horizontal: 14,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.18),
+                          color: Colors.white.withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          'ID: $_candidateId',
+                          '${context.l10n.text('profile_id_label')}: $_candidateId',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 13,
@@ -311,32 +321,32 @@ class _ProfileScreenState extends State<_ProfileScreen> {
               // ── Menu Items ───────────────────────────
               _ProfileTile(
                 icon: Icons.person_outline_rounded,
-                label: 'Edit Profile',
+                label: context.l10n.text('profile_edit_profile'),
                 onTap: () {},
               ),
               _ProfileTile(
                 icon: Icons.verified_outlined,
-                label: 'KYC Status',
+                label: context.l10n.text('profile_kyc_status'),
                 onTap: () {},
               ),
               _ProfileTile(
                 icon: Icons.storefront_outlined,
-                label: 'My Products',
+                label: context.l10n.text('profile_my_products'),
                 onTap: () {},
               ),
               _ProfileTile(
                 icon: Icons.work_outline_rounded,
-                label: 'My Applications',
+                label: context.l10n.text('profile_my_applications'),
                 onTap: () {},
               ),
               _ProfileTile(
                 icon: Icons.lock_outline_rounded,
-                label: 'Change Password',
+                label: context.l10n.text('profile_change_password'),
                 onTap: () {},
               ),
               _ProfileTile(
                 icon: Icons.help_outline_rounded,
-                label: 'Help & Support',
+                label: context.l10n.text('profile_help_support'),
                 onTap: () {},
               ),
 
@@ -351,17 +361,19 @@ class _ProfileScreenState extends State<_ProfileScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFEBEB),
                     borderRadius: BorderRadius.circular(14),
-                    border:
-                        Border.all(color: const Color(0xFFFFCCCC), width: 1),
+                    border: Border.all(
+                      color: const Color(0xFFFFCCCC),
+                      width: 1,
+                    ),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.logout_rounded, color: _red, size: 22),
-                      SizedBox(width: 10),
+                      const Icon(Icons.logout_rounded, color: _red, size: 22),
+                      const SizedBox(width: 10),
                       Text(
-                        'Logout',
-                        style: TextStyle(
+                        context.l10n.text('logout'),
+                        style: const TextStyle(
                           color: _red,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -398,14 +410,13 @@ class _ProfileTile extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: const Color(0xFFFFFFFF),
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -433,8 +444,11 @@ class _ProfileTile extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(Icons.chevron_right_rounded,
-                color: Color(0xFF8A8FA3), size: 20),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: Color(0xFF8A8FA3),
+              size: 20,
+            ),
           ],
         ),
       ),

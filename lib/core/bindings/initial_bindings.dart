@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../features/app/app_controller.dart';
 import '../../features/auth/presentation/bindings/auth_binding.dart';
 import '../../features/auth/presentation/controller/auth_controller.dart';
+import '../../features/news/prsentation/bindings/news_binding.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -16,6 +17,9 @@ class InitialBinding extends Bindings {
 
     // Promote AuthController to permanent
     Get.put<AuthController>(Get.find<AuthController>(), permanent: true);
+
+    // Register news dependencies
+    NewsBinding().dependencies();
   }
 }
 

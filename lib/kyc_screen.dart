@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rojgar/dashboard_screen.dart';
+import 'package:rojgar/localization/app_localizations.dart';
 
 // ─────────────────────────────────────────────
 // COLOR CONSTANTS
@@ -192,7 +193,10 @@ class _EditKycScreenState extends State<EditKycScreen> {
         isImage: true,
       );
     });
-    _showSnackbar('Photo uploaded successfully!', isSuccess: true);
+    _showSnackbar(
+      context.l10n.text('kyc_snack_photo_uploaded'),
+      isSuccess: true,
+    );
   }
 
   // ── Pick document file ───────────────────────
@@ -204,7 +208,7 @@ class _EditKycScreenState extends State<EditKycScreen> {
       exts = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
     }
 
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: exts,
     );
@@ -223,7 +227,7 @@ class _EditKycScreenState extends State<EditKycScreen> {
         size: file.size,
       );
     });
-    _showSnackbar('Document uploaded successfully!', isSuccess: true);
+    _showSnackbar(context.l10n.text('kyc_snack_doc_uploaded'), isSuccess: true);
   }
 
   // ── Bottom sheet: Camera vs Gallery ─────────
@@ -250,9 +254,9 @@ class _EditKycScreenState extends State<EditKycScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Select Image Source',
-              style: TextStyle(
+            Text(
+              context.l10n.text('kyc_image_source_title'),
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: AC.darkText,
@@ -261,21 +265,21 @@ class _EditKycScreenState extends State<EditKycScreen> {
             const SizedBox(height: 16),
             _sourceOption(
               icon: Icons.camera_alt_rounded,
-              label: 'Camera',
+              label: context.l10n.text('kyc_source_camera'),
               color: AC.primaryBlue,
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             const Divider(height: 1, indent: 16, endIndent: 16),
             _sourceOption(
               icon: Icons.photo_library_rounded,
-              label: 'Gallery',
+              label: context.l10n.text('kyc_source_gallery'),
               color: AC.primaryBlue,
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
             const SizedBox(height: 8),
             _sourceOption(
               icon: Icons.close_rounded,
-              label: 'Cancel',
+              label: context.l10n.text('cancel'),
               color: Colors.red,
               onTap: () => Navigator.pop(context, null),
             ),
@@ -297,7 +301,7 @@ class _EditKycScreenState extends State<EditKycScreen> {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(icon, color: color, size: 22),
@@ -339,7 +343,7 @@ class _EditKycScreenState extends State<EditKycScreen> {
 
   void _removeUpload(String slotId) {
     setState(() => _uploads[slotId] = null);
-    _showSnackbar('File removed.');
+    _showSnackbar(context.l10n.text('kyc_snack_file_removed'));
   }
 
   String? _validateTextFields() {
@@ -360,22 +364,22 @@ class _EditKycScreenState extends State<EditKycScreen> {
         locality.isEmpty ||
         pincode.isEmpty ||
         address.isEmpty) {
-      return 'Please fill all required fields.';
+      return context.l10n.text('kyc_snack_missing_fields');
     }
 
     final phoneDigits = phone.replaceAll(RegExp(r'\D'), '');
     if (phoneDigits.length != 10) {
-      return 'Please enter a valid 10-digit phone number.';
+      return context.l10n.text('kyc_snack_invalid_phone');
     }
 
     final pinDigits = pincode.replaceAll(RegExp(r'\D'), '');
     if (pinDigits.length != 6) {
-      return 'Please enter a valid 6-digit pincode.';
+      return context.l10n.text('kyc_snack_invalid_pin');
     }
 
     final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
     if (!emailRegex.hasMatch(email)) {
-      return 'Please enter a valid email address.';
+      return context.l10n.text('kyc_snack_invalid_email');
     }
 
     return null;
@@ -388,7 +392,7 @@ class _EditKycScreenState extends State<EditKycScreen> {
         .map((e) => e.key)
         .toList();
     if (missing.isNotEmpty) {
-      _showSnackbar('Please upload all required documents.');
+      _showSnackbar(context.l10n.text('kyc_snack_missing_docs'));
       return;
     }
 
@@ -406,7 +410,7 @@ class _EditKycScreenState extends State<EditKycScreen> {
       final selectedStateId = prefs.getInt('selected_state_id');
 
       if (candidateId == null) {
-        _showSnackbar('Candidate ID not found. Please login again.');
+        _showSnackbar(context.l10n.text('kyc_snack_no_candidate'));
         setState(() => _isLoading = false);
         return;
       }
@@ -456,7 +460,8 @@ class _EditKycScreenState extends State<EditKycScreen> {
               : <String, dynamic>{};
           final bool status = json['status'] == true;
           final String message =
-              json['message']?.toString() ?? 'KYC updated successfully';
+              json['message']?.toString() ??
+              context.l10n.text('kyc_snack_updated');
           if (status) {
             _showSnackbar(message, isSuccess: true);
             // Navigate back to dashboard after a short delay
@@ -471,7 +476,10 @@ class _EditKycScreenState extends State<EditKycScreen> {
             _showSnackbar(message);
           }
         } catch (_) {
-          _showSnackbar('KYC updated successfully!', isSuccess: true);
+          _showSnackbar(
+            context.l10n.text('kyc_snack_updated'),
+            isSuccess: true,
+          );
           await Future.delayed(const Duration(milliseconds: 600));
           if (mounted) {
             Navigator.of(context).pushAndRemoveUntil(
@@ -482,14 +490,12 @@ class _EditKycScreenState extends State<EditKycScreen> {
         }
       } else {
         _showSnackbar(
-          'Failed to update KYC. Please try again (code ${response.statusCode}).',
+          '${context.l10n.text('kyc_snack_failed')} (code ${response.statusCode}).',
         );
       }
     } catch (_) {
       if (!mounted) return;
-      _showSnackbar(
-        'Something went wrong while updating KYC. Please check your connection.',
-      );
+      _showSnackbar(context.l10n.text('kyc_snack_error'));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -519,21 +525,21 @@ class _EditKycScreenState extends State<EditKycScreen> {
                   const SizedBox(height: 18),
 
                   // Status chip
-                  _statusChip(),
+                  _statusChip(context),
 
                   const SizedBox(height: 22),
 
                   // ── Personal Information ──────
-                  _sectionHeader('Personal Information'),
+                  _sectionHeader(context.l10n.text('kyc_section_personal')),
                   const SizedBox(height: 16),
 
-                  _fieldLabel('Full Name'),
+                  _fieldLabel(context.l10n.text('kyc_field_full_name')),
                   const SizedBox(height: 6),
                   _inputField(controller: _nameCtrl),
 
                   const SizedBox(height: 14),
 
-                  _fieldLabel('Phone Number'),
+                  _fieldLabel(context.l10n.text('kyc_field_phone')),
                   const SizedBox(height: 6),
                   _inputField(
                     controller: _phoneCtrl,
@@ -542,7 +548,7 @@ class _EditKycScreenState extends State<EditKycScreen> {
 
                   const SizedBox(height: 14),
 
-                  _fieldLabel('Email Address'),
+                  _fieldLabel(context.l10n.text('kyc_field_email')),
                   const SizedBox(height: 6),
                   _inputField(
                     controller: _emailCtrl,
@@ -553,7 +559,7 @@ class _EditKycScreenState extends State<EditKycScreen> {
                   const SizedBox(height: 26),
 
                   // ── Address Information ───────
-                  _sectionHeader('Address Information'),
+                  _sectionHeader(context.l10n.text('kyc_section_address')),
                   const SizedBox(height: 16),
 
                   // State + District
@@ -563,9 +569,12 @@ class _EditKycScreenState extends State<EditKycScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _fieldLabel('State'),
+                            _fieldLabel(context.l10n.text('kyc_field_state')),
                             const SizedBox(height: 6),
-                            _inputField(controller: _stateCtrl, hint: 'State'),
+                            _inputField(
+                              controller: _stateCtrl,
+                              hint: context.l10n.text('kyc_field_state'),
+                            ),
                           ],
                         ),
                       ),
@@ -574,11 +583,13 @@ class _EditKycScreenState extends State<EditKycScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _fieldLabel('District'),
+                            _fieldLabel(
+                              context.l10n.text('kyc_field_district'),
+                            ),
                             const SizedBox(height: 6),
                             _inputField(
                               controller: _districtCtrl,
-                              hint: 'District',
+                              hint: context.l10n.text('kyc_field_district'),
                             ),
                           ],
                         ),
@@ -595,11 +606,13 @@ class _EditKycScreenState extends State<EditKycScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _fieldLabel('Locality/Area'),
+                            _fieldLabel(
+                              context.l10n.text('kyc_field_locality'),
+                            ),
                             const SizedBox(height: 6),
                             _inputField(
                               controller: _localityCtrl,
-                              hint: 'Area',
+                              hint: context.l10n.text('kyc_field_locality'),
                             ),
                           ],
                         ),
@@ -609,7 +622,7 @@ class _EditKycScreenState extends State<EditKycScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _fieldLabel('Pincode'),
+                            _fieldLabel(context.l10n.text('kyc_field_pincode')),
                             const SizedBox(height: 6),
                             _inputField(
                               controller: _pincodeCtrl,
@@ -623,21 +636,21 @@ class _EditKycScreenState extends State<EditKycScreen> {
 
                   const SizedBox(height: 14),
 
-                  _fieldLabel('Complete Address'),
+                  _fieldLabel(context.l10n.text('kyc_field_address')),
                   const SizedBox(height: 6),
                   _multilineField(
                     controller: _addressCtrl,
-                    hint: 'Flat No, Building, Street...',
+                    hint: context.l10n.text('kyc_address_hint'),
                   ),
 
                   const SizedBox(height: 28),
 
                   // ── Documents Upload ──────────
-                  _sectionHeader('Documents Upload'),
+                  _sectionHeader(context.l10n.text('kyc_section_documents')),
                   const SizedBox(height: 6),
                   Text(
-                    'Upload clear, readable copies. Supported: JPG, PNG, PDF, DOC',
-                    style: TextStyle(color: AC.greyText, fontSize: 12),
+                    context.l10n.text('kyc_docs_hint'),
+                    style: const TextStyle(color: AC.greyText, fontSize: 12),
                   ),
                   const SizedBox(height: 16),
 
@@ -645,8 +658,8 @@ class _EditKycScreenState extends State<EditKycScreen> {
                   _UploadCard(
                     slotId: 'identity',
                     icon: Icons.badge_outlined,
-                    title: 'Identity Proof',
-                    subtitle: 'Aadhar, PAN or Passport',
+                    title: context.l10n.text('kyc_identity_title'),
+                    subtitle: context.l10n.text('kyc_identity_subtitle'),
                     uploadType: _UploadType.file,
                     uploaded: _uploads['identity'],
                     onUpload: () => _pickFile('identity'),
@@ -660,8 +673,8 @@ class _EditKycScreenState extends State<EditKycScreen> {
                   _UploadCard(
                     slotId: 'resume',
                     icon: Icons.description_outlined,
-                    title: 'Resume / CV',
-                    subtitle: 'PDF or Word format',
+                    title: context.l10n.text('kyc_resume_title'),
+                    subtitle: context.l10n.text('kyc_resume_subtitle'),
                     uploadType: _UploadType.file,
                     uploaded: _uploads['resume'],
                     onUpload: () => _pickFile('resume'),
@@ -675,8 +688,8 @@ class _EditKycScreenState extends State<EditKycScreen> {
                   _UploadCard(
                     slotId: 'photo',
                     icon: Icons.person_outline_rounded,
-                    title: 'Profile Photo',
-                    subtitle: 'Recent passport size photo',
+                    title: context.l10n.text('kyc_photo_title'),
+                    subtitle: context.l10n.text('kyc_photo_subtitle'),
                     uploadType: _UploadType.image,
                     uploaded: _uploads['photo'],
                     onUpload: () => _pickFile('photo'),
@@ -722,9 +735,9 @@ class _EditKycScreenState extends State<EditKycScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'Edit KYC Details',
-                style: TextStyle(
+              Text(
+                context.l10n.text('kyc_title'),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -735,8 +748,8 @@ class _EditKycScreenState extends State<EditKycScreen> {
           const SizedBox(height: 10),
           Text(
             _candidateId == null
-                ? 'Update your KYC information'
-                : 'Update your KYC information for candidate #$_candidateId',
+                ? context.l10n.text('kyc_subtitle')
+                : '${context.l10n.text('kyc_subtitle_id')}$_candidateId',
             style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13),
           ),
         ],
@@ -745,7 +758,7 @@ class _EditKycScreenState extends State<EditKycScreen> {
   }
 
   // ── Status chip ──────────────────────────────
-  Widget _statusChip() {
+  Widget _statusChip(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
@@ -770,9 +783,9 @@ class _EditKycScreenState extends State<EditKycScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          const Text(
-            'STATUS: PENDING',
-            style: TextStyle(
+          Text(
+            context.l10n.text('kyc_status_pending'),
+            style: const TextStyle(
               color: Color(0xFF886600),
               fontSize: 13,
               fontWeight: FontWeight.w700,
@@ -893,12 +906,12 @@ class _EditKycScreenState extends State<EditKycScreen> {
           height: 56,
           decoration: BoxDecoration(
             color: _isLoading
-                ? AC.primaryBlue.withOpacity(0.65)
+                ? AC.primaryBlue.withValues(alpha: 0.65)
                 : AC.primaryBlue,
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
-                color: AC.primaryBlue.withOpacity(0.35),
+                color: AC.primaryBlue.withValues(alpha: 0.35),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
@@ -914,9 +927,9 @@ class _EditKycScreenState extends State<EditKycScreen> {
                       strokeWidth: 2.5,
                     ),
                   )
-                : const Text(
-                    'Update KYC',
-                    style: TextStyle(
+                : Text(
+                    context.l10n.text('kyc_update_button'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -989,12 +1002,14 @@ class _UploadCard extends StatelessWidget {
         color: AC.cardBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: hasFile ? AC.successGreen.withOpacity(0.5) : AC.borderColor,
+          color: hasFile
+              ? AC.successGreen.withValues(alpha: 0.5)
+              : AC.borderColor,
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),

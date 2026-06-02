@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/features/auth/presentation/screens/login_screen.dart';
-import 'package:rojgar/news_screen.dart';
+import 'package:rojgar/features/news/prsentation/screens/news_screen.dart';
 import 'package:rojgar/features/auth/presentation/screens/registration_screen.dart';
 import 'package:rojgar/floating_navbar.dart';
 import 'package:rojgar/modules/product_screens/product_screen_list.dart';
@@ -169,7 +169,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     children: [
                       _SplashMenuItem(
                         icon: Icons.home_rounded,
-                        label: 'Home Screen',
+                        label: l10n.text('splash_menu_home'),
                         onTap: () => _navigateWithAuthCheck(
                           context: context,
                           loggedInScreen: const FloatingNavbarScreen(),
@@ -178,21 +178,21 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
                       _SplashMenuItem(
                         icon: Icons.info_outline_rounded,
-                        label: 'About Us',
+                        label: l10n.text('splash_menu_about'),
                         onTap: () {
                           // TODO: navigate to About Us screen
                         },
                       ),
                       _SplashMenuItem(
                         icon: Icons.report_gmailerrorred_rounded,
-                        label: 'Missing',
+                        label: l10n.text('splash_menu_missing'),
                         onTap: () {
                           // TODO: navigate to Missing screen
                         },
                       ),
                       _SplashMenuItem(
                         icon: Icons.article_rounded,
-                        label: 'News',
+                        label: l10n.text('splash_menu_news'),
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -203,7 +203,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
                       _SplashMenuItem(
                         icon: Icons.storefront_rounded,
-                        label: 'Product',
+                        label: l10n.text('splash_menu_product'),
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -214,7 +214,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
                       _SplashMenuItem(
                         icon: Icons.person_add_alt_1_rounded,
-                        label: 'Candidate Register',
+                        label: l10n.text('splash_menu_register'),
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -225,7 +225,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
                       _SplashMenuItem(
                         icon: Icons.login_rounded,
-                        label: 'Candidate Login',
+                        label: l10n.text('splash_menu_login'),
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -267,9 +267,9 @@ class _SplashMenuItem extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.white.withOpacity(0.3)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -277,7 +277,7 @@ class _SplashMenuItem extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: Colors.white, size: 20),

@@ -72,7 +72,8 @@ class MyAppState extends State<MyApp> {
           title: 'RozgarAdda',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
+          darkTheme: AppTheme.lightTheme, //TODO TEMP LIGHT THEME
+          
           initialBinding: InitialBinding(),
           locale: _locale,
           supportedLocales: AppLocalizations.supportedLocales,

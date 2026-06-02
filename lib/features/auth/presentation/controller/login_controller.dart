@@ -53,21 +53,25 @@ class LoginController extends GetxController {
   Future<AuthResponse> login() async {
     isLoading.value = true;
     try {
-      final result = await authRepository.login(
+      final eitherResult = await authRepository.login(
         username.value.trim(),
         password.value,
       );
 
-      // Persist user properties
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setInt('candidate_id', result.id);
-        await prefs.setString('access_token', result.token);
-      } catch (_) {
-        // Ignore persistence issues
-      }
-
-      return result;
+      return await eitherResult.fold(
+        (failure) => throw failure,
+        (result) async {
+          // Persist user properties
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setInt('candidate_id', result.id);
+            await prefs.setString('access_token', result.token);
+          } catch (_) {
+            // Ignore persistence issues
+          }
+          return result;
+        },
+      );
     } finally {
       isLoading.value = false;
     }

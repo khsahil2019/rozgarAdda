@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/core/exceptions/exceptions.dart';
 import 'package:rojgar/core/theme/theme.extension.dart';
@@ -32,6 +33,11 @@ class RegistrationFormScreen extends GetView<RegisterController> {
         pincode.isEmpty ||
         address.isEmpty) {
       _showMessage(context, l10n.text('registration_error_fields'));
+      return;
+    }
+
+    if (!controller.isPhoneVerified.value) {
+      _showMessage(context, l10n.text('registration_error_phone_verify'));
       return;
     }
 
@@ -487,7 +493,6 @@ class RegistrationFormScreen extends GetView<RegisterController> {
 
   Widget _phoneField(BuildContext context) {
     final colors = context.colors;
-    final l10n = context.l10n;
     return Container(
       decoration: BoxDecoration(
         color: colors.fieldBg,
@@ -528,95 +533,286 @@ class RegistrationFormScreen extends GetView<RegisterController> {
               ),
             ),
           ),
-          Container(
-            margin: const EdgeInsets.only(right: 8),
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colors.warning,
-                foregroundColor: colors.textPrimary,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
+          // ── Send OTP button inside the phone row ──────────────────────────
+          Obx(() {
+            final isVerified = controller.isPhoneVerified.value;
+            final isSending = controller.isSendingOtp.value;
+            return Container(
+              margin: const EdgeInsets.only(right: 8),
+              child: ElevatedButton(
+                onPressed: (isVerified || isSending)
+                    ? null
+                    : () async {
+                        final err = await controller.sendOtp();
+                        if (!context.mounted) return;
+                        if (err != null) {
+                          _showMessage(context, err);
+                        } else {
+                          _showMessage(
+                            context,
+                            context.l10n.text('registration_otp_sent_success'),
+                            isSuccess: true,
+                          );
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isVerified
+                      ? Colors.green.shade600
+                      : colors.warning,
+                  foregroundColor: colors.textPrimary,
+                  disabledBackgroundColor: isVerified
+                      ? Colors.green.shade600
+                      : colors.warning.withValues(alpha: 0.5),
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                child: isSending
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      )
+                    : Text(
+                        isVerified
+                            ? context.l10n.text('registration_phone_verified')
+                            : context.l10n.text('registration_send_otp'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: isVerified ? Colors.white : colors.textPrimary,
+                        ),
+                      ),
               ),
-              child: Text(
-                l10n.text('registration_verify_otp'),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: colors.textPrimary,
-                ),
-              ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );
   }
 
+  // ── OTP section (6-digit, auto-advance, reactive) ──────────────────────────
   Widget _otpSection(BuildContext context, Size size) {
     final colors = context.colors;
     final l10n = context.l10n;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: colors.fieldBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colors.border, width: 1.2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.text('registration_otp_hint'),
-            style: TextStyle(
-              color: colors.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
+    return Obx(() {
+      if (!controller.isOtpSent.value) return const SizedBox.shrink();
+      return AnimatedSize(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: colors.fieldBg,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: controller.isPhoneVerified.value
+                  ? Colors.green
+                  : colors.border,
+              width: 1.4,
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: List.generate(4, (i) {
-              return Expanded(
-                child: Container(
-                  margin: EdgeInsets.only(right: i < 3 ? 10 : 0),
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: colors.border, width: 1.2),
-                  ),
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    maxLength: 1,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: colors.textPrimary,
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      counterText: '',
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.text('registration_otp_hint'),
+                style: TextStyle(
+                  color: colors.textSecondary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
                 ),
-              );
-            }),
+              ),
+              const SizedBox(height: 12),
+
+              // ── 6 OTP digit boxes ─────────────────────────────────────
+              Row(
+                children: List.generate(6, (i) {
+                  return Expanded(
+                    child: Container(
+                      margin: EdgeInsets.only(right: i < 5 ? 8 : 0),
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: colors.border, width: 1.2),
+                      ),
+                      child: TextField(
+                        controller: controller.otpControllers[i],
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.number,
+                        maxLength: 1,
+                        enabled: !controller.isPhoneVerified.value,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: colors.textPrimary,
+                        ),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          counterText: '',
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        onChanged: (val) {
+                          if (val.isNotEmpty && i < 5) {
+                            FocusScope.of(context).nextFocus();
+                          } else if (val.isEmpty && i > 0) {
+                            FocusScope.of(context).previousFocus();
+                          }
+                        },
+                      ),
+                    ),
+                  );
+                }),
+              ),
+
+              const SizedBox(height: 14),
+
+              // ── Verify button + resend row ────────────────────────────
+              if (!controller.isPhoneVerified.value)
+                Row(
+                  children: [
+                    // Verify OTP button
+                    Expanded(
+                      child: Obx(
+                        () => InkWell(
+                          onTap: controller.isVerifyingOtp.value
+                              ? null
+                              : () async {
+                                  final err = await controller.verifyOtp();
+                                  if (!context.mounted) return;
+                                  if (err != null) {
+                                    _showMessage(context, err);
+                                  } else {
+                                    _showMessage(
+                                      context,
+                                      l10n.text(
+                                        'registration_otp_verify_success',
+                                      ),
+                                      isSuccess: true,
+                                    );
+                                  }
+                                },
+                          // style: ElevatedButton.styleFrom(
+                          //   backgroundColor: colors.brandColor,
+                          //   foregroundColor: Colors.white,
+                          //   elevation: 0,
+                          //   padding: EdgeInsets.symmetric(vertical: 0),
+                          //   shape: RoundedRectangleBorder(
+                          //     borderRadius: BorderRadius.circular(10.r),
+                          //   ),
+                          // ),
+                          child: controller.isVerifyingOtp.value
+                              ? SizedBox(
+                                  width: 16.sp,
+                                  height: 16.sp,
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  padding: EdgeInsets.symmetric(vertical: 10.r),
+
+                                  decoration: BoxDecoration(
+                                    color: colors.brandColor,
+                                    borderRadius: BorderRadius.circular(10.r),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      l10n.text('registration_verify_otp'),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: context.colors.background,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // Resend countdown
+                    Obx(() {
+                      final seconds = controller.resendCountdown.value;
+                      if (seconds > 0) {
+                        return Text(
+                          '${context.l10n.text('registration_otp_resend_in')} $seconds${context.l10n.text('registration_otp_resend_sec')}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: colors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        );
+                      }
+                      return GestureDetector(
+                        onTap: () async {
+                          final err = await controller.sendOtp();
+                          if (!context.mounted) return;
+                          if (err != null) {
+                            _showMessage(context, err);
+                          } else {
+                            _showMessage(
+                              context,
+                              l10n.text('registration_otp_sent_success'),
+                              isSuccess: true,
+                            );
+                          }
+                        },
+                        child: Text(
+                          l10n.text('registration_otp_resend'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colors.brandColor,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                )
+              else
+                // Verified badge
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      l10n.text('registration_otp_verify_success'),
+                      style: const TextStyle(
+                        color: Colors.green,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+            ],
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 
   Widget _stateDropdown(BuildContext context) {
@@ -769,24 +965,72 @@ class RegistrationFormScreen extends GetView<RegisterController> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          OutlinedButton(
-            onPressed: () {},
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: colors.brandColor, width: 1.5),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+          Obx(() {
+            final path = controller.identityProofPath.value;
+            if (path != null) {
+              final fileName = path.split('/').last.split('\\').last;
+              return Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          fileName,
+                          style: TextStyle(
+                            color: colors.textPrimary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: controller.pickIdentityProof,
+                    child: Text(
+                      l10n.text('registration_choose_file'),
+                      style: TextStyle(
+                        color: colors.brandColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            return OutlinedButton(
+              onPressed: controller.pickIdentityProof,
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: colors.brandColor, width: 1.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 10,
+                ),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-            ),
-            child: Text(
-              l10n.text('registration_choose_file'),
-              style: TextStyle(
-                color: colors.brandColor,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+              child: Text(
+                l10n.text('registration_choose_file'),
+                style: TextStyle(
+                  color: colors.brandColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );

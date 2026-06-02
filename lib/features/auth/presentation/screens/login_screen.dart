@@ -31,7 +31,7 @@ class LoginScreen extends GetView<LoginController> {
     if (!controller.acceptedTerms.value) {
       _showErrorDialog(
         context,
-        'Please accept Terms and Privacy Policy to continue.',
+        context.l10n.text('login_terms_error'),
       );
       return;
     }
@@ -48,7 +48,7 @@ class LoginScreen extends GetView<LoginController> {
       if (!context.mounted) return;
       final errorMessage = e is Failure
           ? e.message
-          : 'Something went wrong. Please try again.';
+          : context.l10n.text('login_error_generic');
       _showErrorDialog(context, errorMessage);
     }
   }
@@ -259,10 +259,10 @@ class LoginScreen extends GetView<LoginController> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'I agree to Terms of Service and Privacy Policy.',
-                      style: TextStyle(
+                      l10n.text('login_terms_agree'),
+                      style: const TextStyle(
                         color: darkText,
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -282,6 +282,7 @@ class LoginScreen extends GetView<LoginController> {
                       : null,
                   isEnabled: controller.isLoginEnabled,
                   isLoading: controller.isLoading.value,
+                  signInLabel: l10n.text('login_sign_in'),
                 ),
               ),
 
@@ -293,11 +294,11 @@ class LoginScreen extends GetView<LoginController> {
                   Expanded(
                     child: Container(height: 1, color: const Color(0xFFE0E0E0)),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
-                      'OR CONTINUE WITH',
-                      style: TextStyle(
+                      l10n.text('login_or_continue'),
+                      style: const TextStyle(
                         color: greyText,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -493,6 +494,7 @@ class LoginScreen extends GetView<LoginController> {
   static Widget _signInBtn({
     required VoidCallback? onTap,
     required bool isEnabled,
+    required String signInLabel,
     bool isLoading = false,
   }) {
     return Container(
@@ -532,9 +534,9 @@ class LoginScreen extends GetView<LoginController> {
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
-                : const Text(
-                    'Sign In',
-                    style: TextStyle(
+                : Text(
+                    signInLabel,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,

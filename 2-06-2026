@@ -1,0 +1,58 @@
+feat(auth): refactor login/registration to clean architecture, add StorageService and theme colors
+
+Refactored the authentication workflow (login, registration, session management) to follow Clean Architecture principles, integrated GetX state management, and implemented localization and theme extensions.
+
+1. Clean Architecture & Code Reorganization
+- Reorganized auth features into standard folders under `lib/features/auth/`.
+- Moved and refactored `login_screen.dart` into `lib/features/auth/presentation/screens/login_screen.dart` as a stateless `GetView<LoginController>`.
+- Deleted misspelled `ragistartion_screen.dart` and refactored the registration UI to `lib/features/auth/presentation/screens/registration_screen.dart` using a stateless `GetView<RegisterController>`.
+- Updated all related imports in `main.dart`, `splash_screen.dart`, and `select_state_screen.dart`.
+
+2. Domain & Data Layers
+- Extended `AuthRemoteDataSource` with candidate registration (`register`) and dropdown loading (`getStates`, `getDistricts`) methods.
+- Implemented corresponding logic inside `AuthRepository` and `AuthRepositoryImpl` to enforce type safety and Clean Architecture contracts.
+- Added `AuthResponse` deserializer model supporting nested user models and token field names.
+- Added `DropdownItem` model representing remote state and district items.
+- Enhanced `ApiService` in `lib/core/network/api_services.dart` to return status codes and error messages correctly.
+
+3. Presentation Layer & GetX Controllers
+- Implemented `LoginController` to reactively track input, validation, loading, and terms acceptance states.
+- Implemented `RegisterController` to reactively handle input form logic, OTP verification triggers, and asynchronous fetching of states/districts dropdown lists.
+- Created `AuthBinding` registering auth controllers, data sources, and repositories, and wired it globally inside `InitialBinding`.
+
+4. State, Session, and Storage Services
+- Created `StorageService` wrapping `SharedPreferences` to persist `access_token`, `candidate_id`, and `language_code` in a type-safe manner.
+- Refactored `AppController` to listen to reactive session (`isLoggedIn`) and locale state changes from the storage service.
+- Initialized `StorageService` globally during application startup in `main.dart`.
+
+5. Theme Color Extension & Styling System
+- Implemented `NewAppColors` utilizing `ThemeExtension` to provide consistent styling tokens across the app.
+- Configured light and dark app themes inside `AppTheme` at `lib/core/theme/theme.dart`.
+- Replaced all local/hardcoded color definitions inside the registration screen with the dynamic `context.colors` extension.
+
+6. Internationalization & Localization (i18n)
+- Added new translation keys for registration UI texts, OTP verification prompts, and form submission errors inside `AppLocalizations` for English, Hindi, and Marathi.
+- Integrated `context.l10n` to dynamically render localized texts in `registration_screen.dart`.
+
+7. Testing & Static Analysis
+- Added comprehensive unit tests for `AuthRemoteDataSource` register and login actions.
+- Configured isolated mocks in `widget_test.dart` to prevent app bootstrapping crashes.
+- Resolved static analysis warnings (e.g. making `MyAppState` public to satisfy API guidelines, removing unused fields in `splash_screen.dart`).
+
+8. Dashboard Quick Links Card UI Redesign
+- Redesigned the Quick Links layout using stacked `ClipRRect` cards with themed Unsplash background images.
+- Applied colored gradient overlays with custom transparency using `withValues(alpha: ...)` to create a sleek, modern duotone effect.
+- Embedded smooth touch inkwell actions and bottom-left aligned bold white typography.
+- Connected the "News" card to route to `NewsScreen` and added localized preview toast messages for other pending features like "Missing Persons".
+
+9. News Feature Clean Architecture & Refactoring
+- **Domain Layer**: Defined the sealed `NewsItem` entity with subclasses `TextNews`, `VideoNews`, and `YoutubeNews` for type-safe representation, along with `NewsRepository` abstraction.
+- **Data Layer**: Implemented mapping models (`text_news_model.dart`, `video_news_model.dart`, `youtube_news_model.dart`) and standard remote datasource calling `/api/text-news`, `/api/video-news`, and `/api/videos-news` endpoints.
+- **Presentation Layer**: Built `NewsController` to fetch all three APIs concurrently using `Future.wait` and merge/sort feeds by creation date, and wired lazy injection through `NewsBinding` inside `InitialBinding`.
+- **UI Redesign**: Re-implemented `NewsScreen` as a capsule tabbed stateful layout (All, Articles, Videos) with custom YouTube cards invoking `url_launcher` externally, custom shimmer skeletons, and error retry blocks. Created a flexible `NewsDetailScreen` using `CustomScrollView` and sliver elements.
+- **Localization**: Added full English, Marathi, and Hindi translation mappings for news tab titles, empty statuses, and loading error descriptions.
+
+10. News Unit Testing
+- Created a robust test suite at `test/features/news/prsentation/controller/news_controller_test.dart`.
+- Built a `FakeNewsRepository` to verify concurrent fetch logic, correct merging/sorting order of multiple API feeds, and state updates under partial and total API failures.
+

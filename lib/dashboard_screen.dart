@@ -5,6 +5,7 @@ import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/main.dart';
 import 'package:rojgar/modules/product_screens/product_screen_list.dart';
 import 'package:rojgar/modules/sell_product/sell_product_category.dart';
+import 'package:rojgar/features/news/prsentation/screens/news_screen.dart';
 
 class AC {
   static const Color primaryPurple = Color(0xFF5B2BE0);
@@ -42,27 +43,67 @@ class QuickLink {
   final IconData icon;
   final Color bgColor;
   final Color iconColor;
-  const QuickLink(this.label, this.icon, this.bgColor, this.iconColor);
+  final String imageUrl;
+  const QuickLink(
+    this.label,
+    this.icon,
+    this.bgColor,
+    this.iconColor,
+    this.imageUrl,
+  );
 }
 
 const List<QuickLink> kQuickLinks = [
-  QuickLink('Find Jobs', Icons.work_rounded, AC.blueBg, AC.blueIcon),
-  QuickLink('KYC Status', Icons.verified_rounded, AC.greenBg, AC.greenIcon),
+  QuickLink(
+    'Find Jobs',
+    Icons.work_rounded,
+    AC.blueBg,
+    AC.blueIcon,
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=400&q=80',
+  ),
+  QuickLink(
+    'KYC Status',
+    Icons.verified_rounded,
+    AC.greenBg,
+    AC.greenIcon,
+    'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=400&q=80',
+  ),
   QuickLink(
     'Sell Products',
     Icons.storefront_rounded,
     AC.greenBg,
     AC.greenIcon,
+    'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80',
+  ),
+  // QuickLink(
+  //   'Marketplace',
+  //   Icons.storefront_rounded,
+  //   AC.purpleBg,
+  //   AC.purpleIcon,
+  //   '',
+  // ),
+  QuickLink(
+    'News',
+    Icons.payments_rounded,
+    AC.orangeBg,
+    AC.orangeIcon,
+    'https://images.unsplash.com/photo-1565140834639-60452b8b0ae5?auto=format&fit=crop&w=400&q=80',
   ),
   QuickLink(
-    'Marketplace',
-    Icons.storefront_rounded,
-    AC.purpleBg,
-    AC.purpleIcon,
+    'Missing Persons',
+    Icons.support_agent_rounded,
+    AC.pinkBg,
+    AC.pinkIcon,
+
+    'https://images.unsplash.com/photo-1737154590393-20c0b8c389ae?auto=format&fit=crop&w=400&q=80',
   ),
-  QuickLink('Earnings', Icons.payments_rounded, AC.orangeBg, AC.orangeIcon),
-  QuickLink('Support', Icons.support_agent_rounded, AC.pinkBg, AC.pinkIcon),
-  QuickLink('Skill Up', Icons.school_rounded, AC.cyanBg, AC.cyanIcon),
+  QuickLink(
+    'Skill Up',
+    Icons.school_rounded,
+    AC.cyanBg,
+    AC.cyanIcon,
+    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80',
+  ),
 ];
 
 // ─────────────────────────────────────────────
@@ -582,59 +623,131 @@ class _QuickLinkCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AC.cardBg,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    link.label == 'KYC Status' || link.label == 'Sell Products'
-                    ? link.label == 'KYC Status'
-                          ? EditKycScreen()
-                          : SellProductCategoryScreen()
-                    : ExploreCareerScreen(),
-              ),
-            );
-          },
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: link.bgColor,
-                  shape: BoxShape.circle,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Background Image
+            Image.network(
+              link.imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: link.iconColor.withValues(alpha: 0.9),
+                  child: Center(
+                    child: Icon(
+                      link.icon,
+                      color: Colors.white.withValues(alpha: 0.3),
+                      size: 48,
+                    ),
+                  ),
+                );
+              },
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  color: link.iconColor.withValues(alpha: 0.4),
+                  child: const Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            // Gradient Overlay for Tint and Text Contrast
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    link.iconColor.withValues(alpha: 0.3),
+                    link.iconColor.withValues(alpha: 0.85),
+                  ],
                 ),
-                child: Icon(link.icon, color: link.iconColor, size: 28),
               ),
-              const SizedBox(height: 10),
-              Text(
-                AppLocalizations.of(
-                  context,
-                ).text(link.label.toLowerCase().replaceAll(' ', '_')),
-                style: const TextStyle(
-                  color: AC.darkText,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+            ),
+            // Tappable InkWell with Text
+            Positioned.fill(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    if (link.label == 'Missing Persons') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            AppLocalizations.of(
+                              context,
+                            ).text('missing_persons_coming_soon'),
+                          ),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            if (link.label == 'KYC Status') {
+                              return EditKycScreen();
+                            } else if (link.label == 'Sell Products') {
+                              return SellProductCategoryScreen();
+                            } else if (link.label == 'News') {
+                              return const NewsScreen();
+                            } else {
+                              return ExploreCareerScreen();
+                            }
+                          },
+                        ),
+                      );
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Text(
+                        AppLocalizations.of(
+                          context,
+                        ).text(link.label.toLowerCase().replaceAll(' ', '_')),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black26,
+                              offset: Offset(0, 1),
+                              blurRadius: 3,
+                            ),
+                          ],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
                 ),
-                textAlign: TextAlign.center,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

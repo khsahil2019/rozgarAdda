@@ -68,6 +68,6 @@ class AppController extends GetxController {
   void logout() {
     _storageService.clear();
     _isLoggedIn.value = false;
-    _user.value = null;
+    _user.value = null; 
   }
 }
