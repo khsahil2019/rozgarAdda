@@ -327,6 +327,20 @@ class AppLocalizations {
       'sell_review_title': 'Your application is in review',
       'sell_review_desc': 'We have received your product details. Our team will review it shortly.',
       'sell_go_dashboard': 'GO TO DASHBOARD',
+
+      // Available Jobs
+      'jobs_available_title': 'Available Jobs',
+      'jobs_no_jobs_found': 'No job opportunities found for this role.',
+      'jobs_loading': 'Loading job opportunities...',
+      'jobs_error': 'Unable to load job opportunities.',
+      'jobs_vacancy': 'Vacancy',
+      'jobs_vacancies': 'Vacancies',
+      'jobs_walkin': 'Walk-in',
+      'jobs_apply': 'Apply',
+      'jobs_salary_range': 'Salary',
+      'jobs_experience': 'Experience',
+      'jobs_applications': 'Applications',
+      'jobs_view_details': 'View Details',
     },
     'mr': {
       // General / common
@@ -635,6 +649,20 @@ class AppLocalizations {
       'sell_review_title': 'तुमचा अर्ज पुनरावलोकनाधीन आहे',
       'sell_review_desc': 'आम्हाला तुमच्या उत्पादनाचा तपशील प्राप्त झाला आहे. आमची टीम लवकरच याचे पुनरावलोकन करेल.',
       'sell_go_dashboard': 'डॅशबोर्डवर जा',
+
+      // Available Jobs
+      'jobs_available_title': 'उपलब्ध नोकऱ्या',
+      'jobs_no_jobs_found': 'या भूमिकेसाठी कोणतीही नोकरी उपलब्ध नाही.',
+      'jobs_loading': 'नोकरीच्या संधी लोड होत आहेत...',
+      'jobs_error': 'नोकरीच्या संधी लोड करता आल्या नाहीत.',
+      'jobs_vacancy': 'रिक्त जागा',
+      'jobs_vacancies': 'रिक्त जागा',
+      'jobs_walkin': 'वॉक-इन',
+      'jobs_apply': 'अर्ज करा',
+      'jobs_salary_range': 'पगार',
+      'jobs_experience': 'अनुभव',
+      'jobs_applications': 'अर्ज',
+      'jobs_view_details': 'तपशील पहा',
     },
     'hi': {
       // General / common
@@ -940,6 +968,20 @@ class AppLocalizations {
       'sell_review_title': 'आपका आवेदन समीक्षा के अधीन है',
       'sell_review_desc': 'हमें आपके उत्पाद का विवरण प्राप्त हो गया है। हमारी टीम जल्द ही इसकी समीक्षा करेगी।',
       'sell_go_dashboard': 'डैशबोर्ड पर जाएं',
+
+      // Available Jobs
+      'jobs_available_title': 'उपलब्ध नौकरियां',
+      'jobs_no_jobs_found': 'इस भूमिका के लिए कोई नौकरी उपलब्ध नहीं है।',
+      'jobs_loading': 'नौकरी के अवसर लोड हो रहे हैं...',
+      'jobs_error': 'नौकरी के अवसर लोड नहीं हो सके।',
+      'jobs_vacancy': 'रिक्ति',
+      'jobs_vacancies': 'रिक्तियां',
+      'jobs_walkin': 'वॉक-इन',
+      'jobs_apply': 'आवेदन करें',
+      'jobs_salary_range': 'वेतन',
+      'jobs_experience': 'अनुभव',
+      'jobs_applications': 'आवेदन',
+      'jobs_view_details': 'विवरण देखें',
     },
   };
 

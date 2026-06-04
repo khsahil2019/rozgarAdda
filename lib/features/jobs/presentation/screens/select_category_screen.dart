@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/widgets/network_image_service.dart';
 import '../controller/jobs_controller.dart';
 import '../../domain/entities/job_category.dart';
 import 'explore_jobs_screen.dart';
@@ -202,32 +203,17 @@ class _SelectCategoryScreenState extends State<SelectCategoryScreen> {
                 Expanded(
                   child: Container(
                     color: const Color(0xFFF7F8FB),
-                    child: Image.network(
-                      category.imageUrl,
+                    child: NetworkImageService(
+                      imageUrl: category.imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          alignment: Alignment.center,
-                          child: const Icon(
-                            Icons.work_outline_rounded,
-                            color: Color(0xFF0F5FFF),
-                            size: 32,
-                          ),
-                        );
-                      },
-                      loadingBuilder: (context, child, progress) {
-                        if (progress == null) return child;
-                        return const Center(
-                          child: SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Color(0xFF0F5FFF),
-                            ),
-                          ),
-                        );
-                      },
+                      errorWidget: Container(
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.work_outline_rounded,
+                          color: Color(0xFF0F5FFF),
+                          size: 32,
+                        ),
+                      ),
                     ),
                   ),
                 ),

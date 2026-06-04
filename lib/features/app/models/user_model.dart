@@ -2,6 +2,7 @@ import '../entity/user_entiity.dart';
 
 class UserModel {
   final int id;
+
   final String username;
   final String name;
   final String email;

@@ -24,4 +24,10 @@ class ApiRoutes {
   static String get categories => _buildUrl('categories');
   static String get subcategories => _buildUrl('subcategories');
   static String get addProduct => _buildUrl('sell/add');
+
+  // Jobs
+  static String get dashboard => _buildUrl('candidate/dashboard');
+  static String get jobRoles => _buildUrl('candidate/job-roles');
+  static String availableJobs(int roleId) =>
+      _buildUrl('candidate/available-jobs/$roleId');
 }
