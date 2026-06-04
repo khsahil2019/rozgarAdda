@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rojgar/applyjob_form.dart';
+import 'package:rojgar/features/jobs/presentation/screens/applyjob_form.dart';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────
 class AppColors {

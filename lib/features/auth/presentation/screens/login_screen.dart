@@ -29,10 +29,7 @@ class LoginScreen extends GetView<LoginController> {
       return;
     }
     if (!controller.acceptedTerms.value) {
-      _showErrorDialog(
-        context,
-        context.l10n.text('login_terms_error'),
-      );
+      _showErrorDialog(context, context.l10n.text('login_terms_error'));
       return;
     }
 
@@ -502,14 +499,15 @@ class LoginScreen extends GetView<LoginController> {
       height: 56,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
-        gradient: LinearGradient(
-          colors: isEnabled
-              ? const [primaryBlue, Color(0xFF6644FF), accentYellow]
-              : const [Color(0xFFB8BCCD), Color(0xFFB8BCCD)],
-          stops: isEnabled ? const [0.0, 0.6, 1.0] : const [0.0, 1.0],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
+        color: primaryBlue,
+        // gradient: LinearGradient(
+        //   colors: isEnabled
+        //       ? const [primaryBlue, Color(0xFF6644FF), accentYellow]
+        //       : const [Color(0xFFB8BCCD), Color(0xFFB8BCCD)],
+        //   stops: isEnabled ? const [0.0, 0.6, 1.0] : const [0.0, 1.0],
+        //   begin: Alignment.centerLeft,
+        //   end: Alignment.centerRight,
+        // ),
         boxShadow: [
           BoxShadow(
             color: (isEnabled ? primaryBlue : const Color(0xFFB8BCCD))

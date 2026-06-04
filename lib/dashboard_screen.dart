@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:rojgar/home.dart';
-import 'package:rojgar/kyc_screen.dart';
+import 'package:rojgar/features/jobs/presentation/screens/select_category_screen.dart';
+import 'package:rojgar/features/kyc/presentation/screens/edit_kyc_screen.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/main.dart';
 import 'package:rojgar/modules/product_screens/product_screen_list.dart';
-import 'package:rojgar/modules/sell_product/sell_product_category.dart';
+import 'package:rojgar/features/sell_product/presentation/screens/sell_product_category_screen.dart';
 import 'package:rojgar/features/news/prsentation/screens/news_screen.dart';
 
 class AC {
@@ -712,7 +712,7 @@ class _QuickLinkCard extends StatelessWidget {
                             } else if (link.label == 'News') {
                               return const NewsScreen();
                             } else {
-                              return ExploreCareerScreen();
+                              return const SelectCategoryScreen();
                             }
                           },
                         ),

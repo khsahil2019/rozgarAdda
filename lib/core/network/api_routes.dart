@@ -19,4 +19,9 @@ class ApiRoutes {
   static String get textNews => _buildUrl('text-news');
   static String get videoNews => _buildUrl('video-news');
   static String get videosNews => _buildUrl('videos-news');
+
+  // Sell Product
+  static String get categories => _buildUrl('categories');
+  static String get subcategories => _buildUrl('subcategories');
+  static String get addProduct => _buildUrl('sell/add');
 }

@@ -5,6 +5,9 @@ import '../../features/app/app_controller.dart';
 import '../../features/auth/presentation/bindings/auth_binding.dart';
 import '../../features/auth/presentation/controller/auth_controller.dart';
 import '../../features/news/prsentation/bindings/news_binding.dart';
+import '../../features/jobs/presentation/bindings/jobs_binding.dart';
+import '../../features/kyc/presentation/bindings/kyc_binding.dart';
+import '../../features/sell_product/presentation/bindings/sell_product_binding.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -20,6 +23,15 @@ class InitialBinding extends Bindings {
 
     // Register news dependencies
     NewsBinding().dependencies();
+
+    // Register jobs dependencies
+    JobsBinding().dependencies();
+
+    // Register kyc dependencies
+    KycBinding().dependencies();
+
+    // Register sell product dependencies
+    SellProductBinding().dependencies();
   }
 }
 
