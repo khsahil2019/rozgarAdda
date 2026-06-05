@@ -27,8 +27,8 @@ class AppLocalizations {
     'en': {
       // General / common
       'app_title': 'Rozgar Adda',
-      'app_logo_text': 'Rojgar',
-      'sidebar_username': 'Rahul Sharma',
+      'app_logo_text': 'Rozgar',
+      'sidebar_username': 'Rozgar User',
       'ok': 'OK',
       'cancel': 'Cancel',
       'continue': 'Continue',
@@ -91,18 +91,23 @@ class AppLocalizations {
       'registration_otp_resend_in': 'Resend in',
       'registration_otp_resend_sec': 's',
       'registration_phone_verified': '✓ Verified',
-      'registration_error_otp_phone': 'Please enter a valid 10-digit phone number.',
-      'registration_error_otp_incomplete': 'Please enter the complete 6-digit OTP.',
+      'registration_error_otp_phone':
+          'Please enter a valid 10-digit phone number.',
+      'registration_error_otp_incomplete':
+          'Please enter the complete 6-digit OTP.',
       'registration_otp_sent_success': 'OTP sent to your number!',
       'registration_otp_verify_success': 'Phone verified successfully!',
       'registration_error_fields': 'Please fill all required fields.',
       'registration_error_state': 'Please select a state.',
       'registration_error_district': 'Please select a district.',
-      'registration_error_terms': 'Please accept Terms and Privacy Policy to continue.',
-      'registration_error_phone_verify': 'Please verify your phone number first.',
+      'registration_error_terms':
+          'Please accept Terms and Privacy Policy to continue.',
+      'registration_error_phone_verify':
+          'Please verify your phone number first.',
 
       'registration_upload_title': 'Upload Identity Proof',
-      'registration_upload_hint': 'Aadhar Card, PAN, or Voter ID (JPG/PDF, max 2MB)',
+      'registration_upload_hint':
+          'Aadhar Card, PAN, or Voter ID (JPG/PDF, max 2MB)',
       'registration_choose_file': 'Choose File',
       'registration_password_hint': 'Min 8 characters',
       'registration_terms_privacy': 'Privacy Policy',
@@ -200,7 +205,8 @@ class AppLocalizations {
       'worker_kyc_verified': 'Worker • KYC Verified',
       'menu': 'MENU',
       'registration_success_title': 'Registration Successful',
-      'registration_success_message': 'You registered successfully with this email: ',
+      'registration_success_message':
+          'You registered successfully with this email: ',
 
       // Profile screen
       'profile_my_profile': 'My Profile',
@@ -225,7 +231,8 @@ class AppLocalizations {
 
       // Login extras
       'login_terms_agree': 'I agree to Terms of Service and Privacy Policy.',
-      'login_terms_error': 'Please accept Terms and Privacy Policy to continue.',
+      'login_terms_error':
+          'Please accept Terms and Privacy Policy to continue.',
       'login_or_continue': 'OR CONTINUE WITH',
       'login_sign_in': 'Sign In',
       'login_error_generic': 'Something went wrong. Please try again.',
@@ -238,7 +245,8 @@ class AppLocalizations {
       'kyc_section_personal': 'Personal Information',
       'kyc_section_address': 'Address Information',
       'kyc_section_documents': 'Documents Upload',
-      'kyc_docs_hint': 'Upload clear, readable copies. Supported: JPG, PNG, PDF, DOC',
+      'kyc_docs_hint':
+          'Upload clear, readable copies. Supported: JPG, PNG, PDF, DOC',
       'kyc_field_full_name': 'Full Name',
       'kyc_field_phone': 'Phone Number',
       'kyc_field_email': 'Email Address',
@@ -269,7 +277,8 @@ class AppLocalizations {
       'kyc_snack_no_candidate': 'Candidate ID not found. Please login again.',
       'kyc_snack_updated': 'KYC updated successfully',
       'kyc_snack_failed': 'Failed to update KYC. Please try again.',
-      'kyc_snack_error': 'Something went wrong while updating KYC. Please check your connection.',
+      'kyc_snack_error':
+          'Something went wrong while updating KYC. Please check your connection.',
       'kyc_upload_label': 'UPLOAD',
 
       // News screen
@@ -300,7 +309,8 @@ class AppLocalizations {
       'sell_change_by_back': 'You can change this by going back',
       'sell_change': 'CHANGE',
       'sell_no_subcategories': 'No sub-categories found',
-      'sell_subcategory_hint': 'Choose the most relevant sub-category for your\nadvertisement to reach more buyers.',
+      'sell_subcategory_hint':
+          'Choose the most relevant sub-category for your\nadvertisement to reach more buyers.',
       'sell_error_subcategories': 'Unable to load sub-categories.',
       'sell_product_title': 'Product Title',
       'sell_title_hint': 'Enter product name (e.g. BMW X5 2024)',
@@ -325,7 +335,8 @@ class AppLocalizations {
       'sell_error_saving': 'Something went wrong while saving the product.',
       'sell_review': 'Review',
       'sell_review_title': 'Your application is in review',
-      'sell_review_desc': 'We have received your product details. Our team will review it shortly.',
+      'sell_review_desc':
+          'We have received your product details. Our team will review it shortly.',
       'sell_go_dashboard': 'GO TO DASHBOARD',
 
       // Available Jobs
@@ -346,7 +357,7 @@ class AppLocalizations {
       // General / common
       'app_title': 'रोजगार अड्डा',
       'app_logo_text': 'रोजगार',
-      'sidebar_username': 'राहुल शर्मा',
+      'sidebar_username': 'रोजगार उपयोगकर्ता',
       'ok': 'ठीक आहे',
       'cancel': 'रद्द करा',
       'continue': 'पुढे जा',
@@ -411,17 +422,22 @@ class AppLocalizations {
       'registration_otp_resend_in': 'पुन्हा पाठवा',
       'registration_otp_resend_sec': 'से.',
       'registration_phone_verified': '✓ सत्यापित',
-      'registration_error_otp_phone': 'कृपया वैध 10-अंकी फोन नंबर प्रविष्ट करा.',
-      'registration_error_otp_incomplete': 'कृपया संपूर्ण 6-अंकी ओटीपी प्रविष्ट करा.',
+      'registration_error_otp_phone':
+          'कृपया वैध 10-अंकी फोन नंबर प्रविष्ट करा.',
+      'registration_error_otp_incomplete':
+          'कृपया संपूर्ण 6-अंकी ओटीपी प्रविष्ट करा.',
       'registration_otp_sent_success': 'ओटीपी तुमच्या नंबरवर पाठवला!',
       'registration_otp_verify_success': 'फोन नंबर यशस्वीरीत्या सत्यापित झाला!',
       'registration_error_fields': 'कृपया सर्व आवश्यक फील्ड भरा.',
       'registration_error_state': 'कृपया एक राज्य निवडा.',
       'registration_error_district': 'कृपया एक जिल्हा निवडा.',
-      'registration_error_terms': 'कृपया पुढे जाण्यासाठी नियम आणि गोपनीयता धोरण स्वीकारा.',
-      'registration_error_phone_verify': 'कृपया प्रथम तुमचा फोन नंबर सत्यापित करा.',
+      'registration_error_terms':
+          'कृपया पुढे जाण्यासाठी नियम आणि गोपनीयता धोरण स्वीकारा.',
+      'registration_error_phone_verify':
+          'कृपया प्रथम तुमचा फोन नंबर सत्यापित करा.',
       'registration_upload_title': 'ओळखपत्र अपलोड करा',
-      'registration_upload_hint': 'आधार कार्ड, पॅन किंवा मतदार ओळखपत्र (JPG/PDF, कमाल 2MB)',
+      'registration_upload_hint':
+          'आधार कार्ड, पॅन किंवा मतदार ओळखपत्र (JPG/PDF, कमाल 2MB)',
       'registration_choose_file': 'फाइल निवडा',
       'registration_password_hint': 'किमान ८ अक्षरे',
       'registration_terms_privacy': 'गोपनीयता धोरण',
@@ -522,7 +538,8 @@ class AppLocalizations {
       'worker_kyc_verified': 'कामगार • केवायसी सत्यापित',
       'menu': 'मेनू',
       'registration_success_title': 'नोंदणी यशस्वी',
-      'registration_success_message': 'तुम्ही या ईमेलसह यशस्वीरीत्या नोंदणी केली आहे: ',
+      'registration_success_message':
+          'तुम्ही या ईमेलसह यशस्वीरीत्या नोंदणी केली आहे: ',
 
       // Profile screen
       'profile_my_profile': 'माझी प्रोफाइल',
@@ -547,7 +564,8 @@ class AppLocalizations {
 
       // Login extras
       'login_terms_agree': 'मी सेवा अटी आणि गोपनीयता धोरणाशी सहमत आहे.',
-      'login_terms_error': 'कृपया पुढे जाण्यासाठी नियम आणि गोपनीयता धोरण स्वीकारा.',
+      'login_terms_error':
+          'कृपया पुढे जाण्यासाठी नियम आणि गोपनीयता धोरण स्वीकारा.',
       'login_or_continue': 'किंवा यासह सुरू ठेवा',
       'login_sign_in': 'साइन इन',
       'login_error_generic': 'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.',
@@ -560,7 +578,8 @@ class AppLocalizations {
       'kyc_section_personal': 'वैयक्तिक माहिती',
       'kyc_section_address': 'पत्ता माहिती',
       'kyc_section_documents': 'कागदपत्रे अपलोड',
-      'kyc_docs_hint': 'स्पष्ट, वाचनीय प्रती अपलोड करा. समर्थित: JPG, PNG, PDF, DOC',
+      'kyc_docs_hint':
+          'स्पष्ट, वाचनीय प्रती अपलोड करा. समर्थित: JPG, PNG, PDF, DOC',
       'kyc_field_full_name': 'पूर्ण नाव',
       'kyc_field_phone': 'मोबाईल नंबर',
       'kyc_field_email': 'ईमेल पत्ता',
@@ -588,10 +607,13 @@ class AppLocalizations {
       'kyc_snack_invalid_phone': 'कृपया वैध 10-अंकी मोबाईल नंबर प्रविष्ट करा.',
       'kyc_snack_invalid_pin': 'कृपया वैध 6-अंकी पिनकोड प्रविष्ट करा.',
       'kyc_snack_invalid_email': 'कृपया वैध ईमेल पत्ता प्रविष्ट करा.',
-      'kyc_snack_no_candidate': 'उमेदवार आयडी सापडला नाही. कृपया पुन्हा लॉगिन करा.',
+      'kyc_snack_no_candidate':
+          'उमेदवार आयडी सापडला नाही. कृपया पुन्हा लॉगिन करा.',
       'kyc_snack_updated': 'केवायसी यशस्वीरित्या अद्यतनित केले',
-      'kyc_snack_failed': 'केवायसी अद्यतन करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
-      'kyc_snack_error': 'केवायसी अद्यतन करताना काहीतरी चूक झाली. कृपया आपले कनेक्शन तपासा.',
+      'kyc_snack_failed':
+          'केवायसी अद्यतन करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
+      'kyc_snack_error':
+          'केवायसी अद्यतन करताना काहीतरी चूक झाली. कृपया आपले कनेक्शन तपासा.',
       'kyc_upload_label': 'अपलोड',
 
       // News screen
@@ -622,7 +644,8 @@ class AppLocalizations {
       'sell_change_by_back': 'तुम्ही मागे जाऊन हे बदलू शकता',
       'sell_change': 'बदला',
       'sell_no_subcategories': 'कोणत्याही उप-श्रेण्या आढळल्या नाहीत',
-      'sell_subcategory_hint': 'अधिक खरेदीदारांपर्यंत पोहोचण्यासाठी आपल्या जाहिरातीसाठी सर्वात संबंधित उप-श्रेणी निवडा.',
+      'sell_subcategory_hint':
+          'अधिक खरेदीदारांपर्यंत पोहोचण्यासाठी आपल्या जाहिरातीसाठी सर्वात संबंधित उप-श्रेणी निवडा.',
       'sell_error_subcategories': 'उप-श्रेण्या लोड करण्यात अक्षम.',
       'sell_product_title': 'उत्पादनाचे शीर्षक',
       'sell_title_hint': 'उत्पादनाचे नाव प्रविष्ट करा',
@@ -647,7 +670,8 @@ class AppLocalizations {
       'sell_error_saving': 'उत्पादन जतन करताना काहीतरी चुकले.',
       'sell_review': 'पुनरावलोकन',
       'sell_review_title': 'तुमचा अर्ज पुनरावलोकनाधीन आहे',
-      'sell_review_desc': 'आम्हाला तुमच्या उत्पादनाचा तपशील प्राप्त झाला आहे. आमची टीम लवकरच याचे पुनरावलोकन करेल.',
+      'sell_review_desc':
+          'आम्हाला तुमच्या उत्पादनाचा तपशील प्राप्त झाला आहे. आमची टीम लवकरच याचे पुनरावलोकन करेल.',
       'sell_go_dashboard': 'डॅशबोर्डवर जा',
 
       // Available Jobs
@@ -668,7 +692,7 @@ class AppLocalizations {
       // General / common
       'app_title': 'रोज़गार अड्डा',
       'app_logo_text': 'रोज़गार',
-      'sidebar_username': 'राहुल शर्मा',
+      'sidebar_username': 'रोजगार उपयोगकर्ता',
       'ok': 'ठीक है',
       'cancel': 'रद्द करें',
       'continue': 'आगे बढ़ें',
@@ -732,16 +756,21 @@ class AppLocalizations {
       'registration_otp_resend_sec': 'सेकंड',
       'registration_phone_verified': '✓ सत्यापित',
       'registration_error_otp_phone': 'कृपया वैध 10-अंकीय फ़ोन नंबर दर्ज करें।',
-      'registration_error_otp_incomplete': 'कृपया पूरा 6-अंकीय ओटीपी दर्ज करें।',
+      'registration_error_otp_incomplete':
+          'कृपया पूरा 6-अंकीय ओटीपी दर्ज करें।',
       'registration_otp_sent_success': 'ओटीपी आपके नंबर पर भेज दिया गया!',
-      'registration_otp_verify_success': 'फ़ोन नंबर सफलतापूर्वक सत्यापित हो गया!',
+      'registration_otp_verify_success':
+          'फ़ोन नंबर सफलतापूर्वक सत्यापित हो गया!',
       'registration_error_fields': 'कृपया सभी आवश्यक फ़ील्ड भरें।',
       'registration_error_state': 'कृपया एक राज्य चुनें।',
       'registration_error_district': 'कृपया एक ज़िला चुनें।',
-      'registration_error_terms': 'कृपया आगे बढ़ने के लिए नियम और गोपनीयता नीति स्वीकार करें।',
-      'registration_error_phone_verify': 'कृपया पहले अपना फ़ोन नंबर सत्यापित करें।',
+      'registration_error_terms':
+          'कृपया आगे बढ़ने के लिए नियम और गोपनीयता नीति स्वीकार करें।',
+      'registration_error_phone_verify':
+          'कृपया पहले अपना फ़ोन नंबर सत्यापित करें।',
       'registration_upload_title': 'पहचान प्रमाण अपलोड करें',
-      'registration_upload_hint': 'आधार कार्ड, पैन, या मतदाता पहचान पत्र (JPG/PDF, अधिकतम 2MB)',
+      'registration_upload_hint':
+          'आधार कार्ड, पैन, या मतदाता पहचान पत्र (JPG/PDF, अधिकतम 2MB)',
       'registration_choose_file': 'फ़ाइल चुनें',
       'registration_password_hint': 'कम से कम 8 वर्ण',
       'registration_terms_privacy': 'गोपनीयता नीति',
@@ -841,7 +870,8 @@ class AppLocalizations {
       'worker_kyc_verified': 'श्रमिक • केवाईसी सत्यापित',
       'menu': 'मेनू',
       'registration_success_title': 'पंजीकरण सफल',
-      'registration_success_message': 'आपने इस ईमेल के साथ सफलतापूर्वक पंजीकरण किया है: ',
+      'registration_success_message':
+          'आपने इस ईमेल के साथ सफलतापूर्वक पंजीकरण किया है: ',
 
       // Profile screen
       'profile_my_profile': 'मेरी प्रोफ़ाइल',
@@ -866,7 +896,8 @@ class AppLocalizations {
 
       // Login extras
       'login_terms_agree': 'मैं सेवा की शर्तें और गोपनीयता नीति से सहमत हूँ।',
-      'login_terms_error': 'कृपया आगे बढ़ने के लिए नियम और गोपनीयता नीति स्वीकार करें।',
+      'login_terms_error':
+          'कृपया आगे बढ़ने के लिए नियम और गोपनीयता नीति स्वीकार करें।',
       'login_or_continue': 'या इसके साथ जारी रखें',
       'login_sign_in': 'साइन इन',
       'login_error_generic': 'कुछ गलत हो गया। कृपया पुनः प्रयास करें।',
@@ -879,7 +910,8 @@ class AppLocalizations {
       'kyc_section_personal': 'व्यक्तिगत जानकारी',
       'kyc_section_address': 'पता जानकारी',
       'kyc_section_documents': 'दस्तावेज़ अपलोड',
-      'kyc_docs_hint': 'स्पष्ट, पठनीय प्रतियाँ अपलोड करें। समर्थित: JPG, PNG, PDF, DOC',
+      'kyc_docs_hint':
+          'स्पष्ट, पठनीय प्रतियाँ अपलोड करें। समर्थित: JPG, PNG, PDF, DOC',
       'kyc_field_full_name': 'पूरा नाम',
       'kyc_field_phone': 'मोबाइल नंबर',
       'kyc_field_email': 'ईमेल पता',
@@ -907,10 +939,12 @@ class AppLocalizations {
       'kyc_snack_invalid_phone': 'कृपया वैध 10-अंकीय मोबाइल नंबर दर्ज करें।',
       'kyc_snack_invalid_pin': 'कृपया वैध 6-अंकीय पिनकोड दर्ज करें।',
       'kyc_snack_invalid_email': 'कृपया वैध ईमेल पता दर्ज करें।',
-      'kyc_snack_no_candidate': 'उम्मीदवार आईडी नहीं मिली। कृपया पुनः लॉगिन करें।',
+      'kyc_snack_no_candidate':
+          'उम्मीदवार आईडी नहीं मिली। कृपया पुनः लॉगिन करें।',
       'kyc_snack_updated': 'KYC सफलतापूर्वक अपडेट हुई',
       'kyc_snack_failed': 'KYC अपडेट करने में विफल। कृपया पुनः प्रयास करें।',
-      'kyc_snack_error': 'KYC अपडेट करते समय कुछ गलत हो गया। कृपया अपना कनेक्शन जाँचें।',
+      'kyc_snack_error':
+          'KYC अपडेट करते समय कुछ गलत हो गया। कृपया अपना कनेक्शन जाँचें।',
       'kyc_upload_label': 'अपलोड',
 
       // News screen
@@ -941,7 +975,8 @@ class AppLocalizations {
       'sell_change_by_back': 'आप वापस जाकर इसे बदल सकते हैं',
       'sell_change': 'बदलें',
       'sell_no_subcategories': 'कोई उप-श्रेणियां नहीं मिलीं',
-      'sell_subcategory_hint': 'अधिक खरीदारों तक पहुंचने के लिए अपने विज्ञापन के लिए सबसे प्रासंगिक उप-श्रेणी चुनें।',
+      'sell_subcategory_hint':
+          'अधिक खरीदारों तक पहुंचने के लिए अपने विज्ञापन के लिए सबसे प्रासंगिक उप-श्रेणी चुनें।',
       'sell_error_subcategories': 'उप-श्रेणियां लोड करने में असमर्थ।',
       'sell_product_title': 'उत्पाद का शीर्षक',
       'sell_title_hint': 'उत्पाद का नाम दर्ज करें',
@@ -966,7 +1001,8 @@ class AppLocalizations {
       'sell_error_saving': 'उत्पाद सहेजते समय कुछ गलत हो गया।',
       'sell_review': 'समीक्षा',
       'sell_review_title': 'आपका आवेदन समीक्षा के अधीन है',
-      'sell_review_desc': 'हमें आपके उत्पाद का विवरण प्राप्त हो गया है। हमारी टीम जल्द ही इसकी समीक्षा करेगी।',
+      'sell_review_desc':
+          'हमें आपके उत्पाद का विवरण प्राप्त हो गया है। हमारी टीम जल्द ही इसकी समीक्षा करेगी।',
       'sell_go_dashboard': 'डैशबोर्ड पर जाएं',
 
       // Available Jobs

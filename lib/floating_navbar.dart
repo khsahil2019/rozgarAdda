@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:rojgar/dashboard_screen.dart';
+import 'package:rojgar/features/app/app_controller.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -173,32 +175,12 @@ class _FloatingNavbarScreenState extends State<FloatingNavbarScreen> {
 // ─────────────────────────────────────────────
 // PROFILE SCREEN
 // ─────────────────────────────────────────────
-class _ProfileScreen extends StatefulWidget {
+class _ProfileScreen extends StatelessWidget {
   const _ProfileScreen();
-
-  @override
-  State<_ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<_ProfileScreen> {
-  int? _candidateId;
 
   static const Color _greyText = Color(0xFF8A8FA3);
   static const Color _scaffoldBg = Color(0xFFF5F6FA);
   static const Color _red = Color(0xFFDD3344);
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProfile();
-  }
-
-  Future<void> _loadProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _candidateId = prefs.getInt('candidate_id');
-    });
-  }
 
   Future<void> _logout(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
@@ -232,162 +214,188 @@ class _ProfileScreenState extends State<_ProfileScreen> {
 
     if (confirmed != true) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('candidate_id');
-
-    if (!context.mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const SplashScreen()),
-      (_) => false,
-    );
+    AppController.to.logout();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (AppController.to.user != null && AppController.to.user!.name.isEmpty) {
+      AppController.to.fetchAndSyncUserData();
+    }
+
     return Scaffold(
       backgroundColor: _scaffoldBg,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            children: [
-              // ── Avatar Card ──────────────────────────
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 28,
-                  horizontal: 20,
-                ),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1400FF), Color(0xFF4433FF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+        child: Obx(() {
+          if (AppController.to.isUserDataLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFF1400FF)),
+            );
+          }
+          final user = AppController.to.user;
+          final candidateId = user?.id;
+          final name = user?.name.isNotEmpty == true
+              ? user!.name
+              : context.l10n.text('profile_my_profile');
+          final subtitle = user?.email.isNotEmpty == true
+              ? user!.email
+              : (user?.phone.isNotEmpty == true ? user!.phone : '');
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Column(
+              children: [
+                // ── Avatar Card ──────────────────────────
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 28,
+                    horizontal: 20,
                   ),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2.5),
-                      ),
-                      child: const Icon(
-                        Icons.person_rounded,
-                        color: Colors.white,
-                        size: 44,
-                      ),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1400FF), Color(0xFF4433FF)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                    const SizedBox(height: 14),
-                    Text(
-                      context.l10n.text('profile_my_profile'),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    if (_candidateId != null) ...[
-                      const SizedBox(height: 6),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 5,
-                        ),
+                        width: 80,
+                        height: 80,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.18),
-                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.white.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2.5),
                         ),
-                        child: Text(
-                          '${context.l10n.text('profile_id_label')}: $_candidateId',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
+                        child: const Icon(
+                          Icons.person_rounded,
+                          color: Colors.white,
+                          size: 44,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      if (subtitle.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
+                      ],
+                      if (candidateId != null) ...[
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            '${context.l10n.text('profile_id_label')}: $candidateId',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              // ── Menu Items ───────────────────────────
-              _ProfileTile(
-                icon: Icons.person_outline_rounded,
-                label: context.l10n.text('profile_edit_profile'),
-                onTap: () {},
-              ),
-              _ProfileTile(
-                icon: Icons.verified_outlined,
-                label: context.l10n.text('profile_kyc_status'),
-                onTap: () {},
-              ),
-              _ProfileTile(
-                icon: Icons.storefront_outlined,
-                label: context.l10n.text('profile_my_products'),
-                onTap: () {},
-              ),
-              _ProfileTile(
-                icon: Icons.work_outline_rounded,
-                label: context.l10n.text('profile_my_applications'),
-                onTap: () {},
-              ),
-              _ProfileTile(
-                icon: Icons.lock_outline_rounded,
-                label: context.l10n.text('profile_change_password'),
-                onTap: () {},
-              ),
-              _ProfileTile(
-                icon: Icons.help_outline_rounded,
-                label: context.l10n.text('profile_help_support'),
-                onTap: () {},
-              ),
+                // ── Menu Items ───────────────────────────
+                _ProfileTile(
+                  icon: Icons.person_outline_rounded,
+                  label: context.l10n.text('profile_edit_profile'),
+                  onTap: () {},
+                ),
+                _ProfileTile(
+                  icon: Icons.verified_outlined,
+                  label: context.l10n.text('profile_kyc_status'),
+                  onTap: () {},
+                ),
+                _ProfileTile(
+                  icon: Icons.storefront_outlined,
+                  label: context.l10n.text('profile_my_products'),
+                  onTap: () {},
+                ),
+                _ProfileTile(
+                  icon: Icons.work_outline_rounded,
+                  label: context.l10n.text('profile_my_applications'),
+                  onTap: () {},
+                ),
+                _ProfileTile(
+                  icon: Icons.lock_outline_rounded,
+                  label: context.l10n.text('profile_change_password'),
+                  onTap: () {},
+                ),
+                _ProfileTile(
+                  icon: Icons.help_outline_rounded,
+                  label: context.l10n.text('profile_help_support'),
+                  onTap: () {},
+                ),
 
-              const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-              // ── Logout Button ────────────────────────
-              GestureDetector(
-                onTap: () => _logout(context),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFEBEB),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: const Color(0xFFFFCCCC),
-                      width: 1,
+                // ── Logout Button ────────────────────────
+                GestureDetector(
+                  onTap: () => _logout(context),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFEBEB),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: const Color(0xFFFFCCCC),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.logout_rounded, color: _red, size: 22),
+                        const SizedBox(width: 10),
+                        Text(
+                          context.l10n.text('logout'),
+                          style: const TextStyle(
+                            color: _red,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.logout_rounded, color: _red, size: 22),
-                      const SizedBox(width: 10),
-                      Text(
-                        context.l10n.text('logout'),
-                        style: const TextStyle(
-                          color: _red,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
-              ),
 
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
+                const SizedBox(height: 24),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }

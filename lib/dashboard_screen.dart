@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:rojgar/features/app/app_controller.dart';
 import 'package:rojgar/features/jobs/presentation/screens/select_category_screen.dart';
 import 'package:rojgar/features/kyc/presentation/screens/edit_kyc_screen.dart';
 import 'package:rojgar/localization/app_localizations.dart';
@@ -1274,58 +1276,77 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                 ),
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.25),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.person_rounded,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context).text('sidebar_username'),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
+              child: Obx(() {
+                if (AppController.to.isUserDataLoading.value) {
+                  return const Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2.0,
                       ),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          AppLocalizations.of(
-                            context,
-                          ).text('worker_kyc_verified'),
+                    ),
+                  );
+                }
+                final user = AppController.to.user;
+                final name = user?.name.isNotEmpty == true
+                    ? user!.name
+                    : AppLocalizations.of(context).text('sidebar_username');
+
+                return Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.25),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.person_rounded,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            AppLocalizations.of(
+                              context,
+                            ).text('worker_kyc_verified'),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }),
             ),
 
             const SizedBox(height: 20),
@@ -1462,7 +1483,10 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  widget.onClose();
+                  AppController.to.logout();
+                },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
