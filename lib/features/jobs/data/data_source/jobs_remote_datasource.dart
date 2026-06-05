@@ -9,6 +9,12 @@ abstract class JobsRemoteDataSource {
   Future<List<JobCategoryModel>> getCategories();
   Future<List<JobRoleModel>> getJobRoles(int categoryId);
   Future<List<AvailableJobModel>> getAvailableJobs(int roleId);
+  Future<bool> applyJob({
+    required int jobId,
+    required String token,
+    required Map<String, String> fields,
+    required String resumePath,
+  });
 }
 
 class JobsRemoteDataSourceImpl implements JobsRemoteDataSource {
@@ -68,6 +74,33 @@ class JobsRemoteDataSourceImpl implements JobsRemoteDataSource {
     } catch (e) {
       if (e is Failure) rethrow;
       throw Failure('Failed to fetch available jobs. Please check your connection.');
+    }
+  }
+
+  @override
+  Future<bool> applyJob({
+    required int jobId,
+    required String token,
+    required Map<String, String> fields,
+    required String resumePath,
+  }) async {
+    try {
+      final res = await ApiService.uploadFiles(
+        method: 'POST',
+        url: ApiRoutes.applyJob(jobId),
+        accessToken: token,
+        fields: fields,
+        files: {'resume': resumePath},
+      );
+      if (res['statusCode'] == 200 &&
+          (res['status'] == true || res['success'] == true)) {
+        return true;
+      } else {
+        throw Failure(res['message'] ?? 'Failed to submit application');
+      }
+    } catch (e) {
+      if (e is Failure) rethrow;
+      throw Failure('Failed to submit application. Please check your connection.');
     }
   }
 }

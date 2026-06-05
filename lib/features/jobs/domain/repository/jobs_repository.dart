@@ -8,4 +8,18 @@ abstract class JobsRepository {
   Future<Either<Failure, List<JobCategory>>> getCategories();
   Future<Either<Failure, List<JobRoleEntity>>> getJobRoles(int categoryId);
   Future<Either<Failure, List<AvailableJob>>> getAvailableJobs(int roleId);
+  Future<Either<Failure, bool>> applyJob({
+    required int jobId,
+    required String fullName,
+    required String email,
+    required String phone,
+    required String experienceYears,
+    required String experienceMonths,
+    required String expectedSalary,
+    required String noticePeriod,
+    required String educationLevel,
+    required String educationDetails,
+    required String keySkills,
+    required String resumePath,
+  });
 }

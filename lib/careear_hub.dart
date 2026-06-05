@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rojgar/job_detail.dart';
+import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────

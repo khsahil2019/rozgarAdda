@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:rojgar/job_detail.dart';
+import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/widgets/network_image_service.dart';
 import '../../../../localization/app_localizations.dart';
@@ -11,6 +12,7 @@ import '../controller/jobs_controller.dart';
 
 enum _FilterSection {
   category,
+  role,
   jobType,
   salary,
   education,
@@ -105,10 +107,10 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
   void initState() {
     super.initState();
     controller = Get.find<JobsController>();
-    
+
     // Ensure selectedRole is set
     controller.selectedRole.value = widget.role;
-    
+
     // Initialize selected category index
     if (controller.selectedCategory.value != null) {
       final idx = controller.categories.indexWhere(
@@ -118,7 +120,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
         _selectedCategoryIndex = idx;
       }
     }
-    
+
     // Fetch available jobs
     controller.fetchAvailableJobs(widget.role.id);
   }
@@ -171,7 +173,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
 
   bool _matchExperience(AvailableJob job, int index) {
     final expVal = _parseExp(job.experienceLevel);
-    if (expVal == null) return true; 
+    if (expVal == null) return true;
 
     if (index == 1) {
       // Fresher
@@ -229,7 +231,9 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
       return;
     }
     final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
-    final message = Uri.encodeComponent('Hello, I am interested in your job posting: "$title".');
+    final message = Uri.encodeComponent(
+      'Hello, I am interested in your job posting: "$title".',
+    );
     final Uri url = Uri.parse('https://wa.me/$cleanPhone?text=$message');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
@@ -278,7 +282,8 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                 final selectedCategory = categories.isNotEmpty
                     ? categories[_selectedCategoryIndex]
                     : controller.selectedCategory.value;
-                final selectedCategoryName = selectedCategory?.name ?? 'Category';
+                final selectedCategoryName =
+                    selectedCategory?.name ?? 'Category';
 
                 if (controller.isLoadingAvailableJobs.value) {
                   return const Center(
@@ -294,8 +299,11 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                 final filteredJobs = controller.availableJobs.where((job) {
                   // 1. Job Type
                   if (_selectedJobTypeIndex != 0) {
-                    final selectedType = _jobTypeOptions[_selectedJobTypeIndex].toLowerCase();
-                    final typeString = selectedType.replaceAll('-', '_').replaceAll(' ', '_');
+                    final selectedType = _jobTypeOptions[_selectedJobTypeIndex]
+                        .toLowerCase();
+                    final typeString = selectedType
+                        .replaceAll('-', '_')
+                        .replaceAll(' ', '_');
                     if (job.jobType.toLowerCase() != typeString) {
                       return false;
                     }
@@ -310,8 +318,12 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
 
                   // 3. Education
                   if (_selectedEducationIndex != 0) {
-                    final selectedEdu = _educationOptions[_selectedEducationIndex].toLowerCase();
-                    if (!job.educationLevel.toLowerCase().contains(selectedEdu)) {
+                    final selectedEdu =
+                        _educationOptions[_selectedEducationIndex]
+                            .toLowerCase();
+                    if (!job.educationLevel.toLowerCase().contains(
+                      selectedEdu,
+                    )) {
                       return false;
                     }
                   }
@@ -332,8 +344,10 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
 
                   // 6. Location
                   if (_selectedLocationIndex != 0) {
-                    final selectedLoc = _locationOptions[_selectedLocationIndex].toLowerCase();
-                    final inLoc = job.addressLine1.toLowerCase().contains(selectedLoc) ||
+                    final selectedLoc = _locationOptions[_selectedLocationIndex]
+                        .toLowerCase();
+                    final inLoc =
+                        job.addressLine1.toLowerCase().contains(selectedLoc) ||
                         job.addressLine2.toLowerCase().contains(selectedLoc) ||
                         job.stateName.toLowerCase().contains(selectedLoc);
                     if (!inLoc) {
@@ -365,10 +379,12 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: filteredJobs.length,
-                                separatorBuilder: (_, __) => const SizedBox(height: 18),
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 18),
                                 itemBuilder: (context, index) {
                                   final job = filteredJobs[index];
-                                  final categoryImg = selectedCategory?.imageUrl ?? '';
+                                  final categoryImg =
+                                      selectedCategory?.imageUrl ?? '';
                                   return _buildJobCard(job, categoryImg, l10n);
                                 },
                               ),
@@ -411,7 +427,8 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
           const SizedBox(width: 14),
           Expanded(
             child: Obx(() {
-              final roleName = controller.selectedRole.value?.name ?? widget.role.name;
+              final roleName =
+                  controller.selectedRole.value?.name ?? widget.role.name;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -448,6 +465,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     final categoryLabel = categories.isEmpty
         ? 'Job Category'
         : categories[_selectedCategoryIndex].name;
+    final roleLabel = controller.selectedRole.value?.name ?? widget.role.name;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -457,9 +475,17 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
             onTap: categories.isEmpty
                 ? null
                 : () => _showFilterSheet(
-                      categories: categories,
-                      initialSection: _FilterSection.category,
-                    ),
+                    categories: categories,
+                    initialSection: _FilterSection.category,
+                  ),
+          ),
+          const SizedBox(width: 10),
+          _buildFilterChip(
+            label: roleLabel,
+            onTap: () => _showFilterSheet(
+              categories: categories,
+              initialSection: _FilterSection.role,
+            ),
           ),
           const SizedBox(width: 10),
           _buildFilterChip(
@@ -620,7 +646,11 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     );
   }
 
-  Widget _buildJobCard(AvailableJob job, String categoryImageUrl, AppLocalizations l10n) {
+  Widget _buildJobCard(
+    AvailableJob job,
+    String categoryImageUrl,
+    AppLocalizations l10n,
+  ) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -632,7 +662,9 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                 jobId: job.id,
                 jobTitle: job.title,
                 company: job.stateName.isNotEmpty ? job.stateName : 'Company',
-                location: job.addressLine1.isNotEmpty ? job.addressLine1 : job.stateName,
+                location: job.addressLine1.isNotEmpty
+                    ? job.addressLine1
+                    : job.stateName,
                 salary: job.salaryDisplay,
                 jobType: job.jobTypeLabel,
               ),
@@ -717,11 +749,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  const Icon(
-                    Icons.apartment_rounded,
-                    color: _C.grey,
-                    size: 22,
-                  ),
+                  const Icon(Icons.apartment_rounded, color: _C.grey, size: 22),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -746,7 +774,9 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      job.addressLine1.isNotEmpty ? job.addressLine1 : job.stateName,
+                      job.addressLine1.isNotEmpty
+                          ? job.addressLine1
+                          : job.stateName,
                       style: const TextStyle(
                         fontSize: 18,
                         color: _C.grey,
@@ -776,73 +806,78 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                 ),
               ),
               const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _openWhatsApp(job.contactPhone, job.title),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: _C.borderGrey),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+              SizedBox(
+                height: 30.h,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            _openWhatsApp(job.contactPhone, job.title),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: _C.borderGrey),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 5.sp),
+                          foregroundColor: _C.darkText,
+                          backgroundColor: Colors.white,
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        foregroundColor: _C.darkText,
-                        backgroundColor: Colors.white,
-                      ),
-                      icon: const Icon(Icons.chat, color: Color(0xFF1EBE5D)),
-                      label: const Text(
-                        'Chat',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
+                        icon: SizedBox(
+                          width: 20.sp,
+                          height: 20.sp,
+                          child: Image.asset('assets/icons/whatsapp.png'),
                         ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 1,
-                    child: ElevatedButton.icon(
-                      onPressed: () => _makeCall(job.contactPhone),
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: _C.yellow,
-                        foregroundColor: _C.darkText,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                      ),
-                      icon: const Icon(Icons.phone_rounded, size: 18),
-                      label: const Text(
-                        'Call HR',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
+                        label: Text(
+                          'Chat',
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Container(
-                    width: 54,
-                    height: 54,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: _C.borderGrey,
-                        width: 1.2,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 1,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _makeCall(job.contactPhone),
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: _C.yellow,
+                          foregroundColor: _C.darkText,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 5.sp),
+                        ),
+                        icon: const Icon(Icons.phone_rounded, size: 18),
+                        label: Text(
+                          'Call HR',
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                       ),
                     ),
-                    child: const Icon(
-                      Icons.chevron_right_rounded,
-                      size: 34,
-                      color: _C.darkText,
+                    const SizedBox(width: 12),
+                    Container(
+                      width: 54,
+                      height: 54,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: _C.borderGrey, width: 1.2),
+                      ),
+                      child: const Icon(
+                        Icons.chevron_right_rounded,
+                        size: 34,
+                        color: _C.darkText,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -906,11 +941,16 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                 color: _C.red.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.error_outline_rounded, color: _C.red, size: 32),
+              child: const Icon(
+                Icons.error_outline_rounded,
+                color: _C.red,
+                size: 32,
+              ),
             ),
             const SizedBox(height: 20),
             Text(
-              controller.availableJobsError.value ?? l10n.text('jobs_no_jobs_found'),
+              controller.availableJobsError.value ??
+                  l10n.text('jobs_no_jobs_found'),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: _C.darkText,
@@ -932,7 +972,8 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                 ),
               ),
               onPressed: () {
-                final roleId = controller.selectedRole.value?.id ?? widget.role.id;
+                final roleId =
+                    controller.selectedRole.value?.id ?? widget.role.id;
                 controller.fetchAvailableJobs(roleId);
               },
               icon: const Icon(Icons.refresh_rounded, size: 18),
@@ -959,7 +1000,10 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
         return StatefulBuilder(
           builder: (context, setModalState) {
             final options = _optionsForSection(activeSection, categories);
-            final currentIndex = _selectedIndexForSection(activeSection, categories);
+            final currentIndex = _selectedIndexForSection(
+              activeSection,
+              categories,
+            );
 
             return Align(
               alignment: Alignment.bottomCenter,
@@ -1035,10 +1079,14 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                       vertical: 18,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: isActive ? Colors.white : Colors.transparent,
+                                      color: isActive
+                                          ? Colors.white
+                                          : Colors.transparent,
                                       border: Border(
                                         left: BorderSide(
-                                          color: isActive ? _C.yellow : Colors.transparent,
+                                          color: isActive
+                                              ? _C.yellow
+                                              : Colors.transparent,
                                           width: 4,
                                         ),
                                       ),
@@ -1048,7 +1096,9 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w700,
-                                        color: isActive ? _C.yellow : _C.darkText,
+                                        color: isActive
+                                            ? _C.yellow
+                                            : _C.darkText,
                                       ),
                                     ),
                                   ),
@@ -1060,41 +1110,58 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                             child: Column(
                               children: [
                                 Expanded(
-                                  child: activeSection == _FilterSection.category
+                                  child:
+                                      activeSection == _FilterSection.category
                                       ? GridView.builder(
-                                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                                          padding: const EdgeInsets.fromLTRB(
+                                            16,
+                                            14,
+                                            16,
+                                            16,
+                                          ),
                                           gridDelegate:
                                               const SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 2,
-                                            mainAxisSpacing: 12,
-                                            crossAxisSpacing: 12,
-                                            childAspectRatio: 0.92,
-                                          ),
+                                                crossAxisCount: 2,
+                                                mainAxisSpacing: 12,
+                                                crossAxisSpacing: 12,
+                                                childAspectRatio: 0.92,
+                                              ),
                                           itemCount: categories.length,
                                           itemBuilder: (_, index) {
                                             final category = categories[index];
-                                            final isSelected = index == _selectedCategoryIndex;
+                                            final isSelected =
+                                                index == _selectedCategoryIndex;
                                             return _CategoryFilterCard(
                                               category: category,
                                               isSelected: isSelected,
                                               onTap: () async {
-                                                final navigator = Navigator.of(context);
                                                 setState(() {
-                                                  _selectedCategoryIndex = index;
+                                                  _selectedCategoryIndex =
+                                                      index;
                                                 });
                                                 await _changeCategory(category);
-                                                navigator.pop(true);
+                                                setModalState(() {
+                                                  activeSection =
+                                                      _FilterSection.role;
+                                                });
                                               },
                                             );
                                           },
                                         )
                                       : ListView.separated(
-                                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                                          padding: const EdgeInsets.fromLTRB(
+                                            16,
+                                            14,
+                                            16,
+                                            16,
+                                          ),
                                           itemCount: options.length,
-                                          separatorBuilder: (_, __) => const SizedBox(height: 8),
+                                          separatorBuilder: (_, __) =>
+                                              const SizedBox(height: 8),
                                           itemBuilder: (_, index) {
                                             final option = options[index];
-                                            final isSelected = index == currentIndex;
+                                            final isSelected =
+                                                index == currentIndex;
                                             return InkWell(
                                               onTap: () {
                                                 setState(() {
@@ -1106,17 +1173,20 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                                 });
                                                 setModalState(() {});
                                               },
-                                              borderRadius: BorderRadius.circular(16),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
                                               child: Container(
-                                                padding: const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 10,
-                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 10,
+                                                    ),
                                                 decoration: BoxDecoration(
                                                   color: isSelected
                                                       ? const Color(0xFFF7F8FC)
                                                       : Colors.transparent,
-                                                  borderRadius: BorderRadius.circular(16),
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
                                                 ),
                                                 child: Row(
                                                   children: [
@@ -1125,7 +1195,8 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                                         option,
                                                         style: const TextStyle(
                                                           fontSize: 18,
-                                                          fontWeight: FontWeight.w700,
+                                                          fontWeight:
+                                                              FontWeight.w700,
                                                           color: _C.darkText,
                                                         ),
                                                       ),
@@ -1138,16 +1209,20 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                                         border: Border.all(
                                                           color: isSelected
                                                               ? _C.darkText
-                                                              : const Color(0xFF8A8E97),
+                                                              : const Color(
+                                                                  0xFF8A8E97,
+                                                                ),
                                                           width: 2,
                                                         ),
                                                       ),
                                                       child: isSelected
                                                           ? const Center(
                                                               child: Icon(
-                                                                Icons.circle_rounded,
+                                                                Icons
+                                                                    .circle_rounded,
                                                                 size: 14,
-                                                                color: _C.darkText,
+                                                                color:
+                                                                    _C.darkText,
                                                               ),
                                                             )
                                                           : null,
@@ -1160,7 +1235,12 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                         ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+                                  padding: const EdgeInsets.fromLTRB(
+                                    16,
+                                    0,
+                                    16,
+                                    18,
+                                  ),
                                   child: Column(
                                     children: [
                                       SizedBox(
@@ -1177,7 +1257,8 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                               _selectedLocationIndex = 0;
                                             });
                                             setModalState(() {
-                                              activeSection = _FilterSection.category;
+                                              activeSection =
+                                                  _FilterSection.category;
                                             });
                                             if (categories.isNotEmpty) {
                                               _changeCategory(categories.first);
@@ -1189,9 +1270,12 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                               width: 2,
                                             ),
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
-                                            padding: const EdgeInsets.symmetric(vertical: 16),
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 16,
+                                            ),
                                           ),
                                           child: const Text(
                                             'Clear filter',
@@ -1207,15 +1291,19 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                       SizedBox(
                                         width: double.infinity,
                                         child: ElevatedButton(
-                                          onPressed: () => Navigator.pop(context, true),
+                                          onPressed: () =>
+                                              Navigator.pop(context, true),
                                           style: ElevatedButton.styleFrom(
                                             elevation: 0,
                                             backgroundColor: _C.yellow,
                                             foregroundColor: _C.darkText,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
-                                            padding: const EdgeInsets.symmetric(vertical: 16),
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 16,
+                                            ),
                                           ),
                                           child: const Text(
                                             'Submit',
@@ -1252,6 +1340,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
   String _sectionTitle(_FilterSection section) {
     return switch (section) {
       _FilterSection.category => 'Job Category',
+      _FilterSection.role => 'Job Role',
       _FilterSection.jobType => 'Job Type',
       _FilterSection.salary => 'Salary Range',
       _FilterSection.education => 'Education',
@@ -1267,9 +1356,10 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
   ) {
     return switch (section) {
       _FilterSection.category => [
-          'All Categories',
-          ...categories.map((item) => item.name),
-        ],
+        'All Categories',
+        ...categories.map((item) => item.name),
+      ],
+      _FilterSection.role => controller.jobRoles.map((r) => r.name).toList(),
       _FilterSection.jobType => _jobTypeOptions,
       _FilterSection.salary => _salaryOptions,
       _FilterSection.education => _educationOptions,
@@ -1284,7 +1374,16 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     List<JobCategory> categories,
   ) {
     return switch (section) {
-      _FilterSection.category => categories.isEmpty ? 0 : _selectedCategoryIndex + 1,
+      _FilterSection.category =>
+        categories.isEmpty ? 0 : _selectedCategoryIndex + 1,
+      _FilterSection.role => () {
+        final currentRole = controller.selectedRole.value;
+        if (currentRole == null) return 0;
+        final idx = controller.jobRoles.indexWhere(
+          (r) => r.id == currentRole.id,
+        );
+        return idx != -1 ? idx : 0;
+      }(),
       _FilterSection.jobType => _selectedJobTypeIndex,
       _FilterSection.salary => _selectedSalaryIndex,
       _FilterSection.education => _selectedEducationIndex,
@@ -1307,6 +1406,14 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
         if (categories.isNotEmpty) {
           final cat = categories[_selectedCategoryIndex];
           _changeCategory(cat);
+        }
+        return;
+      case _FilterSection.role:
+        if (controller.jobRoles.isNotEmpty &&
+            index >= 0 &&
+            index < controller.jobRoles.length) {
+          final newRole = controller.jobRoles[index];
+          controller.selectRole(newRole);
         }
         return;
       case _FilterSection.jobType:
@@ -1363,7 +1470,9 @@ class _CategoryFilterCard extends StatelessWidget {
             children: [
               Expanded(
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(17)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(17),
+                  ),
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
