@@ -4,7 +4,8 @@ import 'package:rojgar/core/exceptions/exceptions.dart';
 import 'package:rojgar/features/auth/presentation/controller/login_controller.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/features/auth/presentation/screens/registration_screen.dart';
-import 'package:rojgar/select_state_screen.dart';
+import 'package:rojgar/features/state_selection/presentation/screens/select_state_screen.dart';
+import 'package:rojgar/features/state_selection/presentation/bindings/state_selection_binding.dart';
 import 'package:rojgar/splash_screen.dart';
 
 class LoginScreen extends GetView<LoginController> {
@@ -36,10 +37,9 @@ class LoginScreen extends GetView<LoginController> {
     try {
       await controller.login();
       if (!context.mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => SelectStateScreen(successMessage: username),
-        ),
+      Get.off(
+        () => SelectStateScreen(successMessage: username),
+        binding: StateSelectionBinding(),
       );
     } catch (e) {
       if (!context.mounted) return;

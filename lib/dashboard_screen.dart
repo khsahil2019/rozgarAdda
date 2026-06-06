@@ -8,6 +8,8 @@ import 'package:rojgar/main.dart';
 import 'package:rojgar/modules/product_screens/product_screen_list.dart';
 import 'package:rojgar/features/sell_product/presentation/screens/sell_product_category_screen.dart';
 import 'package:rojgar/features/news/prsentation/screens/news_screen.dart';
+import 'package:rojgar/features/state_selection/presentation/screens/select_state_screen.dart';
+import 'package:rojgar/features/state_selection/presentation/bindings/state_selection_binding.dart';
 
 class AC {
   static const Color primaryPurple = Color(0xFF5B2BE0);
@@ -89,7 +91,7 @@ const List<QuickLink> kQuickLinks = [
     Icons.payments_rounded,
     AC.orangeBg,
     AC.orangeIcon,
-    'https://images.unsplash.com/photo-1565140834639-60452b8b0ae5?auto=format&fit=crop&w=400&q=80',
+    'https://i.ibb.co/qFXNhgFD/Whats-App-Image-2026-06-06-at-12-45-46-AM.jpg',
   ),
   QuickLink(
     'Missing Persons',
@@ -104,6 +106,13 @@ const List<QuickLink> kQuickLinks = [
     Icons.school_rounded,
     AC.cyanBg,
     AC.cyanIcon,
+    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80',
+  ),
+  QuickLink(
+    'Recent Jobs',
+    Icons.school_rounded,
+    AC.cyanBg,
+    Color.fromARGB(255, 174, 152, 255),
     'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80',
   ),
 ];
@@ -348,38 +357,54 @@ class _HomeScreenState extends State<HomeScreen>
 
           // Location chip
           Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: AC.lightPurple,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.location_on_rounded,
-                    color: AC.primaryPurple,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      l10n.text('dashboard_location'),
-                      style: const TextStyle(
-                        color: AC.primaryPurple,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        height: 1.2,
-                      ),
+            child: GestureDetector(
+              onTap: () {
+                Get.to(
+                  () => const SelectStateScreen(fromDashboard: true),
+                  binding: StateSelectionBinding(),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: AC.lightPurple,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.location_on_rounded,
+                      color: AC.primaryPurple,
+                      size: 16,
                     ),
-                  ),
-                  const Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: AC.primaryPurple,
-                    size: 18,
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Obx(() {
+                        final stateName = AppController.to.selectedStateName;
+                        return Text(
+                          stateName ?? l10n.text('dashboard_location'),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AC.primaryPurple,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            height: 1.2,
+                          ),
+                        );
+                      }),
+                    ),
+                    const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: AC.primaryPurple,
+                      size: 18,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -417,20 +442,20 @@ class _HomeScreenState extends State<HomeScreen>
 
           const SizedBox(width: 10),
 
-          // Avatar
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AC.lightPurple,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.person_rounded,
-              color: AC.primaryPurple,
-              size: 22,
-            ),
-          ),
+          // // Avatar
+          // Container(
+          //   width: 40,
+          //   height: 40,
+          //   decoration: BoxDecoration(
+          //     color: AC.lightPurple,
+          //     shape: BoxShape.circle,
+          //   ),
+          //   child: const Icon(
+          //     Icons.person_rounded,
+          //     color: AC.primaryPurple,
+          //     size: 22,
+          //   ),
+          // ),
         ],
       ),
     );

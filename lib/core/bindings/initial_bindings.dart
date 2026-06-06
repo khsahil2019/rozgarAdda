@@ -8,6 +8,7 @@ import '../../features/news/prsentation/bindings/news_binding.dart';
 import '../../features/jobs/presentation/bindings/jobs_binding.dart';
 import '../../features/kyc/presentation/bindings/kyc_binding.dart';
 import '../../features/sell_product/presentation/bindings/sell_product_binding.dart';
+import '../../features/state_selection/presentation/bindings/state_selection_binding.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -32,6 +33,9 @@ class InitialBinding extends Bindings {
 
     // Register sell product dependencies
     SellProductBinding().dependencies();
+
+    // Register state selection dependencies
+    StateSelectionBinding().dependencies();
   }
 }
 

@@ -1085,7 +1085,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                       border: Border(
                                         left: BorderSide(
                                           color: isActive
-                                              ? _C.yellow
+                                              ? _C.primaryBlue
                                               : Colors.transparent,
                                           width: 4,
                                         ),
@@ -1097,7 +1097,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                         fontSize: 15,
                                         fontWeight: FontWeight.w700,
                                         color: isActive
-                                            ? _C.yellow
+                                            ? _C.primaryBlue
                                             : _C.darkText,
                                       ),
                                     ),

@@ -16,9 +16,13 @@ class AppController extends GetxController {
   final _isLoggedIn = false.obs;
   final _user = Rxn<UserEntity>();
   final isUserDataLoading = false.obs;
+  final rxSelectedStateId = RxnInt();
+  final rxSelectedStateName = RxnString();
 
   bool get isLoggedIn => _isLoggedIn.value;
   UserEntity? get user => _user.value;
+  int? get selectedStateId => rxSelectedStateId.value;
+  String? get selectedStateName => rxSelectedStateName.value;
 
   final rxLocale = const Locale('en').obs;
   Locale get currentLocale => rxLocale.value;
@@ -34,6 +38,7 @@ class AppController extends GetxController {
   void onInit() {
     super.onInit();
     _loadSavedLocale();
+    _loadSelectedState();
     _checkLoginState();
     _configureInterceptor();
   }
@@ -49,6 +54,18 @@ class AppController extends GetxController {
   void _loadSavedLocale() {
     final savedCode = _storageService.getLanguageCode() ?? 'en';
     rxLocale.value = Locale(savedCode);
+  }
+
+  void _loadSelectedState() {
+    rxSelectedStateId.value = _storageService.getSelectedStateId();
+    rxSelectedStateName.value = _storageService.getSelectedStateName();
+  }
+
+  void updateSelectedState(int id, String name) {
+    rxSelectedStateId.value = id;
+    rxSelectedStateName.value = name;
+    _storageService.saveSelectedStateId(id);
+    _storageService.saveSelectedStateName(name);
   }
 
   void _checkLoginState() {

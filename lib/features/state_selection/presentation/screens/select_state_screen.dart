@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
 import 'package:rojgar/floating_navbar.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../domain/entities/state_entity.dart';
+import '../controller/select_state_controller.dart';
 
 class AC {
   static const Color primaryBlue = Color(0xFF1400FF);
@@ -19,112 +19,29 @@ class AC {
 }
 
 // ─────────────────────────────────────────────
-// DATA
-// ─────────────────────────────────────────────
-class StateItem {
-  final String english;
-  final String hindi;
-  // Currently unused on this page.
-  // final String imagePlaceholder;
-  // final Color landmarkColor;
-
-  const StateItem({
-    required this.english,
-    required this.hindi,
-    // required this.imagePlaceholder,
-    // required this.landmarkColor,
-  });
-}
-
-const List<StateItem> kStates = [
-  StateItem(
-    english: 'Uttar Pradesh',
-    hindi: 'उत्तर प्रदेश',
-    // imagePlaceholder: 'taj',
-    // landmarkColor: Color(0xFF87CEEB),
-  ),
-  StateItem(
-    english: 'Maharashtra',
-    hindi: 'महाराष्ट्र',
-    // imagePlaceholder: 'gateway',
-    // landmarkColor: Color(0xFF6B9BD2),
-  ),
-  StateItem(
-    english: 'Bihar',
-    hindi: 'बिहार',
-    // imagePlaceholder: 'nalanda',
-    // landmarkColor: Color(0xFFC8860A),
-  ),
-  StateItem(
-    english: 'Rajasthan',
-    hindi: 'राजस्थान',
-    // imagePlaceholder: 'hawa',
-    // landmarkColor: Color(0xFFE8A95C),
-  ),
-  StateItem(
-    english: 'West Bengal',
-    hindi: 'पश्चिम बंगाल',
-    // imagePlaceholder: 'victoria',
-    // landmarkColor: Color(0xFF4A8C5C),
-  ),
-  StateItem(
-    english: 'Madhya Pradesh',
-    hindi: 'मध्य प्रदेश',
-    // imagePlaceholder: 'khajuraho',
-    // landmarkColor: Color(0xFF8B6914),
-  ),
-];
-
-class ApiState {
-  final int id;
-  final String name;
-  final String language;
-  final String imageUrl;
-
-  const ApiState({
-    required this.id,
-    required this.name,
-    required this.language,
-    required this.imageUrl,
-  });
-
-  factory ApiState.fromJson(Map<String, dynamic> json) {
-    return ApiState(
-      id: (json['s_id'] ?? 0) is int
-          ? json['s_id'] as int
-          : int.tryParse(json['s_id'].toString()) ?? 0,
-      name: (json['s_name'] ?? '').toString(),
-      language: (json['s_language'] ?? '').toString(),
-      imageUrl: (json['s_image'] ?? '').toString(),
-    );
-  }
-}
-
-const String kStatesEndpoint = 'https://rozgaradda.com/api/states-images';
-
-// ─────────────────────────────────────────────
 // SCREEN
 // ─────────────────────────────────────────────
 class SelectStateScreen extends StatefulWidget {
-  const SelectStateScreen({super.key, this.successMessage});
+  const SelectStateScreen({
+    super.key,
+    this.successMessage,
+    this.fromDashboard = false,
+  });
 
   final String? successMessage;
+  final bool fromDashboard;
 
   @override
   State<SelectStateScreen> createState() => _SelectStateScreenState();
 }
 
 class _SelectStateScreenState extends State<SelectStateScreen> {
-  final List<ApiState> _states = [];
-  bool _isLoading = false;
-  String? _error;
-  String _searchQuery = '';
-  int? _selectedStateId;
+  late final SelectStateController controller;
 
   @override
   void initState() {
     super.initState();
-    _fetchStates();
+    controller = Get.find<SelectStateController>();
     if (widget.successMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showLoginSuccessDialog(widget.successMessage!);
@@ -153,84 +70,11 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
     );
   }
 
-  Future<void> _fetchStates() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final response = await http.get(Uri.parse(kStatesEndpoint));
-
-      if (response.statusCode == 200) {
-        final decoded = json.decode(response.body) as Map<String, dynamic>;
-        final List<dynamic> data = (decoded['data'] as List?) ?? <dynamic>[];
-
-        final fetchedStates = data
-            .map((e) => ApiState.fromJson(e as Map<String, dynamic>))
-            .toList();
-
-        setState(() {
-          _states
-            ..clear()
-            ..addAll(fetchedStates);
-          _isLoading = false;
-          if (_states.isNotEmpty) {
-            _selectedStateId = _states.first.id;
-          }
-        });
-      } else {
-        setState(() {
-          _isLoading = false;
-          _error = 'Unable to load states. Please try again.';
-        });
-        // _loadFallbackStates();
-      }
-    } catch (_) {
-      setState(() {
-        _isLoading = false;
-        _error = 'Unable to load states. Please check your connection.';
-      });
-      // _loadFallbackStates();
-    }
-  }
-
-  /*
-  // Dummy fallback data is intentionally disabled on this screen.
-  void _loadFallbackStates() {
-    if (_states.isNotEmpty) return;
-
-    final fallback = <ApiState>[];
-    for (var i = 0; i < kStates.length; i++) {
-      final s = kStates[i];
-      fallback.add(
-        ApiState(id: i + 1, name: s.english, language: s.hindi, imageUrl: ''),
-      );
-    }
-
-    setState(() {
-      _states
-        ..clear()
-        ..addAll(fallback);
-      if (_states.isNotEmpty) {
-        _selectedStateId = _states.first.id;
-      }
-    });
-  }
-  */
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final hPad = size.width * 0.045;
     final l10n = context.l10n;
-    final filteredStates = _searchQuery.isEmpty
-        ? _states
-        : _states.where((s) {
-            final q = _searchQuery.toLowerCase();
-            return s.name.toLowerCase().contains(q) ||
-                s.language.toLowerCase().contains(q);
-          }).toList();
 
     return Scaffold(
       backgroundColor: AC.scaffoldBg,
@@ -299,19 +143,19 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Container(
-                      height: 6,
-                      width: double.infinity,
-                      color: AC.lightGrey,
-                      child: FractionallySizedBox(
-                        alignment: Alignment.centerLeft,
-                        widthFactor: 0.66,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AC.yellow,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
+                       height: 6,
+                       width: double.infinity,
+                       color: AC.lightGrey,
+                       child: FractionallySizedBox(
+                         alignment: Alignment.centerLeft,
+                         widthFactor: 0.66,
+                         child: Container(
+                           decoration: BoxDecoration(
+                             color: AC.yellow,
+                             borderRadius: BorderRadius.circular(8),
+                           ),
+                         ),
+                       ),
                     ),
                   ),
 
@@ -353,9 +197,7 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
                     child: TextField(
                       style: const TextStyle(color: AC.darkText, fontSize: 14),
                       onChanged: (value) {
-                        setState(() {
-                          _searchQuery = value.trim();
-                        });
+                        controller.updateSearchQuery(value);
                       },
                       decoration: InputDecoration(
                         hintText: l10n.text('select_state_search_hint'),
@@ -369,7 +211,7 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
                           size: 22,
                         ),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
                         ),
@@ -380,45 +222,50 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
                   const SizedBox(height: 22),
 
                   // ── State list (from API) ─────
-                  if (_isLoading)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 24),
-                      child: Center(
-                        child: CircularProgressIndicator(color: AC.primaryBlue),
-                      ),
-                    )
-                  else if (_error != null && _states.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _error!,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontSize: 14,
+                  Obx(() {
+                    if (controller.isLoading) {
+                      return const Padding(
+                        padding: EdgeInsets.only(top: 24),
+                        child: Center(
+                          child: CircularProgressIndicator(color: AC.primaryBlue),
+                        ),
+                      );
+                    } else if (controller.error != null && controller.states.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              controller.error!,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          TextButton.icon(
-                            onPressed: _fetchStates,
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Retry'),
-                          ),
-                        ],
-                      ),
-                    )
-                  else if (filteredStates.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 24),
-                      child: Text(
-                        'No states found',
-                        style: TextStyle(color: AC.greyText, fontSize: 14),
-                      ),
-                    )
-                  else
-                    GridView.builder(
+                            const SizedBox(height: 8),
+                            TextButton.icon(
+                              onPressed: controller.fetchStates,
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    final filteredStates = controller.filteredStates;
+                    if (filteredStates.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.only(top: 24),
+                        child: Text(
+                          'No states found',
+                          style: TextStyle(color: AC.greyText, fontSize: 14),
+                        ),
+                      );
+                    }
+
+                    return GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: filteredStates.length,
@@ -431,14 +278,16 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
                           ),
                       itemBuilder: (context, index) {
                         final state = filteredStates[index];
-                        final selected = state.id == _selectedStateId;
-                        return GestureDetector(
-                          onTap: () =>
-                              setState(() => _selectedStateId = state.id),
-                          child: _StateCard(state: state, selected: selected),
-                        );
+                        return Obx(() {
+                          final selected = state.id == controller.selectedStateId;
+                          return GestureDetector(
+                            onTap: () => controller.selectState(state.id),
+                            child: _StateCard(state: state, selected: selected),
+                          );
+                        });
                       },
-                    ),
+                    );
+                  }),
 
                   const SizedBox(height: 24),
                 ],
@@ -474,7 +323,12 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(30),
                   onTap: () {
-                    _showLanguageDialogAndContinue(context, _selectedStateId);
+                    _showLanguageDialogAndContinue(
+                      context,
+                      controller.selectedStateId,
+                      widget.fromDashboard,
+                      controller,
+                    );
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -508,6 +362,8 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
 Future<void> _showLanguageDialogAndContinue(
   BuildContext context,
   int? selectedStateId,
+  bool fromDashboard,
+  SelectStateController controller,
 ) async {
   final l10n = context.l10n;
   final currentCode = Localizations.localeOf(context).languageCode;
@@ -575,21 +431,23 @@ Future<void> _showLanguageDialogAndContinue(
               final appState = MyApp.of(context);
               await appState?.setLocale(locale);
               if (selectedStateId != null) {
-                try {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setInt('selected_state_id', selectedStateId);
-                } catch (_) {
-                  // ignore write errors
+                final selectedState = controller.states.firstWhereOrNull((s) => s.id == selectedStateId);
+                if (selectedState != null) {
+                  controller.saveSelection(selectedStateId, selectedState.name);
                 }
               }
               if (context.mounted) {
                 Navigator.of(ctx).pop();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const FloatingNavbarScreen(),
-                  ),
-                );
+                if (fromDashboard) {
+                  Navigator.of(context).pop();
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FloatingNavbarScreen(),
+                    ),
+                  );
+                }
               }
             },
             child: Text(l10n.text('continue')),
@@ -635,7 +493,7 @@ LandmarkData _getLandmarkData(String stateName) {
 }
 
 class _StateCard extends StatelessWidget {
-  final ApiState state;
+  final StateEntity state;
   final bool selected;
 
   const _StateCard({required this.state, required this.selected});
@@ -663,8 +521,8 @@ class _StateCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: selected
-                ? AC.primaryBlue.withValues(alpha: 0.08)
-                : Colors.black.withValues(alpha: 0.04),
+                ? AC.primaryBlue.withOpacity(0.08)
+                : Colors.black.withOpacity(0.04),
             blurRadius: selected ? 16 : 8,
             offset: selected ? const Offset(0, 6) : const Offset(0, 2),
           ),
@@ -681,7 +539,7 @@ class _StateCard extends StatelessWidget {
                     top: Radius.circular(14),
                   ),
                   child: Container(
-                    color: lData.skyColor.withValues(alpha: 0.2),
+                    color: lData.skyColor.withOpacity(0.2),
                     child: state.imageUrl.isEmpty
                         ? _LandmarkIllustration(
                             stateKey: lData.stateKey,
@@ -700,7 +558,7 @@ class _StateCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Container(height: 1.0, color: AC.lightGrey.withValues(alpha: 0.6)),
+              Container(height: 1.0, color: AC.lightGrey.withOpacity(0.6)),
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -753,7 +611,7 @@ class _StateCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AC.primaryBlue.withValues(alpha: 0.3),
+                      color: AC.primaryBlue.withOpacity(0.3),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
