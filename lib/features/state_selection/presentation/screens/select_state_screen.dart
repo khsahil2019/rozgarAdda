@@ -367,7 +367,9 @@ Future<void> _showLanguageDialogAndContinue(
 ) async {
   final l10n = context.l10n;
   final currentCode = Localizations.localeOf(context).languageCode;
-  String selectedCode = (currentCode == 'hi' || currentCode == 'mr')
+  String selectedCode = AppLocalizations.supportedLocales
+          .map((e) => e.languageCode)
+          .contains(currentCode)
       ? currentCode
       : 'en';
 
@@ -386,35 +388,17 @@ Future<void> _showLanguageDialogAndContinue(
               builder: (context, setState) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
-                    RadioListTile<String>(
-                      title: Text(l10n.text('language_english')),
-                      value: 'en',
+                  children: AppLocalizations.languages.map((lang) {
+                    return RadioListTile<String>(
+                      title: Text('${lang.nativeName} (${lang.englishName})'),
+                      value: lang.code,
                       groupValue: selectedCode,
                       onChanged: (v) {
                         if (v == null) return;
                         setState(() => selectedCode = v);
                       },
-                    ),
-                    RadioListTile<String>(
-                      title: Text(l10n.text('language_hindi')),
-                      value: 'hi',
-                      groupValue: selectedCode,
-                      onChanged: (v) {
-                        if (v == null) return;
-                        setState(() => selectedCode = v);
-                      },
-                    ),
-                    RadioListTile<String>(
-                      title: const Text('मराठी (Marathi)'),
-                      value: 'mr',
-                      groupValue: selectedCode,
-                      onChanged: (v) {
-                        if (v == null) return;
-                        setState(() => selectedCode = v);
-                      },
-                    ),
-                  ],
+                    );
+                  }).toList(),
                 );
               },
             ),
