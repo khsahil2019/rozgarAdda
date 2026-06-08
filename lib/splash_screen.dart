@@ -4,7 +4,9 @@ import 'package:rojgar/features/auth/presentation/screens/login_screen.dart';
 import 'package:rojgar/features/news/prsentation/screens/news_screen.dart';
 import 'package:rojgar/features/auth/presentation/screens/registration_screen.dart';
 import 'package:rojgar/floating_navbar.dart';
-import 'package:rojgar/modules/product_screens/product_screen_list.dart';
+import 'package:rojgar/features/buy_product/presentation/screens/product_category_list_screen.dart';
+import 'package:rojgar/features/buy_product/presentation/bindings/buy_product_binding.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -205,10 +207,9 @@ class _SplashScreenState extends State<SplashScreen> {
                         icon: Icons.storefront_rounded,
                         label: l10n.text('splash_menu_product'),
                         onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const ProductScreenList(),
-                            ),
+                          Get.to(
+                            () => const ProductCategoryListScreen(),
+                            binding: BuyProductBinding(),
                           );
                         },
                       ),

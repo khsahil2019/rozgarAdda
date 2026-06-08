@@ -8,6 +8,7 @@ import 'package:rojgar/features/kyc/domain/repository/kyc_repository.dart';
 import 'package:rojgar/services/storage_service.dart';
 import 'package:rojgar/splash_screen.dart';
 
+// authtoken  178|jILugiYXhdVYfazigTidaBcBgsnGXAZm8bbNT253b5dfdc40
 class AppController extends GetxController {
   static AppController get to => Get.find();
 

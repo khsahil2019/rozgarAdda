@@ -5,7 +5,8 @@ import 'package:rojgar/features/jobs/presentation/screens/select_category_screen
 import 'package:rojgar/features/kyc/presentation/screens/edit_kyc_screen.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/main.dart';
-import 'package:rojgar/modules/product_screens/product_screen_list.dart';
+import 'package:rojgar/features/buy_product/presentation/screens/product_category_list_screen.dart';
+import 'package:rojgar/features/buy_product/presentation/bindings/buy_product_binding.dart';
 import 'package:rojgar/features/sell_product/presentation/screens/sell_product_category_screen.dart';
 import 'package:rojgar/features/news/prsentation/screens/news_screen.dart';
 import 'package:rojgar/features/state_selection/presentation/screens/select_state_screen.dart';
@@ -1593,10 +1594,9 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                             _selected = i;
                           });
                           if (item.label == 'Products') {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const ProductScreenList(),
-                              ),
+                            Get.to(
+                              () => const ProductCategoryListScreen(),
+                              binding: BuyProductBinding(),
                             );
                           }
                           if (item.label == 'KYC Status') {
