@@ -87,6 +87,7 @@ class AppLocalizations {
       'explore_opportunities_pill': 'OPPORTUNITIES',
       'find_jobs': 'Find Jobs',
       'home': 'Home',
+      'messages': 'Messages',
       'jobdetail_annual_salary': 'ANNUAL SALARY',
       'jobdetail_appbar_title': 'Job Opportunity',
       'jobdetail_applicants': 'APPLICANTS',

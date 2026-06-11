@@ -11,6 +11,9 @@ import 'package:rojgar/features/sell_product/presentation/screens/sell_product_c
 import 'package:rojgar/features/news/prsentation/screens/news_screen.dart';
 import 'package:rojgar/features/state_selection/presentation/screens/select_state_screen.dart';
 import 'package:rojgar/features/state_selection/presentation/bindings/state_selection_binding.dart';
+import 'package:rojgar/features/chat/presentation/screens/chat_user_list_screen.dart';
+import 'package:rojgar/features/chat/presentation/bindings/chat_binding.dart';
+import 'package:rojgar/features/chat/presentation/controller/chat_controller.dart';
 
 class AC {
   static const Color primaryPurple = Color(0xFF5B2BE0);
@@ -1326,6 +1329,12 @@ const List<_SidebarMenuItem> _kSidebarItems = [
     Color(0xFF2255DD),
   ),
   _SidebarMenuItem(
+    Icons.chat_bubble_rounded,
+    'Messages',
+    Color(0xFFE0E7FF),
+    Color(0xFF4338CA),
+  ),
+  _SidebarMenuItem(
     Icons.work_rounded,
     'Find Jobs',
     Color(0xFFD6F5E8),
@@ -1597,6 +1606,14 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                             Get.to(
                               () => const ProductCategoryListScreen(),
                               binding: BuyProductBinding(),
+                            );
+                          }
+                          if (item.label == 'Messages') {
+                            if (!Get.isRegistered<ChatController>()) {
+                              ChatBinding().dependencies();
+                            }
+                            Get.to(
+                              () => const ChatUserListScreen(),
                             );
                           }
                           if (item.label == 'KYC Status') {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../chat_user_list.dart';
+import '../../../chat/presentation/controller/chat_controller.dart';
+import '../../../chat/presentation/bindings/chat_binding.dart';
 import '../../domain/entities/buy_product_entities.dart';
 import '../controller/buy_product_controller.dart';
 
@@ -227,7 +228,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                     onPressed: () {
-                      Get.to(() => ChatUserListScreen());
+                      if (!Get.isRegistered<ChatController>()) {
+                        ChatBinding().dependencies();
+                      }
+                      Get.find<ChatController>().initiateChat(product.id);
                     },
                     child: const Text('Chat with Seller'),
                   ),

@@ -9,6 +9,7 @@ import '../../features/jobs/presentation/bindings/jobs_binding.dart';
 import '../../features/kyc/presentation/bindings/kyc_binding.dart';
 import '../../features/sell_product/presentation/bindings/sell_product_binding.dart';
 import '../../features/state_selection/presentation/bindings/state_selection_binding.dart';
+import '../../features/chat/presentation/bindings/chat_binding.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -36,6 +37,9 @@ class InitialBinding extends Bindings {
 
     // Register state selection dependencies
     StateSelectionBinding().dependencies();
+
+    // Register chat dependencies
+    ChatBinding().dependencies();
   }
 }
 
