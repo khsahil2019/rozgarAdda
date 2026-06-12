@@ -274,5 +274,7 @@
   "jobs_salary_range": "Salary",
   "jobs_experience": "Experience",
   "jobs_applications": "Applications",
-  "jobs_view_details": "View Details"
+  "jobs_view_details": "View Details",
+  "recent_jobs_title": "Recent Jobs",
+  "no_recent_jobs": "No recent jobs available at the moment."
 }

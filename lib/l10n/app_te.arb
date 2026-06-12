@@ -274,5 +274,7 @@
   "jobs_salary_range": "జీతం",
   "jobs_experience": "అనుభవం",
   "jobs_applications": "దరఖాస్తులు",
-  "jobs_view_details": "వివరాలను చూడు"
+  "jobs_view_details": "వివరాలను చూడు",
+  "recent_jobs_title": "ఇటీవలి ఉద్యోగాలు",
+  "no_recent_jobs": "ప్రస్తుతం ఇటీవలి ఉద్యోగాలు ఏవీ అందుబాటులో లేవు."
 }

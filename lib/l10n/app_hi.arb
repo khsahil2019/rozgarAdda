@@ -274,5 +274,7 @@
   "jobs_salary_range": "वेतन",
   "jobs_experience": "अनुभव",
   "jobs_applications": "आवेदन",
-  "jobs_view_details": "विवरण देखें"
+  "jobs_view_details": "विवरण देखें",
+  "recent_jobs_title": "हाल की नौकरियां",
+  "no_recent_jobs": "वर्तमान में कोई हालिया नौकरियां उपलब्ध नहीं हैं।"
 }

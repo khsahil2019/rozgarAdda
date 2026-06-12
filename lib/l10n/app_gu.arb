@@ -274,5 +274,7 @@
   "jobs_salary_range": "પગાર",
   "jobs_experience": "અનુભવ",
   "jobs_applications": "અરજીઓ",
-  "jobs_view_details": "વિગતો જુઓ"
+  "jobs_view_details": "વિગતો જુઓ",
+  "recent_jobs_title": "તાજેતરની નોકરીઓ",
+  "no_recent_jobs": "હાલમાં કોઈ તાજેતરની નોકરીઓ ઉપલબ્ધ નથી."
 }

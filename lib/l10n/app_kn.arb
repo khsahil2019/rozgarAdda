@@ -274,5 +274,7 @@
   "jobs_salary_range": "ಸಂಬಳ",
   "jobs_experience": "ಅನುಭവം",
   "jobs_applications": "ಅರ್ಜಿಗಳು",
-  "jobs_view_details": "ವಿವರಗಳನ್ನು ವೀಕ್ಷಿಸಿ"
+  "jobs_view_details": "ವಿವರಗಳನ್ನು ವೀಕ್ಷಿಸಿ",
+  "recent_jobs_title": "ಇತ್ತೀಚಿನ ಉದ್ಯೋಗಗಳು",
+  "no_recent_jobs": "ಪ್ರಸ್ತುತ ಯಾವುದೇ ಇತ್ತೀಚಿನ ಉದ್ಯೋಗಗಳು ಲಭ್ಯವಿಲ್ಲ."
 }

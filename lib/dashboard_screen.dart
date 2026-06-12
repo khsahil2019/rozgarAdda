@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/features/app/app_controller.dart';
 import 'package:rojgar/features/jobs/presentation/screens/select_category_screen.dart';
+import 'package:rojgar/features/jobs/presentation/screens/recent_jobs_screen.dart';
 import 'package:rojgar/features/kyc/presentation/screens/edit_kyc_screen.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/main.dart';
@@ -923,6 +924,8 @@ class _QuickLinkCard extends StatelessWidget {
                               return SellProductCategoryScreen();
                             } else if (link.label == 'News') {
                               return const NewsScreen();
+                            } else if (link.label == 'Recent Jobs') {
+                              return const RecentJobsScreen();
                             } else {
                               return const SelectCategoryScreen();
                             }

@@ -274,5 +274,7 @@
   "jobs_salary_range": "சம்பளம்",
   "jobs_experience": "அனுபவம்",
   "jobs_applications": "விண்ணப்பங்கள்",
-  "jobs_view_details": "விவரங்களைப் பார்"
+  "jobs_view_details": "விவரங்களைப் பார்",
+  "recent_jobs_title": "சமீபத்திய வேலைகள்",
+  "no_recent_jobs": "தற்போது சமீபத்திய வேலைகள் எதுவும் கிடைக்கவில்லை."
 }

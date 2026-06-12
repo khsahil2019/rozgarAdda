@@ -274,5 +274,7 @@
   "jobs_salary_range": "पगार",
   "jobs_experience": "अनुभव",
   "jobs_applications": "अर्ज",
-  "jobs_view_details": "तपशील पहा"
+  "jobs_view_details": "तपशील पहा",
+  "recent_jobs_title": "अलीकडील नोकऱ्या",
+  "no_recent_jobs": "सध्या कोणतीही अलीकडील नोकरी उपलब्ध नाही."
 }
