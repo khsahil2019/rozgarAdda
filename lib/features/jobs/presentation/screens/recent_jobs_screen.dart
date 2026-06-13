@@ -28,12 +28,12 @@ class RecentJobsScreen extends StatefulWidget {
 class _RecentJobsScreenState extends State<RecentJobsScreen> {
   late final PageController _pageController;
   final TextEditingController _searchController = TextEditingController();
-  
+
   bool _isLoading = true;
   String? _errorMessage;
   List<AvailableJob> _recentJobs = [];
   List<AvailableJob> _filteredJobs = [];
-  
+
   double _currentPage = 0.0;
   String _searchQuery = '';
   String _selectedJobType = 'all';
@@ -73,7 +73,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
         });
       }
     });
-    
+
     _searchController.addListener(() {
       setState(() {
         _searchQuery = _searchController.text;
@@ -308,7 +308,8 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     final query = _searchQuery.toLowerCase().trim();
     _filteredJobs = _recentJobs.where((job) {
       // 1. Search Query filter
-      final matchesSearch = query.isEmpty ||
+      final matchesSearch =
+          query.isEmpty ||
           job.title.toLowerCase().contains(query) ||
           job.stateName.toLowerCase().contains(query) ||
           job.addressLine1.toLowerCase().contains(query) ||
@@ -320,17 +321,19 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       if (_selectedCategory != 'all') {
         int expectedCatId = -1;
         if (_selectedCategory == 'Driver') expectedCatId = 2;
-        if (_selectedCategory == 'Office') expectedCatId = 2; 
+        if (_selectedCategory == 'Office') expectedCatId = 2;
         if (_selectedCategory == 'Delivery') expectedCatId = 5;
         if (_selectedCategory == 'Design') expectedCatId = 3;
         if (_selectedCategory == 'Warehouse') expectedCatId = 4;
         if (_selectedCategory == 'Support') expectedCatId = 1;
-        
+
         if (expectedCatId != -1 && job.categoryId != expectedCatId) {
-          if (_selectedCategory == 'Driver' && !job.title.toLowerCase().contains('driver')) {
+          if (_selectedCategory == 'Driver' &&
+              !job.title.toLowerCase().contains('driver')) {
             return false;
           }
-          if (_selectedCategory == 'Office' && !job.title.toLowerCase().contains('clerk')) {
+          if (_selectedCategory == 'Office' &&
+              !job.title.toLowerCase().contains('clerk')) {
             return false;
           }
           if (expectedCatId != 2) return false;
@@ -345,8 +348,9 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       // 4. Salary filter
       if (_selectedSalaryRange != 'all') {
         final double minSal = double.tryParse(job.minSalary ?? '0') ?? 0;
-        final double maxSal = double.tryParse(job.maxSalary ?? '999999') ?? 999999;
-        
+        final double maxSal =
+            double.tryParse(job.maxSalary ?? '999999') ?? 999999;
+
         if (_selectedSalaryRange == '10k-15k') {
           if (maxSal < 10000 || minSal > 15000) return false;
         } else if (_selectedSalaryRange == '15k-25k') {
@@ -358,7 +362,8 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
       // 5. Qualification filter
       if (_selectedQualification != 'all') {
-        if (job.educationLevel.toLowerCase() != _selectedQualification.toLowerCase()) {
+        if (job.educationLevel.toLowerCase() !=
+            _selectedQualification.toLowerCase()) {
           return false;
         }
       }
@@ -393,10 +398,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
   Widget _buildCustomTabBar(AppLocalizations l10n) {
     final lang = l10n.locale.languageCode;
-    final tabs = [
-      _getTab1Label(lang),
-      _getTab2Label(lang),
-    ];
+    final tabs = [_getTab1Label(lang), _getTab2Label(lang)];
 
     return Container(
       color: Colors.white,
@@ -418,7 +420,9 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                     tabs[index],
                     style: TextStyle(
                       color: isSelected ? _Colors.primaryBlue : _Colors.grey,
-                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                      fontWeight: isSelected
+                          ? FontWeight.w800
+                          : FontWeight.w600,
                       fontSize: 15,
                     ),
                   ),
@@ -466,7 +470,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 12.0, top: 10, bottom: 10),
+            padding: const EdgeInsets.only(right: 12.0),
             child: ElevatedButton(
               onPressed: () {
                 Get.snackbar(
@@ -479,10 +483,15 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 backgroundColor: _Colors.primaryBlue,
                 foregroundColor: Colors.white,
                 elevation: 0,
+                minimumSize: const Size(0, 32),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 0,
+                ),
               ),
               child: Text(
                 _getPostJobLabel(l10n.locale.languageCode),
@@ -495,22 +504,18 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
           ),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(44),
+          preferredSize: const Size.fromHeight(48),
           child: _buildCustomTabBar(l10n),
         ),
       ),
-      body: SafeArea(
-        child: _buildBody(size, l10n),
-      ),
+      body: SafeArea(child: _buildBody(size, l10n)),
     );
   }
 
   Widget _buildBody(Size size, AppLocalizations l10n) {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(
-          color: _Colors.primaryBlue,
-        ),
+        child: CircularProgressIndicator(color: _Colors.primaryBlue),
       );
     }
 
@@ -531,7 +536,10 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
         // Search and Filters Section Header (Filter tab below app bar)
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 16.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -549,7 +557,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 16.0, top: 4.0, bottom: 4.0),
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  top: 4.0,
+                  bottom: 4.0,
+                ),
                 child: Text(
                   _getSponsorLabel(l10n.locale.languageCode),
                   style: const TextStyle(
@@ -560,10 +572,12 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 ),
               ),
               SizedBox(
-                height: 230,
+                height: 180,
                 child: PageView.builder(
                   controller: _pageController,
-                  itemCount: _recentJobs.take(5).length, // Show top 5 most recent in the slider
+                  itemCount: _recentJobs
+                      .take(5)
+                      .length, // Show top 5 most recent in the slider
                   itemBuilder: (context, index) {
                     final job = _recentJobs[index];
                     return _buildSliderCard(job, index);
@@ -608,7 +622,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.search_off_rounded, size: 54, color: _Colors.grey.withValues(alpha: 0.5)),
+                        Icon(
+                          Icons.search_off_rounded,
+                          size: 54,
+                          color: _Colors.grey.withValues(alpha: 0.5),
+                        ),
                         const SizedBox(height: 12),
                         const Text(
                           'No jobs match your search',
@@ -626,22 +644,17 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
             : SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final job = _filteredJobs[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: _buildVerticalJobCard(job, l10n),
-                      );
-                    },
-                    childCount: _filteredJobs.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final job = _filteredJobs[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: _buildVerticalJobCard(job, l10n),
+                    );
+                  }, childCount: _filteredJobs.length),
                 ),
               ),
-        
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 24),
-        )
+
+        const SliverToBoxAdapter(child: SizedBox(height: 24)),
       ],
     );
   }
@@ -675,7 +688,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
             ),
           ],
         ),
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -694,7 +707,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                       width: 50,
                       height: 50,
                       color: _Colors.chipBg,
-                      child: const Icon(Icons.work_outline_rounded, color: _Colors.primaryBlue, size: 24),
+                      child: const Icon(
+                        Icons.work_outline_rounded,
+                        color: _Colors.primaryBlue,
+                        size: 24,
+                      ),
                     ),
                   ),
                 ),
@@ -750,7 +767,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             // Middle Part: Location and Qualification rows
             Expanded(
               child: Column(
@@ -759,37 +776,53 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.location_on_outlined, size: 14, color: _Colors.grey),
-                      const SizedBox(width: 6),
                       Expanded(
-                        child: Text(
-                          job.addressLine1.isNotEmpty ? job.addressLine1 : job.stateName,
-                          style: const TextStyle(
-                            color: _Colors.grey,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on_outlined,
+                              size: 14,
+                              color: _Colors.grey,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                job.addressLine1.isNotEmpty
+                                    ? job.addressLine1
+                                    : job.stateName,
+                                style: const TextStyle(
+                                  color: _Colors.grey,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.school_outlined, size: 14, color: _Colors.grey),
-                      const SizedBox(width: 6),
                       Expanded(
-                        child: Text(
-                          '${job.educationLevel} • ${job.experienceLabel} Experience',
-                          style: const TextStyle(
-                            color: _Colors.grey,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            const Icon(
+                              Icons.school_outlined,
+                              size: 14,
+                              color: _Colors.grey,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              job.educationLevel,
+                              style: const TextStyle(
+                                color: _Colors.grey,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -797,11 +830,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             // Bottom Part: Full-width yellow Call button
             SizedBox(
               width: double.infinity,
-              height: 38,
+              height: 36,
               child: ElevatedButton.icon(
                 onPressed: () => _makeCall(job.contactPhone),
                 style: ElevatedButton.styleFrom(
@@ -874,13 +907,20 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                                 width: 58,
                                 height: 58,
                                 color: _Colors.chipBg,
-                                child: const Icon(Icons.work_outline_rounded, color: _Colors.primaryBlue, size: 28),
+                                child: const Icon(
+                                  Icons.work_outline_rounded,
+                                  color: _Colors.primaryBlue,
+                                  size: 28,
+                                ),
                               ),
                             ),
                           ),
                           const SizedBox(height: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF1F2F5),
                               borderRadius: BorderRadius.circular(6),
@@ -935,7 +975,9 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              job.stateName.isNotEmpty ? job.stateName : 'Company',
+                              job.stateName.isNotEmpty
+                                  ? job.stateName
+                                  : 'Company',
                               style: const TextStyle(
                                 color: _Colors.darkText,
                                 fontSize: 14,
@@ -967,7 +1009,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 10),
                   const Divider(color: Color(0xFFE7E9EE), height: 1),
                   const SizedBox(height: 10),
@@ -978,11 +1020,17 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                       Expanded(
                         child: Row(
                           children: [
-                            const Icon(Icons.location_on_outlined, size: 15, color: _Colors.grey),
+                            const Icon(
+                              Icons.location_on_outlined,
+                              size: 15,
+                              color: _Colors.grey,
+                            ),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
-                                job.addressLine1.isNotEmpty ? job.addressLine1 : job.stateName,
+                                job.addressLine1.isNotEmpty
+                                    ? job.addressLine1
+                                    : job.stateName,
                                 style: const TextStyle(
                                   color: _Colors.grey,
                                   fontSize: 12,
@@ -998,7 +1046,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                       Expanded(
                         child: Row(
                           children: [
-                            const Icon(Icons.work_outline_rounded, size: 15, color: _Colors.grey),
+                            const Icon(
+                              Icons.work_outline_rounded,
+                              size: 15,
+                              color: _Colors.grey,
+                            ),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
@@ -1023,7 +1075,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                       Expanded(
                         child: Row(
                           children: [
-                            const Icon(Icons.schedule_outlined, size: 15, color: _Colors.grey),
+                            const Icon(
+                              Icons.schedule_outlined,
+                              size: 15,
+                              color: _Colors.grey,
+                            ),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
@@ -1043,7 +1099,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                       Expanded(
                         child: Row(
                           children: [
-                            const Icon(Icons.school_outlined, size: 15, color: _Colors.grey),
+                            const Icon(
+                              Icons.school_outlined,
+                              size: 15,
+                              color: _Colors.grey,
+                            ),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
@@ -1075,7 +1135,10 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: _Colors.borderGrey, width: 1),
+                            border: Border.all(
+                              color: _Colors.borderGrey,
+                              width: 1,
+                            ),
                           ),
                           child: const Icon(
                             Icons.more_horiz_rounded,
@@ -1089,9 +1152,13 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                         child: SizedBox(
                           height: 38,
                           child: OutlinedButton.icon(
-                            onPressed: () => _openWhatsApp(job.contactPhone, job.title),
+                            onPressed: () =>
+                                _openWhatsApp(job.contactPhone, job.title),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFF25D366), width: 1.2),
+                              side: const BorderSide(
+                                color: Color(0xFF25D366),
+                                width: 1.2,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -1103,11 +1170,12 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                               height: 18,
                               child: Image.asset(
                                 'assets/icons/whatsapp.png',
-                                errorBuilder: (context, error, stackTrace) => const Icon(
-                                  Icons.chat_bubble_outline_rounded,
-                                  size: 16,
-                                  color: Color(0xFF25D366),
-                                ),
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(
+                                      Icons.chat_bubble_outline_rounded,
+                                      size: 16,
+                                      color: Color(0xFF25D366),
+                                    ),
                               ),
                             ),
                             label: const Text(
@@ -1137,7 +1205,9 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                             ),
                             icon: const Icon(Icons.phone_rounded, size: 16),
                             label: Text(
-                              l10n.locale.languageCode == 'mr' ? 'कॉल करा' : 'Call HR',
+                              l10n.locale.languageCode == 'mr'
+                                  ? 'कॉल करा'
+                                  : 'Call HR',
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
@@ -1160,16 +1230,16 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   Widget _buildPageIndicator() {
     int slideCount = _recentJobs.take(5).length;
     if (slideCount <= 1) return const SizedBox.shrink();
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(slideCount, (index) {
         double diff = (_currentPage - index).abs();
         double size = diff <= 1.0 ? 8.0 + (1 - diff) * 6.0 : 8.0;
-        Color color = diff <= 0.5 
-            ? _Colors.primaryBlue 
+        Color color = diff <= 0.5
+            ? _Colors.primaryBlue
             : _Colors.primaryBlue.withValues(alpha: 0.3);
-            
+
         return AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           margin: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -1211,7 +1281,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
           ),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear_rounded, color: _Colors.grey, size: 20),
+                  icon: const Icon(
+                    Icons.clear_rounded,
+                    color: _Colors.grey,
+                    size: 20,
+                  ),
                   onPressed: () {
                     _searchController.clear();
                   },
@@ -1235,9 +1309,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   }) {
     final isFiltering = activeValue != 'all';
     return Theme(
-      data: Theme.of(context).copyWith(
-        cardColor: Colors.white,
-      ),
+      data: Theme.of(context).copyWith(cardColor: Colors.white),
       child: PopupMenuButton<String>(
         onSelected: onSelected,
         itemBuilder: (context) => items,
@@ -1292,7 +1364,10 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
               PopupMenuItem(value: 'Delivery', child: Text('Delivery')),
               PopupMenuItem(value: 'Design', child: Text('Graphic Design')),
               PopupMenuItem(value: 'Warehouse', child: Text('Warehouse')),
-              PopupMenuItem(value: 'Support', child: Text('Telecalling / Support')),
+              PopupMenuItem(
+                value: 'Support',
+                child: Text('Telecalling / Support'),
+              ),
             ],
             onSelected: (val) {
               setState(() {
@@ -1410,7 +1485,10 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.share_rounded, color: _Colors.primaryBlue),
+                leading: const Icon(
+                  Icons.share_rounded,
+                  color: _Colors.primaryBlue,
+                ),
                 title: const Text('Share Job'),
                 onTap: () {
                   Navigator.pop(context);
@@ -1419,7 +1497,9 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
               ),
               ListTile(
                 leading: Icon(
-                  isSaved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                  isSaved
+                      ? Icons.favorite_rounded
+                      : Icons.favorite_border_rounded,
                   color: isSaved ? Colors.red : _Colors.grey,
                 ),
                 title: Text(isSaved ? 'Unsave Job' : 'Save Job'),
@@ -1435,7 +1515,10 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.report_problem_outlined, color: Colors.red),
+                leading: const Icon(
+                  Icons.report_problem_outlined,
+                  color: Colors.red,
+                ),
                 title: const Text('Report this Job'),
                 onTap: () {
                   Navigator.pop(context);
@@ -1483,9 +1566,14 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _Colors.primaryBlue.withValues(alpha: 0.1),
-                        border: Border.all(color: _Colors.primaryBlue, width: 1.5),
+                        border: Border.all(
+                          color: _Colors.primaryBlue,
+                          width: 1.5,
+                        ),
                         image: const DecorationImage(
-                          image: NetworkImage('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150'),
+                          image: NetworkImage(
+                            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+                          ),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -1514,7 +1602,10 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                           ),
                           const SizedBox(height: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFE8F5E9),
                               borderRadius: BorderRadius.circular(20),
@@ -1522,7 +1613,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.verified_user_rounded, color: Color(0xFF2E7D32), size: 14),
+                                Icon(
+                                  Icons.verified_user_rounded,
+                                  color: Color(0xFF2E7D32),
+                                  size: 14,
+                                ),
                                 SizedBox(width: 4),
                                 Text(
                                   'KYC Verified',
@@ -1742,7 +1837,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded, color: Colors.red, size: 48),
+            const Icon(
+              Icons.error_outline_rounded,
+              color: Colors.red,
+              size: 48,
+            ),
             const SizedBox(height: 16),
             Text(
               _errorMessage ?? 'Unable to load recent jobs',
@@ -1871,12 +1970,13 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
           jobId: job.id,
           jobTitle: job.title,
           company: job.stateName.isNotEmpty ? job.stateName : 'Company',
-          location: job.addressLine1.isNotEmpty ? job.addressLine1 : job.stateName,
+          location: job.addressLine1.isNotEmpty
+              ? job.addressLine1
+              : job.stateName,
           salary: job.salaryDisplay,
           jobType: job.jobTypeLabel,
         ),
       ),
     );
   }
-
 }

@@ -82,7 +82,7 @@ const List<QuickLink> kQuickLinks = [
     Icons.storefront_rounded,
     AC.greenBg,
     AC.greenIcon,
-    'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80',
+    'https://images.unsplash.com/photo-1573216755088-971e32839531?auto=format&fit=crop&w=400&q=80',
   ),
   // QuickLink(
   //   'Marketplace',
@@ -552,7 +552,8 @@ class _HomeScreenState extends State<HomeScreen>
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: AppLocalizations.languages.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 10),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final lang = AppLocalizations.languages[index];
                     final bool isSelected = lang.code == currentLangCode;
@@ -1615,9 +1616,7 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                             if (!Get.isRegistered<ChatController>()) {
                               ChatBinding().dependencies();
                             }
-                            Get.to(
-                              () => const ChatUserListScreen(),
-                            );
+                            Get.to(() => const ChatUserListScreen());
                           }
                           if (item.label == 'KYC Status') {
                             Navigator.of(context).push(

@@ -844,7 +844,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                         onPressed: () => _makeCall(job.contactPhone),
                         style: ElevatedButton.styleFrom(
                           elevation: 0,
-                          backgroundColor: _C.yellow,
+                          backgroundColor: _C.primaryBlue,
                           foregroundColor: _C.darkText,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
