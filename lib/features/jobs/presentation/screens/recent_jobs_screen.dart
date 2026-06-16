@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
@@ -646,10 +647,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final job = _filteredJobs[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: _buildVerticalJobCard(job, l10n),
-                    );
+                    return _buildVerticalJobCard(job, l10n);
                   }, childCount: _filteredJobs.length),
                 ),
               ),
@@ -767,7 +765,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             // Middle Part: Location and Qualification rows
             Expanded(
               child: Column(
@@ -775,9 +773,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
+                      Flexible(
                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             const Icon(
                               Icons.location_on_outlined,
@@ -785,7 +785,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                               color: _Colors.grey,
                             ),
                             const SizedBox(width: 4),
-                            Expanded(
+                            Flexible(
                               child: Text(
                                 job.addressLine1.isNotEmpty
                                     ? job.addressLine1
@@ -802,28 +802,27 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                           ],
                         ),
                       ),
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            const Icon(
-                              Icons.school_outlined,
-                              size: 14,
+                      const SizedBox(width: 8),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.school_outlined,
+                            size: 14,
+                            color: _Colors.grey,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            job.educationLevel,
+                            style: const TextStyle(
                               color: _Colors.grey,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              job.educationLevel,
-                              style: const TextStyle(
-                                color: _Colors.grey,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -863,7 +862,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
   Widget _buildVerticalJobCard(AvailableJob job, AppLocalizations l10n) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
+      margin: EdgeInsets.only(bottom: 10.sp),
       decoration: BoxDecoration(
         color: _Colors.cardBg,
         borderRadius: BorderRadius.circular(16),
@@ -1975,6 +1974,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
               : job.stateName,
           salary: job.salaryDisplay,
           jobType: job.jobTypeLabel,
+          contactPhone: job.contactPhone,
         ),
       ),
     );

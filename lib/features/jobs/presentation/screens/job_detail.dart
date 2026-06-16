@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:rojgar/features/jobs/presentation/screens/applyjob_form.dart';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────
@@ -45,6 +47,7 @@ class JobDetailScreen extends StatelessWidget {
   final String location;
   final String salary;
   final String jobType;
+  final String? contactPhone;
 
   const JobDetailScreen({
     super.key,
@@ -54,6 +57,7 @@ class JobDetailScreen extends StatelessWidget {
     this.location = 'San Francisco, CA (Remote Friendly)',
     this.salary = '\$140k - \$180k',
     this.jobType = 'Full-time',
+    this.contactPhone,
   });
 
   @override
@@ -66,7 +70,7 @@ class JobDetailScreen extends StatelessWidget {
       body: Column(
         children: [
           // ── Header ──────────────────────────────────────────────────────────
-          _buildHeader(topPad),
+          _buildHeader(context, topPad),
           // ── Scrollable Content ──────────────────────────────────────────────
           Expanded(
             child: SingleChildScrollView(
@@ -104,34 +108,48 @@ class JobDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(double topPad) {
-    return Container(
+  Widget _buildHeader(BuildContext context, double topPad) {
+    return Material(
       color: AppColors.white,
-      padding: EdgeInsets.fromLTRB(20, topPad + 12, 20, 14),
-      child: Row(
-        children: [
-          _iconBtn(Icons.close_rounded),
-          const Expanded(
-            child: Center(
-              child: Text(
-                'Job Opportunity',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryBlue,
-                  letterSpacing: 0.1,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(12, topPad + 4, 12, 6),
+        child: Row(
+          children: [
+            _iconBtn(Icons.close_rounded, onTap: () => Navigator.pop(context)),
+            const Expanded(
+              child: Center(
+                child: Text(
+                  'Job Opportunity',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryBlue,
+                    letterSpacing: 0.1,
+                  ),
                 ),
               ),
             ),
-          ),
-          _iconBtn(Icons.share_outlined),
-        ],
+            _iconBtn(
+              Icons.share_outlined,
+              onTap: () {
+                // Share logic if needed
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _iconBtn(IconData icon) {
-    return Icon(icon, size: 22, color: AppColors.darkText);
+  Widget _iconBtn(IconData icon, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(100),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Icon(icon, size: 22, color: AppColors.darkText),
+      ),
+    );
   }
 
   Widget _buildCompanySection() {
@@ -420,16 +438,136 @@ class JobDetailScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _makeCall(String? phone) async {
+    if (phone == null || phone.isEmpty) {
+      Get.snackbar(
+        'Unavailable',
+        'Contact phone number is not available',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
+    final Uri url = Uri.parse('tel:$cleanPhone');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      Get.snackbar(
+        'Error',
+        'Could not make a call',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> _openWhatsApp(String? phone, String title) async {
+    if (phone == null || phone.isEmpty) {
+      Get.snackbar(
+        'Unavailable',
+        'Contact phone number is not available',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
+    final message = Uri.encodeComponent(
+      'Hello, I am interested in your job posting: "$title".',
+    );
+    final Uri url = Uri.parse('https://wa.me/$cleanPhone?text=$message');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      Get.snackbar(
+        'Error',
+        'Could not open WhatsApp. Please check if WhatsApp is installed.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
   Widget _buildBottomBar(double bottomPad, VoidCallback onApplyTap) {
     return Container(
       color: AppColors.white,
       padding: EdgeInsets.fromLTRB(20, 14, 20, bottomPad + 14),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
+          // Call & Chat Row
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 44,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _openWhatsApp(contactPhone, jobTitle),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(
+                        color: Color(0xFF25D366),
+                        width: 1.2,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      foregroundColor: const Color(0xFF25D366),
+                      padding: EdgeInsets.zero,
+                    ),
+                    icon: SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: Image.asset(
+                        'assets/icons/whatsapp.png',
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
+                              Icons.chat_bubble_outline_rounded,
+                              size: 16,
+                              color: Color(0xFF25D366),
+                            ),
+                      ),
+                    ),
+                    label: const Text(
+                      'Chat',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: SizedBox(
+                  height: 44,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _makeCall(contactPhone),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryBlue,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.zero,
+                    ),
+                    icon: const Icon(Icons.phone_rounded, size: 18),
+                    label: const Text(
+                      'Call HR',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
           // Apply Now button
-          Expanded(
+          SizedBox(
+            width: double.infinity,
+            height: 54,
             child: Container(
-              height: 54,
               decoration: BoxDecoration(
                 color: AppColors.yellow,
                 borderRadius: BorderRadius.circular(30),
@@ -461,28 +599,6 @@ class JobDetailScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          // Bookmark button
-          Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              color: AppColors.cardBg,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: const [
-                BoxShadow(
-                  color: AppColors.cardShadow,
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.bookmark_border_rounded,
-              color: AppColors.greyText,
-              size: 22,
             ),
           ),
         ],

@@ -276,5 +276,7 @@
   "jobs_applications": "Applications",
   "jobs_view_details": "View Details",
   "recent_jobs_title": "Recent Jobs",
-  "no_recent_jobs": "No recent jobs available at the moment."
+  "no_recent_jobs": "No recent jobs available at the moment.",
+  "post_job": "Post Job",
+  "post_job_coming_soon": "Post Job feature coming soon!"
 }

@@ -120,6 +120,13 @@ const List<QuickLink> kQuickLinks = [
     Color.fromARGB(255, 174, 152, 255),
     'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80',
   ),
+  // QuickLink(
+  //   'Post Job',
+  //   Icons.add_business_rounded,
+  //   AC.orangeBg,
+  //   AC.orangeIcon,
+  //   'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=400&q=80',
+  // ),
 ];
 
 // ─────────────────────────────────────────────
@@ -910,6 +917,17 @@ class _QuickLinkCard extends StatelessWidget {
                             AppLocalizations.of(
                               context,
                             ).text('missing_persons_coming_soon'),
+                          ),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    } else if (link.label == 'Post Job') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            AppLocalizations.of(
+                              context,
+                            ).text('post_job_coming_soon'),
                           ),
                           duration: const Duration(seconds: 2),
                         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -58,10 +59,11 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
   final Set<int> _savedJobIds = {};
 
   static const List<String> _jobTypeOptions = [
-    'Job Type',
+    'Any',
     'Full-time',
     'Part-time',
     'Contract',
+    'Work From Home',
   ];
 
   static const List<String> _salaryOptions = [
@@ -577,7 +579,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
         borderRadius: BorderRadius.circular(12),
         child: Container(
           constraints: const BoxConstraints(minWidth: 120),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 5.sp),
           decoration: BoxDecoration(
             color: _C.cardBg,
             borderRadius: BorderRadius.circular(12),
@@ -713,6 +715,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                         : job.stateName,
                     salary: job.salaryDisplay,
                     jobType: job.jobTypeLabel,
+                    contactPhone: job.contactPhone,
                   ),
                 ),
               );
@@ -1363,7 +1366,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                     child: Text(
                                       _sectionTitle(section),
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 13.sp,
                                         fontWeight: FontWeight.w700,
                                         color: isActive
                                             ? _C.primaryBlue
@@ -1462,8 +1465,8 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                                     Expanded(
                                                       child: Text(
                                                         option,
-                                                        style: const TextStyle(
-                                                          fontSize: 18,
+                                                        style: TextStyle(
+                                                          fontSize: 13.sp,
                                                           fontWeight:
                                                               FontWeight.w700,
                                                           color: _C.darkText,
@@ -1503,90 +1506,77 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                           },
                                         ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    16,
-                                    0,
-                                    16,
-                                    18,
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: OutlinedButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _selectedCategoryIndex = 0;
-                                              _selectedJobTypeIndex = 0;
-                                              _selectedSalaryIndex = 0;
-                                              _selectedEducationIndex = 0;
-                                              _selectedExperienceIndex = 0;
-                                              _selectedFreshnessIndex = 0;
-                                              _selectedLocationIndex = 0;
-                                            });
-                                            setModalState(() {
-                                              activeSection =
-                                                  _FilterSection.category;
-                                            });
-                                            if (categories.isNotEmpty) {
-                                              _changeCategory(categories.first);
-                                            }
-                                          },
-                                          style: OutlinedButton.styleFrom(
-                                            side: const BorderSide(
-                                              color: Color(0xFFF0C000),
-                                              width: 2,
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 16,
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            'Clear filter',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w700,
-                                              color: _C.darkText,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: ElevatedButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context, true),
-                                          style: ElevatedButton.styleFrom(
-                                            elevation: 0,
-                                            backgroundColor: _C.yellow,
-                                            foregroundColor: _C.darkText,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 16,
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            'Submit',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
                               ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 20.sp),
+                      height: 60.sp,
+                      padding: EdgeInsets.all(10.sp),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedCategoryIndex = 0;
+                                  _selectedJobTypeIndex = 0;
+                                  _selectedSalaryIndex = 0;
+                                  _selectedEducationIndex = 0;
+                                  _selectedExperienceIndex = 0;
+                                  _selectedFreshnessIndex = 0;
+                                  _selectedLocationIndex = 0;
+                                });
+                                setModalState(() {
+                                  activeSection = _FilterSection.category;
+                                });
+                                if (categories.isNotEmpty) {
+                                  _changeCategory(categories.first);
+                                }
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(
+                                  color: Color(0xFFF0C000),
+                                  width: 2,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 12.sp),
+                              ),
+                              child: Text(
+                                'Clear filter',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: _C.darkText,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10.sp),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                backgroundColor: _C.yellow,
+                                foregroundColor: _C.darkText,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 12.sp),
+                              ),
+                              child: Text(
+                                'Submit',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
                             ),
                           ),
                         ],
