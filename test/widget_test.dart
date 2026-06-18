@@ -18,11 +18,13 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     Get.put(StorageService(prefs), permanent: true);
-
     await tester.pumpWidget(
-      const MyApp(initialLocale: Locale('en'), isLoggedIn: false),
+      const MyApp(
+        initialLocale: Locale('en'),
+        isCandidateLoggedIn: false,
+        isEmployerLoggedIn: false,
+      ),
     );
-
     // Verify that we rendered a GetMaterialApp
     expect(find.byType(GetMaterialApp), findsOneWidget);
   });

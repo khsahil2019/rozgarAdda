@@ -6,6 +6,8 @@ import '../../domain/entities/available_job_entity.dart';
 import '../../domain/entities/job_category.dart';
 import '../../domain/entities/job_role_entity.dart';
 import '../../domain/repository/jobs_repository.dart';
+import 'package:rojgar/features/employer_dashboard/data/models/mock_employer_database.dart';
+import 'package:rojgar/features/employer_dashboard/domain/entities/job_application_entity.dart';
 import '../data_source/jobs_remote_datasource.dart';
 
 class JobsRepositoryImpl implements JobsRepository {
@@ -90,6 +92,31 @@ class JobsRepositoryImpl implements JobsRepository {
         fields: fields,
         resumePath: resumePath,
       );
+
+      // Local bridge to sync candidate application with local employer database
+      try {
+        final mockDb = MockEmployerDatabase();
+        await mockDb.applyToJob(
+          JobApplication(
+            id: 0,
+            jobId: jobId,
+            candidateName: fullName,
+            email: email,
+            phone: phone,
+            experienceYears: experienceYears,
+            experienceMonths: experienceMonths,
+            educationLevel: educationLevel,
+            educationDetails: educationDetails,
+            keySkills: keySkills,
+            resumePath: resumePath,
+            status: 'pending',
+            appliedAt: DateTime.now(),
+          ),
+        );
+      } catch (_) {
+        // Ignore mock database errors to not block candidates
+      }
+
       return Right(result);
     } catch (e) {
       if (e is Failure) return Left(e);

@@ -11,25 +11,35 @@ import 'package:rojgar/splash_screen.dart';
 import 'package:rojgar/services/storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:rojgar/features/employer_dashboard/presentation/screens/employer_dashboard_screen.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final storageService = Get.put(StorageService(prefs), permanent: true);
 
   final savedCode = storageService.getLanguageCode() ?? 'en';
-  final bool isLoggedIn = storageService.getCandidateId() != null;
-  runApp(MyApp(initialLocale: Locale(savedCode), isLoggedIn: isLoggedIn));
+  final bool isCandidateLoggedIn = storageService.getCandidateId() != null;
+  final bool isEmployerLoggedIn = prefs.getInt('employer_id') != null;
+
+  runApp(MyApp(
+    initialLocale: Locale(savedCode),
+    isCandidateLoggedIn: isCandidateLoggedIn,
+    isEmployerLoggedIn: isEmployerLoggedIn,
+  ));
 }
 
 class MyApp extends StatefulWidget {
   const MyApp({
     super.key,
     required this.initialLocale,
-    required this.isLoggedIn,
+    required this.isCandidateLoggedIn,
+    required this.isEmployerLoggedIn,
   });
 
   final Locale initialLocale;
-  final bool isLoggedIn;
+  final bool isCandidateLoggedIn;
+  final bool isEmployerLoggedIn;
 
   static MyAppState? of(BuildContext context) =>
       context.findAncestorStateOfType<MyAppState>();
@@ -40,13 +50,15 @@ class MyApp extends StatefulWidget {
 
 class MyAppState extends State<MyApp> {
   late Locale _locale;
-  late bool _isLoggedIn;
+  late bool _isCandidateLoggedIn;
+  late bool _isEmployerLoggedIn;
 
   @override
   void initState() {
     super.initState();
     _locale = widget.initialLocale;
-    _isLoggedIn = widget.isLoggedIn;
+    _isCandidateLoggedIn = widget.isCandidateLoggedIn;
+    _isEmployerLoggedIn = widget.isEmployerLoggedIn;
   }
 
   Future<void> setLocale(Locale locale) async {
@@ -86,7 +98,11 @@ class MyAppState extends State<MyApp> {
           home: child,
         );
       },
-      child: _isLoggedIn ? const FloatingNavbarScreen() : const SplashScreen(),
+      child: _isCandidateLoggedIn
+          ? const FloatingNavbarScreen()
+          : _isEmployerLoggedIn
+              ? const EmployerDashboardScreen()
+              : const SplashScreen(),
     );
   }
 }

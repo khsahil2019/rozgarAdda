@@ -8,6 +8,10 @@ import 'package:rojgar/features/buy_product/presentation/screens/product_categor
 import 'package:rojgar/features/buy_product/presentation/bindings/buy_product_binding.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rojgar/features/employer_auth/presentation/screens/employer_login_screen.dart';
+import 'package:rojgar/features/employer_auth/presentation/screens/employer_registration_screen.dart';
+import 'package:rojgar/features/employer_auth/presentation/bindings/employer_auth_binding.dart';
+import 'package:rojgar/features/employer_dashboard/presentation/screens/employer_dashboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,19 +27,27 @@ class _SplashScreenState extends State<SplashScreen> {
   static const Color lightWhite = Color(0xAAFFFFFF);
   static const Color innerBlue = Color(0xFF1400EE);
 
-  Future<bool> _isLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('candidate_id') != null;
-  }
 
   Future<void> _navigateWithAuthCheck({
     required BuildContext context,
     required Widget loggedInScreen,
     bool replace = false,
   }) async {
-    final loggedIn = await _isLoggedIn();
+    final prefs = await SharedPreferences.getInstance();
+    final isCandidate = prefs.getInt('candidate_id') != null;
+    final isEmployer = prefs.getInt('employer_id') != null;
+
     if (!context.mounted) return;
-    final destination = loggedIn ? loggedInScreen : const LoginScreen();
+
+    Widget destination;
+    if (isCandidate) {
+      destination = loggedInScreen;
+    } else if (isEmployer) {
+      destination = const EmployerDashboardScreen();
+    } else {
+      destination = const LoginScreen();
+    }
+
     if (replace) {
       Navigator.of(
         context,
@@ -232,6 +244,26 @@ class _SplashScreenState extends State<SplashScreen> {
                             MaterialPageRoute(
                               builder: (_) => const LoginScreen(),
                             ),
+                          );
+                        },
+                      ),
+                      _SplashMenuItem(
+                        icon: Icons.business_center_rounded,
+                        label: l10n.text('splash_menu_employer_login'),
+                        onTap: () {
+                          Get.to(
+                            () => const EmployerLoginScreen(),
+                            binding: EmployerAuthBinding(),
+                          );
+                        },
+                      ),
+                      _SplashMenuItem(
+                        icon: Icons.domain_add_rounded,
+                        label: l10n.text('splash_menu_employer_register'),
+                        onTap: () {
+                          Get.to(
+                            () => const EmployerRegistrationScreen(),
+                            binding: EmployerAuthBinding(),
                           );
                         },
                       ),

@@ -10,6 +10,8 @@ import '../../features/kyc/presentation/bindings/kyc_binding.dart';
 import '../../features/sell_product/presentation/bindings/sell_product_binding.dart';
 import '../../features/state_selection/presentation/bindings/state_selection_binding.dart';
 import '../../features/chat/presentation/bindings/chat_binding.dart';
+import '../../features/employer_auth/presentation/bindings/employer_auth_binding.dart';
+import '../../features/employer_dashboard/presentation/bindings/employer_dashboard_binding.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -40,6 +42,10 @@ class InitialBinding extends Bindings {
 
     // Register chat dependencies
     ChatBinding().dependencies();
+
+    // Register employer auth & dashboard dependencies
+    EmployerAuthBinding().dependencies();
+    EmployerDashboardBinding().dependencies();
   }
 }
 
