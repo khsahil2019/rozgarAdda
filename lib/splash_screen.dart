@@ -12,6 +12,7 @@ import 'package:rojgar/features/employer_auth/presentation/screens/employer_logi
 import 'package:rojgar/features/employer_auth/presentation/screens/employer_registration_screen.dart';
 import 'package:rojgar/features/employer_auth/presentation/bindings/employer_auth_binding.dart';
 import 'package:rojgar/features/employer_dashboard/presentation/screens/employer_dashboard_screen.dart';
+import 'package:rojgar/features/missing_person/presentation/screens/missing_person_list_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -201,7 +202,11 @@ class _SplashScreenState extends State<SplashScreen> {
                         icon: Icons.report_gmailerrorred_rounded,
                         label: l10n.text('splash_menu_missing'),
                         onTap: () {
-                          // TODO: navigate to Missing screen
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const MissingPersonListScreen(),
+                            ),
+                          );
                         },
                       ),
                       _SplashMenuItem(

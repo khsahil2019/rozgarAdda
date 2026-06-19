@@ -39,4 +39,7 @@ class ApiRoutes {
   static String get myEnquiries => _buildUrl('chat/my-enquiries');
   static String chatMessages(int chatId) => _buildUrl('chat/$chatId/messages');
   static String sendMessage(int chatId) => _buildUrl('chat/$chatId/send');
+
+  // Missing Person
+  static String get missingPersons => _buildUrl('missing-person');
 }

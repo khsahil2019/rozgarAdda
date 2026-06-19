@@ -15,6 +15,7 @@ import 'package:rojgar/features/state_selection/presentation/bindings/state_sele
 import 'package:rojgar/features/chat/presentation/screens/chat_user_list_screen.dart';
 import 'package:rojgar/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:rojgar/features/chat/presentation/controller/chat_controller.dart';
+import 'package:rojgar/features/missing_person/presentation/screens/missing_person_list_screen.dart';
 
 class AC {
   static const Color primaryPurple = Color(0xFF5B2BE0);
@@ -911,14 +912,10 @@ class _QuickLinkCard extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     if (link.label == 'Missing Persons') {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            AppLocalizations.of(
-                              context,
-                            ).text('missing_persons_coming_soon'),
-                          ),
-                          duration: const Duration(seconds: 2),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MissingPersonListScreen(),
                         ),
                       );
                     } else if (link.label == 'Post Job') {
