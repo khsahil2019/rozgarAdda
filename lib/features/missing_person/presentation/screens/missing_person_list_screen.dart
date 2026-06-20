@@ -5,6 +5,7 @@ import 'package:rojgar/localization/app_localizations.dart';
 import '../../domain/entities/missing_person.dart';
 import '../controller/missing_person_controller.dart';
 import 'missing_person_detail_screen.dart';
+import 'post_missing_person_screen.dart';
 
 // Styling Colors (matching App Theme and News screen styles)
 class _MPC {
@@ -24,7 +25,7 @@ class MissingPersonListScreen extends GetView<MissingPersonController> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Get.toNamed('/add_missing_person');
+          Get.to(() => const PostMissingPersonScreen());
         },
         child: const Icon(Icons.person_add_alt, color: Colors.white),
       ),

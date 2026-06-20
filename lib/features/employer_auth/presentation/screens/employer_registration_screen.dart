@@ -43,8 +43,9 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
         controller.email.value.trim().isEmpty ||
         controller.phone.value.trim().isEmpty ||
         controller.password.value.isEmpty ||
-        controller.address.value.trim().isEmpty) {
-      _showErrorDialog(context, context.l10n.text('registration_error_fields'));
+        controller.address.value.trim().isEmpty ||
+        controller.identityProofPath.value == null) {
+      _showErrorDialog(context, 'Please upload identity proof.');
       return;
     }
 
@@ -195,6 +196,12 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
                     onSuffixTap: controller.togglePasswordObscurity,
                   ),
                 ),
+
+                const SizedBox(height: 16),
+
+                _buildFieldLabel('Identity Proof (ID Proof)'),
+                const SizedBox(height: 6),
+                _buildUploadBox(context),
 
                 const SizedBox(height: 20),
 
@@ -409,6 +416,117 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
                   ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildUploadBox(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      decoration: BoxDecoration(
+        color: fieldBg,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: borderColor, width: 1.5),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: primaryBlue.withAlpha((0.1 * 255).round()),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.cloud_upload_outlined,
+              color: primaryBlue,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Upload ID Proof',
+            style: TextStyle(
+              color: darkText,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Select JPG, PNG, or PDF file',
+            style: TextStyle(color: greyText, fontSize: 12),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 14),
+          Obx(() {
+            final path = controller.identityProofPath.value;
+            if (path != null) {
+              final fileName = path.split('/').last.split('\\').last;
+              return Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          fileName,
+                          style: const TextStyle(
+                            color: darkText,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: controller.pickIdentityProof,
+                    child: const Text(
+                      'Choose Another File',
+                      style: TextStyle(
+                        color: primaryBlue,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            return OutlinedButton(
+              onPressed: controller.pickIdentityProof,
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: primaryBlue, width: 1.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
+              ),
+              child: const Text(
+                'Choose File',
+                style: TextStyle(
+                  color: primaryBlue,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            );
+          }),
+        ],
       ),
     );
   }

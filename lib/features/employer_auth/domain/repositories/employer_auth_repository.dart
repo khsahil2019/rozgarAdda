@@ -11,6 +11,7 @@ abstract class EmployerAuthRepository {
     required String contactPerson,
     required String password,
     required String address,
+    String? identityProofPath,
   });
   Future<bool> checkLoggedIn();
   Future<void> logout();

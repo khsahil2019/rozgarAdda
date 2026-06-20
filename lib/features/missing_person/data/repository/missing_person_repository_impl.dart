@@ -20,4 +20,21 @@ class MissingPersonRepositoryImpl implements MissingPersonRepository {
       return Left(Failure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, String>> addMissingPerson({
+    required Map<String, String> fields,
+    required Map<String, String> files,
+  }) async {
+    try {
+      final responseMsg = await remoteDataSource.addMissingPerson(
+        fields: fields,
+        files: files,
+      );
+      return Right(responseMsg);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(Failure(e.toString()));
+    }
+  }
 }

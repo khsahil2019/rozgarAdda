@@ -1,0 +1,253 @@
+ROZGAR ADDA - JOB POST API DOCUMENTATION
+
+API Endpoint:
+POST /api/emp/post-job
+Authentication:
+Authorization: Bearer {token}
+
+IMPORTANT:
+Employer can post jobs only when booking_status = approved.
+If employer is pending/rejected, API should return:
+
+{
+"status": false,
+"message": "Your account is awaiting admin approval."
+}
+
+---
+
+## REQUIRED FIELDS
+
+category_id          (integer)
+role_id              (integer)
+title                (string)
+vacancy              (integer)
+job_type             (enum)
+work_location_type   (enum)
+pay_type             (enum)
+education_level      (string)
+english_level        (enum)
+experience_level     (string)
+plan_id              (integer)
+
+---
+
+## ENUM VALUES
+
+job_type:
+full_time
+part_time
+both
+
+work_location_type:
+office
+home
+field
+
+pay_type:
+fixed
+fixed_inc
+inc_only
+
+english_level:
+none
+basic
+good
+
+contact_preference:
+self
+other
+none
+
+shifts:
+day
+night
+rotational
+flexible
+
+---
+
+## LOCATION RULES
+
+If work_location_type = office
+
+Required Fields:
+
+office_state_id
+office_district_id
+office_localite_id
+office_address_line1
+office_pincode
+
+Optional:
+
+office_address_line2
+
+---
+
+If work_location_type = field
+
+Required Fields:
+
+field_state_id
+field_district_id
+field_localite_id
+field_address_line1
+field_pincode
+
+Optional:
+
+field_address_line2
+
+---
+
+If work_location_type = home
+
+No location fields required.
+
+---
+
+## SALARY RULES
+
+If pay_type = fixed
+
+min_salary
+max_salary
+
+---
+
+If pay_type = fixed_inc
+
+fixed_salary
+avg_incentive
+
+---
+
+If pay_type = inc_only
+
+estimated_incentive
+
+---
+
+## OPTIONAL ARRAYS
+
+skills
+
+Example:
+["Laravel","PHP","MySQL"]
+
+languages
+
+Example:
+["Hindi","English"]
+
+perks
+
+Example:
+["PF","ESI","Food"]
+
+additional_requirements
+
+Example:
+["Bike","Laptop"]
+
+shifts
+
+Example:
+["day","night"]
+
+---
+
+## WALK-IN INTERVIEW
+
+If is_walkin = 1
+
+Required Fields:
+
+walkin_date
+walkin_time
+walkin_end_time
+walkin_venue
+
+---
+
+## CONTACT INFORMATION
+
+contact_preference = self
+
+No additional fields required.
+
+---
+
+contact_preference = other
+
+Required Fields:
+
+contact_person
+contact_phone
+contact_email
+
+---
+
+## SAMPLE REQUEST
+
+{
+"category_id": 1,
+"role_id": 2,
+"title": "Laravel Developer",
+"vacancy": 5,
+"job_type": "full_time",
+
+"work_location_type": "office",
+
+"office_state_id": 1,
+"office_district_id": 10,
+"office_localite_id": 100,
+"office_address_line1": "Sector 63",
+"office_address_line2": "Near Metro",
+"office_pincode": "201301",
+
+"pay_type": "fixed",
+"min_salary": 25000,
+"max_salary": 40000,
+
+"education_level": "Graduate",
+"english_level": "good",
+"experience_level": "1-2 Years",
+
+"skills": ["Laravel","PHP","MySQL"],
+"languages": ["Hindi","English"],
+
+"contact_preference": "self",
+
+"plan_id": 1
+}
+
+---
+
+## SUCCESS RESPONSE
+
+{
+"status": true,
+"message": "Job posted successfully",
+"job_id": 123
+}
+
+---
+
+## VALIDATION ERROR RESPONSE
+
+{
+"status": false,
+"errors": {
+"title": [
+"The title field is required."
+]
+}
+}
+
+---
+
+## HELPER APIS
+
+GET /api/emp/state

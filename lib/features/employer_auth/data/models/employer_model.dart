@@ -23,6 +23,19 @@ class EmployerModel extends Employer {
     );
   }
 
+  factory EmployerModel.fromApiResponse(Map<String, dynamic> json) {
+    final user = json['user'] as Map<String, dynamic>? ?? {};
+    return EmployerModel(
+      id: user['id'] as int? ?? 0,
+      companyName: (user['company_name'] ?? user['username'] ?? '').toString(),
+      email: (user['email'] ?? '').toString(),
+      phone: (user['phone'] ?? '').toString(),
+      contactPerson: (user['username'] ?? '').toString(),
+      address: (user['address'] ?? '').toString(),
+      token: (json['token'] ?? '').toString(),
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

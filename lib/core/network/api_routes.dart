@@ -7,6 +7,10 @@ class ApiRoutes {
   //endpoints
   static String get login => _buildUrl('candidate/login');
   static String get register => _buildUrl('candidate/register');
+  static String get employerLogin => _buildUrl('emp/login');
+  static String get employerRegister => _buildUrl('emp/register');
+  static String get employerJobs => _buildUrl('emp/jobs');
+  static String get postJob => _buildUrl('emp/post-job');
   static String get forgotPassword => _buildUrl('candidate/forgot-password');
   static String get resetPassword => _buildUrl('candidate/reset-password');
   static String get verifyEmail => _buildUrl('candidate/verify-email');

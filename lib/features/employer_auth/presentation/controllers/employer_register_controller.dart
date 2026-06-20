@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../domain/repositories/employer_auth_repository.dart';
@@ -24,6 +25,24 @@ class EmployerRegisterController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool isPasswordObscured = true.obs;
   final RxBool acceptedTerms = false.obs;
+
+  // ── File Upload ───────────────────────────────────────────────────────────
+  final RxnString identityProofPath = RxnString();
+
+  Future<void> pickIdentityProof() async {
+    try {
+      FilePickerResult? result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        identityProofPath.value = result.files.single.path;
+      }
+    } catch (e) {
+      debugPrint('Error picking file: $e');
+    }
+  }
 
   @override
   void onInit() {
@@ -62,6 +81,7 @@ class EmployerRegisterController extends GetxController {
       phone.value.trim().isNotEmpty &&
       password.value.isNotEmpty &&
       address.value.trim().isNotEmpty &&
+      identityProofPath.value != null &&
       acceptedTerms.value &&
       !isLoading.value;
 
@@ -79,6 +99,7 @@ class EmployerRegisterController extends GetxController {
       contactPerson: contactPerson.value.trim(),
       password: password.value,
       address: address.value.trim(),
+      identityProofPath: identityProofPath.value,
     );
 
     result.fold(
