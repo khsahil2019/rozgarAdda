@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/core/exceptions/exceptions.dart';
 import 'package:rojgar/features/auth/presentation/controller/login_controller.dart';
@@ -115,15 +116,11 @@ class LoginScreen extends GetView<LoginController> {
               SizedBox(height: size.height * 0.04),
 
               // Logo Icon
-              Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  color: lightLavender,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Center(
-                  child: Icon(Icons.work_rounded, color: primaryBlue, size: 42),
+              SizedBox(
+                width: 100.w,
+                child: Image.asset(
+                  'assets/icons/logo.png',
+                  fit: BoxFit.contain,
                 ),
               ),
 

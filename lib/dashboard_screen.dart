@@ -107,13 +107,13 @@ const List<QuickLink> kQuickLinks = [
 
     'https://images.unsplash.com/photo-1737154590393-20c0b8c389ae?auto=format&fit=crop&w=400&q=80',
   ),
-  QuickLink(
-    'Skill Up',
-    Icons.school_rounded,
-    AC.cyanBg,
-    AC.cyanIcon,
-    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80',
-  ),
+  // QuickLink(
+  //   'Skill Up',
+  //   Icons.school_rounded,
+  //   AC.cyanBg,
+  //   AC.cyanIcon,
+  //   'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80',
+  // ),
   QuickLink(
     'Recent Jobs',
     Icons.school_rounded,
@@ -1383,12 +1383,12 @@ const List<_SidebarMenuItem> _kSidebarItems = [
     Color(0xFFFFDDDD),
     Color(0xFFDD3366),
   ),
-  _SidebarMenuItem(
-    Icons.school_rounded,
-    'Skill Up',
-    Color(0xFFD5F5FF),
-    Color(0xFF0099CC),
-  ),
+  // _SidebarMenuItem(
+  //   Icons.school_rounded,
+  //   'Skill Up',
+  //   Color(0xFFD5F5FF),
+  //   Color(0xFF0099CC),
+  // ),
   _SidebarMenuItem(
     Icons.support_agent_rounded,
     'Support',

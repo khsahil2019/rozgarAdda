@@ -42,6 +42,9 @@ class AvailableJobModel {
   final String? walkinEndTime;
   final String? walkinVenue;
   final DateTime createdAt;
+  final int? stateId;
+  final int? districtId;
+  final int? localiteId;
 
   AvailableJobModel({
     required this.id,
@@ -85,6 +88,9 @@ class AvailableJobModel {
     this.walkinEndTime,
     this.walkinVenue,
     required this.createdAt,
+    this.stateId,
+    this.districtId,
+    this.localiteId,
   });
 
   factory AvailableJobModel.fromJson(Map<String, dynamic> json) {
@@ -159,7 +165,9 @@ class AvailableJobModel {
       englishLevel: (json['english_level'] ?? '').toString(),
       experienceLevel: (json['experience_level'] ?? '').toString(),
       additionalRequirements:
-          (json['additional_requirements'] as Map<String, dynamic>?) ?? {},
+          json['additional_requirements'] is Map<String, dynamic>
+          ? json['additional_requirements']
+          : {},
       skills: parseSkills(json['skills']),
       languages: parseStringList(json['languages']),
       jobDescription: json['job_description']?.toString(),
@@ -176,10 +184,30 @@ class AvailableJobModel {
       walkinTime: json['walkin_time']?.toString(),
       walkinEndTime: json['walkin_end_time']?.toString(),
       walkinVenue: json['walkin_venue']?.toString(),
-      createdAt: DateTime.tryParse(
-            (json['created_at'] ?? '').toString(),
-          ) ??
+      createdAt:
+          DateTime.tryParse((json['created_at'] ?? '').toString()) ??
           DateTime.now(),
+      stateId: json['state_id'] != null
+          ? _parseInt(json['state_id'])
+          : (json['office_state_id'] != null
+                ? _parseInt(json['office_state_id'])
+                : (json['field_state_id'] != null
+                      ? _parseInt(json['field_state_id'])
+                      : null)),
+      districtId: json['district_id'] != null
+          ? _parseInt(json['district_id'])
+          : (json['office_district_id'] != null
+                ? _parseInt(json['office_district_id'])
+                : (json['field_district_id'] != null
+                      ? _parseInt(json['field_district_id'])
+                      : null)),
+      localiteId: json['localite_id'] != null
+          ? _parseInt(json['localite_id'])
+          : (json['office_localite_id'] != null
+                ? _parseInt(json['office_localite_id'])
+                : (json['field_localite_id'] != null
+                      ? _parseInt(json['field_localite_id'])
+                      : null)),
     );
   }
 
@@ -232,6 +260,9 @@ class AvailableJobModel {
       walkinEndTime: walkinEndTime,
       walkinVenue: walkinVenue,
       createdAt: createdAt,
+      stateId: stateId,
+      districtId: districtId,
+      localiteId: localiteId,
     );
   }
 }

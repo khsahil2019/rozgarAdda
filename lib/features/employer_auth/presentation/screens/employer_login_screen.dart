@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/features/auth/presentation/screens/login_screen.dart';
@@ -112,15 +113,11 @@ class EmployerLoginScreen extends GetView<EmployerLoginController> {
               SizedBox(height: size.height * 0.04),
 
               // Employer Branding Icon
-              Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  color: lightLavender,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Center(
-                  child: Icon(Icons.business_center_rounded, color: primaryBlue, size: 42),
+              SizedBox(
+                width: 90.w,
+                child: Image.asset(
+                  'assets/icons/logo.png',
+                  fit: BoxFit.contain,
                 ),
               ),
 

@@ -26,10 +26,10 @@ class MockEmployerDatabase {
             .map((item) => _jobFromMap(item as Map<String, dynamic>))
             .toList();
       } catch (_) {
-        _seedDefaultJobs();
+        // _seedDefaultJobs();
       }
     } else {
-      _seedDefaultJobs();
+      // _seedDefaultJobs();
     }
 
     // Load Applications
@@ -51,87 +51,6 @@ class MockEmployerDatabase {
 
     _isInitialized = true;
     await _saveToStorage();
-  }
-
-  void _seedDefaultJobs() {
-    _jobs = [
-      AvailableJob(
-        id: 1001,
-        employerId: 2001, // Mock Tech Solutions Ltd
-        categoryId: 1,
-        roleId: 2,
-        title: 'Delivery Rider (Mock)',
-        jobType: 'full_time',
-        shifts: const ['Day Shift'],
-        workLocationType: 'field',
-        stateName: 'Rajasthan',
-        addressLine1: '45 Blue Plaza, Malviya Nagar',
-        addressLine2: 'Near Apex Mall',
-        landmark: 'Apex Mall',
-        pincode: '302017',
-        payType: 'fixed',
-        fixedSalary: '15000',
-        perks: const ['Fuel Allowance', 'Health Insurance'],
-        educationLevel: '10th Pass',
-        englishLevel: 'No English required',
-        experienceLevel: 'fresher',
-        additionalRequirements: const {},
-        skills: const ['Driving License', 'Two Wheeler'],
-        languages: const ['Hindi'],
-        jobDescription:
-            'Required delivery riders for food/grocery deliveries. Flexible working hours with weekly payouts. Fuel expenses reimbursed.',
-        vacancy: 15,
-        isWalkin: false,
-        contactPreference: 'call',
-        contactPerson: 'Raman Khanna',
-        contactPhone: '9876543210',
-        contactEmail: 'hr@techsolutions.com',
-        viewsCount: 142,
-        applicationsCount: 3,
-        status: 'active',
-        createdAt: DateTime.now().subtract(const Duration(days: 5)),
-      ),
-      AvailableJob(
-        id: 1002,
-        employerId: 2001,
-        categoryId: 2,
-        roleId: 5,
-        title: 'Data Entry Operator (Mock)',
-        jobType: 'part_time',
-        shifts: const ['Flexible'],
-        workLocationType: 'remote',
-        stateName: 'Rajasthan',
-        addressLine1: '45 Blue Plaza, Malviya Nagar',
-        addressLine2: 'Near Apex Mall',
-        pincode: '302017',
-        payType: 'range',
-        minSalary: '8000',
-        maxSalary: '12000',
-        perks: const ['Flexible hours'],
-        educationLevel: '12th Pass',
-        englishLevel: 'Basic English',
-        experienceLevel: '1',
-        additionalRequirements: const {},
-        skills: const ['Typing speed > 30 wpm', 'MS Excel'],
-        languages: const ['Hindi', 'English'],
-        jobDescription:
-            'Looking for a diligent data entry operator to manage databases. Work from home options are available.',
-        vacancy: 4,
-        isWalkin: true,
-        walkinDate: '2026-06-25',
-        walkinTime: '10:00 AM',
-        walkinEndTime: '04:00 PM',
-        walkinVenue: '45 Blue Plaza, Malviya Nagar, Jaipur',
-        contactPreference: 'email',
-        contactPerson: 'Raman Khanna',
-        contactPhone: '9876543210',
-        contactEmail: 'hr@techsolutions.com',
-        viewsCount: 89,
-        applicationsCount: 1,
-        status: 'active',
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-    ];
   }
 
   void _seedDefaultApplications() {
@@ -422,6 +341,9 @@ class MockEmployerDatabase {
       'walkin_end_time': job.walkinEndTime,
       'walkin_venue': job.walkinVenue,
       'created_at': job.createdAt.toIso8601String(),
+      'state_id': job.stateId,
+      'district_id': job.districtId,
+      'localite_id': job.localiteId,
     };
   }
 
@@ -463,9 +385,9 @@ class MockEmployerDatabase {
       educationLevel: (json['education_level'] ?? '').toString(),
       englishLevel: (json['english_level'] ?? '').toString(),
       experienceLevel: (json['experience_level'] ?? '').toString(),
-      additionalRequirements:
-          (json['additional_requirements'] as Map?)?.cast<String, dynamic>() ??
-          const {},
+      additionalRequirements: (json['additional_requirements'] is Map
+          ? json['additional_requirements'] as Map<String, dynamic>
+          : <String, dynamic>{}),
       skills: parseList(json['skills']),
       languages: parseList(json['languages']),
       jobDescription: json['job_description']?.toString(),
@@ -485,6 +407,9 @@ class MockEmployerDatabase {
       createdAt:
           DateTime.tryParse((json['created_at'] ?? '').toString()) ??
           DateTime.now(),
+      stateId: json['state_id'] as int?,
+      districtId: json['district_id'] as int?,
+      localiteId: json['localite_id'] as int?,
     );
   }
 }

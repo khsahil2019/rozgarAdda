@@ -47,7 +47,10 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                         Text(
                           context.l10n.text('sell_error_categories'),
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.red, fontSize: 16),
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 16,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
@@ -89,7 +92,8 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                   final category = controller.categories[itemIndex];
 
                   return Obx(() {
-                    final isSelected = controller.selectedCategoryIndex.value == itemIndex;
+                    final isSelected =
+                        controller.selectedCategoryIndex.value == itemIndex;
 
                     return GestureDetector(
                       onTap: () {
@@ -103,12 +107,17 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 180),
                         margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 14,
+                        ),
                         decoration: BoxDecoration(
                           color: _C.cardBg,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: isSelected ? _C.primaryBlue : Colors.transparent,
+                            color: isSelected
+                                ? _C.primaryBlue
+                                : Colors.transparent,
                             width: 1.8,
                           ),
                           boxShadow: [
@@ -125,7 +134,9 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                               width: 46,
                               height: 46,
                               decoration: BoxDecoration(
-                                color: isSelected ? const Color(0xFFE8EAFF) : const Color(0xFFEEEEF8),
+                                color: isSelected
+                                    ? const Color(0xFFE8EAFF)
+                                    : const Color(0xFFEEEEF8),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               clipBehavior: Clip.antiAlias,
@@ -135,13 +146,17 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                                       fit: BoxFit.cover,
                                       errorBuilder: (_, __, ___) => Icon(
                                         Icons.category,
-                                        color: isSelected ? _C.primaryBlue : const Color(0xFF5A6070),
+                                        color: isSelected
+                                            ? _C.primaryBlue
+                                            : const Color(0xFF5A6070),
                                         size: 24,
                                       ),
                                     )
                                   : Icon(
                                       Icons.category,
-                                      color: isSelected ? _C.primaryBlue : const Color(0xFF5A6070),
+                                      color: isSelected
+                                          ? _C.primaryBlue
+                                          : const Color(0xFF5A6070),
                                       size: 24,
                                     ),
                             ),
@@ -152,7 +167,9 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                                 style: TextStyle(
                                   color: _C.darkText,
                                   fontSize: 15,
-                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w600,
                                 ),
                               ),
                             ),
@@ -367,8 +384,8 @@ class _NextButton extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(
         16,
         12,
-        16,
-        MediaQuery.of(context).padding.bottom + 12,
+        22,
+        MediaQuery.of(context).padding.bottom + 20,
       ),
       child: GestureDetector(
         onTap: onTap,
@@ -376,14 +393,16 @@ class _NextButton extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           height: 52,
           decoration: BoxDecoration(
-            color: enabled ? _C.yellow : const Color(0xFFEEEE99),
+            color: enabled
+                ? _C.primaryBlue
+                : const Color.fromARGB(255, 169, 161, 252),
             borderRadius: BorderRadius.circular(30),
           ),
           alignment: Alignment.center,
           child: Text(
             context.l10n.text('sell_next'),
             style: const TextStyle(
-              color: _C.darkText,
+              color: _C.cardBg,
               fontSize: 15,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.5,

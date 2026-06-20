@@ -20,7 +20,11 @@ class _C {
 class SellProductFormScreen extends GetView<SellProductController> {
   const SellProductFormScreen({super.key});
 
-  void _showSnackBar(BuildContext context, String message, {Color? backgroundColor}) {
+  void _showSnackBar(
+    BuildContext context,
+    String message, {
+    Color? backgroundColor,
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -57,12 +61,15 @@ class SellProductFormScreen extends GetView<SellProductController> {
                     // Category Banner
                     Obx(() {
                       final catIdx = controller.selectedCategoryIndex.value;
-                      final subCatIdx = controller.selectedSubCategoryIndex.value;
+                      final subCatIdx =
+                          controller.selectedSubCategoryIndex.value;
 
-                      if (catIdx == null || subCatIdx == null) return const SizedBox.shrink();
+                      if (catIdx == null || subCatIdx == null)
+                        return const SizedBox.shrink();
 
                       final catName = controller.categories[catIdx].name;
-                      final subCatName = controller.subCategories[subCatIdx].name;
+                      final subCatName =
+                          controller.subCategories[subCatIdx].name;
 
                       return _CategoryBanner(
                         categoryName: catName,
@@ -76,7 +83,9 @@ class SellProductFormScreen extends GetView<SellProductController> {
                     _InputField(
                       controller: controller.titleCtrl,
                       hint: context.l10n.text('sell_title_hint'),
-                      validator: (v) => (v == null || v.trim().isEmpty) ? context.l10n.text('sell_required') : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? context.l10n.text('sell_required')
+                          : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -86,7 +95,9 @@ class SellProductFormScreen extends GetView<SellProductController> {
                       controller: controller.descCtrl,
                       hint: context.l10n.text('sell_desc_hint'),
                       maxLines: 5,
-                      validator: (v) => (v == null || v.trim().isEmpty) ? context.l10n.text('sell_required') : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? context.l10n.text('sell_required')
+                          : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -107,7 +118,9 @@ class SellProductFormScreen extends GetView<SellProductController> {
                             ? context.l10n.text('sell_no_file')
                             : mainImg.name,
                         onTap: controller.pickMainImage,
-                        previewFile: mainImg != null ? File(mainImg.path) : null,
+                        previewFile: mainImg != null
+                            ? File(mainImg.path)
+                            : null,
                         chooseFileText: context.l10n.text('sell_choose_file'),
                       );
                     }),
@@ -138,11 +151,17 @@ class SellProductFormScreen extends GetView<SellProductController> {
                               _InputField(
                                 controller: controller.priceCtrl,
                                 hint: '0.00',
-                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
                                 inputFormatters: [
-                                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                                  FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}'),
+                                  ),
                                 ],
-                                onChanged: (_) => controller.priceCtrl.text = controller.priceCtrl.text,
+                                onChanged: (_) => controller.priceCtrl.text =
+                                    controller.priceCtrl.text,
                               ),
                             ],
                           ),
@@ -160,7 +179,8 @@ class SellProductFormScreen extends GetView<SellProductController> {
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
                                 ],
-                                onChanged: (_) => controller.discountCtrl.text = controller.discountCtrl.text,
+                                onChanged: (_) => controller.discountCtrl.text =
+                                    controller.discountCtrl.text,
                               ),
                             ],
                           ),
@@ -173,7 +193,10 @@ class SellProductFormScreen extends GetView<SellProductController> {
                     _FieldLabel(context.l10n.text('sell_total_cost')),
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
                       decoration: BoxDecoration(
                         color: _C.fieldBg,
                         borderRadius: BorderRadius.circular(12),
@@ -186,7 +209,9 @@ class SellProductFormScreen extends GetView<SellProductController> {
                               ? 'Calculated total'
                               : '₹ ${total.toStringAsFixed(2)}',
                           style: TextStyle(
-                            color: controller.priceCtrl.text.isEmpty ? _C.greyText : _C.darkText,
+                            color: controller.priceCtrl.text.isEmpty
+                                ? _C.greyText
+                                : _C.darkText,
                             fontSize: 14,
                           ),
                         );
@@ -229,15 +254,25 @@ class SellProductFormScreen extends GetView<SellProductController> {
 
                     // Active Product toggle
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF5F5E0),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE8E8C0), width: 1),
+                        border: Border.all(
+                          color: const Color(0xFFE8E8C0),
+                          width: 1,
+                        ),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.visibility_rounded, color: _C.primaryBlue, size: 20),
+                          const Icon(
+                            Icons.visibility_rounded,
+                            color: _C.primaryBlue,
+                            size: 20,
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
@@ -292,13 +327,17 @@ class SellProductFormScreen extends GetView<SellProductController> {
             if (success) {
               Get.off(() => const SellProductReviewScreen());
             } else {
-              final errMsg = controller.savingError.value ?? l10n.text('sell_error_saving');
+              final errMsg =
+                  controller.savingError.value ??
+                  l10n.text('sell_error_saving');
               messenger.showSnackBar(
                 SnackBar(
                   content: Text(errMsg),
                   backgroundColor: Colors.red,
                   behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               );
             }
@@ -362,7 +401,11 @@ class _StepIndicator extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
       child: Row(
         children: [
-          _StepCircle(number: 1, label: context.l10n.text('sell_category'), state: _StepState.done),
+          _StepCircle(
+            number: 1,
+            label: context.l10n.text('sell_category'),
+            state: _StepState.done,
+          ),
           const _StepLine(active: true),
           _StepCircle(number: 2, label: 'Sub-Cat', state: _StepState.done),
           const _StepLine(active: true),
@@ -408,7 +451,9 @@ class _StepCircle extends StatelessWidget {
           height: 32,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: (isDone || isActive) ? _C.primaryBlue : const Color(0xFFE8E8F0),
+            color: (isDone || isActive)
+                ? _C.primaryBlue
+                : const Color(0xFFE8E8F0),
           ),
           alignment: Alignment.center,
           child: isDone
@@ -428,7 +473,9 @@ class _StepCircle extends StatelessWidget {
           style: TextStyle(
             color: (isDone || isActive) ? _C.primaryBlue : _C.greyText,
             fontSize: 9,
-            fontWeight: (isDone || isActive) ? FontWeight.w700 : FontWeight.w500,
+            fontWeight: (isDone || isActive)
+                ? FontWeight.w700
+                : FontWeight.w500,
             letterSpacing: 0.4,
           ),
         ),
@@ -480,7 +527,11 @@ class _CategoryBanner extends StatelessWidget {
               color: const Color(0xFFE0E0FF),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.directions_car_rounded, color: _C.primaryBlue, size: 22),
+            child: const Icon(
+              Icons.directions_car_rounded,
+              color: _C.primaryBlue,
+              size: 22,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -497,10 +548,7 @@ class _CategoryBanner extends StatelessWidget {
                 ),
                 Text(
                   'Sub Category: $subCategoryName',
-                  style: const TextStyle(
-                    color: _C.greyText,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: _C.greyText, fontSize: 12),
                 ),
               ],
             ),
@@ -565,7 +613,10 @@ class _InputField extends StatelessWidget {
         hintStyle: const TextStyle(color: _C.greyText, fontSize: 14),
         filled: true,
         fillColor: _C.fieldBg,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: _C.borderColor, width: 1),
@@ -630,7 +681,10 @@ class _ImagePickerTile extends StatelessWidget {
               GestureDetector(
                 onTap: onTap,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEEEEFF),
                     borderRadius: BorderRadius.circular(20),
@@ -698,7 +752,11 @@ class _GalleryPickerTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           child: Row(
             children: [
-              const Icon(Icons.photo_library_outlined, color: _C.greyText, size: 22),
+              const Icon(
+                Icons.photo_library_outlined,
+                color: _C.greyText,
+                size: 22,
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -711,7 +769,10 @@ class _GalleryPickerTile extends StatelessWidget {
               GestureDetector(
                 onTap: onPickTap,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEEEEFF),
                     borderRadius: BorderRadius.circular(20),
@@ -760,7 +821,11 @@ class _GalleryPickerTile extends StatelessWidget {
                           color: Colors.black54,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.close, color: Colors.white, size: 12),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 12,
+                        ),
                       ),
                     ),
                   ),
@@ -794,7 +859,11 @@ class _BottomActions extends StatelessWidget {
     return Container(
       color: Colors.white,
       padding: EdgeInsets.fromLTRB(
-          16, 12, 16, MediaQuery.of(context).padding.bottom + 12),
+        16,
+        12,
+        16,
+        MediaQuery.of(context).padding.bottom + 20,
+      ),
       child: Row(
         children: [
           Expanded(
@@ -805,7 +874,10 @@ class _BottomActions extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: const Color(0xFFDDDDEE), width: 1.5),
+                  border: Border.all(
+                    color: const Color(0xFFDDDDEE),
+                    width: 1.5,
+                  ),
                 ),
                 alignment: Alignment.center,
                 child: Text(

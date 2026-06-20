@@ -35,7 +35,8 @@ class SellProductSubCategoryScreen extends GetView<SellProductController> {
                 );
               }
 
-              final category = controller.categories[controller.selectedCategoryIndex.value!];
+              final category = controller
+                  .categories[controller.selectedCategoryIndex.value!];
 
               if (controller.isLoadingSubCategories.value) {
                 return const Center(
@@ -53,7 +54,10 @@ class SellProductSubCategoryScreen extends GetView<SellProductController> {
                         Text(
                           context.l10n.text('sell_error_subcategories'),
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.red, fontSize: 16),
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 16,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
@@ -61,7 +65,8 @@ class SellProductSubCategoryScreen extends GetView<SellProductController> {
                             backgroundColor: _C.primaryBlue,
                             foregroundColor: Colors.white,
                           ),
-                          onPressed: () => controller.fetchSubCategories(category.id),
+                          onPressed: () =>
+                              controller.fetchSubCategories(category.id),
                           icon: const Icon(Icons.refresh),
                           label: Text(context.l10n.text('sell_retry')),
                         ),
@@ -129,16 +134,18 @@ class SellProductSubCategoryScreen extends GetView<SellProductController> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: controller.subCategories.length,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.85,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 0.85,
+                            ),
                         itemBuilder: (context, i) {
                           final subCat = controller.subCategories[i];
                           return Obx(() {
-                            final isSelected = controller.selectedSubCategoryIndex.value == i;
+                            final isSelected =
+                                controller.selectedSubCategoryIndex.value == i;
 
                             return GestureDetector(
                               onTap: () => controller.selectSubCategory(i),
@@ -148,12 +155,16 @@ class SellProductSubCategoryScreen extends GetView<SellProductController> {
                                   color: _C.cardBg,
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: isSelected ? _C.primaryBlue : Colors.transparent,
+                                    color: isSelected
+                                        ? _C.primaryBlue
+                                        : Colors.transparent,
                                     width: 2,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.06),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.06,
+                                      ),
                                       blurRadius: 8,
                                       offset: const Offset(0, 2),
                                     ),
@@ -161,7 +172,8 @@ class SellProductSubCategoryScreen extends GetView<SellProductController> {
                                 ),
                                 clipBehavior: Clip.antiAlias,
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
                                   children: [
                                     Expanded(
                                       child: Stack(
@@ -170,23 +182,28 @@ class SellProductSubCategoryScreen extends GetView<SellProductController> {
                                           Image.network(
                                             subCat.imageUrl,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => Container(
-                                              color: const Color(0xFFEEEEF8),
-                                              child: const Icon(
-                                                Icons.image_rounded,
-                                                color: Color(0xFFAAAAAA),
-                                                size: 40,
-                                              ),
-                                            ),
+                                            errorBuilder: (_, __, ___) =>
+                                                Container(
+                                                  color: const Color(
+                                                    0xFFEEEEF8,
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.image_rounded,
+                                                    color: Color(0xFFAAAAAA),
+                                                    size: 40,
+                                                  ),
+                                                ),
                                             loadingBuilder: (_, child, progress) {
-                                              if (progress == null) return child;
+                                              if (progress == null)
+                                                return child;
                                               return Container(
                                                 color: const Color(0xFFEEEEF8),
                                                 child: const Center(
-                                                  child: CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                    color: _C.primaryBlue,
-                                                  ),
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                        color: _C.primaryBlue,
+                                                      ),
                                                 ),
                                               );
                                             },
@@ -195,7 +212,10 @@ class SellProductSubCategoryScreen extends GetView<SellProductController> {
                                       ),
                                     ),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 10,
+                                      ),
                                       child: Row(
                                         children: [
                                           Expanded(
@@ -204,13 +224,17 @@ class SellProductSubCategoryScreen extends GetView<SellProductController> {
                                               style: TextStyle(
                                                 color: _C.darkText,
                                                 fontSize: 14,
-                                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                                fontWeight: isSelected
+                                                    ? FontWeight.w700
+                                                    : FontWeight.w600,
                                               ),
                                             ),
                                           ),
                                           Icon(
                                             Icons.chevron_right_rounded,
-                                            color: isSelected ? _C.primaryBlue : _C.greyText,
+                                            color: isSelected
+                                                ? _C.primaryBlue
+                                                : _C.greyText,
                                             size: 20,
                                           ),
                                         ],
@@ -229,7 +253,10 @@ class SellProductSubCategoryScreen extends GetView<SellProductController> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Text(
                           context.l10n.text('sell_no_subcategories'),
-                          style: const TextStyle(color: _C.greyText, fontSize: 14),
+                          style: const TextStyle(
+                            color: _C.greyText,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
 
@@ -318,7 +345,11 @@ class _StepIndicator extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
       child: Row(
         children: [
-          _StepCircle(number: 1, label: context.l10n.text('sell_category'), state: _StepState.done),
+          _StepCircle(
+            number: 1,
+            label: context.l10n.text('sell_category'),
+            state: _StepState.done,
+          ),
           const _StepLine(active: true),
           _StepCircle(
             number: 2,
@@ -326,7 +357,11 @@ class _StepIndicator extends StatelessWidget {
             state: _StepState.active,
           ),
           const _StepLine(active: false),
-          _StepCircle(number: 3, label: context.l10n.text('sell_details'), state: _StepState.inactive),
+          _StepCircle(
+            number: 3,
+            label: context.l10n.text('sell_details'),
+            state: _StepState.inactive,
+          ),
         ],
       ),
     );
@@ -358,7 +393,9 @@ class _StepCircle extends StatelessWidget {
           height: 34,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: (isDone || isActive) ? _C.primaryBlue : const Color(0xFFE8E8F0),
+            color: (isDone || isActive)
+                ? _C.primaryBlue
+                : const Color(0xFFE8E8F0),
           ),
           alignment: Alignment.center,
           child: isDone
@@ -378,7 +415,9 @@ class _StepCircle extends StatelessWidget {
           style: TextStyle(
             color: (isDone || isActive) ? _C.primaryBlue : _C.greyText,
             fontSize: 9,
-            fontWeight: (isDone || isActive) ? FontWeight.w700 : FontWeight.w500,
+            fontWeight: (isDone || isActive)
+                ? FontWeight.w700
+                : FontWeight.w500,
             letterSpacing: 0.5,
           ),
         ),
@@ -497,7 +536,7 @@ class _NextButton extends StatelessWidget {
         16,
         12,
         16,
-        MediaQuery.of(context).padding.bottom + 12,
+        MediaQuery.of(context).padding.bottom + 20,
       ),
       child: GestureDetector(
         onTap: onTap,
@@ -505,7 +544,9 @@ class _NextButton extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           height: 52,
           decoration: BoxDecoration(
-            color: enabled ? _C.yellow : const Color(0xFFEEEE99),
+            color: enabled
+                ? _C.primaryBlue
+                : const Color.fromARGB(255, 169, 161, 252),
             borderRadius: BorderRadius.circular(30),
           ),
           alignment: Alignment.center,

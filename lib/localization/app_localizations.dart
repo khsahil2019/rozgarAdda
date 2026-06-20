@@ -44,14 +44,16 @@ class AppLocalizations {
   // {{GENERATED_LOCALIZED_VALUES_START}}
   static const Map<String, Map<String, String>> _localizedValues = {
     'en': {
-      'app_logo_text': 'Rozgar',
+      'app_logo_text': 'Rozgar Adda',
       'app_title': 'Rozgar Adda',
-      'apply_agree': 'I agree to share my application details with the employer.',
+      'apply_agree':
+          'I agree to share my application details with the employer.',
       'apply_complete': 'Complete',
       'apply_current_position': 'Current Position',
       'apply_email': 'Email Address',
       'apply_first_name': 'First Name',
-      'apply_footer': 'By submitting, you agree to our privacy policy and terms.',
+      'apply_footer':
+          'By submitting, you agree to our privacy policy and terms.',
       'apply_header_title': 'Senior Product Designer',
       'apply_last_name': 'Last Name',
       'apply_linkedin': 'LinkedIn Profile',
@@ -63,7 +65,8 @@ class AppLocalizations {
       'apply_upload_cta': 'Click to upload or drag and drop',
       'apply_upload_hint': 'Max file size 10MB • PDF or DOCX',
       'apply_why_hire': 'Why should we hire you?',
-      'apply_why_hire_hint': 'Tell us briefly about your experience and why you are a great fit for this role.',
+      'apply_why_hire_hint':
+          'Tell us briefly about your experience and why you are a great fit for this role.',
       'back': 'Back',
       'cancel': 'Cancel',
       'careerhub_search_hint': 'Search for jobs, companies...',
@@ -83,7 +86,8 @@ class AppLocalizations {
       'explore_custom_search': 'Custom Search',
       'explore_custom_search_sub': 'Find roles based on your skills',
       'explore_job_categories': 'Job Categories',
-      'explore_job_categories_subtitle': 'Find the perfect role across various industries',
+      'explore_job_categories_subtitle':
+          'Find the perfect role across various industries',
       'explore_opportunities_pill': 'OPPORTUNITIES',
       'find_jobs': 'Find Jobs',
       'home': 'Home',
@@ -108,7 +112,8 @@ class AppLocalizations {
       'jobs_view_details': 'View Details',
       'jobs_walkin': 'Walk-in',
       'kyc_address_hint': 'Flat No, Building, Street...',
-      'kyc_docs_hint': 'Upload clear, readable copies. Supported: JPG, PNG, PDF, DOC',
+      'kyc_docs_hint':
+          'Upload clear, readable copies. Supported: JPG, PNG, PDF, DOC',
       'kyc_field_address': 'Complete Address',
       'kyc_field_district': 'District',
       'kyc_field_email': 'Email Address',
@@ -128,7 +133,8 @@ class AppLocalizations {
       'kyc_section_documents': 'Documents Upload',
       'kyc_section_personal': 'Personal Information',
       'kyc_snack_doc_uploaded': 'Document uploaded successfully!',
-      'kyc_snack_error': 'Something went wrong while updating KYC. Please check your connection.',
+      'kyc_snack_error':
+          'Something went wrong while updating KYC. Please check your connection.',
       'kyc_snack_failed': 'Failed to update KYC. Please try again.',
       'kyc_snack_file_removed': 'File removed.',
       'kyc_snack_invalid_email': 'Please enter a valid email address.',
@@ -148,7 +154,8 @@ class AppLocalizations {
       'kyc_title': 'Edit KYC Details',
       'kyc_update_button': 'Update KYC',
       'kyc_upload_label': 'UPLOAD',
-      'language_dialog_message': 'Choose your preferred app language. You can change it anytime later.',
+      'language_dialog_message':
+          'Choose your preferred app language. You can change it anytime later.',
       'language_dialog_title': 'Select Language',
       'language_english': 'English',
       'language_hindi': 'Hindi',
@@ -166,7 +173,8 @@ class AppLocalizations {
       'login_sign_in': 'Sign In',
       'login_subtitle': 'Enter your credentials to access your job portal',
       'login_terms_agree': 'I agree to Terms of Service and Privacy Policy.',
-      'login_terms_error': 'Please accept Terms and Privacy Policy to continue.',
+      'login_terms_error':
+          'Please accept Terms and Privacy Policy to continue.',
       'login_title': 'Rozgar Adda',
       'login_welcome_back': 'Welcome Back',
       'logout': 'Logout',
@@ -217,11 +225,15 @@ class AppLocalizations {
       'registration_email_hint': 'name@example.com',
       'registration_error_district': 'Please select a district.',
       'registration_error_fields': 'Please fill all required fields.',
-      'registration_error_otp_incomplete': 'Please enter the complete 6-digit OTP.',
-      'registration_error_otp_phone': 'Please enter a valid 10-digit phone number.',
-      'registration_error_phone_verify': 'Please verify your phone number first.',
+      'registration_error_otp_incomplete':
+          'Please enter the complete 6-digit OTP.',
+      'registration_error_otp_phone':
+          'Please enter a valid 10-digit phone number.',
+      'registration_error_phone_verify':
+          'Please verify your phone number first.',
       'registration_error_state': 'Please select a state.',
-      'registration_error_terms': 'Please accept Terms and Privacy Policy to continue.',
+      'registration_error_terms':
+          'Please accept Terms and Privacy Policy to continue.',
       'registration_full_address': 'Full Address',
       'registration_full_address_hint': 'House no, Street name...',
       'registration_full_name': 'Full Name',
@@ -247,14 +259,16 @@ class AppLocalizations {
       'registration_send_otp': 'Send OTP',
       'registration_state': 'State',
       'registration_step': 'Step 1 of 3',
-      'registration_success_message': 'You registered successfully with this email: ',
+      'registration_success_message':
+          'You registered successfully with this email: ',
       'registration_success_title': 'Registration Successful',
       'registration_terms_and': ' and ',
       'registration_terms_link': 'Terms & Conditions',
       'registration_terms_prefix': 'I agree to the ',
       'registration_terms_privacy': 'Privacy Policy',
       'registration_terms_suffix': ' of Rozgar Adda.',
-      'registration_upload_hint': 'Aadhar Card, PAN, or Voter ID (JPG/PDF, max 2MB)',
+      'registration_upload_hint':
+          'Aadhar Card, PAN, or Voter ID (JPG/PDF, max 2MB)',
       'registration_upload_title': 'Upload Identity Proof',
       'registration_username': 'Username',
       'registration_username_hint': 'Choose a unique username',
@@ -264,7 +278,8 @@ class AppLocalizations {
       'select_state_progress': '66% Complete',
       'select_state_search_hint': 'Search state name...',
       'select_state_step_label': 'STEP 2 OF 3',
-      'select_state_subheading': 'Choose your state to see the best local opportunities tailored for you',
+      'select_state_subheading':
+          'Choose your state to see the best local opportunities tailored for you',
       'sell_active_product': 'Active Product',
       'sell_back': 'BACK',
       'sell_capacity': 'Capacity',
@@ -297,14 +312,16 @@ class AppLocalizations {
       'sell_required': 'Required',
       'sell_retry': 'Retry',
       'sell_review': 'Review',
-      'sell_review_desc': 'We have received your product details. Our team will review it shortly.',
+      'sell_review_desc':
+          'We have received your product details. Our team will review it shortly.',
       'sell_review_title': 'Your application is in review',
       'sell_save_product': 'SAVE PRODUCT',
       'sell_select_main_image': 'Please select a main product image.',
       'sell_select_subcategory': 'SELECT SUB CATEGORY',
       'sell_selected_category': 'Selected Category: ',
       'sell_sub_category': 'SUB CATEGORY',
-      'sell_subcategory_hint': 'Choose the most relevant sub-category for your\nadvertisement to reach more buyers.',
+      'sell_subcategory_hint':
+          'Choose the most relevant sub-category for your\nadvertisement to reach more buyers.',
       'sell_title_hint': 'Enter product name (e.g. BMW X5 2024)',
       'sell_total_cost': 'Total Cost (₹)',
       'sell_warranty': 'Warranty',
@@ -327,9 +344,11 @@ class AppLocalizations {
       'splash_menu_employer_login': 'Employer Login',
       'splash_menu_employer_register': 'Employer Register',
       'employer_login_title': 'Employer Access',
-      'employer_login_subtitle': 'Sign in to post jobs and view candidate applications',
+      'employer_login_subtitle':
+          'Sign in to post jobs and view candidate applications',
       'employer_register_title': 'Register Company',
-      'employer_register_subtitle': 'Create an employer account to find top local talent',
+      'employer_register_subtitle':
+          'Create an employer account to find top local talent',
       'employer_dashboard_title': 'Employer Dashboard',
       'employer_dashboard_total_jobs': 'Total Jobs',
       'employer_dashboard_total_applications': 'Applications',
@@ -337,19 +356,23 @@ class AppLocalizations {
       'employer_dashboard_active_jobs': 'Active Jobs',
       'employer_dashboard_post_job': 'Post a Job',
       'employer_dashboard_view_applicants': 'View Applicants',
-      'employer_dashboard_no_jobs': 'No jobs posted yet. Click + to post your first job!',
+      'employer_dashboard_no_jobs':
+          'No jobs posted yet. Click + to post your first job!',
       'employer_dashboard_applicants_title': 'Job Applicants',
-      'employer_dashboard_no_applicants': 'No applications received yet for this job.',
+      'employer_dashboard_no_applicants':
+          'No applications received yet for this job.',
     },
     'gu': {
       'app_logo_text': 'રોજગાર',
       'app_title': 'રોજગાર અડ્ડા',
-      'apply_agree': 'હું એમ્પ્લોયર (માલિક) સાથે મારી અરજીની વિગતો શેર કરવા માટે સંમત છું.',
+      'apply_agree':
+          'હું એમ્પ્લોયર (માલિક) સાથે મારી અરજીની વિગતો શેર કરવા માટે સંમત છું.',
       'apply_complete': 'પૂર્ણ',
       'apply_current_position': 'વર્તમાન હોદ્દો',
       'apply_email': 'ઇમેઇલ સરનામું',
       'apply_first_name': 'પ્રથમ નામ',
-      'apply_footer': 'સબમિટ કરીને, તમે અમારી ગોપનીયતા નીતિ અને શરતો સાથે સંમત થાઓ છો.',
+      'apply_footer':
+          'સબમિટ કરીને, તમે અમારી ગોપનીયતા નીતિ અને શરતો સાથે સંમત થાઓ છો.',
       'apply_header_title': 'સિનિયર પ્રોડક્ટ ડિઝાઇનર',
       'apply_last_name': 'અટક / છેલ્લું નામ',
       'apply_linkedin': 'લિંક્ડઇન પ્રોફાઇલ',
@@ -358,10 +381,12 @@ class AppLocalizations {
       'apply_resume_upload': 'રેઝ્યૂમે અપલોડ',
       'apply_step_label': 'પગલું ૨ માંથી ૪:\nઅનુભવ',
       'apply_submit': 'અરજી સબમિટ કરો',
-      'apply_upload_cta': 'અપલોડ કરવા માટે ક્લિક કરો અથવા ફાઇલ ખેંચીને અહીં લાવો',
+      'apply_upload_cta':
+          'અપલોડ કરવા માટે ક્લિક કરો અથવા ફાઇલ ખેંચીને અહીં લાવો',
       'apply_upload_hint': 'વધુમાં વધુ ફાઇલ સાઈઝ 10MB • PDF અથવા DOCX',
       'apply_why_hire': 'અમે તમને કેમ નોકરી પર રાખીએ?',
-      'apply_why_hire_hint': 'તમારા અનુભવ વિશે ટૂંકમાં જણાવો અને તમે આ ભૂમિકા માટે કેમ યોગ્ય છો તે લખો.',
+      'apply_why_hire_hint':
+          'તમારા અનુભવ વિશે ટૂંકમાં જણાવો અને તમે આ ભૂમિકા માટે કેમ યોગ્ય છો તે લખો.',
       'back': 'પાછા જાઓ',
       'cancel': 'રદ કરો',
       'careerhub_search_hint': 'નોકરીઓ, કંપનીઓ શોધો...',
@@ -381,7 +406,8 @@ class AppLocalizations {
       'explore_custom_search': 'કસ્ટમ સર્ચ',
       'explore_custom_search_sub': 'તમારા કૌશલ્યોના આધારે નોકરીઓ શોધો',
       'explore_job_categories': 'નોકરીની શ્રેણીઓ',
-      'explore_job_categories_subtitle': 'વિવિધ ઉદ્યોગોમાં તમારા માટે યોગ્ય ભૂમિકા શોધો',
+      'explore_job_categories_subtitle':
+          'વિવિધ ઉદ્યોગોમાં તમારા માટે યોગ્ય ભૂમિકા શોધો',
       'explore_opportunities_pill': 'તકો',
       'find_jobs': 'નોકરીઓ શોધો',
       'home': 'હોમ',
@@ -406,7 +432,8 @@ class AppLocalizations {
       'jobs_view_details': 'વિગતો જુઓ',
       'jobs_walkin': 'વોક-ઈન',
       'kyc_address_hint': 'ફ્લેટ નંબર, બિલ્ડિંગ, શેરી...',
-      'kyc_docs_hint': 'સ્પષ્ટ અને વાંચી શકાય તેવી નકલો અપલોડ કરો. સપોર્ટેડ: JPG, PNG, PDF, DOC',
+      'kyc_docs_hint':
+          'સ્પષ્ટ અને વાંચી શકાય તેવી નકલો અપલોડ કરો. સપોર્ટેડ: JPG, PNG, PDF, DOC',
       'kyc_field_address': 'સંપૂર્ણ સરનામું',
       'kyc_field_district': 'જિલ્લો',
       'kyc_field_email': 'ઇમેઇલ સરનામું',
@@ -426,15 +453,19 @@ class AppLocalizations {
       'kyc_section_documents': 'દસ્તાવેજો અપલોડ કરો',
       'kyc_section_personal': 'વ્યક્તિગત માહિતી',
       'kyc_snack_doc_uploaded': 'દસ્તાવેજ સફળતાપૂર્વક અપલોડ થયો!',
-      'kyc_snack_error': 'KYC અપડેટ કરતી વખતે કંઈક ખોટું થયું. કૃપા કરીને તમારું કનેક્શન તપાસો.',
-      'kyc_snack_failed': 'KYC અપડેટ કરવામાં નિષ્ફળતા. કૃપા કરીને ફરી પ્રયાસ કરો.',
+      'kyc_snack_error':
+          'KYC અપડેટ કરતી વખતે કંઈક ખોટું થયું. કૃપા કરીને તમારું કનેક્શન તપાસો.',
+      'kyc_snack_failed':
+          'KYC અપડેટ કરવામાં નિષ્ફળતા. કૃપા કરીને ફરી પ્રયાસ કરો.',
       'kyc_snack_file_removed': 'ફાઇલ હટાવવામાં આવી.',
       'kyc_snack_invalid_email': 'કૃપા કરીને માન્ય ઇમેઇલ સરનામું દાખલ કરો.',
-      'kyc_snack_invalid_phone': 'કૃપા કરીને માન્ય ૧૦-આંકડાનો ફોન નંબર દાખલ કરો.',
+      'kyc_snack_invalid_phone':
+          'કૃપા કરીને માન્ય ૧૦-આંકડાનો ફોન નંબર દાખલ કરો.',
       'kyc_snack_invalid_pin': 'કૃપા કરીને માન્ય ૬-આંકડાનો પિનકોડ દાખલ કરો.',
       'kyc_snack_missing_docs': 'કૃપા કરીને બધા જરૂરી દસ્તાવેજો અપલોડ કરો.',
       'kyc_snack_missing_fields': 'કૃપા કરીને બધી ફરજિયાત વિગતો ભરો.',
-      'kyc_snack_no_candidate': 'ઉમેદવાર ID મળ્યો નથી. કૃપા કરીને ફરી લોગિન કરો.',
+      'kyc_snack_no_candidate':
+          'ઉમેદવાર ID મળ્યો નથી. કૃપા કરીને ફરી લોગિન કરો.',
       'kyc_snack_photo_uploaded': 'ફોટો સફળતાપૂર્વક અપલોડ થયો!',
       'kyc_snack_updated': 'KYC સફળતાપૂર્વક અપડેટ થયું',
       'kyc_source_camera': 'કેમેરા',
@@ -446,7 +477,8 @@ class AppLocalizations {
       'kyc_title': 'KYC વિગતો સુધારો',
       'kyc_update_button': 'KYC અપડેટ કરો',
       'kyc_upload_label': 'અપલોડ કરો',
-      'language_dialog_message': 'તમારી પસંદગીની એપ્લિકેશન ભાષા પસંદ કરો. તમે તેને પછીથી ગમે ત્યારે બદલી શકો છો.',
+      'language_dialog_message':
+          'તમારી પસંદગીની એપ્લિકેશન ભાષા પસંદ કરો. તમે તેને પછીથી ગમે ત્યારે બદલી શકો છો.',
       'language_dialog_title': 'ભાષા પસંદ કરો',
       'language_english': 'English',
       'language_hindi': 'Hindi',
@@ -462,9 +494,11 @@ class AppLocalizations {
       'login_password_label': 'પાસવર્ડ',
       'login_register': 'રજીસ્ટ્રેશન કરો',
       'login_sign_in': 'સાઇન ઇન કરો',
-      'login_subtitle': 'તમારા જોબ પોર્ટલનો ઉપયોગ કરવા માટે લોગિન વિગતો દાખલ કરો',
+      'login_subtitle':
+          'તમારા જોબ પોર્ટલનો ઉપયોગ કરવા માટે લોગિન વિગતો દાખલ કરો',
       'login_terms_agree': 'હું સેવાની શરતો અને ગોપનીયતા નીતિ સાથે સંમત છું.',
-      'login_terms_error': 'આગળ વધવા માટે કૃપા કરીને નિયમો અને ગોપનીયતા નીતિ સ્વીકારો.',
+      'login_terms_error':
+          'આગળ વધવા માટે કૃપા કરીને નિયમો અને ગોપનીયતા નીતિ સ્વીકારો.',
       'login_title': 'રોજગાર અડ્ડા',
       'login_welcome_back': 'સ્વાગત છે',
       'logout': 'લોગઆઉટ',
@@ -473,7 +507,8 @@ class AppLocalizations {
       'marketplace': 'માર્કેટપ્લેસ',
       'menu': 'મેનૂ',
       'missing_persons': 'ગુમ થયેલ વ્યક્તિઓ',
-      'missing_persons_coming_soon': 'ગુમ થયેલ વ્યક્તિઓનું ફીચર ટૂંક સમયમાં આવી રહ્યું છે!',
+      'missing_persons_coming_soon':
+          'ગુમ થયેલ વ્યક્તિઓનું ફીચર ટૂંક સમયમાં આવી રહ્યું છે!',
       'nav_explore': 'એક્સપ્લોર',
       'nav_home': 'હોમ',
       'nav_profile': 'પ્રોફાઇલ',
@@ -492,7 +527,8 @@ class AppLocalizations {
       'no_recent_jobs': 'હાલમાં કોઈ તાજેતરની નોકરીઓ ઉપલબ્ધ નથી.',
       'ok': 'બરાબર',
       'post_job': 'નોકરી પોસ્ટ કરો',
-      'post_job_coming_soon': 'નોકરી પોસ્ટ કરવાનું ફીચર ટૂંક સમયમાં આવી રહ્યું છે!',
+      'post_job_coming_soon':
+          'નોકરી પોસ્ટ કરવાનું ફીચર ટૂંક સમયમાં આવી રહ્યું છે!',
       'products': 'પ્રોડક્ટ્સ',
       'profile_change_password': 'પાસવર્ડ બદલો',
       'profile_edit_profile': 'પ્રોફાઇલ એડિટ કરો',
@@ -515,11 +551,15 @@ class AppLocalizations {
       'registration_email_hint': 'name@example.com',
       'registration_error_district': 'કૃપા કરીને જિલ્લો પસંદ કરો.',
       'registration_error_fields': 'કૃપા કરીને બધી ફરજિયાત વિગતો ભરો.',
-      'registration_error_otp_incomplete': 'કૃપા કરીને સંપૂર્ણ ૬-આંકડાનો OTP દાખલ કરો.',
-      'registration_error_otp_phone': 'કૃપા કરીને માન્ય ૧૦-આંકડાનો ફોન નંબર દાખલ કરો.',
-      'registration_error_phone_verify': 'કૃપા કરીને પહેલા તમારો ફોન નંબર વેરિફાઇ કરો.',
+      'registration_error_otp_incomplete':
+          'કૃપા કરીને સંપૂર્ણ ૬-આંકડાનો OTP દાખલ કરો.',
+      'registration_error_otp_phone':
+          'કૃપા કરીને માન્ય ૧૦-આંકડાનો ફોન નંબર દાખલ કરો.',
+      'registration_error_phone_verify':
+          'કૃપા કરીને પહેલા તમારો ફોન નંબર વેરિફાઇ કરો.',
       'registration_error_state': 'કૃપા કરીને રાજ્ય પસંદ કરો.',
-      'registration_error_terms': 'આગળ વધવા માટે કૃપા કરીને નિયમો અને ગોપનીયતા નીતિ સ્વીકારો.',
+      'registration_error_terms':
+          'આગળ વધવા માટે કૃપા કરીને નિયમો અને ગોપનીયતા નીતિ સ્વીકારો.',
       'registration_full_address': 'પૂરું સરનામું',
       'registration_full_address_hint': 'ઘર નંબર, શેરીનું નામ...',
       'registration_full_name': 'પૂરું નામ',
@@ -545,14 +585,16 @@ class AppLocalizations {
       'registration_send_otp': 'OTP મોકલો',
       'registration_state': 'રાજ્ય',
       'registration_step': 'પગલું ૧ માંથી ૩',
-      'registration_success_message': 'તમે આ ઇમેઇલ સાથે સફળતાપૂર્વક રજીસ્ટ્રેશન કર્યું છે: ',
+      'registration_success_message':
+          'તમે આ ઇમેઇલ સાથે સફળતાપૂર્વક રજીસ્ટ્રેશન કર્યું છે: ',
       'registration_success_title': 'રજીસ્ટ્રેશન સફળ રહ્યું',
       'registration_terms_and': ' અને ',
       'registration_terms_link': 'નિયમો અને શરતો',
       'registration_terms_prefix': 'હું સંમત છું ',
       'registration_terms_privacy': 'ગોપનીયતા નીતિ',
       'registration_terms_suffix': ' રોજગાર અડ્ડાના.',
-      'registration_upload_hint': 'આધાર કાર્ડ, પાન કાર્ડ, અથવા વોટર આઈડી (JPG/PDF, વધુમાં વધુ 2MB)',
+      'registration_upload_hint':
+          'આધાર કાર્ડ, પાન કાર્ડ, અથવા વોટર આઈડી (JPG/PDF, વધુમાં વધુ 2MB)',
       'registration_upload_title': 'ઓળખ પત્ર અપલોડ કરો',
       'registration_username': 'યુઝરનેમ',
       'registration_username_hint': 'એક અજોડ યુઝરનેમ પસંદ કરો',
@@ -562,7 +604,8 @@ class AppLocalizations {
       'select_state_progress': '૬૬% પૂર્ણ',
       'select_state_search_hint': 'રાજ્યનું નામ શોધો...',
       'select_state_step_label': 'પગલું ૨ માંથી ૩',
-      'select_state_subheading': 'તમારા માટે ખાસ તૈયાર કરાયેલી શ્રેષ્ઠ સ્થાનિક તકો જોવા માટે તમારું રાજ્ય પસંદ કરો',
+      'select_state_subheading':
+          'તમારા માટે ખાસ તૈયાર કરાયેલી શ્રેષ્ઠ સ્થાનિક તકો જોવા માટે તમારું રાજ્ય પસંદ કરો',
       'sell_active_product': 'સક્રિય પ્રોડક્ટ',
       'sell_back': 'પાછા જાઓ',
       'sell_capacity': 'ક્ષમતા',
@@ -595,14 +638,16 @@ class AppLocalizations {
       'sell_required': 'જરૂરી',
       'sell_retry': 'ફરી પ્રયાસ કરો',
       'sell_review': 'રિવ્યૂ હેઠળ',
-      'sell_review_desc': 'અમને તમારી પ્રોડક્ટની વિગતો મળી ગઈ છે. અમારી ટીમ ટૂંક સમયમાં તેની સમીક્ષા કરશે.',
+      'sell_review_desc':
+          'અમને તમારી પ્રોડક્ટની વિગતો મળી ગઈ છે. અમારી ટીમ ટૂંક સમયમાં તેની સમીક્ષા કરશે.',
       'sell_review_title': 'તમારી અરજી રિવ્યૂ હેઠળ છે',
       'sell_save_product': 'પ્રોડક્ટ સેવ કરો',
       'sell_select_main_image': 'કૃપા કરીને પ્રોડક્ટનો મુખ્ય ફોટો પસંદ કરો.',
       'sell_select_subcategory': 'ઉપ-શ્રેણી પસંદ કરો',
       'sell_selected_category': 'પસંદ કરેલ શ્રેણી: ',
       'sell_sub_category': 'ઉપ-શ્રેણી',
-      'sell_subcategory_hint': 'વધુ ખરીદદારો સુધી પહોંચવા માટે તમારી જાહેરાત માટે સૌથી સંબંધિત ઉપ-શ્રેણી પસંદ કરો.',
+      'sell_subcategory_hint':
+          'વધુ ખરીદદારો સુધી પહોંચવા માટે તમારી જાહેરાત માટે સૌથી સંબંધિત ઉપ-શ્રેણી પસંદ કરો.',
       'sell_title_hint': 'પ્રોડક્ટનું નામ દાખલ કરો (દા.ત. BMW X5 2024)',
       'sell_total_cost': 'કુલ કિંમત (₹)',
       'sell_warranty': 'વોરંટી',
@@ -625,9 +670,11 @@ class AppLocalizations {
       'splash_menu_employer_login': 'એમ્પ્લોયર લોગિન',
       'splash_menu_employer_register': 'એમ્પ્લોયર રજીસ્ટ્રેશન',
       'employer_login_title': 'એમ્પ્લોયર પ્રવેશ',
-      'employer_login_subtitle': 'નોકરીઓ પોસ્ટ કરવા અને અરજીઓ જોવા માટે લોગિન કરો',
+      'employer_login_subtitle':
+          'નોકરીઓ પોસ્ટ કરવા અને અરજીઓ જોવા માટે લોગિન કરો',
       'employer_register_title': 'કંપની રજીસ્ટ્રેશન',
-      'employer_register_subtitle': 'સ્થાનિક પ્રતિભાઓ શોધવા માટે એમ્પ્લોયર ખાતું બનાવો',
+      'employer_register_subtitle':
+          'સ્થાનિક પ્રતિભાઓ શોધવા માટે એમ્પ્લોયર ખાતું બનાવો',
       'employer_dashboard_title': 'એમ્પ્લોયર ડેશબોર્ડ',
       'employer_dashboard_total_jobs': 'કુલ નોકરીઓ',
       'employer_dashboard_total_applications': 'અરજીઓ',
@@ -635,19 +682,22 @@ class AppLocalizations {
       'employer_dashboard_active_jobs': 'સક્રિય નોકરીઓ',
       'employer_dashboard_post_job': 'નોકરી પોસ્ટ કરો',
       'employer_dashboard_view_applicants': 'અરજદારો જુઓ',
-      'employer_dashboard_no_jobs': 'હજી કોઈ નોકરી પોસ્ટ નથી થઈ. પ્રથમ નોકરી માટે + ક્લિક કરો!',
+      'employer_dashboard_no_jobs':
+          'હજી કોઈ નોકરી પોસ્ટ નથી થઈ. પ્રથમ નોકરી માટે + ક્લિક કરો!',
       'employer_dashboard_applicants_title': 'નોકરીના અરજદારો',
       'employer_dashboard_no_applicants': 'આ નોકરી માટે હજી કોઈ અરજી મળી નથી.',
     },
     'hi': {
       'app_logo_text': 'रोज़गार',
       'app_title': 'रोज़गार अड्डा',
-      'apply_agree': 'मैं अपनी एप्लिकेशन डिटेल्स नियोक्ता के साथ साझा करने के लिए सहमत हूँ।',
+      'apply_agree':
+          'मैं अपनी एप्लिकेशन डिटेल्स नियोक्ता के साथ साझा करने के लिए सहमत हूँ।',
       'apply_complete': 'पूरा',
       'apply_current_position': 'वर्तमान पद',
       'apply_email': 'ईमेल पता',
       'apply_first_name': 'पहला नाम',
-      'apply_footer': 'सबमिट करके, आप हमारी प्राइवेसी नीति और नियमों से सहमत होते हैं.',
+      'apply_footer':
+          'सबमिट करके, आप हमारी प्राइवेसी नीति और नियमों से सहमत होते हैं.',
       'apply_header_title': 'सीनियर प्रोडक्ट डिज़ाइनर',
       'apply_last_name': 'अंतिम नाम',
       'apply_linkedin': 'लिंक्डइन प्रोफाइल',
@@ -659,7 +709,8 @@ class AppLocalizations {
       'apply_upload_cta': 'क्लिक कर अपलोड करें या ड्रैग और ड्रॉप करें',
       'apply_upload_hint': 'अधिकतम फ़ाइल साइज़ 10MB • केवल PDF या DOCX',
       'apply_why_hire': 'हमें आपको क्यों रखना चाहिए?',
-      'apply_why_hire_hint': 'संक्षेप में हमें अपने अनुभव और इस भूमिका के लिए अपनी उपयुक्तता के बारे में बताएं।',
+      'apply_why_hire_hint':
+          'संक्षेप में हमें अपने अनुभव और इस भूमिका के लिए अपनी उपयुक्तता के बारे में बताएं।',
       'back': 'वापस',
       'cancel': 'रद्द करें',
       'careerhub_search_hint': 'नौकरियां, कंपनियां खोजें...',
@@ -679,7 +730,8 @@ class AppLocalizations {
       'explore_custom_search': 'कस्टम सर्च',
       'explore_custom_search_sub': 'अपनी स्किल के अनुसार नौकरी खोजें',
       'explore_job_categories': 'जॉब कैटेगरी',
-      'explore_job_categories_subtitle': 'विभिन्न उद्योगों में सही भूमिका खोजें',
+      'explore_job_categories_subtitle':
+          'विभिन्न उद्योगों में सही भूमिका खोजें',
       'explore_opportunities_pill': 'अवसर',
       'find_jobs': 'नौकरियां खोजें',
       'home': 'होम',
@@ -704,7 +756,8 @@ class AppLocalizations {
       'jobs_view_details': 'विवरण देखें',
       'jobs_walkin': 'वॉक-इन',
       'kyc_address_hint': 'फ्लैट नं., इमारत, गली...',
-      'kyc_docs_hint': 'स्पष्ट, पठनीय प्रतियाँ अपलोड करें। समर्थित: JPG, PNG, PDF, DOC',
+      'kyc_docs_hint':
+          'स्पष्ट, पठनीय प्रतियाँ अपलोड करें। समर्थित: JPG, PNG, PDF, DOC',
       'kyc_field_address': 'पूरा पता',
       'kyc_field_district': 'ज़िला',
       'kyc_field_email': 'ईमेल पता',
@@ -724,7 +777,8 @@ class AppLocalizations {
       'kyc_section_documents': 'दस्तावेज़ अपलोड',
       'kyc_section_personal': 'व्यक्तिगत जानकारी',
       'kyc_snack_doc_uploaded': 'दस्तावेज़ सफलतापूर्वक अपलोड हुआ!',
-      'kyc_snack_error': 'KYC अपडेट करते समय कुछ गलत हो गया। कृपया अपना कनेक्शन जाँचें।',
+      'kyc_snack_error':
+          'KYC अपडेट करते समय कुछ गलत हो गया। कृपया अपना कनेक्शन जाँचें।',
       'kyc_snack_failed': 'KYC अपडेट करने में विफल। कृपया पुनः प्रयास करें।',
       'kyc_snack_file_removed': 'फ़ाइल हटाई गई।',
       'kyc_snack_invalid_email': 'कृपया वैध ईमेल पता दर्ज करें।',
@@ -732,7 +786,8 @@ class AppLocalizations {
       'kyc_snack_invalid_pin': 'कृपया वैध 6-अंकीय पिनकोड दर्ज करें।',
       'kyc_snack_missing_docs': 'कृपया सभी आवश्यक दस्तावेज़ अपलोड करें।',
       'kyc_snack_missing_fields': 'कृपया सभी आवश्यक फ़ील्ड भरें।',
-      'kyc_snack_no_candidate': 'उम्मीदवार आईडी नहीं मिली। कृपया पुनः लॉगिन करें।',
+      'kyc_snack_no_candidate':
+          'उम्मीदवार आईडी नहीं मिली। कृपया पुनः लॉगिन करें।',
       'kyc_snack_photo_uploaded': 'फोटो सफलतापूर्वक अपलोड हुआ!',
       'kyc_snack_updated': 'KYC सफलतापूर्वक अपडेट हुई',
       'kyc_source_camera': 'कैमरा',
@@ -744,7 +799,8 @@ class AppLocalizations {
       'kyc_title': 'KYC विवरण संपादित करें',
       'kyc_update_button': 'KYC अपडेट करें',
       'kyc_upload_label': 'अपलोड',
-      'language_dialog_message': 'अपनी पसंदीदा ऐप भाषा चुनें। आप इसे बाद में भी बदल सकते हैं।',
+      'language_dialog_message':
+          'अपनी पसंदीदा ऐप भाषा चुनें। आप इसे बाद में भी बदल सकते हैं।',
       'language_dialog_title': 'भाषा चुनें',
       'language_english': 'अंग्रेज़ी',
       'language_hindi': 'हिंदी',
@@ -762,7 +818,8 @@ class AppLocalizations {
       'login_sign_in': 'साइन इन',
       'login_subtitle': 'अपना जॉब पोर्टल एक्सेस करने के लिए विवरण दर्ज करें',
       'login_terms_agree': 'मैं सेवा की शर्तें और गोपनीयता नीति से सहमत हूँ।',
-      'login_terms_error': 'कृपया आगे बढ़ने के लिए नियम और गोपनीयता नीति स्वीकार करें।',
+      'login_terms_error':
+          'कृपया आगे बढ़ने के लिए नियम और गोपनीयता नीति स्वीकार करें।',
       'login_title': 'रोज़गार अड्डा',
       'login_welcome_back': 'दोबारा स्वागत है',
       'logout': 'लॉगआउट',
@@ -813,11 +870,14 @@ class AppLocalizations {
       'registration_email_hint': 'name@example.com',
       'registration_error_district': 'कृपया एक ज़िला चुनें।',
       'registration_error_fields': 'कृपया सभी आवश्यक फ़ील्ड भरें।',
-      'registration_error_otp_incomplete': 'कृपया पूरा 6-अंकीय ओटीपी दर्ज करें।',
+      'registration_error_otp_incomplete':
+          'कृपया पूरा 6-अंकीय ओटीपी दर्ज करें।',
       'registration_error_otp_phone': 'कृपया वैध 10-अंकीय फ़ोन नंबर दर्ज करें।',
-      'registration_error_phone_verify': 'कृपया पहले अपना फ़ोन नंबर सत्यापित करें।',
+      'registration_error_phone_verify':
+          'कृपया पहले अपना फ़ोन नंबर सत्यापित करें।',
       'registration_error_state': 'कृपया एक राज्य चुनें।',
-      'registration_error_terms': 'कृपया आगे बढ़ने के लिए नियम और गोपनीयता नीति स्वीकार करें।',
+      'registration_error_terms':
+          'कृपया आगे बढ़ने के लिए नियम और गोपनीयता नीति स्वीकार करें।',
       'registration_full_address': 'पूरा पता',
       'registration_full_address_hint': 'मकान नंबर, गली का नाम...',
       'registration_full_name': 'पूरा नाम',
@@ -830,7 +890,8 @@ class AppLocalizations {
       'registration_otp_resend_in': 'दोबारा भेजें',
       'registration_otp_resend_sec': 'सेकंड',
       'registration_otp_sent_success': 'ओटीपी आपके नंबर पर भेज दिया गया!',
-      'registration_otp_verify_success': 'फ़ोन नंबर सफलतापूर्वक सत्यापित हो गया!',
+      'registration_otp_verify_success':
+          'फ़ोन नंबर सफलतापूर्वक सत्यापित हो गया!',
       'registration_password': 'पासवर्ड',
       'registration_password_hint': 'कम से कम 8 वर्ण',
       'registration_personal_info': 'व्यक्तिगत जानकारी',
@@ -843,14 +904,16 @@ class AppLocalizations {
       'registration_send_otp': 'ओटीपी भेजें',
       'registration_state': 'राज्य',
       'registration_step': 'स्टेप 1 / 3',
-      'registration_success_message': 'आपने इस ईमेल के साथ सफलतापूर्वक पंजीकरण किया है: ',
+      'registration_success_message':
+          'आपने इस ईमेल के साथ सफलतापूर्वक पंजीकरण किया है: ',
       'registration_success_title': 'पंजीकरण सफल',
       'registration_terms_and': ' और ',
       'registration_terms_link': 'नियम और शर्तें',
       'registration_terms_prefix': 'मैं ',
       'registration_terms_privacy': 'गोपनीयता नीति',
       'registration_terms_suffix': ' से सहमत हूँ।',
-      'registration_upload_hint': 'आधार कार्ड, पैन, या मतदाता पहचान पत्र (JPG/PDF, अधिकतम 2MB)',
+      'registration_upload_hint':
+          'आधार कार्ड, पैन, या मतदाता पहचान पत्र (JPG/PDF, अधिकतम 2MB)',
       'registration_upload_title': 'पहचान प्रमाण अपलोड करें',
       'registration_username': 'यूज़रनेम',
       'registration_username_hint': 'एक यूनिक यूज़रनेम चुनें',
@@ -860,7 +923,8 @@ class AppLocalizations {
       'select_state_progress': '66% पूरा',
       'select_state_search_hint': 'राज्य का नाम खोजें...',
       'select_state_step_label': 'स्टेप 2 / 3',
-      'select_state_subheading': 'अपने राज्य का चयन करें ताकि आपके लिए स्थानीय अवसर दिखाए जा सकें',
+      'select_state_subheading':
+          'अपने राज्य का चयन करें ताकि आपके लिए स्थानीय अवसर दिखाए जा सकें',
       'sell_active_product': 'सक्रिय उत्पाद',
       'sell_back': 'वापस',
       'sell_capacity': 'क्षमता',
@@ -893,14 +957,16 @@ class AppLocalizations {
       'sell_required': 'आवश्यक',
       'sell_retry': 'पुनः प्रयास करें',
       'sell_review': 'समीक्षा',
-      'sell_review_desc': 'हमें आपके उत्पाद का विवरण प्राप्त हो गया है। हमारी टीम जल्द ही इसकी समीक्षा करेगी।',
+      'sell_review_desc':
+          'हमें आपके उत्पाद का विवरण प्राप्त हो गया है। हमारी टीम जल्द ही इसकी समीक्षा करेगी।',
       'sell_review_title': 'आपका आवेदन समीक्षा के अधीन है',
       'sell_save_product': 'उत्पाद सहेजें',
       'sell_select_main_image': 'कृपया मुख्य उत्पाद छवि चुनें।',
       'sell_select_subcategory': 'उप श्रेणी चुनें',
       'sell_selected_category': 'चयनित श्रेणी: ',
       'sell_sub_category': 'उप श्रेणी',
-      'sell_subcategory_hint': 'अधिक खरीदारों तक पहुंचने के लिए अपने विज्ञापन के लिए सबसे प्रासंगिक उप-श्रेणी चुनें।',
+      'sell_subcategory_hint':
+          'अधिक खरीदारों तक पहुंचने के लिए अपने विज्ञापन के लिए सबसे प्रासंगिक उप-श्रेणी चुनें।',
       'sell_title_hint': 'उत्पाद का नाम दर्ज करें',
       'sell_total_cost': 'कुल लागत (₹)',
       'sell_warranty': 'वारंटी',
@@ -923,9 +989,11 @@ class AppLocalizations {
       'splash_menu_employer_login': 'नियोक्ता लॉगिन',
       'splash_menu_employer_register': 'नियोक्ता पंजीकरण',
       'employer_login_title': 'नियोक्ता प्रवेश',
-      'employer_login_subtitle': 'नौकरियां पोस्ट करने और उम्मीदवारों के आवेदन देखने के लिए लॉगिन करें',
+      'employer_login_subtitle':
+          'नौकरियां पोस्ट करने और उम्मीदवारों के आवेदन देखने के लिए लॉगिन करें',
       'employer_register_title': 'कंपनी पंजीकरण',
-      'employer_register_subtitle': 'प्रतिभाओं को खोजने के लिए नियोक्ता खाता बनाएं',
+      'employer_register_subtitle':
+          'प्रतिभाओं को खोजने के लिए नियोक्ता खाता बनाएं',
       'employer_dashboard_title': 'नियोक्ता डैशबोर्ड',
       'employer_dashboard_total_jobs': 'कुल नौकरियां',
       'employer_dashboard_total_applications': 'आवेदन',
@@ -933,19 +1001,23 @@ class AppLocalizations {
       'employer_dashboard_active_jobs': 'सक्रिय नौकरियां',
       'employer_dashboard_post_job': 'नौकरी पोस्ट करें',
       'employer_dashboard_view_applicants': 'आवेदक देखें',
-      'employer_dashboard_no_jobs': 'अभी तक कोई नौकरी पोस्ट नहीं की गई है। पहली नौकरी के लिए + दबाएं!',
+      'employer_dashboard_no_jobs':
+          'अभी तक कोई नौकरी पोस्ट नहीं की गई है। पहली नौकरी के लिए + दबाएं!',
       'employer_dashboard_applicants_title': 'नौकरी के आवेदक',
-      'employer_dashboard_no_applicants': 'इस नौकरी के लिए अभी तक कोई आवेदन प्राप्त नहीं हुआ है।',
+      'employer_dashboard_no_applicants':
+          'इस नौकरी के लिए अभी तक कोई आवेदन प्राप्त नहीं हुआ है।',
     },
     'kn': {
       'app_logo_text': 'ರೋಜಗಾರ್',
       'app_title': 'ರೋಜಗಾರ್ ಅಡ್ಡಾ',
-      'apply_agree': 'ನನ್ನ ಅರ್ಜಿಯ ವಿವರಗಳನ್ನು ಉದ್ಯೋಗದಾತರೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಲು ನಾನು ಒಪ್ಪುತ್ತೇನೆ.',
+      'apply_agree':
+          'ನನ್ನ ಅರ್ಜಿಯ ವಿವರಗಳನ್ನು ಉದ್ಯೋಗದಾತರೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಲು ನಾನು ಒಪ್ಪುತ್ತೇನೆ.',
       'apply_complete': 'ಪೂರ್ಣಗೊಂಡಿದೆ',
       'apply_current_position': 'ಪ್ರಸ್ತುತ ಹುದ್ದೆ',
       'apply_email': 'ಇಮೇಲ್ ವಿಳಾಸ',
       'apply_first_name': 'ಮೊದಲ ಹೆಸರು',
-      'apply_footer': 'ಸಲ್ಲಿಸುವ ಮೂಲಕ, ನೀವು ನಮ್ಮ ಗೌಪ್ಯತೆ ನೀತಿ ಮತ್ತು ನಿಯಮಗಳನ್ನು ಒಪ್ಪಿಕೊಳ್ಳುತ್ತೀರಿ.',
+      'apply_footer':
+          'ಸಲ್ಲಿಸುವ ಮೂಲಕ, ನೀವು ನಮ್ಮ ಗೌಪ್ಯತೆ ನೀತಿ ಮತ್ತು ನಿಯಮಗಳನ್ನು ಒಪ್ಪಿಕೊಳ್ಳುತ್ತೀರಿ.',
       'apply_header_title': 'ಸೀನಿಯರ್ ಪ್ರಾಡಕ್ಟ್ ಡಿಸೈನರ್',
       'apply_last_name': 'ಮನೆತನದ ಹೆಸರು / ಕೊನೆಯ ಹೆಸರು',
       'apply_linkedin': 'ಲಿಂಕ್ಡ್ಇನ್ ಪ್ರೊಫೈಲ್',
@@ -954,10 +1026,12 @@ class AppLocalizations {
       'apply_resume_upload': 'ರೆಸ್ಯೂಮ್ ಅಪ್ಲೋಡ್',
       'apply_step_label': 'ಹಂತ 4 ರಲ್ಲಿ 2:\nಅನುಭವ',
       'apply_submit': 'ಅರ್ಜಿಯನ್ನು ಸಲ್ಲಿಸಿ',
-      'apply_upload_cta': 'ಅಪ್ಲೋಡ್ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ ಅಥವಾ ಫೈಲ್ ಅನ್ನು ಇಲ್ಲಿಗೆ ಎಳೆಯಿರಿ',
+      'apply_upload_cta':
+          'ಅಪ್ಲೋಡ್ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ ಅಥವಾ ಫೈಲ್ ಅನ್ನು ಇಲ್ಲಿಗೆ ಎಳೆಯಿರಿ',
       'apply_upload_hint': 'ಗರಿಷ್ಠ ಫೈಲ್ ಗಾತ್ರ 10MB • PDF ಅಥವಾ DOCX',
       'apply_why_hire': 'ನಾವು ನಿಮ್ಮನ್ನು ಏಕೆ ಕೆಲಸಕ್ಕೆ ತೆಗೆದುಕೊಳ್ಳಬೇಕು?',
-      'apply_why_hire_hint': 'ನಿಮ್ಮ ಅನುಭವದ ಬಗ್ಗೆ ಮತ್ತು ಈ ಪಾತ್ರಕ್ಕೆ ನೀವು ಹೇಗೆ ಸೂಕ್ತವಾಗಿದ್ದೀರಿ ಎಂದು ಸಂಕ್ಷಿಪ್ತವಾಗಿ ತಿಳಿಸಿ.',
+      'apply_why_hire_hint':
+          'ನಿಮ್ಮ ಅನುಭವದ ಬಗ್ಗೆ ಮತ್ತು ಈ ಪಾತ್ರಕ್ಕೆ ನೀವು ಹೇಗೆ ಸೂಕ್ತವಾಗಿದ್ದೀರಿ ಎಂದು ಸಂಕ್ಷಿಪ್ತವಾಗಿ ತಿಳಿಸಿ.',
       'back': 'ಹಿಂದಕ್ಕೆ',
       'cancel': 'ರದ್ದುಮಾಡು',
       'careerhub_search_hint': 'ಉದ್ಯೋಗಗಳು, ಕಂಪನಿಗಳಿಗಾಗಿ ಹುಡುಕಿ...',
@@ -975,9 +1049,11 @@ class AppLocalizations {
       'earnings': 'ಗಳಿಕೆ',
       'explore_careers_title': 'ವೃತ್ತಿಜೀವನವನ್ನು ಅನ್ವೇಷಿಸಿ',
       'explore_custom_search': 'ಕಸ್ಟಮ್ ಸರ್ಚ್',
-      'explore_custom_search_sub': 'ನಿಮ್ಮ ಕೌಶಲ್ಯಗಳ ಆಧಾರದ ಮೇಲೆ ಉದ್ಯೋಗಗಳನ್ನು ಹುಡುಕಿ',
+      'explore_custom_search_sub':
+          'ನಿಮ್ಮ ಕೌಶಲ್ಯಗಳ ಆಧಾರದ ಮೇಲೆ ಉದ್ಯೋಗಗಳನ್ನು ಹುಡುಕಿ',
       'explore_job_categories': 'ಉದ್ಯೋಗ ವಿಭಾಗಗಳು',
-      'explore_job_categories_subtitle': 'ವಿವಿಧ ಉದ್ಯಮಗಳಲ್ಲಿ ನಿಮಗಾಗಿ ಸೂಕ್ತವಾದ ಪಾತ್ರವನ್ನು ಕಂಡುಕೊಳ್ಳಿ',
+      'explore_job_categories_subtitle':
+          'ವಿವಿಧ ಉದ್ಯಮಗಳಲ್ಲಿ ನಿಮಗಾಗಿ ಸೂಕ್ತವಾದ ಪಾತ್ರವನ್ನು ಕಂಡುಕೊಳ್ಳಿ',
       'explore_opportunities_pill': 'ಅವಕಾಶಗಳು',
       'find_jobs': 'ಉದ್ಯೋಗಗಳನ್ನು ಹುಡುಕಿ',
       'home': 'ಹೋಮ್',
@@ -1002,7 +1078,8 @@ class AppLocalizations {
       'jobs_view_details': 'ವಿವರಗಳನ್ನು ವೀಕ್ಷಿಸಿ',
       'jobs_walkin': 'ನೇರ ಸಂದರ್ಶನ (Walk-in)',
       'kyc_address_hint': 'ಫ್ಲಾಟ್ ನಂ, ಬಿಲ್ಡಿಂಗ್, ರಸ್ತೆ...',
-      'kyc_docs_hint': 'ಸ್ಪಷ್ಟವಾದ, ಓದಬಹುದಾದ ಪ್ರತಿಗಳನ್ನು ಅಪ್ಲೋಡ್ ಮಾಡಿ. ಬೆಂಬಲಿತ ಫಾರ್ಮ್ಯಾಟ್‌ಗಳು: JPG, PNG, PDF, DOC',
+      'kyc_docs_hint':
+          'ಸ್ಪಷ್ಟವಾದ, ಓದಬಹುದಾದ ಪ್ರತಿಗಳನ್ನು ಅಪ್ಲೋಡ್ ಮಾಡಿ. ಬೆಂಬಲಿತ ಫಾರ್ಮ್ಯಾಟ್‌ಗಳು: JPG, PNG, PDF, DOC',
       'kyc_field_address': 'ಪೂರ್ಣ ವಿಳಾಸ',
       'kyc_field_district': 'ಜಿಲ್ಲೆ',
       'kyc_field_email': 'ಇಮೇಲ್ ವಿಳಾಸ',
@@ -1022,15 +1099,22 @@ class AppLocalizations {
       'kyc_section_documents': 'ದಾಖಲೆಗಳ ಅಪ್ಲೋಡ್',
       'kyc_section_personal': 'ವೈಯಕ್ತಿಕ ಮಾಹಿತಿ',
       'kyc_snack_doc_uploaded': 'ದಾಖಲೆ ಯಶಸ್ವಿಯಾಗಿ ಅಪ್ಲೋಡ್ ಆಗಿದೆ!',
-      'kyc_snack_error': 'KYC ನವೀಕರಿಸುವಾಗ ಏನೋ ತಪ್ಪಾಗಿದೆ. ನಿಮ್ಮ ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ.',
-      'kyc_snack_failed': 'KYC ನವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.',
+      'kyc_snack_error':
+          'KYC ನವೀಕರಿಸುವಾಗ ಏನೋ ತಪ್ಪಾಗಿದೆ. ನಿಮ್ಮ ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ.',
+      'kyc_snack_failed':
+          'KYC ನವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.',
       'kyc_snack_file_removed': 'ಫೈಲ್ ಅನ್ನು ತೆಗೆದುಹಾಕಲಾಗಿದೆ.',
       'kyc_snack_invalid_email': 'ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ ಇಮೇಲ್ ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ.',
-      'kyc_snack_invalid_phone': 'ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ 10-ಅಂಕಿಯ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ.',
-      'kyc_snack_invalid_pin': 'ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ 6-ಅಂಕಿಯ ಪಿನ್ಕೋಡ್ ಅನ್ನು ನಮೂದಿಸಿ.',
-      'kyc_snack_missing_docs': 'ದಯವಿಟ್ಟು ಅಗತ್ಯವಿರುವ ಎಲ್ಲಾ ದಾಖಲೆಗಳನ್ನು ಅಪ್ಲೋಡ್ ಮಾಡಿ.',
-      'kyc_snack_missing_fields': 'ದಯವಿಟ್ಟು ಅಗತ್ಯವಿರುವ ಎಲ್ಲಾ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ.',
-      'kyc_snack_no_candidate': 'ಅಭ್ಯರ್ಥಿ ID ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಲಾಗಿನ್ ಮಾಡಿ.',
+      'kyc_snack_invalid_phone':
+          'ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ 10-ಅಂಕಿಯ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ.',
+      'kyc_snack_invalid_pin':
+          'ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ 6-ಅಂಕಿಯ ಪಿನ್ಕೋಡ್ ಅನ್ನು ನಮೂದಿಸಿ.',
+      'kyc_snack_missing_docs':
+          'ದಯವಿಟ್ಟು ಅಗತ್ಯವಿರುವ ಎಲ್ಲಾ ದಾಖಲೆಗಳನ್ನು ಅಪ್ಲೋಡ್ ಮಾಡಿ.',
+      'kyc_snack_missing_fields':
+          'ದಯವಿಟ್ಟು ಅಗತ್ಯವಿರುವ ಎಲ್ಲಾ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ.',
+      'kyc_snack_no_candidate':
+          'ಅಭ್ಯರ್ಥಿ ID ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಲಾಗಿನ್ ಮಾಡಿ.',
       'kyc_snack_photo_uploaded': 'ಫೋಟೋ ಯಶಸ್ವಿಯಾಗಿ ಅಪ್ಲೋಡ್ ಆಗಿದೆ!',
       'kyc_snack_updated': 'KYC ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲ್ಪಟ್ಟಿದೆ',
       'kyc_source_camera': 'ಕ್ಯಾಮೆರಾ',
@@ -1042,7 +1126,8 @@ class AppLocalizations {
       'kyc_title': 'KYC ವಿವರಗಳನ್ನು ಸಂಪಾದಿಸಿ',
       'kyc_update_button': 'KYC ನವೀಕರಿಸಿ',
       'kyc_upload_label': 'ಅಪ್ಲೋಡ್',
-      'language_dialog_message': 'ನಿಮ್ಮ ಆದ್ಯತೆಯ ಆಪ್ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ. ನೀವು ಇದನ್ನು ನಂತರ ಯಾವಾಗ ಬೇಕಾದರೂ ಬದಲಾಯಿಸಬಹುದು.',
+      'language_dialog_message':
+          'ನಿಮ್ಮ ಆದ್ಯತೆಯ ಆಪ್ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ. ನೀವು ಇದನ್ನು ನಂತರ ಯಾವಾಗ ಬೇಕಾದರೂ ಬದಲಾಯಿಸಬಹುದು.',
       'language_dialog_title': 'ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ',
       'language_english': 'English',
       'language_hindi': 'Hindi',
@@ -1058,9 +1143,12 @@ class AppLocalizations {
       'login_password_label': 'ಪಾಸ್‌ವರ್ಡ್',
       'login_register': 'ನೋಂದಾಯಿಸಿ',
       'login_sign_in': 'ಸೈನ್ ಇನ್ ಮಾಡಿ',
-      'login_subtitle': 'ನಿಮ್ಮ ಉದ್ಯೋಗ ಪೋರ್ಟಲ್ ಅನ್ನು ಪ್ರವೇಶಿಸಲು ನಿಮ್ಮ ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ',
-      'login_terms_agree': 'ನಾನು ಸೇವಾ ನಿಯಮಗಳು ಮತ್ತು ಗೌಪ್ಯತೆ ನೀತಿಯನ್ನು ಒಪ್ಪುತ್ತೇನೆ.',
-      'login_terms_error': 'ಮುಂದುವರೆಯಲು ದಯವಿಟ್ಟು ನಿಯಮಗಳು ಮತ್ತು ಗೌಪ್ಯತೆ ನೀತಿಯನ್ನು ಒಪ್ಪಿಕೊಳ್ಳಿ.',
+      'login_subtitle':
+          'ನಿಮ್ಮ ಉದ್ಯೋಗ ಪೋರ್ಟಲ್ ಅನ್ನು ಪ್ರವೇಶಿಸಲು ನಿಮ್ಮ ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ',
+      'login_terms_agree':
+          'ನಾನು ಸೇವಾ ನಿಯಮಗಳು ಮತ್ತು ಗೌಪ್ಯತೆ ನೀತಿಯನ್ನು ಒಪ್ಪುತ್ತೇನೆ.',
+      'login_terms_error':
+          'ಮುಂದುವರೆಯಲು ದಯವಿಟ್ಟು ನಿಯಮಗಳು ಮತ್ತು ಗೌಪ್ಯತೆ ನೀತಿಯನ್ನು ಒಪ್ಪಿಕೊಳ್ಳಿ.',
       'login_title': 'ರೋಜಗಾರ್ ಅಡ್ಡಾ',
       'login_welcome_back': 'ಸ್ವಾಗತ',
       'logout': 'ಲಾಗ್ಔಟ್',
@@ -1069,7 +1157,8 @@ class AppLocalizations {
       'marketplace': 'ಮಾರುಕಟ್ಟೆ (Marketplace)',
       'menu': 'ಮೆನು',
       'missing_persons': 'ಕಾಣೆಯಾದ ವ್ಯಕ್ತಿಗಳು',
-      'missing_persons_coming_soon': 'ಕಾಣೆಯಾದ ವ್ಯಕ್ತಿಗಳ ವೈಶಿಷ್ಟ್ಯವು ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ!',
+      'missing_persons_coming_soon':
+          'ಕಾಣೆಯಾದ ವ್ಯಕ್ತಿಗಳ ವೈಶಿಷ್ಟ್ಯವು ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ!',
       'nav_explore': 'ಎಕ್ಸ್ಪ್ಲೋರ್',
       'nav_home': 'ಹೋಮ್',
       'nav_profile': 'ಪ್ರೊಫೈಲ್',
@@ -1088,7 +1177,8 @@ class AppLocalizations {
       'no_recent_jobs': 'ಪ್ರಸ್ತುತ ಯಾವುದೇ ಇತ್ತೀಚಿನ ಉದ್ಯೋಗಗಳು ಲಭ್ಯವಿಲ್ಲ.',
       'ok': 'ಸರಿ',
       'post_job': 'ಉದ್ಯೋಗವನ್ನು ಪೋಸ್ಟ್ ಮಾಡಿ',
-      'post_job_coming_soon': 'ಉದ್ಯೋಗವನ್ನು ಪೋಸ್ಟ್ ಮಾಡುವ ವೈಶಿಷ್ಟ್ಯವು ಶೀಘ్రದಲ್ಲೇ ಬರಲಿದೆ!',
+      'post_job_coming_soon':
+          'ಉದ್ಯೋಗವನ್ನು ಪೋಸ್ಟ್ ಮಾಡುವ ವೈಶಿಷ್ಟ್ಯವು ಶೀಘ్రದಲ್ಲೇ ಬರಲಿದೆ!',
       'products': 'ಉತ್ಪನ್ನಗಳು',
       'profile_change_password': 'ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಿ',
       'profile_edit_profile': 'ಪ್ರೊಫೈಲ್ ಸಂಪಾದಿಸಿ',
@@ -1110,12 +1200,17 @@ class AppLocalizations {
       'registration_email': 'ಇಮೇಲ್ ವಿಳಾಸ',
       'registration_email_hint': 'name@example.com',
       'registration_error_district': 'ದಯವಿಟ್ಟು ಜಿಲ್ಲೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
-      'registration_error_fields': 'ದಯವಿಟ್ಟು ಅಗತ್ಯವಿರುವ ಎಲ್ಲಾ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ.',
-      'registration_error_otp_incomplete': 'ದಯವಿಟ್ಟು ಪೂರ್ಣ 6-ಅಂಕಿಯ OTP ಅನ್ನು ನಮೂದಿಸಿ.',
-      'registration_error_otp_phone': 'ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ 10-ಅಂಕಿಯ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ.',
-      'registration_error_phone_verify': 'ದಯವಿಟ್ಟು ಮೊದಲು ನಿಮ್ಮ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ಪರಿಶೀಲಿಸಿ.',
+      'registration_error_fields':
+          'ದಯವಿಟ್ಟು ಅಗತ್ಯವಿರುವ ಎಲ್ಲಾ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ.',
+      'registration_error_otp_incomplete':
+          'ದಯವಿಟ್ಟು ಪೂರ್ಣ 6-ಅಂಕಿಯ OTP ಅನ್ನು ನಮೂದಿಸಿ.',
+      'registration_error_otp_phone':
+          'ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ 10-ಅಂಕಿಯ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ.',
+      'registration_error_phone_verify':
+          'ದಯವಿಟ್ಟು ಮೊದಲು ನಿಮ್ಮ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ಪರಿಶೀಲಿಸಿ.',
       'registration_error_state': 'ದಯವಿಟ್ಟು ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
-      'registration_error_terms': 'ಮುಂದುವರೆಯಲು ದಯವಿಟ್ಟು ನಿಯಮಗಳು ಮತ್ತು ಗೌಪ್ಯತೆ ನೀತಿಯನ್ನು ಒಪ್ಪಿಕೊಳ್ಳಿ.',
+      'registration_error_terms':
+          'ಮುಂದುವರೆಯಲು ದಯವಿಟ್ಟು ನಿಯಮಗಳು ಮತ್ತು ಗೌಪ್ಯತೆ ನೀತಿಯನ್ನು ಒಪ್ಪಿಕೊಳ್ಳಿ.',
       'registration_full_address': 'ಪೂರ್ಣ ವಿಳಾಸ',
       'registration_full_address_hint': 'ಮನೆ ಸಂಖ್ಯೆ, ರಸ್ತೆ ಹೆಸರು...',
       'registration_full_name': 'ಪೂರ್ಣ ಹೆಸರು',
@@ -1123,12 +1218,14 @@ class AppLocalizations {
       'registration_identity_verification': 'ಗುರುತಿನ ಪರಿಶೀಲನೆ',
       'registration_join_tagline': 'ಕಾರ್ಯಪಡೆಯಲ್ಲಿ ಸೇರಿಕೊಳ್ಳಿ',
       'registration_login': 'ಲಾಗಿನ್ ಮಾಡಿ',
-      'registration_otp_hint': 'ನಿಮ್ಮ ಫೋನ್‌ಗೆ ಕಳುಹಿಸಲಾದ 6-ಅಂಕಿಯ OTP ಅನ್ನು ನಮೂದಿಸಿ',
+      'registration_otp_hint':
+          'ನಿಮ್ಮ ಫೋನ್‌ಗೆ ಕಳುಹಿಸಲಾದ 6-ಅಂಕಿಯ OTP ಅನ್ನು ನಮೂದಿಸಿ',
       'registration_otp_resend': 'OTP ಅನ್ನು ಮರುಕಳುಹಿಸಿ',
       'registration_otp_resend_in': 'ಮರುಕಳುಹಿಸಲು ',
       'registration_otp_resend_sec': 'ಸೆಕೆಂಡುಗಳು ಬಾಕಿ',
       'registration_otp_sent_success': 'ನಿಮ್ಮ ಸಂಖ್ಯೆಗೆ OTP ಕಳುಹಿಸಲಾಗಿದೆ!',
-      'registration_otp_verify_success': 'ಫೋನ್ ಸಂಖ್ಯೆ ಯಶಸ್ವಿಯಾಗಿ ಪರಿಶೀಲಿಸಲ್ಪಟ್ಟಿದೆ!',
+      'registration_otp_verify_success':
+          'ಫೋನ್ ಸಂಖ್ಯೆ ಯಶಸ್ವಿಯಾಗಿ ಪರಿಶೀಲಿಸಲ್ಪಟ್ಟಿದೆ!',
       'registration_password': 'ಪಾಸ್‌ವರ್ಡ್',
       'registration_password_hint': 'ಕನಿಷ್ಠ 8 ಅಕ್ಷರಗಳು',
       'registration_personal_info': 'ವೈಯಕ್ತಿಕ ಮಾಹಿತಿ',
@@ -1141,14 +1238,16 @@ class AppLocalizations {
       'registration_send_otp': 'OTP ಕಳುಹಿಸಿ',
       'registration_state': 'ರಾಜ್ಯ',
       'registration_step': 'ಹಂತ 3 ರಲ್ಲಿ 1',
-      'registration_success_message': 'ಈ ಇಮೇಲ್‌ನೊಂದಿಗೆ ನೀವು ಯಶಸ್ವಿಯಾಗಿ ನೋಂದಾಯಿಸಿಕೊಂಡಿದ್ದೀರಿ: ',
+      'registration_success_message':
+          'ಈ ಇಮೇಲ್‌ನೊಂದಿಗೆ ನೀವು ಯಶಸ್ವಿಯಾಗಿ ನೋಂದಾಯಿಸಿಕೊಂಡಿದ್ದೀರಿ: ',
       'registration_success_title': 'ನೋಂದಣಿ ಯಶಸ್ವಿಯಾಗಿದೆ',
       'registration_terms_and': ' ಮತ್ತು ',
       'registration_terms_link': 'ನಿಯಮಗಳು ಮತ್ತು ಷರತ್ತುಗಳು',
       'registration_terms_prefix': 'ನಾನು ಒಪ್ಪುತ್ತೇನೆ ',
       'registration_terms_privacy': 'ಗೌಪ್ಯತೆ ನೀತಿ',
       'registration_terms_suffix': ' ರೋಜಗಾರ್ ಅಡ್ಡಾದ ನಿಯಮಗಳು.',
-      'registration_upload_hint': 'ಆಧಾರ್ ಕಾರ್ಡ್, ಪಾನ್ ಕಾರ್ಡ್, ಅಥವಾ ಮತದಾರರ ಗುರುತಿನ ಚೀಟಿ (JPG/PDF, ಗರಿಷ್ಠ 2MB)',
+      'registration_upload_hint':
+          'ಆಧಾರ್ ಕಾರ್ಡ್, ಪಾನ್ ಕಾರ್ಡ್, ಅಥವಾ ಮತದಾರರ ಗುರುತಿನ ಚೀಟಿ (JPG/PDF, ಗರಿಷ್ಠ 2MB)',
       'registration_upload_title': 'ಗುರುತಿನ ಚೀಟಿ ಅಪ್ಲೋಡ್ ಮಾಡಿ',
       'registration_username': 'ಬಳಕೆದಾರರ ಹೆಸರು',
       'registration_username_hint': 'ವಿಶಿಷ್ಟ ಬಳಕೆದಾರ ಹೆಸರನ್ನು ಆರಿಸಿ',
@@ -1158,7 +1257,8 @@ class AppLocalizations {
       'select_state_progress': '66% ಪೂರ್ಣಗೊಂಡಿದೆ',
       'select_state_search_hint': 'ರಾಜ್ಯದ ಹೆಸರನ್ನು ಹುಡುಕಿ...',
       'select_state_step_label': 'ಹಂತ 3 ರಲ್ಲಿ 2',
-      'select_state_subheading': 'ನಿಮಗಾಗಿ ಕಸ್ಟಮೈಸ್ ಮಾಡಿದ ಅತ್ಯುತ್ತಮ ಸ್ಥಳೀಯ ಅವಕಾಶಗಳನ್ನು ನೋಡಲು ನಿಮ್ಮ ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+      'select_state_subheading':
+          'ನಿಮಗಾಗಿ ಕಸ್ಟಮೈಸ್ ಮಾಡಿದ ಅತ್ಯುತ್ತಮ ಸ್ಥಳೀಯ ಅವಕಾಶಗಳನ್ನು ನೋಡಲು ನಿಮ್ಮ ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
       'sell_active_product': 'ಸಕ್ರಿಯ ಉತ್ಪನ್ನ',
       'sell_back': 'ಹಿಂದಕ್ಕೆ',
       'sell_capacity': 'ಸಾಮರ್ಥ್ಯ (Capacity)',
@@ -1191,14 +1291,16 @@ class AppLocalizations {
       'sell_required': 'ಅಗತ್ಯವಿದೆ',
       'sell_retry': 'ಮರುಪ್ರಯತ್ನಿಸಿ',
       'sell_review': 'ಪರಿಶೀಲನೆ',
-      'sell_review_desc': 'ನಿಮ್ಮ ಉತ್ಪನ್ನದ ವಿವರಗಳನ್ನು ನಾವು ಸ್ವೀಕರಿಸಿದ್ದೇವೆ. ನಮ್ಮ ತಂಡವು ಶೀಘ್ರದಲ್ಲೇ ಅದನ್ನು ಪರಿಶೀಲಿಸಲಿದೆ.',
+      'sell_review_desc':
+          'ನಿಮ್ಮ ಉತ್ಪನ್ನದ ವಿವರಗಳನ್ನು ನಾವು ಸ್ವೀಕರಿಸಿದ್ದೇವೆ. ನಮ್ಮ ತಂಡವು ಶೀಘ್ರದಲ್ಲೇ ಅದನ್ನು ಪರಿಶೀಲಿಸಲಿದೆ.',
       'sell_review_title': 'ನಿಮ್ಮ ಅರ್ಜಿ ಪರಿಶೀಲನೆಯಲ್ಲಿದೆ',
       'sell_save_product': 'ಉತ್ಪನ್ನವನ್ನು ಉಳಿಸಿ',
       'sell_select_main_image': 'ದಯವಿಟ್ಟು ಉತ್ಪನ್ನದ ಮುಖ್ಯ ಚಿತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
       'sell_select_subcategory': 'ಉಪ ವರ್ಗವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
       'sell_selected_category': 'ಆಯ್ಕೆಮಾಡಿದ ವರ್ಗ: ',
       'sell_sub_category': 'ಉಪ ವರ್ಗ (Sub Category)',
-      'sell_subcategory_hint': 'ಹೆಚ್ಚಿನ ಖರೀದಿದಾರರನ್ನು ತಲುಪಲು ನಿಮ್ಮ ಜಾಹೀರಾತಿಗಾಗಿ ಅತ್ಯಂತ ಸೂಕ್ತವಾದ ಉಪ ವರ್ಗವನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
+      'sell_subcategory_hint':
+          'ಹೆಚ್ಚಿನ ಖರೀದಿದಾರರನ್ನು ತಲುಪಲು ನಿಮ್ಮ ಜಾಹೀರಾತಿಗಾಗಿ ಅತ್ಯಂತ ಸೂಕ್ತವಾದ ಉಪ ವರ್ಗವನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
       'sell_title_hint': 'ಉತ್ಪನ್ನದ ಹೆಸರನ್ನು ನಮೂದಿಸಿ (ಉದಾ. BMW X5 2024)',
       'sell_total_cost': 'ಒಟ್ಟು ವೆಚ್ಚ (₹)',
       'sell_warranty': 'ಖಾತರಿ (Warranty)',
@@ -1221,9 +1323,11 @@ class AppLocalizations {
       'splash_menu_employer_login': 'ಉದ್ಯೋಗದಾತರ ಲಾಗಿನ್',
       'splash_menu_employer_register': 'ಉದ್ಯೋಗದಾತರ ನೋಂದಣಿ',
       'employer_login_title': 'ಉದ್ಯೋಗದಾತರ ಪ್ರವೇಶ',
-      'employer_login_subtitle': 'ಉದ್ಯೋಗಗಳನ್ನು ಪೋಸ್ಟ್ ಮಾಡಲು ಮತ್ತು ಅಭ್ಯರ್ಥಿ ಅರ್ಜಿಗಳನ್ನು ವೀಕ್ಷಿಸಲು ಲಾಗಿನ್ ಮಾಡಿ',
+      'employer_login_subtitle':
+          'ಉದ್ಯೋಗಗಳನ್ನು ಪೋಸ್ಟ್ ಮಾಡಲು ಮತ್ತು ಅಭ್ಯರ್ಥಿ ಅರ್ಜಿಗಳನ್ನು ವೀಕ್ಷಿಸಲು ಲಾಗಿನ್ ಮಾಡಿ',
       'employer_register_title': 'ಕಂಪನಿ ನೋಂದಣಿ',
-      'employer_register_subtitle': 'ಅತ್ಯುತ್ತమ ಸ್ಥಳೀಯ ಪ್ರತಿಭೆಗಳನ್ನು ಹುಡುಕಲು ಉದ್ಯೋಗದಾತ ಖಾತೆಯನ್ನು ರಚಿಸಿ',
+      'employer_register_subtitle':
+          'ಅತ್ಯುತ್ತమ ಸ್ಥಳೀಯ ಪ್ರತಿಭೆಗಳನ್ನು ಹುಡುಕಲು ಉದ್ಯೋಗದಾತ ಖಾತೆಯನ್ನು ರಚಿಸಿ',
       'employer_dashboard_title': 'ಉದ್ಯೋಗದಾತರ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
       'employer_dashboard_total_jobs': 'ಒಟ್ಟು ಉದ್ಯೋಗಗಳು',
       'employer_dashboard_total_applications': 'ಅರ್ಜಿಗಳು',
@@ -1231,19 +1335,23 @@ class AppLocalizations {
       'employer_dashboard_active_jobs': 'ಸಕ್ರಿಯ ಉದ್ಯೋಗಗಳು',
       'employer_dashboard_post_job': 'ಉದ್ಯೋಗವನ್ನು ಪೋಸ್ಟ್ ಮಾಡಿ',
       'employer_dashboard_view_applicants': 'ಅರ್ಜಿದารರನ್ನು ವೀಕ್ಷಿಸಿ',
-      'employer_dashboard_no_jobs': 'ಇನ್ನೂ ಯಾವುದೇ ಉದ್ಯೋಗಗಳನ್ನು ಪೋಸ್ಟ್ ಮಾಡಲಾಗಿಲ್ಲ. ನಿಮ್ಮ ಮೊದಲ ಉದ್ಯೋಗವನ್ನು ಪೋಸ್ಟ್ ಮಾಡಲು + ಕ್ಲಿಕ್ ಮಾಡಿ!',
+      'employer_dashboard_no_jobs':
+          'ಇನ್ನೂ ಯಾವುದೇ ಉದ್ಯೋಗಗಳನ್ನು ಪೋಸ್ಟ್ ಮಾಡಲಾಗಿಲ್ಲ. ನಿಮ್ಮ ಮೊದಲ ಉದ್ಯೋಗವನ್ನು ಪೋಸ್ಟ್ ಮಾಡಲು + ಕ್ಲಿಕ್ ಮಾಡಿ!',
       'employer_dashboard_applicants_title': 'ಉದ್ಯೋಗ ಅರ್ಜಿದಾರರು',
-      'employer_dashboard_no_applicants': 'ಈ ಉದ್ಯೋಗಕ್ಕೆ ಇನ್ನೂ ಯಾವುದೇ ಅರ್ಜಿಗಳು ಬಂದಿಲ್ಲ.',
+      'employer_dashboard_no_applicants':
+          'ಈ ಉದ್ಯೋಗಕ್ಕೆ ಇನ್ನೂ ಯಾವುದೇ ಅರ್ಜಿಗಳು ಬಂದಿಲ್ಲ.',
     },
     'mr': {
       'app_logo_text': 'रोजगार',
       'app_title': 'रोजगार अड्डा',
-      'apply_agree': 'मी माझ्या अर्जाचा तपशील नियोक्त्यासोबत (employer) शेअर करण्यास सहमत आहे.',
+      'apply_agree':
+          'मी माझ्या अर्जाचा तपशील नियोक्त्यासोबत (employer) शेअर करण्यास सहमत आहे.',
       'apply_complete': 'पूर्ण झाले',
       'apply_current_position': 'सध्याचे पद',
       'apply_email': 'ईमेल पत्ता',
       'apply_first_name': 'पहिले नाव',
-      'apply_footer': 'सबमिट करून, तुम्ही आमच्या गोपनीयता धोरण आणि अटींशी सहमत आहात.',
+      'apply_footer':
+          'सबमिट करून, तुम्ही आमच्या गोपनीयता धोरण आणि अटींशी सहमत आहात.',
       'apply_header_title': 'सीनिअर प्रॉडक्ट डिझायनर',
       'apply_last_name': 'आडनाव',
       'apply_linkedin': 'लिंक्डइन प्रोफाइल (LinkedIn)',
@@ -1252,10 +1360,12 @@ class AppLocalizations {
       'apply_resume_upload': 'रेझ्युमे अपलोड (Resume Upload)',
       'apply_step_label': 'टप्पा २ पैकी ४:\nअनुभव',
       'apply_submit': 'अर्ज सबमिट करा',
-      'apply_upload_cta': 'अपलोड करण्यासाठी क्लिक करा किंवा फाइल येथे ड्रॅग करा',
+      'apply_upload_cta':
+          'अपलोड करण्यासाठी क्लिक करा किंवा फाइल येथे ड्रॅग करा',
       'apply_upload_hint': 'कमाल फाइल आकार १०MB • PDF किंवा DOCX',
       'apply_why_hire': 'आम्ही तुमची निवड का करावी?',
-      'apply_why_hire_hint': 'तुमच्या अनुभवाबद्दल आणि तुम्ही या भूमिकेसाठी योग्य का आहात याबद्दल थोडक्यात सांगा.',
+      'apply_why_hire_hint':
+          'तुमच्या अनुभवाबद्दल आणि तुम्ही या भूमिकेसाठी योग्य का आहात याबद्दल थोडक्यात सांगा.',
       'back': 'मागे',
       'cancel': 'रद्द करा',
       'careerhub_search_hint': 'नोकऱ्या, कंपन्या शोधा...',
@@ -1275,7 +1385,8 @@ class AppLocalizations {
       'explore_custom_search': 'कस्टम सर्च',
       'explore_custom_search_sub': 'तुमच्या कौशल्यांवर आधारित नोकऱ्या शोधा',
       'explore_job_categories': 'नोकरीच्या श्रेणी',
-      'explore_job_categories_subtitle': 'विविध उद्योगांमध्ये तुमच्यासाठी योग्य भूमिका शोधा',
+      'explore_job_categories_subtitle':
+          'विविध उद्योगांमध्ये तुमच्यासाठी योग्य भूमिका शोधा',
       'explore_opportunities_pill': 'संधी',
       'find_jobs': 'नोकऱ्या शोधा',
       'home': 'मुख्यपृष्ठ',
@@ -1300,7 +1411,8 @@ class AppLocalizations {
       'jobs_view_details': 'तपशील पहा',
       'jobs_walkin': 'वॉक-इन',
       'kyc_address_hint': 'फ्लॅट क्र., इमारत, रस्ता...',
-      'kyc_docs_hint': 'स्पष्ट, वाचनीय प्रती अपलोड करा. समर्थित: JPG, PNG, PDF, DOC',
+      'kyc_docs_hint':
+          'स्पष्ट, वाचनीय प्रती अपलोड करा. समर्थित: JPG, PNG, PDF, DOC',
       'kyc_field_address': 'पूर्ण पत्ता',
       'kyc_field_district': 'जिल्हा',
       'kyc_field_email': 'ईमेल पत्ता',
@@ -1320,15 +1432,18 @@ class AppLocalizations {
       'kyc_section_documents': 'कागदपत्रे अपलोड',
       'kyc_section_personal': 'वैयक्तिक माहिती',
       'kyc_snack_doc_uploaded': 'दस्तऐवज यशस्वीरित्या अपलोड झाला!',
-      'kyc_snack_error': 'केवायसी अद्यतन करताना काहीतरी चूक झाली. कृपया आपले कनेक्शन तपासा.',
-      'kyc_snack_failed': 'केवायसी अद्यतन करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
+      'kyc_snack_error':
+          'केवायसी अद्यतन करताना काहीतरी चूक झाली. कृपया आपले कनेक्शन तपासा.',
+      'kyc_snack_failed':
+          'केवायसी अद्यतन करण्यात अयशस्वी. कृपया पुन्हा प्रयत्न करा.',
       'kyc_snack_file_removed': 'फाइल काढली.',
       'kyc_snack_invalid_email': 'कृपया वैध ईमेल पत्ता प्रविष्ट करा.',
       'kyc_snack_invalid_phone': 'कृपया वैध 10-अंकी मोबाईल नंबर प्रविष्ट करा.',
       'kyc_snack_invalid_pin': 'कृपया वैध 6-अंकी पिनकोड प्रविष्ट करा.',
       'kyc_snack_missing_docs': 'कृपया सर्व आवश्यक कागदपत्रे अपलोड करा.',
       'kyc_snack_missing_fields': 'कृपया सर्व आवश्यक फील्ड भरा.',
-      'kyc_snack_no_candidate': 'उमेदवार आयडी सापडला नाही. कृपया पुन्हा लॉगिन करा.',
+      'kyc_snack_no_candidate':
+          'उमेदवार आयडी सापडला नाही. कृपया पुन्हा लॉगिन करा.',
       'kyc_snack_photo_uploaded': 'फोटो यशस्वीरित्या अपलोड झाला!',
       'kyc_snack_updated': 'केवायसी यशस्वीरित्या अद्यतनित केले',
       'kyc_source_camera': 'कॅमेरा',
@@ -1340,14 +1455,16 @@ class AppLocalizations {
       'kyc_title': 'केवायसी तपशील संपादित करा',
       'kyc_update_button': 'केवायसी अद्यतनित करा',
       'kyc_upload_label': 'अपलोड',
-      'language_dialog_message': 'तुमची पसंतीची ॲप भाषा निवडा. तुम्ही ती नंतर कधीही बदलू शकता.',
+      'language_dialog_message':
+          'तुमची पसंतीची ॲप भाषा निवडा. तुम्ही ती नंतर कधीही बदलू शकता.',
       'language_dialog_title': 'भाषा निवडा',
       'language_english': 'इंग्रजी (English)',
       'language_hindi': 'हिंदी (Hindi)',
       'login_button': 'लॉग इन करा',
       'login_email_hint': 'name@company.com',
       'login_email_label': 'ईमेल पत्ता',
-      'login_error_empty': 'कृपया वापरकर्तानाव (username) आणि पासवर्ड प्रविष्ट करा.',
+      'login_error_empty':
+          'कृपया वापरकर्तानाव (username) आणि पासवर्ड प्रविष्ट करा.',
       'login_error_generic': 'काहीतरी चूक झाली. कृपया पुन्हा प्रयत्न करा.',
       'login_error_title': 'लॉग इन अयशस्वी',
       'login_forgot': 'पासवर्ड विसरलात?',
@@ -1356,9 +1473,11 @@ class AppLocalizations {
       'login_password_label': 'पासवर्ड',
       'login_register': 'नोंदणी करा',
       'login_sign_in': 'साइन इन',
-      'login_subtitle': 'तुमच्या जॉब पोर्टलवर लॉग इन करण्यासाठी तुमची माहिती प्रविष्ट करा',
+      'login_subtitle':
+          'तुमच्या जॉब पोर्टलवर लॉग इन करण्यासाठी तुमची माहिती प्रविष्ट करा',
       'login_terms_agree': 'मी सेवा अटी आणि गोपनीयता धोरणाशी सहमत आहे.',
-      'login_terms_error': 'कृपया पुढे जाण्यासाठी नियम आणि गोपनीयता धोरण स्वीकारा.',
+      'login_terms_error':
+          'कृपया पुढे जाण्यासाठी नियम आणि गोपनीयता धोरण स्वीकारा.',
       'login_title': 'रोजगार अड्डा',
       'login_welcome_back': 'पुन्हा आपले स्वागत आहे',
       'logout': 'लॉगआउट',
@@ -1409,11 +1528,15 @@ class AppLocalizations {
       'registration_email_hint': 'name@example.com',
       'registration_error_district': 'कृपया एक जिल्हा निवडा.',
       'registration_error_fields': 'कृपया सर्व आवश्यक फील्ड भरा.',
-      'registration_error_otp_incomplete': 'कृपया संपूर्ण 6-अंकी ओटीपी प्रविष्ट करा.',
-      'registration_error_otp_phone': 'कृपया वैध 10-अंकी फोन नंबर प्रविष्ट करा.',
-      'registration_error_phone_verify': 'कृपया प्रथम तुमचा फोन नंबर सत्यापित करा.',
+      'registration_error_otp_incomplete':
+          'कृपया संपूर्ण 6-अंकी ओटीपी प्रविष्ट करा.',
+      'registration_error_otp_phone':
+          'कृपया वैध 10-अंकी फोन नंबर प्रविष्ट करा.',
+      'registration_error_phone_verify':
+          'कृपया प्रथम तुमचा फोन नंबर सत्यापित करा.',
       'registration_error_state': 'कृपया एक राज्य निवडा.',
-      'registration_error_terms': 'कृपया पुढे जाण्यासाठी नियम आणि गोपनीयता धोरण स्वीकारा.',
+      'registration_error_terms':
+          'कृपया पुढे जाण्यासाठी नियम आणि गोपनीयता धोरण स्वीकारा.',
       'registration_full_address': 'पूर्ण पत्ता',
       'registration_full_address_hint': 'घर क्रमांक, गल्लीचे नाव...',
       'registration_full_name': 'पूर्ण नाव',
@@ -1439,14 +1562,16 @@ class AppLocalizations {
       'registration_send_otp': 'ओटीपी पाठवा',
       'registration_state': 'राज्य',
       'registration_step': 'टप्पा १ पैकी ३',
-      'registration_success_message': 'तुम्ही या ईमेलसह यशस्वीरीत्या नोंदणी केली आहे: ',
+      'registration_success_message':
+          'तुम्ही या ईमेलसह यशस्वीरीत्या नोंदणी केली आहे: ',
       'registration_success_title': 'नोंदणी यशस्वी',
       'registration_terms_and': ' आणि ',
       'registration_terms_link': 'सहमत आहे',
       'registration_terms_prefix': 'मी नियम आणि अटींशी ',
       'registration_terms_privacy': 'गोपनीयता धोरण',
       'registration_terms_suffix': ' शी सहमत आहे.',
-      'registration_upload_hint': 'आधार कार्ड, पॅन किंवा मतदार ओळखपत्र (JPG/PDF, कमाल 2MB)',
+      'registration_upload_hint':
+          'आधार कार्ड, पॅन किंवा मतदार ओळखपत्र (JPG/PDF, कमाल 2MB)',
       'registration_upload_title': 'ओळखपत्र अपलोड करा',
       'registration_username': 'वापरकर्तानाव (Username)',
       'registration_username_hint': 'एक युनिक वापरकर्तानाव निवडा',
@@ -1456,7 +1581,8 @@ class AppLocalizations {
       'select_state_progress': '६६% पूर्ण',
       'select_state_search_hint': 'राज्याचे नाव शोधा...',
       'select_state_step_label': 'टप्पा २ पैकी ३',
-      'select_state_subheading': 'तुमच्यासाठी खास तयार केलेल्या सर्वोत्तम स्थानिक संधी पाहण्यासाठी तुमचे राज्य निवडा',
+      'select_state_subheading':
+          'तुमच्यासाठी खास तयार केलेल्या सर्वोत्तम स्थानिक संधी पाहण्यासाठी तुमचे राज्य निवडा',
       'sell_active_product': 'सक्रिय उत्पादन',
       'sell_back': 'मागे',
       'sell_capacity': 'क्षमता',
@@ -1489,14 +1615,16 @@ class AppLocalizations {
       'sell_required': 'आवश्यक',
       'sell_retry': 'पुन्हा प्रयत्न करा',
       'sell_review': 'पुनरावलोकन',
-      'sell_review_desc': 'आम्हाला तुमच्या उत्पादनाचा तपशील प्राप्त झाला आहे. आमची टीम लवकरच याचे पुनरावलोकन करेल.',
+      'sell_review_desc':
+          'आम्हाला तुमच्या उत्पादनाचा तपशील प्राप्त झाला आहे. आमची टीम लवकरच याचे पुनरावलोकन करेल.',
       'sell_review_title': 'तुमचा अर्ज पुनरावलोकनाधीन आहे',
       'sell_save_product': 'उत्पादन जतन करा',
       'sell_select_main_image': 'कृपया मुख्य उत्पादन प्रतिमा निवडा.',
       'sell_select_subcategory': 'उप श्रेणी निवडा',
       'sell_selected_category': 'निवडलेली श्रेणी: ',
       'sell_sub_category': 'उप श्रेणी',
-      'sell_subcategory_hint': 'अधिक खरेदीदारांपर्यंत पोहोचण्यासाठी आपल्या जाहिरातीसाठी सर्वात संबंधित उप-श्रेणी निवडा.',
+      'sell_subcategory_hint':
+          'अधिक खरेदीदारांपर्यंत पोहोचण्यासाठी आपल्या जाहिरातीसाठी सर्वात संबंधित उप-श्रेणी निवडा.',
       'sell_title_hint': 'उत्पादनाचे नाव प्रविष्ट करा',
       'sell_total_cost': 'एकूण किंमत (₹)',
       'sell_warranty': 'हमी/वारंटी',
@@ -1519,9 +1647,11 @@ class AppLocalizations {
       'splash_menu_employer_login': 'नियोक्ता लॉगिन',
       'splash_menu_employer_register': 'नियोक्ता नोंदणी',
       'employer_login_title': 'नियोक्ता प्रवेश',
-      'employer_login_subtitle': 'नोकरी पोस्ट करण्यासाठी आणि उमेदवारांचे अर्ज पाहण्यासाठी लॉग इन करा',
+      'employer_login_subtitle':
+          'नोकरी पोस्ट करण्यासाठी आणि उमेदवारांचे अर्ज पाहण्यासाठी लॉग इन करा',
       'employer_register_title': 'कंपनी नोंदणी',
-      'employer_register_subtitle': 'उत्कृष्ट स्थानिक कौशल्ये शोधण्यासाठी नियोक्ता खाते तयार करा',
+      'employer_register_subtitle':
+          'उत्कृष्ट स्थानिक कौशल्ये शोधण्यासाठी नियोक्ता खाते तयार करा',
       'employer_dashboard_title': 'नियोक्ता डॅशबोर्ड',
       'employer_dashboard_total_jobs': 'एकूण नोकऱ्या',
       'employer_dashboard_total_applications': 'अर्ज',
@@ -1529,20 +1659,25 @@ class AppLocalizations {
       'employer_dashboard_active_jobs': 'सक्रिय नोकऱ्या',
       'employer_dashboard_post_job': 'नोकरी पोस्ट करा',
       'employer_dashboard_view_applicants': 'अर्जदार पहा',
-      'employer_dashboard_no_jobs': 'अद्याप कोणतीही नोकरी पोस्ट केलेली नाही. पहिली नोकरी पोस्ट करण्यासाठी + वर क्लिक करा!',
+      'employer_dashboard_no_jobs':
+          'अद्याप कोणतीही नोकरी पोस्ट केलेली नाही. पहिली नोकरी पोस्ट करण्यासाठी + वर क्लिक करा!',
       'employer_dashboard_applicants_title': 'नोकरीचे अर्जदार',
-      'employer_dashboard_no_applicants': 'या नोकरीसाठी अद्याप कोणताही अर्ज मिळालेला नाही.',
+      'employer_dashboard_no_applicants':
+          'या नोकरीसाठी अद्याप कोणताही अर्ज मिळालेला नाही.',
     },
     'ta': {
       'app_logo_text': 'ரோஸ்கார்',
       'app_title': 'ரோஸ்கார் அட்டா',
-      'apply_agree': 'எனது விண்ணப்ப விவரங்களை முதலாளியுடன் பகிர்ந்து கொள்ள ஒப்புக்கொள்கிறேன்.',
+      'apply_agree':
+          'எனது விண்ணப்ப விவரங்களை முதலாளியுடன் பகிர்ந்து கொள்ள ஒப்புக்கொள்கிறேன்.',
       'apply_complete': 'முடிந்தது',
       'apply_current_position': 'தற்போதைய பதவி',
       'apply_email': 'மின்னஞ்சல் முகவரி',
       'apply_first_name': 'முதல் பெயர்',
-      'apply_footer': 'சமர்ப்பிப்பதன் மூலம், எங்கள் தனியுரிமைக் கொள்கை மற்றும் விதிமுறைகளை நீங்கள் ஒப்புக்கொள்கிறீர்கள்.',
-      'apply_header_title': 'சீனியர் தயாரிப்பு வடிவமைப்பாளர் (Product Designer)',
+      'apply_footer':
+          'சமர்ப்பிப்பதன் மூலம், எங்கள் தனியுரிமைக் கொள்கை மற்றும் விதிமுறைகளை நீங்கள் ஒப்புக்கொள்கிறீர்கள்.',
+      'apply_header_title':
+          'சீனியர் தயாரிப்பு வடிவமைப்பாளர் (Product Designer)',
       'apply_last_name': 'குடும்பப் பெயர் / கடைசி பெயர்',
       'apply_linkedin': 'LinkedIn சுயவிவரம்',
       'apply_personal_info': 'தனிப்பட்ட தகவல்கள்',
@@ -1550,10 +1685,12 @@ class AppLocalizations {
       'apply_resume_upload': 'சுயவிவரக் குறிப்பு (Resume) பதிவேற்றம்',
       'apply_step_label': 'படி 4 இல் 2:\nஅனுபவம்',
       'apply_submit': 'விண்ணப்பத்தைச் சமர்ப்பி',
-      'apply_upload_cta': 'பதிவேற்ற கிளிக் செய்யவும் அல்லது கோப்பை இழுத்து வந்து போடவும்',
+      'apply_upload_cta':
+          'பதிவேற்ற கிளிக் செய்யவும் அல்லது கோப்பை இழுத்து வந்து போடவும்',
       'apply_upload_hint': 'அதிகபட்ச கோப்பு அளவு 10MB • PDF அல்லது DOCX',
       'apply_why_hire': 'நாங்கள் ஏன் உங்களை வேலைக்கு அமர்த்த வேண்டும்?',
-      'apply_why_hire_hint': 'உங்கள் அனுபவத்தைப் பற்றியும், இந்த வேலைக்கு நீங்கள் எவ்வாறு பொருத்தமானவர் என்றும் சுருக்கமாகக் கூறவும்.',
+      'apply_why_hire_hint':
+          'உங்கள் அனுபவத்தைப் பற்றியும், இந்த வேலைக்கு நீங்கள் எவ்வாறு பொருத்தமானவர் என்றும் சுருக்கமாகக் கூறவும்.',
       'back': 'பின்னே செல்',
       'cancel': 'ரத்துசெய்',
       'careerhub_search_hint': 'வேலைகள், நிறுவனங்களைத் தேடவும்...',
@@ -1571,9 +1708,11 @@ class AppLocalizations {
       'earnings': 'வருவாய்',
       'explore_careers_title': 'தொழில்துறைகளை ஆராயுங்கள்',
       'explore_custom_search': 'விருப்பத் தேடல்',
-      'explore_custom_search_sub': 'உங்கள் திறன்களின் அடிப்படையில் பணிகளைக் கண்டறியவும்',
+      'explore_custom_search_sub':
+          'உங்கள் திறன்களின் அடிப்படையில் பணிகளைக் கண்டறியவும்',
       'explore_job_categories': 'வேலை பிரிவுகள்',
-      'explore_job_categories_subtitle': 'பல்வேறு துறைகளில் உங்களுக்கான சரியான பணியைத் கண்டறியவும்',
+      'explore_job_categories_subtitle':
+          'பல்வேறு துறைகளில் உங்களுக்கான சரியான பணியைத் கண்டறியவும்',
       'explore_opportunities_pill': 'வாய்ப்புகள்',
       'find_jobs': 'வேலைகளைத் தேடு',
       'home': 'முகப்பு',
@@ -1591,14 +1730,16 @@ class AppLocalizations {
       'jobs_error': 'வேலை வாய்ப்புகளை ஏற்ற முடியவில்லை.',
       'jobs_experience': 'அனுபவம்',
       'jobs_loading': 'வேலை வாய்ப்புகள் ஏற்றப்படுகின்றன...',
-      'jobs_no_jobs_found': 'இந்தப்பணிக்கு எந்த வேலை வாய்ப்புகளும் காணப்படவில்லை.',
+      'jobs_no_jobs_found':
+          'இந்தப்பணிக்கு எந்த வேலை வாய்ப்புகளும் காணப்படவில்லை.',
       'jobs_salary_range': 'சம்பளம்',
       'jobs_vacancies': 'காலியிடங்கள்',
       'jobs_vacancy': 'காலியிடம்',
       'jobs_view_details': 'விவரங்களைப் பார்',
       'jobs_walkin': 'நேரடி நேர்காணல் (Walk-in)',
       'kyc_address_hint': 'பிளாட் எண், கட்டிடம், தெரு...',
-      'kyc_docs_hint': 'தெளிவான, படிக்கக்கூடிய பிரதிகளைப் பதிவேற்றவும். அனுமதிக்கப்படுபவை: JPG, PNG, PDF, DOC',
+      'kyc_docs_hint':
+          'தெளிவான, படிக்கக்கூடிய பிரதிகளைப் பதிவேற்றவும். அனுமதிக்கப்படுபவை: JPG, PNG, PDF, DOC',
       'kyc_field_address': 'முழுமையான முகவரி',
       'kyc_field_district': 'மாவட்டம்',
       'kyc_field_email': 'மின்னஞ்சல் முகவரி',
@@ -1618,15 +1759,19 @@ class AppLocalizations {
       'kyc_section_documents': 'ஆவணங்கள் பதிவேற்றம்',
       'kyc_section_personal': 'தனிப்பட்ட தகவல்கள்',
       'kyc_snack_doc_uploaded': 'ஆவணம் வெற்றிகரமாக பதிவேற்றப்பட்டது!',
-      'kyc_snack_error': 'KYC-ஐப் புதுப்பிக்கும்போது ஏதோ தவறு நடந்தது. உங்கள் இணைய இணைப்பைச் சரிபார்க்கவும்.',
-      'kyc_snack_failed': 'KYC-ஐப் புதுப்பிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
+      'kyc_snack_error':
+          'KYC-ஐப் புதுப்பிக்கும்போது ஏதோ தவறு நடந்தது. உங்கள் இணைய இணைப்பைச் சரிபார்க்கவும்.',
+      'kyc_snack_failed':
+          'KYC-ஐப் புதுப்பிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
       'kyc_snack_file_removed': 'கோப்பு அகற்றப்பட்டது.',
       'kyc_snack_invalid_email': 'முறையான மின்னஞ்சல் முகவரியை உள்ளிடவும்.',
       'kyc_snack_invalid_phone': 'முறையான 10 இலக்க தொலைபேசி எண்ணை உள்ளிடவும்.',
-      'kyc_snack_invalid_pin': 'முறையான 6 இலக்க அஞ்சல் குறியீட்டை (Pincode) உள்ளிடவும்.',
+      'kyc_snack_invalid_pin':
+          'முறையான 6 இலக்க அஞ்சல் குறியீட்டை (Pincode) உள்ளிடவும்.',
       'kyc_snack_missing_docs': 'தேவையான அனைத்து ஆவணங்களையும் பதிவேற்றவும்.',
       'kyc_snack_missing_fields': 'தேவையான அனைத்து விவரங்களையும் நிரப்பவும்.',
-      'kyc_snack_no_candidate': 'வேட்பாளர் ID கண்டறியப்படவில்லை. மீண்டும் உள்நுழையவும்.',
+      'kyc_snack_no_candidate':
+          'வேட்பாளர் ID கண்டறியப்படவில்லை. மீண்டும் உள்நுழையவும்.',
       'kyc_snack_photo_uploaded': 'புகைப்படம் வெற்றிகரமாக பதிவேற்றப்பட்டது!',
       'kyc_snack_updated': 'KYC வெற்றிகரமாக புதுப்பிக்கப்பட்டது',
       'kyc_source_camera': 'கேமரா',
@@ -1638,7 +1783,8 @@ class AppLocalizations {
       'kyc_title': 'KYC விபரங்களைத் திருத்து',
       'kyc_update_button': 'KYC-ஐப் புதுப்பி',
       'kyc_upload_label': 'பதிவேற்று',
-      'language_dialog_message': 'உங்களுக்கு விருப்பமான பயன்பாட்டு மொழியைத் தேர்ந்தெடுக்கவும். இதை நீங்கள் எப்போது வேண்டுமானாலும் மாற்றிக்கொள்ளலாம்.',
+      'language_dialog_message':
+          'உங்களுக்கு விருப்பமான பயன்பாட்டு மொழியைத் தேர்ந்தெடுக்கவும். இதை நீங்கள் எப்போது வேண்டுமானாலும் மாற்றிக்கொள்ளலாம்.',
       'language_dialog_title': 'மொழியைத் தேர்ந்தெடுக்கவும்',
       'language_english': 'English',
       'language_hindi': 'Hindi',
@@ -1654,9 +1800,12 @@ class AppLocalizations {
       'login_password_label': 'கடவுச்சொல்',
       'login_register': 'பதிவு செய்',
       'login_sign_in': 'உள்நுழைக',
-      'login_subtitle': 'உங்கள் வேலை வாய்ப்பு போர்ட்டலை அணுக உங்கள் விபரங்களை உள்ளிடவும்',
-      'login_terms_agree': 'சேவை விதிமுறைகள் மற்றும் தனியுரிமைக் கொள்கையை நான் ஒப்புக்கொள்கிறேன்.',
-      'login_terms_error': 'தொடர, விதிமுறைகள் மற்றும் தனியுரிமைக் கொள்கையை ஏற்கவும்.',
+      'login_subtitle':
+          'உங்கள் வேலை வாய்ப்பு போர்ட்டலை அணுக உங்கள் விபரங்களை உள்ளிடவும்',
+      'login_terms_agree':
+          'சேவை விதிமுறைகள் மற்றும் தனியுரிமைக் கொள்கையை நான் ஒப்புக்கொள்கிறேன்.',
+      'login_terms_error':
+          'தொடர, விதிமுறைகள் மற்றும் தனியுரிமைக் கொள்கையை ஏற்கவும்.',
       'login_title': 'ரோஸ்கார் அட்டா',
       'login_welcome_back': 'நல்வரவு',
       'logout': 'வெளியேறு',
@@ -1705,13 +1854,19 @@ class AppLocalizations {
       'registration_district': 'மாவட்டம்',
       'registration_email': 'மின்னஞ்சல் முகவரி',
       'registration_email_hint': 'name@example.com',
-      'registration_error_district': 'தயவுசெய்து ஒரு மாவட்டத்தைத் தேர்ந்தெடுக்கவும்.',
+      'registration_error_district':
+          'தயவுசெய்து ஒரு மாவட்டத்தைத் தேர்ந்தெடுக்கவும்.',
       'registration_error_fields': 'தேவையான அனைத்து விவரங்களையும் நிரப்பவும்.',
-      'registration_error_otp_incomplete': 'முழுமையான 6 இலக்க OTP-ஐ உள்ளிடவும்.',
-      'registration_error_otp_phone': 'முறையான 10 இலக்க தொலைபேசி எண்ணை உள்ளிடவும்.',
-      'registration_error_phone_verify': 'முதலில் உங்கள் தொலைபேசி எண்ணைச் சரிபார்க்கவும்.',
-      'registration_error_state': 'தயவுசெய்து ஒரு மாநிலத்தைத் தேர்ந்தெடுக்கவும்.',
-      'registration_error_terms': 'தொடர, விதிமுறைகள் மற்றும் தனியுரிமைக் கொள்கையை ஏற்கவும்.',
+      'registration_error_otp_incomplete':
+          'முழுமையான 6 இலக்க OTP-ஐ உள்ளிடவும்.',
+      'registration_error_otp_phone':
+          'முறையான 10 இலக்க தொலைபேசி எண்ணை உள்ளிடவும்.',
+      'registration_error_phone_verify':
+          'முதலில் உங்கள் தொலைபேசி எண்ணைச் சரிபார்க்கவும்.',
+      'registration_error_state':
+          'தயவுசெய்து ஒரு மாநிலத்தைத் தேர்ந்தெடுக்கவும்.',
+      'registration_error_terms':
+          'தொடர, விதிமுறைகள் மற்றும் தனியுரிமைக் கொள்கையை ஏற்கவும்.',
       'registration_full_address': 'முழு முகவரி',
       'registration_full_address_hint': 'கதவு எண், தெரு பெயர்...',
       'registration_full_name': 'முழு பெயர்',
@@ -1719,12 +1874,14 @@ class AppLocalizations {
       'registration_identity_verification': 'அடையாளச் சரிபார்ப்பு',
       'registration_join_tagline': 'பணியாளராக இணையுங்கள்',
       'registration_login': 'உள்நுழைக',
-      'registration_otp_hint': 'உங்கள் தொலைபேசிக்கு அனுப்பப்பட்ட 6 இலக்க OTP-ஐ உள்ளிடவும்',
+      'registration_otp_hint':
+          'உங்கள் தொலைபேசிக்கு அனுப்பப்பட்ட 6 இலக்க OTP-ஐ உள்ளிடவும்',
       'registration_otp_resend': 'OTP-ஐ மீண்டும் அனுப்பு',
       'registration_otp_resend_in': 'மீண்டும் அனுப்ப ',
       'registration_otp_resend_sec': 'விநாடிகள்',
       'registration_otp_sent_success': 'உங்கள் எண்ணிற்கு OTP அனுப்பப்பட்டது!',
-      'registration_otp_verify_success': 'தொலைபேசி எண் வெற்றிகரமாக சரிபார்க்கப்பட்டது!',
+      'registration_otp_verify_success':
+          'தொலைபேசி எண் வெற்றிகரமாக சரிபார்க்கப்பட்டது!',
       'registration_password': 'கடவுச்சொல்',
       'registration_password_hint': 'குறைந்தது 8 எழுத்துக்கள்',
       'registration_personal_info': 'தனிப்பட்ட தகவல்',
@@ -1737,24 +1894,28 @@ class AppLocalizations {
       'registration_send_otp': 'OTP அனுப்பு',
       'registration_state': 'மாநிலம்',
       'registration_step': 'படி 3 இல் 1',
-      'registration_success_message': 'இந்த மின்னஞ்சல் முகவரியுடன் வெற்றிகரமாகப் பதிவு செய்துள்ளீர்கள்: ',
+      'registration_success_message':
+          'இந்த மின்னஞ்சல் முகவரியுடன் வெற்றிகரமாகப் பதிவு செய்துள்ளீர்கள்: ',
       'registration_success_title': 'பதிவு வெற்றிகரமாக முடிந்தது',
       'registration_terms_and': ' மற்றும் ',
       'registration_terms_link': 'விதிமுறைகள் மற்றும் நிபந்தனைகள்',
       'registration_terms_prefix': 'நான் ஏற்றுக்கொள்கிறேன் ',
       'registration_terms_privacy': 'தனியுரிமைக் கொள்கை',
       'registration_terms_suffix': ' ரோஸ்கார் அட்டா இன் விதிமுறைகள்.',
-      'registration_upload_hint': 'ஆதார் கார்டு, பான் கார்டு அல்லது வாக்காளர் அடையாள அட்டை (JPG/PDF, அதிகபட்சம் 2MB)',
+      'registration_upload_hint':
+          'ஆதார் கார்டு, பான் கார்டு அல்லது வாக்காளர் அடையாள அட்டை (JPG/PDF, அதிகபட்சம் 2MB)',
       'registration_upload_title': 'அடையாளச் சான்றை பதிவேற்றவும்',
       'registration_username': 'பயனர் பெயர்',
-      'registration_username_hint': 'தனித்துவமான பயனர் பெயரைத் தேர்ந்தெடுக்கவும்',
+      'registration_username_hint':
+          'தனித்துவமான பயனர் பெயரைத் தேர்ந்தெடுக்கவும்',
       'registration_verify_otp': 'OTP-ஐச் சரிபார்',
       'select_state_appbar': 'Select State / மாநிலத்தைத் தேர்ந்தெடுக்கவும்',
       'select_state_heading': 'நீங்கள் எங்கு வேலை தேடுகிறீர்கள்?',
       'select_state_progress': '66% நிறைவடைந்தது',
       'select_state_search_hint': 'மாநிலப் பெயரைத் தேடவும்...',
       'select_state_step_label': 'படி 3 இல் 2',
-      'select_state_subheading': 'உங்களுக்கு ஏற்ற சிறந்த உள்ளூர் வேலை வாய்ப்புகளைப் பார்க்க உங்கள் மாநிலத்தைத் தேர்ந்தெடுக்கவும்',
+      'select_state_subheading':
+          'உங்களுக்கு ஏற்ற சிறந்த உள்ளூர் வேலை வாய்ப்புகளைப் பார்க்க உங்கள் மாநிலத்தைத் தேர்ந்தெடுக்கவும்',
       'sell_active_product': 'செயலில் உள்ள பொருள்',
       'sell_back': 'பின்னே செல்',
       'sell_capacity': 'கொள்ளளவு (Capacity)',
@@ -1787,14 +1948,17 @@ class AppLocalizations {
       'sell_required': 'தேவையானது',
       'sell_retry': 'மீண்டும் முயற்சி செய்',
       'sell_review': 'மதிப்பாய்வு',
-      'sell_review_desc': 'உங்கள் பொருளின் விவரங்களைப் பெற்றுள்ளோம். எங்களது குழு விரைவில் அதை மதிப்பாய்வு செய்யும்.',
+      'sell_review_desc':
+          'உங்கள் பொருளின் விவரங்களைப் பெற்றுள்ளோம். எங்களது குழு விரைவில் அதை மதிப்பாய்வு செய்யும்.',
       'sell_review_title': 'உங்கள் விண்ணப்பம் பரிசீலனையில் உள்ளது',
       'sell_save_product': 'பொருளைச் சேமி',
-      'sell_select_main_image': 'தயவுசெய்து பொருளின் முக்கிய புகைப்படத்தைத் தேர்ந்தெடுக்கவும்.',
+      'sell_select_main_image':
+          'தயவுசெய்து பொருளின் முக்கிய புகைப்படத்தைத் தேர்ந்தெடுக்கவும்.',
       'sell_select_subcategory': 'துணைப் பிரிவைத் தேர்ந்தெடுக்கவும்',
       'sell_selected_category': 'தேர்ந்தெடுக்கப்பட்ட பிரிவு: ',
       'sell_sub_category': 'துணைப் பிரிவு (Sub Category)',
-      'sell_subcategory_hint': 'அதிகப்படியான வாங்குபவர்களைச் சென்றடைய, உங்கள் விளம்பரத்திற்கு மிகவும் பொருத்தமான துணைப் பிரிவைத் தேர்ந்தெடுக்கவும்.',
+      'sell_subcategory_hint':
+          'அதிகப்படியான வாங்குபவர்களைச் சென்றடைய, உங்கள் விளம்பரத்திற்கு மிகவும் பொருத்தமான துணைப் பிரிவைத் தேர்ந்தெடுக்கவும்.',
       'sell_title_hint': 'பொருளின் பெயரை உள்ளிடவும் (எ.கா. BMW X5 2024)',
       'sell_total_cost': 'மொத்த விலை (₹)',
       'sell_warranty': 'உத்தரவாதம் (Warranty)',
@@ -1817,9 +1981,11 @@ class AppLocalizations {
       'splash_menu_employer_login': 'முதலாளி உள்நுழைவு',
       'splash_menu_employer_register': 'முதலாளி பதிவு',
       'employer_login_title': 'முதலாளி அனுமதி',
-      'employer_login_subtitle': 'வேலைகளைப் பதிவிடவும் விண்ணப்பங்களை பார்க்கவும் உள்நுழையவும்',
+      'employer_login_subtitle':
+          'வேலைகளைப் பதிவிடவும் விண்ணப்பங்களை பார்க்கவும் உள்நுழையவும்',
       'employer_register_title': 'நிறுவன பதிவு',
-      'employer_register_subtitle': 'சிறந்த உள்ளூர் திறமையாளர்களைக் கண்டறிய முதலாளி கணக்கை உருவாக்கவும்',
+      'employer_register_subtitle':
+          'சிறந்த உள்ளூர் திறமையாளர்களைக் கண்டறிய முதலாளி கணக்கை உருவாக்கவும்',
       'employer_dashboard_title': 'முதலாளி டாஷ்போர்டு',
       'employer_dashboard_total_jobs': 'மொத்த வேலைகள்',
       'employer_dashboard_total_applications': 'விண்ணப்பங்கள்',
@@ -1827,19 +1993,23 @@ class AppLocalizations {
       'employer_dashboard_active_jobs': 'செயலில் உள்ள வேலைகள்',
       'employer_dashboard_post_job': 'வேலையைப் பதிவிடு',
       'employer_dashboard_view_applicants': 'விண்ணப்பதாரர்களைப் பார்',
-      'employer_dashboard_no_jobs': 'இன்னும் வேலைகள் எதுவும் பதிவிடப்படவில்லை. உங்கள் முதல் வேலையைப் பதிவிட + ஐக் கிளிக் செய்க!',
+      'employer_dashboard_no_jobs':
+          'இன்னும் வேலைகள் எதுவும் பதிவிடப்படவில்லை. உங்கள் முதல் வேலையைப் பதிவிட + ஐக் கிளிக் செய்க!',
       'employer_dashboard_applicants_title': 'வேலை விண்ணப்பதாரர்கள்',
-      'employer_dashboard_no_applicants': 'இந்த வேலைக்கு இன்னும் விண்ணப்பங்கள் எதுவும் வரவில்லை.',
+      'employer_dashboard_no_applicants':
+          'இந்த வேலைக்கு இன்னும் விண்ணப்பங்கள் எதுவும் வரவில்லை.',
     },
     'te': {
       'app_logo_text': 'రోజ్‌గార్',
       'app_title': 'రోజ్‌గార్ అడ్డా',
-      'apply_agree': 'నేను నా దరఖాస్తు వివరాలను యజమానితో పంచుకోవడానికి అంగీకరిస్తున్నాను.',
+      'apply_agree':
+          'నేను నా దరఖాస్తు వివరాలను యజమానితో పంచుకోవడానికి అంగీకరిస్తున్నాను.',
       'apply_complete': 'పూర్తయింది',
       'apply_current_position': 'ప్రస్తుత ఉద్యోగ హోదా',
       'apply_email': 'ఈమెయిల్ చిరునామా',
       'apply_first_name': 'మొదటి పేరు',
-      'apply_footer': 'సమర్పించడం ద్వారా, మీరు మా గోప్యతా విధానం మరియు నిబంధనలను అంగీకరిస్తున్నారు.',
+      'apply_footer':
+          'సమర్పించడం ద్వారా, మీరు మా గోప్యతా విధానం మరియు నిబంధనలను అంగీకరిస్తున్నారు.',
       'apply_header_title': 'సీనియర్ ప్రొడక్ట్ డిజైనర్',
       'apply_last_name': 'ఇంటి పేరు / చివరి పేరు',
       'apply_linkedin': 'లింక్డ్‌ఇన్ ప్రొఫైల్',
@@ -1848,10 +2018,12 @@ class AppLocalizations {
       'apply_resume_upload': 'రెజ్యూమే అప్‌లోడ్',
       'apply_step_label': 'దశ 2 లో 4:\nఅనుభవం',
       'apply_submit': 'దరఖాస్తును సమర్పించండి',
-      'apply_upload_cta': 'అప్‌లోడ్ చేయడానికి క్లిక్ చేయండి లేదా ఫైల్‌ని ఇక్కడికి లాగండి',
+      'apply_upload_cta':
+          'అప్‌లోడ్ చేయడానికి క్లిక్ చేయండి లేదా ఫైల్‌ని ఇక్కడికి లాగండి',
       'apply_upload_hint': 'గరిష్ట ఫైల్ పరిమాణం 10MB • PDF లేదా DOCX',
       'apply_why_hire': 'మిమ్మల్ని మేము ఎందుకు ఉద్యోగంలోకి తీసుకోవాలి?',
-      'apply_why_hire_hint': 'మీ అనుభవం గురించి మరియు మీరు ఈ ఉద్యోగానికి ఎలా సరిపోతారో క్లుప్తంగా చెప్పండి.',
+      'apply_why_hire_hint':
+          'మీ అనుభవం గురించి మరియు మీరు ఈ ఉద్యోగానికి ఎలా సరిపోతారో క్లుప్తంగా చెప్పండి.',
       'back': 'వెనుకకు',
       'cancel': 'రద్దు చేయి',
       'careerhub_search_hint': 'ఉద్యోగాలు, కంపెనీల కోసం వెతకండి...',
@@ -1871,7 +2043,8 @@ class AppLocalizations {
       'explore_custom_search': 'కస్టమ్ సెర్చ్',
       'explore_custom_search_sub': 'మీ నైపుణ్యాల ఆధారంగా ఉద్యోగాలను కనుగొనండి',
       'explore_job_categories': 'ఉద్యోగ విభాగాలు',
-      'explore_job_categories_subtitle': 'వివిధ పరిశ్రమలలో మీ కోసం సరైన పాత్రను కనుగొనండి',
+      'explore_job_categories_subtitle':
+          'వివిధ పరిశ్రమలలో మీ కోసం సరైన పాత్రను కనుగొనండి',
       'explore_opportunities_pill': 'అవకాశాలు',
       'find_jobs': 'ఉద్యోగాలను కనుగొనండి',
       'home': 'హోమ్',
@@ -1896,7 +2069,8 @@ class AppLocalizations {
       'jobs_view_details': 'వివరాలను చూడు',
       'jobs_walkin': 'వాక్-ఇన్',
       'kyc_address_hint': 'ఫ్లాట్ నంబర్, బిల్డింగ్, వీధి...',
-      'kyc_docs_hint': 'స్పష్టమైన, చదవగలిగే కాపీలను అప్‌లోడ్ చేయండి. అనుమతించబడినవి: JPG, PNG, PDF, DOC',
+      'kyc_docs_hint':
+          'స్పష్టమైన, చదవగలిగే కాపీలను అప్‌లోడ్ చేయండి. అనుమతించబడినవి: JPG, PNG, PDF, DOC',
       'kyc_field_address': 'పూర్తి చిరునామా',
       'kyc_field_district': 'జిల్లా',
       'kyc_field_email': 'ఈమెయిల్ చిరునామా',
@@ -1916,15 +2090,20 @@ class AppLocalizations {
       'kyc_section_documents': 'పత్రాల అప్‌లోడ్',
       'kyc_section_personal': 'వ్యక్తిగత సమాచారం',
       'kyc_snack_doc_uploaded': 'పత్రం విజయవంతంగా అప్‌లోడ్ చేయబడింది!',
-      'kyc_snack_error': 'KYCని అప్‌డేట్ చేస్తున్నప్పుడు ఏదో తప్పు జరిగింది. మీ కనెక్షన్‌ని తనిఖీ చేయండి.',
-      'kyc_snack_failed': 'KYC అప్‌డేట్ చేయడం విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.',
+      'kyc_snack_error':
+          'KYCని అప్‌డేట్ చేస్తున్నప్పుడు ఏదో తప్పు జరిగింది. మీ కనెక్షన్‌ని తనిఖీ చేయండి.',
+      'kyc_snack_failed':
+          'KYC అప్‌డేట్ చేయడం విఫలమైంది. దయచేసి మళ్లీ ప్రయత్నించండి.',
       'kyc_snack_file_removed': 'ఫైల్ తీసివేయబడింది.',
       'kyc_snack_invalid_email': 'దయచేసి సరైన ఈమెయిల్ చిరునామాను నమోదు చేయండి.',
-      'kyc_snack_invalid_phone': 'దయచేసి సరైన 10-అంకెల ఫోన్ నంబర్‌ను నమోదు చేయండి.',
+      'kyc_snack_invalid_phone':
+          'దయచేసి సరైన 10-అంకెల ఫోన్ నంబర్‌ను నమోదు చేయండి.',
       'kyc_snack_invalid_pin': 'దయచేసి సరైన 6-అంకెల పిన్‌కోడ్‌ను నమోదు చేయండి.',
-      'kyc_snack_missing_docs': 'దయచేసి అవసరమైన అన్ని పత్రాలను అప్‌లోడ్ చేయండి.',
+      'kyc_snack_missing_docs':
+          'దయచేసి అవసరమైన అన్ని పత్రాలను అప్‌లోడ్ చేయండి.',
       'kyc_snack_missing_fields': 'దయచేసి అవసరమైన అన్ని వివరాలను పూరించండి.',
-      'kyc_snack_no_candidate': 'అభ్యర్థి ID కనుగొనబడలేదు. దయచేసి మళ్లీ లాగిన్ చేయండి.',
+      'kyc_snack_no_candidate':
+          'అభ్యర్థి ID కనుగొనబడలేదు. దయచేసి మళ్లీ లాగిన్ చేయండి.',
       'kyc_snack_photo_uploaded': 'ఫోటో విజయవంతంగా అప్‌లోడ్ చేయబడింది!',
       'kyc_snack_updated': 'KYC విజయవంతంగా అప్‌డేట్ చేయబడింది',
       'kyc_source_camera': 'కెమెరా',
@@ -1936,7 +2115,8 @@ class AppLocalizations {
       'kyc_title': 'KYC వివరాలను సవరించండి',
       'kyc_update_button': 'KYCని అప్‌డేట్ చేయి',
       'kyc_upload_label': 'అప్‌లోడ్',
-      'language_dialog_message': 'మీకు నచ్చిన యాప్ భాషను ఎంచుకోండి. మీరు దీన్ని తర్వాత ఎప్పుడైనా మార్చుకోవచ్చు.',
+      'language_dialog_message':
+          'మీకు నచ్చిన యాప్ భాషను ఎంచుకోండి. మీరు దీన్ని తర్వాత ఎప్పుడైనా మార్చుకోవచ్చు.',
       'language_dialog_title': 'భాషను ఎంచుకోండి',
       'language_english': 'English',
       'language_hindi': 'Hindi',
@@ -1952,9 +2132,12 @@ class AppLocalizations {
       'login_password_label': 'పాస్‌వర్డ్',
       'login_register': 'రిజిస్టర్ చేసుకోండి',
       'login_sign_in': 'సైన్ ఇన్ చేయండి',
-      'login_subtitle': 'మీ జాబ్ పోర్టల్‌ని యాక్సెస్ చేయడానికి మీ వివరాలను నమోదు చేయండి',
-      'login_terms_agree': 'నేను సేవా నిబంధనలు మరియు గోప్యతా విధానాన్ని అంగీకరిస్తున్నాను.',
-      'login_terms_error': 'కొనసాగడానికి దయచేసి నిబంధనలు మరియు గోప్యతా విధానాన్ని అంగీకరించండి.',
+      'login_subtitle':
+          'మీ జాబ్ పోర్టల్‌ని యాక్సెస్ చేయడానికి మీ వివరాలను నమోదు చేయండి',
+      'login_terms_agree':
+          'నేను సేవా నిబంధనలు మరియు గోప్యతా విధానాన్ని అంగీకరిస్తున్నాను.',
+      'login_terms_error':
+          'కొనసాగడానికి దయచేసి నిబంధనలు మరియు గోప్యతా విధానాన్ని అంగీకరించండి.',
       'login_title': 'రోజ్‌గార్ అడ్డా',
       'login_welcome_back': 'స్వాగతం',
       'logout': 'లాగ్‌అవుట్',
@@ -1963,7 +2146,8 @@ class AppLocalizations {
       'marketplace': 'మార్కెట్‌ప్లేస్',
       'menu': 'మెనూ',
       'missing_persons': 'తప్పిపోయిన వ్యక్తులు',
-      'missing_persons_coming_soon': 'తప్పిపోయిన వ్యక్తుల ఫీచర్ త్వరలో అందుబాటులోకి వస్తుంది!',
+      'missing_persons_coming_soon':
+          'తప్పిపోయిన వ్యక్తుల ఫీచర్ త్వరలో అందుబాటులోకి వస్తుంది!',
       'nav_explore': 'ఎక్స్‌ప్లోర్',
       'nav_home': 'హోమ్',
       'nav_profile': 'ప్రొఫైల్',
@@ -1982,7 +2166,8 @@ class AppLocalizations {
       'no_recent_jobs': 'ప్రస్తుతం ఇటీవలి ఉద్యోగాలు ఏవీ అందుబాటులో లేవు.',
       'ok': 'సరే',
       'post_job': 'ఉద్యోగాన్ని పోస్ట్ చేయండి',
-      'post_job_coming_soon': 'ఉద్యోగాన్ని పోస్ట్ చేసే ఫీచర్ త్వరలో అందుబాటులోకి వస్తుంది!',
+      'post_job_coming_soon':
+          'ఉద్యోగాన్ని పోస్ట్ చేసే ఫీచర్ త్వరలో అందుబాటులోకి వస్తుంది!',
       'products': 'ఉత్పత్తులు',
       'profile_change_password': 'పాస్‌వర్డ్ మార్చండి',
       'profile_edit_profile': 'ప్రొఫైల్‌ను సవరించండి',
@@ -2005,11 +2190,15 @@ class AppLocalizations {
       'registration_email_hint': 'name@example.com',
       'registration_error_district': 'దయచేసి జిల్లాను ఎంచుకోండి.',
       'registration_error_fields': 'దయచేసి అవసరమైన అన్ని వివరాలను పూరించండి.',
-      'registration_error_otp_incomplete': 'దయచేసి పూర్తి 6-అంకెల OTPని నమోదు చేయండి.',
-      'registration_error_otp_phone': 'దయచేసి సరైన 10-అంకెల ఫోన్ నంబర్‌ను నమోదు చేయండి.',
-      'registration_error_phone_verify': 'దయచేసి మొదట మీ ఫోన్ నంబర్‌ను ధృవీకరించండి.',
+      'registration_error_otp_incomplete':
+          'దయచేసి పూర్తి 6-అంకెల OTPని నమోదు చేయండి.',
+      'registration_error_otp_phone':
+          'దయచేసి సరైన 10-అంకెల ఫోన్ నంబర్‌ను నమోదు చేయండి.',
+      'registration_error_phone_verify':
+          'దయచేసి మొదట మీ ఫోన్ నంబర్‌ను ధృవీకరించండి.',
       'registration_error_state': 'దయచేసి రాష్ట్రాన్ని ఎంచుకోండి.',
-      'registration_error_terms': 'కొనసాగడానికి దయచేసి నిబంధనలు మరియు గోప్యతా విధానాన్ని అంగీకరించండి.',
+      'registration_error_terms':
+          'కొనసాగడానికి దయచేసి నిబంధనలు మరియు గోప్యతా విధానాన్ని అంగీకరించండి.',
       'registration_full_address': 'పూర్తి చిరునామా',
       'registration_full_address_hint': 'ఇంటి నంబర్, వీధి పేరు...',
       'registration_full_name': 'పూర్తి పేరు',
@@ -2035,14 +2224,16 @@ class AppLocalizations {
       'registration_send_otp': 'OTP పంపు',
       'registration_state': 'రాష్ట్రం',
       'registration_step': 'దశ 1 లో 3',
-      'registration_success_message': 'ఈ ఈమెయిల్ ఐడితో మీరు విజయవంతంగా రిజిస్టర్ అయ్యారు: ',
+      'registration_success_message':
+          'ఈ ఈమెయిల్ ఐడితో మీరు విజయవంతంగా రిజిస్టర్ అయ్యారు: ',
       'registration_success_title': 'రిజిస్ట్రేషన్ విజయవంతమైంది',
       'registration_terms_and': ' మరియు ',
       'registration_terms_link': 'నిబంధనలు & షరతులు',
       'registration_terms_prefix': 'నేను అంగీకరిస్తున్నాను ',
       'registration_terms_privacy': 'గోప్యతా విధానం',
       'registration_terms_suffix': ' రోజ్‌గార్ అడ్డా నిబంధనలు.',
-      'registration_upload_hint': 'ఆధార్ కార్డ్, పాన్ కార్డ్, లేదా ఓటర్ ఐడి (JPG/PDF, గరిష్టంగా 2MB)',
+      'registration_upload_hint':
+          'ఆధార్ కార్డ్, పాన్ కార్డ్, లేదా ఓటర్ ఐడి (JPG/PDF, గరిష్టంగా 2MB)',
       'registration_upload_title': 'గుర్తింపు కార్డును అప్‌లోడ్ చేయండి',
       'registration_username': 'యూజర్‌నేమ్',
       'registration_username_hint': 'ప్రత్యేకమైన యూజర్‌నేమ్‌ను ఎంచుకోండి',
@@ -2052,7 +2243,8 @@ class AppLocalizations {
       'select_state_progress': '66% పూర్తయింది',
       'select_state_search_hint': 'రాష్ట్రం పేరును వెతకండి...',
       'select_state_step_label': 'దశ 2 లో 3',
-      'select_state_subheading': 'మీకు సరిపోయే ఉత్తమ స్థానిక అవకాశాలను చూడటానికి మీ రాష్ట్రాన్ని ఎంచుకోండి',
+      'select_state_subheading':
+          'మీకు సరిపోయే ఉత్తమ స్థానిక అవకాశాలను చూడటానికి మీ రాష్ట్రాన్ని ఎంచుకోండి',
       'sell_active_product': 'యాక్టివ్ ఉత్పత్తి',
       'sell_back': 'వెనుకకు',
       'sell_capacity': 'సామర్థ్యం (Capacity)',
@@ -2066,7 +2258,8 @@ class AppLocalizations {
       'sell_details': 'వివరాలు',
       'sell_discount': 'తగ్గింపు (%)',
       'sell_error_categories': 'వర్గాలను లోడ్ చేయడం సాధ్యపడలేదు.',
-      'sell_error_saving': 'ఉత్పత్తిని సేవ్ చేస్తున్నప్పుడు ఏదో తప్పు జరిగింది.',
+      'sell_error_saving':
+          'ఉత్పత్తిని సేవ్ చేస్తున్నప్పుడు ఏదో తప్పు జరిగింది.',
       'sell_error_subcategories': 'ఉప వర్గాలను లోడ్ చేయడం సాధ్యపడలేదు.',
       'sell_features': 'లక్షణాలు (కామాలతో వేరు చేయండి)',
       'sell_features_hint': 'సన్‌రూఫ్, లెదర్ సీట్లు, ఆటోపైలట్...',
@@ -2085,14 +2278,17 @@ class AppLocalizations {
       'sell_required': 'తప్పనిసరి',
       'sell_retry': 'మళ్లీ ప్రయత్నించు',
       'sell_review': 'పరిశీలన',
-      'sell_review_desc': 'మేము మీ ఉత్పత్తి వివరాలను అందుకున్నాము. మా బృందం త్వరలో దాన్ని సమీక్షిస్తుంది.',
+      'sell_review_desc':
+          'మేము మీ ఉత్పత్తి వివరాలను అందుకున్నాము. మా బృందం త్వరలో దాన్ని సమీక్షిస్తుంది.',
       'sell_review_title': 'మీ దరఖాస్తు పరిశీలనలో ఉంది',
       'sell_save_product': 'ఉత్పత్తిని సేవ్ చేయి',
-      'sell_select_main_image': 'దయచేసి ఉత్పత్తి యొక్క ప్రధాన చిత్రాన్ని ఎంచుకోండి.',
+      'sell_select_main_image':
+          'దయచేసి ఉత్పత్తి యొక్క ప్రధాన చిత్రాన్ని ఎంచుకోండి.',
       'sell_select_subcategory': 'ఉప వర్గాన్ని ఎంచుకోండి',
       'sell_selected_category': 'ఎంచుకున్న వర్గం: ',
       'sell_sub_category': 'ఉప వర్గం (Sub Category)',
-      'sell_subcategory_hint': 'ఎక్కువ మంది కొనుగోలుదారులను చేరుకోవడానికి మీ ప్రకటనకు అత్యంత సంబంధిత ఉప వర్గాన్ని ఎంచుకోండి.',
+      'sell_subcategory_hint':
+          'ఎక్కువ మంది కొనుగోలుదారులను చేరుకోవడానికి మీ ప్రకటనకు అత్యంత సంబంధిత ఉప వర్గాన్ని ఎంచుకోండి.',
       'sell_title_hint': 'ఉత్పత్తి పేరును నమోదు చేయండి (ఉదా. BMW X5 2024)',
       'sell_total_cost': 'మొత్తం ఖర్చు (₹)',
       'sell_warranty': 'వారంటీ (Warranty)',
@@ -2115,9 +2311,11 @@ class AppLocalizations {
       'splash_menu_employer_login': 'యజమాని లాగిన్',
       'splash_menu_employer_register': 'యజమాని నమోదు',
       'employer_login_title': 'యజమాని ప్రవేశం',
-      'employer_login_subtitle': 'ఉద్యోగాలు పోస్ట్ చేయడానికి మరియు దరఖాస్తులను చూడటానికి లాగిన్ అవ్వండి',
+      'employer_login_subtitle':
+          'ఉద్యోగాలు పోస్ట్ చేయడానికి మరియు దరఖాస్తులను చూడటానికి లాగిన్ అవ్వండి',
       'employer_register_title': 'కంపెనీ నమోదు',
-      'employer_register_subtitle': 'ఉత్తమ స్థానిక ప్రతిభావంతులను కనుగొనడానికి యజమాని ఖాతాను సృష్టించండి',
+      'employer_register_subtitle':
+          'ఉత్తమ స్థానిక ప్రతిభావంతులను కనుగొనడానికి యజమాని ఖాతాను సృష్టించండి',
       'employer_dashboard_title': 'యజమాని డాష్‌బోర్డ్',
       'employer_dashboard_total_jobs': 'మొత్తం ఉద్యోగాలు',
       'employer_dashboard_total_applications': 'దరఖాస్తులు',
@@ -2125,9 +2323,11 @@ class AppLocalizations {
       'employer_dashboard_active_jobs': 'యాక్టివ్ ఉద్యోగాలు',
       'employer_dashboard_post_job': 'ఉద్యోగాన్ని పోస్ట్ చేయి',
       'employer_dashboard_view_applicants': 'దరఖాతుదారులను చూడు',
-      'employer_dashboard_no_jobs': 'ఇంకా ఎలాంటి ఉద్యోగాలు పోస్ట్ చేయలేదు. మీ మొదటి ఉద్యోగాన్ని పోస్ట్ చేయడానికి + క్లిక్ చేయండి!',
+      'employer_dashboard_no_jobs':
+          'ఇంకా ఎలాంటి ఉద్యోగాలు పోస్ట్ చేయలేదు. మీ మొదటి ఉద్యోగాన్ని పోస్ట్ చేయడానికి + క్లిక్ చేయండి!',
       'employer_dashboard_applicants_title': 'ఉద్యోగ దరఖాస్తుదారులు',
-      'employer_dashboard_no_applicants': 'ఈ ఉద్యోగానికి ఇంకా దరఖాస్తులు రాలేదు.',
+      'employer_dashboard_no_applicants':
+          'ఈ ఉద్యోగానికి ఇంకా దరఖాస్తులు రాలేదు.',
     },
   };
 

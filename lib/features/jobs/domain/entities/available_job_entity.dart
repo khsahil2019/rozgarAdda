@@ -40,6 +40,9 @@ class AvailableJob {
   final String? walkinEndTime;
   final String? walkinVenue;
   final DateTime createdAt;
+  final int? stateId;
+  final int? districtId;
+  final int? localiteId;
 
   const AvailableJob({
     required this.id,
@@ -83,6 +86,9 @@ class AvailableJob {
     this.walkinEndTime,
     this.walkinVenue,
     required this.createdAt,
+    this.stateId,
+    this.districtId,
+    this.localiteId,
   });
 
   /// Human-readable salary display string

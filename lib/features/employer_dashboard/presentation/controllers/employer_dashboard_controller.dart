@@ -13,7 +13,8 @@ class EmployerDashboardController extends GetxController {
 
   final RxInt employerId = 0.obs;
   final RxList<AvailableJob> postedJobs = <AvailableJob>[].obs;
-  final RxMap<int, List<JobApplication>> jobApplications = <int, List<JobApplication>>{}.obs;
+  final RxMap<int, List<JobApplication>> jobApplications =
+      <int, List<JobApplication>>{}.obs;
   final RxBool isLoading = false.obs;
 
   @override
@@ -26,7 +27,8 @@ class EmployerDashboardController extends GetxController {
     isLoading.value = true;
     try {
       final prefs = await SharedPreferences.getInstance();
-      final empId = prefs.getInt('employer_id') ?? 2001; // Fallback to seeded employer
+      final empId =
+          prefs.getInt('employer_id') ?? 2001; // Fallback to seeded employer
       employerId.value = empId;
       final token = prefs.getString('employer_token');
 
@@ -38,10 +40,16 @@ class EmployerDashboardController extends GetxController {
             ApiRoutes.employerJobs,
             accessToken: token,
           );
-          if (res['status'] == true && res['jobs'] != null) {
-            final jobsData = res['jobs']['data'] as List<dynamic>? ?? [];
+          if (res['status'] == true &&
+              res['jobs']['data'] != null &&
+              res['jobs']['data'].isNotEmpty) {
+            final List<dynamic> jobsData = res['jobs']['data'] ?? [];
             jobs = jobsData
-                .map((j) => AvailableJobModel.fromJson(j as Map<String, dynamic>).toEntity())
+                .map<AvailableJob>(
+                  (j) => AvailableJobModel.fromJson(
+                    j as Map<String, dynamic>,
+                  ).toEntity(),
+                )
                 .toList();
           } else {
             await db.init();
@@ -92,24 +100,73 @@ class EmployerDashboardController extends GetxController {
         throw Failure('Authentication token not found. Please login again.');
       }
 
-      final body = {
-        'category_id': newJob.categoryId.toString(),
-        'role_id': newJob.roleId.toString(),
+      final body = <String, dynamic>{
+        'category_id': newJob.categoryId,
+        'role_id': newJob.roleId,
         'title': newJob.title,
+        'vacancy': newJob.vacancy,
         'job_type': newJob.jobType,
         'work_location_type': newJob.workLocationType,
         'pay_type': newJob.payType,
         'education_level': newJob.educationLevel,
         'english_level': newJob.englishLevel,
         'experience_level': newJob.experienceLevel,
-        'plan_id': '2',
-        if (newJob.minSalary != null && newJob.minSalary!.isNotEmpty)
-          'min_salary': newJob.minSalary,
-        if (newJob.maxSalary != null && newJob.maxSalary!.isNotEmpty)
-          'max_salary': newJob.maxSalary,
-        if (newJob.fixedSalary != null && newJob.fixedSalary!.isNotEmpty)
-          'fixed_salary': newJob.fixedSalary,
+        'plan_id': 1,
+        'skills': newJob.skills,
+        'languages': newJob.languages,
+        'perks': newJob.perks,
+        'shifts': newJob.shifts,
+        'is_walkin': newJob.isWalkin ? 1 : 0,
+        'contact_preference': newJob.contactPreference,
       };
+
+      // Add conditional location fields
+      if (newJob.workLocationType == 'office') {
+        body['office_state_id'] = newJob.stateId;
+        body['office_district_id'] = newJob.districtId;
+        body['office_localite_id'] = newJob.localiteId;
+        body['office_address_line1'] = newJob.addressLine1;
+        body['office_pincode'] = newJob.pincode;
+        if (newJob.addressLine2.isNotEmpty) {
+          body['office_address_line2'] = newJob.addressLine2;
+        }
+      } else if (newJob.workLocationType == 'field') {
+        body['field_state_id'] = newJob.stateId;
+        body['field_district_id'] = newJob.districtId;
+        body['field_localite_id'] = newJob.localiteId;
+        body['field_address_line1'] = newJob.addressLine1;
+        body['field_pincode'] = newJob.pincode;
+        if (newJob.addressLine2.isNotEmpty) {
+          body['field_address_line2'] = newJob.addressLine2;
+        }
+      }
+
+      // Add conditional salary fields
+      if (newJob.payType == 'fixed') {
+        body['min_salary'] = int.tryParse(newJob.minSalary ?? '') ?? 0;
+        body['max_salary'] = int.tryParse(newJob.maxSalary ?? '') ?? 0;
+      } else if (newJob.payType == 'fixed_inc') {
+        body['fixed_salary'] = int.tryParse(newJob.fixedSalary ?? '') ?? 0;
+        body['avg_incentive'] = int.tryParse(newJob.avgIncentive ?? '') ?? 0;
+      } else if (newJob.payType == 'inc_only') {
+        body['estimated_incentive'] =
+            int.tryParse(newJob.estimatedIncentive ?? '') ?? 0;
+      }
+
+      // Add conditional walk-in fields
+      if (newJob.isWalkin) {
+        body['walkin_date'] = newJob.walkinDate;
+        body['walkin_time'] = newJob.walkinTime;
+        body['walkin_end_time'] = newJob.walkinEndTime;
+        body['walkin_venue'] = newJob.walkinVenue;
+      }
+
+      // Add conditional contact fields
+      if (newJob.contactPreference == 'other') {
+        body['contact_person'] = newJob.contactPerson;
+        body['contact_phone'] = newJob.contactPhone;
+        body['contact_email'] = newJob.contactEmail;
+      }
 
       final res = await ApiService.post(
         ApiRoutes.postJob,
@@ -127,13 +184,17 @@ class EmployerDashboardController extends GetxController {
     }
   }
 
-  Future<void> updateApplicationStatus(int jobId, int appId, String status) async {
+  Future<void> updateApplicationStatus(
+    int jobId,
+    int appId,
+    String status,
+  ) async {
     await db.updateApplicationStatus(appId, status);
-    
+
     // Refresh applicants
     final apps = await db.getJobApplications(jobId);
     jobApplications[jobId] = apps;
-    
+
     // Update local applications count or lists
     final jobIndex = postedJobs.indexWhere((j) => j.id == jobId);
     if (jobIndex != -1) {

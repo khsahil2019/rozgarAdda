@@ -5,6 +5,7 @@ import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
+import 'package:rojgar/features/jobs/presentation/widgets/job_card_widget.dart';
 
 class _Colors {
   static const Color primaryBlue = Color(0xFF1400FF);
@@ -112,7 +113,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       educationLevel: '10th Pass',
       englishLevel: 'Basic',
       experienceLevel: '1-3',
-      additionalRequirements: const {},
+      additionalRequirements: {},
       skills: const ['Driving', 'GPS'],
       languages: const ['Marathi', 'Hindi'],
       vacancy: 3,
@@ -143,7 +144,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       educationLevel: '12th Pass',
       englishLevel: 'Intermediate',
       experienceLevel: '1-3',
-      additionalRequirements: const {},
+      additionalRequirements: {},
       skills: const ['Excel', 'Data entry'],
       languages: const ['Marathi', 'English'],
       vacancy: 2,
@@ -174,7 +175,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       educationLevel: '12th Pass',
       englishLevel: 'Basic',
       experienceLevel: '1-3',
-      additionalRequirements: const {},
+      additionalRequirements: {},
       skills: const ['Administration', 'Typing'],
       languages: const ['Marathi', 'Hindi'],
       vacancy: 1,
@@ -235,7 +236,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       educationLevel: '10th Pass',
       englishLevel: 'Basic',
       experienceLevel: 'fresher',
-      additionalRequirements: const {},
+      additionalRequirements: {},
       skills: const ['Inventory management', 'Packaging'],
       languages: const ['Gujarati', 'Hindi'],
       vacancy: 25,
@@ -992,285 +993,12 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   }
 
   Widget _buildVerticalJobCard(AvailableJob job, AppLocalizations l10n) {
-    final lang = l10n.locale.languageCode;
-    final localizedTitle = _getLocalizedTitle(job.title, lang);
-    final localizedSubcategory = _getLocalizedTitle(job.title, lang);
-    final localizedLocation = job.stateName;
-    final localizedJobType = _getLocalizedJobType(job.jobType, lang);
-    final localizedExperience = _getLocalizedExperience(
-      job.experienceLevel,
-      lang,
-    );
-    final localizedEducation = _getLocalizedEducation(job.educationLevel, lang);
-
-    return Container(
-      color: Colors.white,
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          GestureDetector(
-            onTap: () => _navigateToDetail(job),
-            behavior: HitTestBehavior.opaque,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: NetworkImageService(
-                        imageUrl: _getJobImageUrl(job),
-                        width: 56,
-                        height: 56,
-                        fit: BoxFit.cover,
-                        errorWidget: Container(
-                          width: 56,
-                          height: 56,
-                          color: _Colors.chipBg,
-                          child: const Icon(
-                            Icons.work_outline_rounded,
-                            color: _Colors.primaryBlue,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  localizedTitle,
-                                  style: const TextStyle(
-                                    color: Color(0xFF007AFF),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(
-                                Icons.arrow_forward,
-                                color: Color(0xFF007AFF),
-                                size: 14,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            job.addressLine1.isNotEmpty
-                                ? job.addressLine1
-                                : 'Company',
-                            style: const TextStyle(
-                              color: _Colors.darkText,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            localizedSubcategory,
-                            style: const TextStyle(
-                              color: _Colors.grey,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            job.salaryDisplay,
-                            style: const TextStyle(
-                              color: _Colors.green,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(
-                      Icons.favorite_border_rounded,
-                      color: Colors.grey,
-                      size: 24,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF1F2F5),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '${job.vacancy} ${job.vacancy == 1 ? "Vacancy" : "Vacancies"}',
-                    style: const TextStyle(
-                      color: _Colors.darkText,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Divider(color: Color(0xFFE7E9EE), height: 1),
-                const SizedBox(height: 12),
-                Table(
-                  columnWidths: const {
-                    0: FlexColumnWidth(1.1),
-                    1: FlexColumnWidth(0.9),
-                  },
-                  children: [
-                    TableRow(
-                      children: [
-                        _buildMetadataItem(
-                          Icons.location_on,
-                          localizedLocation,
-                        ),
-                        _buildMetadataItem(
-                          Icons.access_time_filled,
-                          localizedJobType,
-                        ),
-                      ],
-                    ),
-                    const TableRow(
-                      children: [SizedBox(height: 8), SizedBox(height: 8)],
-                    ),
-                    TableRow(
-                      children: [
-                        _buildMetadataItem(Icons.work, localizedExperience),
-                        _buildMetadataItem(Icons.menu_book, localizedEducation),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              PopupMenuButton<String>(
-                icon: const Icon(
-                  Icons.more_vert_rounded,
-                  color: Colors.grey,
-                  size: 24,
-                ),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                onSelected: (value) {
-                  if (value == 'share') {
-                    _shareJob(job);
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'share',
-                    child: Row(
-                      children: [
-                        Icon(Icons.share, size: 18, color: _Colors.darkText),
-                        SizedBox(width: 8),
-                        Text('Share Job'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                flex: 4,
-                child: SizedBox(
-                  height: 40,
-                  child: OutlinedButton.icon(
-                    onPressed: () => _openWhatsApp(job.contactPhone, job.title),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
-                        color: Color(0xFFD7DADF),
-                        width: 1.2,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      foregroundColor: _Colors.darkText,
-                      padding: EdgeInsets.zero,
-                    ),
-                    icon: SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: Image.asset(
-                        'assets/icons/whatsapp.png',
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
-                              Icons.chat_bubble_outline_rounded,
-                              size: 16,
-                              color: Color(0xFF25D366),
-                            ),
-                      ),
-                    ),
-                    label: const Text(
-                      'Chat',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: _Colors.darkText,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                flex: 5,
-                child: SizedBox(
-                  height: 40,
-                  child: ElevatedButton.icon(
-                    onPressed: () => _makeCall(job.contactPhone),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _Colors.primaryBlue,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: EdgeInsets.zero,
-                    ),
-                    icon: const Icon(
-                      Icons.phone_rounded,
-                      size: 16,
-                      color: Colors.white,
-                    ),
-                    label: Text(
-                      lang == 'mr' ? 'कॉल' : 'Call',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+    return JobCardWidget(
+      job: job,
+      onTap: () => _navigateToDetail(job),
+      onWhatsAppTap: () => _openWhatsApp(job.contactPhone, job.title),
+      onCallTap: () => _makeCall(job.contactPhone),
+      onShareTap: () => _shareJob(job),
     );
   }
 

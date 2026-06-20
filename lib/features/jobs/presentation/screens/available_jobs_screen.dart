@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
+import 'package:rojgar/features/jobs/presentation/widgets/job_card_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/widgets/network_image_service.dart';
 import '../../../../localization/app_localizations.dart';
@@ -608,7 +609,9 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
           ),
           const SizedBox(width: 10),
           _buildFilterChip(
-            label: _jobTypeOptions[_selectedJobTypeIndex],
+            label: _selectedJobTypeIndex == 0
+                ? 'Job Type'
+                : _jobTypeOptions[_selectedJobTypeIndex],
             onTap: () => _showFilterSheet(
               categories: categories,
               initialSection: _FilterSection.jobType,
@@ -669,8 +672,8 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          constraints: const BoxConstraints(minWidth: 120),
-          padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 5.sp),
+          constraints: BoxConstraints(minWidth: 35.sp, maxWidth: 180.sp),
+          padding: EdgeInsets.symmetric(horizontal: 5.sp, vertical: 3.sp),
           decoration: BoxDecoration(
             color: _C.cardBg,
             borderRadius: BorderRadius.circular(12),
@@ -683,14 +686,14 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                 child: Text(
                   label,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: 13.sp,
                     color: _C.chipText,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 1.w),
               const Icon(
                 Icons.keyboard_arrow_down_rounded,
                 color: _C.lightGrey,
@@ -770,294 +773,12 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     String categoryImageUrl,
     AppLocalizations l10n,
   ) {
-    return Container(
-      decoration: const BoxDecoration(color: _C.cardBg),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => JobDetailScreen(
-                  jobId: job.id,
-                  jobTitle: job.title,
-                  company: job.stateName.isNotEmpty ? job.stateName : 'Company',
-                  location: job.addressLine1.isNotEmpty
-                      ? job.addressLine1
-                      : job.stateName,
-                  salary: job.salaryDisplay,
-                  jobType: job.jobTypeLabel,
-                  contactPhone: job.contactPhone,
-                ),
-              ),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top Part: Logo, Title, Salary Column, and Share button
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: NetworkImageService(
-                        imageUrl: categoryImageUrl,
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.cover,
-                        errorWidget: Container(
-                          width: 48,
-                          height: 48,
-                          color: _C.chipBg,
-                          child: const Icon(
-                            Icons.work_outline_rounded,
-                            color: _C.primaryBlue,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            job.title,
-                            style: const TextStyle(
-                              color: _C.darkText,
-                              fontSize: 17,
-                              fontWeight: FontWeight.w800,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            job.salaryDisplay,
-                            style: const TextStyle(
-                              color: _C.grey,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () => _shareJob(job),
-                      child: const Icon(
-                        Icons.share_outlined,
-                        color: _C.grey,
-                        size: 22,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                // Company Row
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.business_outlined,
-                      color: _C.grey,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        job.stateName.isNotEmpty ? job.stateName : 'Company',
-                        style: const TextStyle(
-                          color: _C.grey,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-
-                // Location Row
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on_outlined,
-                      color: _C.grey,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        job.addressLine1.isNotEmpty
-                            ? job.addressLine1
-                            : job.stateName,
-                        style: const TextStyle(
-                          color: _C.grey,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                // Vacancies badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF1F2F5),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    '${job.vacancy} Vacancies',
-                    style: const TextStyle(
-                      color: _C.grey,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 14),
-
-                // Bottom Buttons Row
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 4,
-                      child: SizedBox(
-                        height: 38,
-                        child: OutlinedButton.icon(
-                          onPressed: () =>
-                              _openWhatsApp(job.contactPhone, job.title),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(
-                              color: Color(0xFF25D366),
-                              width: 1.2,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            foregroundColor: const Color(0xFF25D366),
-                            padding: EdgeInsets.zero,
-                          ),
-                          icon: SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: Image.asset(
-                              'assets/icons/whatsapp.png',
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                    Icons.chat_bubble_outline_rounded,
-                                    size: 16,
-                                    color: Color(0xFF25D366),
-                                  ),
-                            ),
-                          ),
-                          label: const Text(
-                            'Chat',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      flex: 4,
-                      child: SizedBox(
-                        height: 38,
-                        child: ElevatedButton.icon(
-                          onPressed: () => _makeCall(job.contactPhone),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _C.primaryBlue,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.zero,
-                          ),
-                          icon: const Icon(
-                            Icons.phone_rounded,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                          label: Text(
-                            l10n.locale.languageCode == 'mr'
-                                ? 'कॉल करा'
-                                : 'Call HR',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => JobDetailScreen(
-                              jobId: job.id,
-                              jobTitle: job.title,
-                              company: job.stateName.isNotEmpty
-                                  ? job.stateName
-                                  : 'Company',
-                              location: job.addressLine1.isNotEmpty
-                                  ? job.addressLine1
-                                  : job.stateName,
-                              salary: job.salaryDisplay,
-                              jobType: job.jobTypeLabel,
-                              contactPhone: job.contactPhone,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: _C.borderGrey, width: 1.2),
-                        ),
-                        child: const Icon(
-                          Icons.chevron_right_rounded,
-                          size: 22,
-                          color: _C.darkText,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                const Divider(color: Color(0xFFE7E9EE), height: 1),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return JobCardWidget(
+      job: job,
+      imageUrl: categoryImageUrl,
+      onWhatsAppTap: () => _openWhatsApp(job.contactPhone, job.title),
+      onCallTap: () => _makeCall(job.contactPhone),
+      onShareTap: () => _shareJob(job),
     );
   }
 
