@@ -58,7 +58,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
   int _selectedExperienceIndex = 0;
   int _selectedFreshnessIndex = 0;
   int _selectedLocationIndex = 0;
-  String _currentLocation = 'Fetching location...';
+  // String _currentLocation = 'Fetching location...';
   static const List<String> _jobTypeOptions = [
     'Any',
     'Full-time',
@@ -107,81 +107,81 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     'Gurugram',
   ];
 
-  Future<void> _getCurrentLocation() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        setState(() {
-          _currentLocation = 'Location services disabled';
-        });
-        return;
-      }
+  // Future<void> _getCurrentLocation() async {
+  //   try {
+  //     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //     if (!serviceEnabled) {
+  //       setState(() {
+  //         _currentLocation = 'Location services disabled';
+  //       });
+  //       return;
+  //     }
 
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          setState(() {
-            _currentLocation = 'Location permission denied';
-          });
-          return;
-        }
-      }
+  //     LocationPermission permission = await Geolocator.checkPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       permission = await Geolocator.requestPermission();
+  //       if (permission == LocationPermission.denied) {
+  //         setState(() {
+  //           _currentLocation = 'Location permission denied';
+  //         });
+  //         return;
+  //       }
+  //     }
 
-      if (permission == LocationPermission.deniedForever) {
-        setState(() {
-          _currentLocation = 'Location permission permanently denied';
-        });
-        return;
-      }
+  //     if (permission == LocationPermission.deniedForever) {
+  //       setState(() {
+  //         _currentLocation = 'Location permission permanently denied';
+  //       });
+  //       return;
+  //     }
 
-      Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.low,
-        ),
-      );
+  //     Position position = await Geolocator.getCurrentPosition(
+  //       locationSettings: const LocationSettings(
+  //         accuracy: LocationAccuracy.low,
+  //       ),
+  //     );
 
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
+  //     List<Placemark> placemarks = await placemarkFromCoordinates(
+  //       position.latitude,
+  //       position.longitude,
+  //     );
 
-      if (placemarks.isNotEmpty) {
-        final placemark = placemarks.first;
-        final locality = placemark.subLocality ?? placemark.locality ?? '';
-        final subAdministrativeArea = placemark.subAdministrativeArea ?? '';
-        final administrativeArea = placemark.administrativeArea ?? '';
+  //     if (placemarks.isNotEmpty) {
+  //       final placemark = placemarks.first;
+  //       final locality = placemark.subLocality ?? placemark.locality ?? '';
+  //       final subAdministrativeArea = placemark.subAdministrativeArea ?? '';
+  //       final administrativeArea = placemark.administrativeArea ?? '';
 
-        String formattedLocation = '';
-        if (locality.isNotEmpty) {
-          formattedLocation += locality;
-        }
-        if (subAdministrativeArea.isNotEmpty) {
-          if (formattedLocation.isNotEmpty) formattedLocation += ', ';
-          formattedLocation += subAdministrativeArea;
-        } else if (administrativeArea.isNotEmpty) {
-          if (formattedLocation.isNotEmpty) formattedLocation += ', ';
-          formattedLocation += administrativeArea;
-        }
+  //       String formattedLocation = '';
+  //       if (locality.isNotEmpty) {
+  //         formattedLocation += locality;
+  //       }
+  //       if (subAdministrativeArea.isNotEmpty) {
+  //         if (formattedLocation.isNotEmpty) formattedLocation += ', ';
+  //         formattedLocation += subAdministrativeArea;
+  //       } else if (administrativeArea.isNotEmpty) {
+  //         if (formattedLocation.isNotEmpty) formattedLocation += ', ';
+  //         formattedLocation += administrativeArea;
+  //       }
 
-        if (formattedLocation.isEmpty) {
-          formattedLocation = 'Noida';
-        }
+  //       if (formattedLocation.isEmpty) {
+  //         formattedLocation = 'Noida';
+  //       }
 
-        setState(() {
-          _currentLocation = formattedLocation;
-        });
-      } else {
-        setState(() {
-          _currentLocation = 'Noida';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _currentLocation = 'Film City, Noida';
-      });
-    }
-  }
+  //       setState(() {
+  //         _currentLocation = formattedLocation;
+  //       });
+  //     } else {
+  //       setState(() {
+  //         _currentLocation = 'Noida';
+  //       });
+  //     }
+  //   } catch (e) {
+  //     setState(() {
+  //       _currentLocation = 'Film City, Noida';
+  //     });
+  //   }
+  // }
 
   @override
   void initState() {
@@ -206,7 +206,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
       controller.fetchAvailableJobs(widget.role.id);
 
       // Fetch current location
-      await _getCurrentLocation();
+      // await _getCurrentLocation();
     });
   }
 
@@ -459,8 +459,8 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                 children: [
                                   _buildFilterRow(categories),
                                   const SizedBox(height: 18),
-                                  _buildLocationRow(),
-                                  const SizedBox(height: 8),
+                                  // _buildLocationRow(),
+                                  // const SizedBox(height: 8),
                                   _buildCategoryHint(selectedCategoryName),
                                   const SizedBox(height: 18),
                                 ],
@@ -706,48 +706,48 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     );
   }
 
-  Widget _buildLocationRow() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Text.rich(
-            TextSpan(
-              children: [
-                const TextSpan(
-                  text: 'Jobs near ',
-                  style: TextStyle(
-                    color: _C.grey,
-                    fontSize: 19,
-                    fontWeight: FontWeight.w400,
-                    height: 1.25,
-                  ),
-                ),
-                TextSpan(
-                  text: _currentLocation,
-                  style: const TextStyle(
-                    color: _C.primaryBlue,
-                    fontSize: 19,
-                    fontWeight: FontWeight.w800,
-                    height: 1.25,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        const Padding(
-          padding: EdgeInsets.only(top: 14),
-          child: Icon(
-            Icons.chevron_right_rounded,
-            color: _C.primaryBlue,
-            size: 34,
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildLocationRow() {
+  //   return Row(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Expanded(
+  //         child: Text.rich(
+  //           TextSpan(
+  //             children: [
+  //               const TextSpan(
+  //                 text: 'Jobs near ',
+  //                 style: TextStyle(
+  //                   color: _C.grey,
+  //                   fontSize: 19,
+  //                   fontWeight: FontWeight.w400,
+  //                   height: 1.25,
+  //                 ),
+  //               ),
+  //               TextSpan(
+  //                 text: _currentLocation,
+  //                 style: const TextStyle(
+  //                   color: _C.primaryBlue,
+  //                   fontSize: 19,
+  //                   fontWeight: FontWeight.w800,
+  //                   height: 1.25,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //       const SizedBox(width: 10),
+  //       const Padding(
+  //         padding: EdgeInsets.only(top: 14),
+  //         child: Icon(
+  //           Icons.chevron_right_rounded,
+  //           color: _C.primaryBlue,
+  //           size: 34,
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildCategoryHint(String selectedCategoryName) {
     return Container(

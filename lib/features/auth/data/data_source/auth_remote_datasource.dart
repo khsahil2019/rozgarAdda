@@ -18,6 +18,7 @@ abstract class AuthRemoteDataSource {
     required String pincode,
     required String address,
     String? identityProofPath,
+    required String termsAccepted,
   });
   Future<List<DropdownItem>> getStates();
   Future<List<DropdownItem>> getDistricts(int stateId);
@@ -62,6 +63,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String pincode,
     required String address,
     String? identityProofPath,
+    String termsAccepted = '0',
   }) async {
     try {
       final fields = {
@@ -75,6 +77,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'locality': locality,
         'pincode': pincode,
         'address': address,
+        "terms_accepted": termsAccepted,
       };
 
       Map<String, dynamic> res;
@@ -86,10 +89,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           files: {'identity_proof': identityProofPath},
         );
       } else {
-        res = await ApiService.post(
-          ApiRoutes.register,
-          body: fields,
-        );
+        res = await ApiService.post(ApiRoutes.register, body: fields);
       }
 
       if ((res['statusCode'] == 200 || res['statusCode'] == 201) &&

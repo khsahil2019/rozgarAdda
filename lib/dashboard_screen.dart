@@ -1621,19 +1621,25 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                           setState(() {
                             _selected = i;
                           });
-                          if (item.label == 'Products') {
+                          if (item.label == 'Home') {
+                            widget.onClose();
+                          } else if (item.label == 'Products') {
                             Get.to(
                               () => const ProductCategoryListScreen(),
                               binding: BuyProductBinding(),
                             );
-                          }
-                          if (item.label == 'Messages') {
+                          } else if (item.label == 'Messages') {
                             if (!Get.isRegistered<ChatController>()) {
                               ChatBinding().dependencies();
                             }
                             Get.to(() => const ChatUserListScreen());
-                          }
-                          if (item.label == 'KYC Status') {
+                          } else if (item.label == 'Find Jobs') {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const SelectCategoryScreen(),
+                              ),
+                            );
+                          } else if (item.label == 'KYC Status') {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) => const EditKycScreen(),
@@ -1644,6 +1650,17 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                               MaterialPageRoute(
                                 builder: (_) =>
                                     const SellProductCategoryScreen(),
+                              ),
+                            );
+                          } else {
+                            widget.onClose();
+                            final displayName = AppLocalizations.of(context).text(
+                              item.label.toLowerCase().replaceAll(' ', '_'),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("$displayName coming soon"),
+                                duration: const Duration(seconds: 2),
                               ),
                             );
                           }

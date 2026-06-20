@@ -17,6 +17,7 @@ abstract class AuthRepository {
     required String pincode,
     required String address,
     String? identityProofPath,
+    String? termsAccepted,
   });
   Future<Either<Failure, List<DropdownItem>>> getStates();
   Future<Either<Failure, List<DropdownItem>>> getDistricts(int stateId);

@@ -276,6 +276,7 @@ class RegisterController extends GetxController {
         pincode: pincode.value.trim(),
         address: address.value.trim(),
         identityProofPath: identityProofPath.value,
+        termsAccepted: acceptedTerms.value ? '1' : '0',
       );
 
       return either.fold((failure) => throw failure, (result) {

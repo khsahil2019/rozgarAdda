@@ -37,6 +37,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String pincode,
     required String address,
     String? identityProofPath,
+    String? termsAccepted,
   }) async {
     try {
       final result = await remoteDataSource.register(
@@ -51,6 +52,7 @@ class AuthRepositoryImpl implements AuthRepository {
         pincode: pincode,
         address: address,
         identityProofPath: identityProofPath,
+        termsAccepted: termsAccepted ?? '0',
       );
       return Right(result);
     } catch (e) {
