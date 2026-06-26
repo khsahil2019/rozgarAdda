@@ -109,4 +109,3 @@ class JobsController extends GetxController {
     fetchAvailableJobs(role.id);
   }
 }
-

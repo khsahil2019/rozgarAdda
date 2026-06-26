@@ -169,17 +169,8 @@ class JobCardWidget extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => JobDetailScreen(
-          jobId: job.id,
-          jobTitle: job.title,
-          company: job.stateName.isNotEmpty ? job.stateName : 'Company',
-          location: job.addressLine1.isNotEmpty
-              ? job.addressLine1
-              : job.stateName,
-          salary: job.salaryDisplay,
-          jobType: job.jobTypeLabel,
-          contactPhone: job.contactPhone,
-        ),
+        builder: (_) =>
+            JobDetailScreen(job: job, imageUrl: _getJobImageUrl(job)),
       ),
     );
   }
@@ -443,7 +434,11 @@ class JobCardWidget extends StatelessWidget {
                     value: 'share',
                     child: Row(
                       children: [
-                        Icon(Icons.share, size: 18, color: _CardColors.darkText),
+                        Icon(
+                          Icons.share,
+                          size: 18,
+                          color: _CardColors.darkText,
+                        ),
                         SizedBox(width: 8),
                         Text('Share Job'),
                       ],
@@ -495,7 +490,7 @@ class JobCardWidget extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
-                flex: 5,
+                flex: 4,
                 child: SizedBox(
                   height: 40,
                   child: ElevatedButton.icon(

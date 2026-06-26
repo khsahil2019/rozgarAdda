@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:open_share_plus/open.dart';
+// import 'package:open_whatsapp/open_whatsapp.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/features/jobs/presentation/widgets/job_card_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -316,19 +318,20 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
       return;
     }
     final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
-    final message = Uri.encodeComponent(
-      'Hello, I am interested in your job posting: "$title".',
-    );
-    final Uri url = Uri.parse('https://wa.me/$cleanPhone?text=$message');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      Get.snackbar(
-        'Error',
-        'Could not open WhatsApp. Please check if WhatsApp is installed.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
+    final message = "Hello, I am interested in your job posting: \"$title\".";
+    Open.whatsApp(whatsAppNumber: cleanPhone, text: message);
+
+    // FlutterOpenWhatsapp.sendSingleMessage(cleanPhone, message);
+
+    // if (true) {
+    //   await launchUrl(url);
+    // } else {
+    //   Get.snackbar(
+    //     'Error',
+    //     'Could not open WhatsApp. Please check if WhatsApp is installed.',
+    //     snackPosition: SnackPosition.BOTTOM,
+    //   );
+    // }
   }
 
   Future<void> _shareJob(AvailableJob job) async {
@@ -776,7 +779,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     return JobCardWidget(
       job: job,
       imageUrl: categoryImageUrl,
-      onWhatsAppTap: () => _openWhatsApp(job.contactPhone, job.title),
+      onWhatsAppTap: () => _openWhatsApp(job.whatsappNumber, job.title),
       onCallTap: () => _makeCall(job.contactPhone),
       onShareTap: () => _shareJob(job),
     );

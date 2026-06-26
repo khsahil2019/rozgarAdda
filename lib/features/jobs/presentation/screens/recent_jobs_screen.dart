@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:open_share_plus/open.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/localization/app_localizations.dart';
@@ -1564,19 +1565,18 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       return;
     }
     final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
-    final message = Uri.encodeComponent(
-      'Hello, I am interested in your job posting: "$title".',
-    );
-    final Uri url = Uri.parse('https://wa.me/$cleanPhone?text=$message');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      Get.snackbar(
-        'Error',
-        'Could not open WhatsApp. Please check if WhatsApp is installed.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
+    final message = 'Hello, I am interested in your job posting: "$title".';
+    Open.whatsApp(whatsAppNumber: cleanPhone, text: message);
+    // final Uri url = Uri.parse('https://wa.me/$cleanPhone?text=$message');
+    // if (await canLaunchUrl(url)) {
+    //   await launchUrl(url);
+    // } else {
+    //   Get.snackbar(
+    //     'Error',
+    //     'Could not open WhatsApp. Please check if WhatsApp is installed.',
+    //     snackPosition: SnackPosition.BOTTOM,
+    //   );
+    // }
   }
 
   Future<void> _shareJob(AvailableJob job) async {
@@ -1590,19 +1590,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   void _navigateToDetail(AvailableJob job) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => JobDetailScreen(
-          jobId: job.id,
-          jobTitle: job.title,
-          company: job.stateName.isNotEmpty ? job.stateName : 'Company',
-          location: job.addressLine1.isNotEmpty
-              ? job.addressLine1
-              : job.stateName,
-          salary: job.salaryDisplay,
-          jobType: job.jobTypeLabel,
-          contactPhone: job.contactPhone,
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => JobDetailScreen(job: job)),
     );
   }
 }

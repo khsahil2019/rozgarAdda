@@ -3,7 +3,7 @@ import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────
-class AppColors {
+class _HubColors {
   static const Color background = Color(0xFFF2F2F7);
   static const Color white = Colors.white;
   static const Color primaryBlue = Color(0xFF1A1AE6);
@@ -100,12 +100,12 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
     final l10n = AppLocalizations.of(context);
     final topPad = MediaQuery.of(context).padding.top;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: _HubColors.background,
       body: Column(
         children: [
           // ── App Bar + Search (white section) ──────────────────────────────
           Container(
-            color: AppColors.white,
+            color: _HubColors.white,
             padding: EdgeInsets.fromLTRB(20, topPad + 12, 20, 0),
             child: Column(
               children: [
@@ -125,7 +125,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const JobDetailScreen(),
+                    builder: (context) => JobDetailScreen.placeholder(),
                   ),
                 );
               },
@@ -138,7 +138,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const JobDetailScreen(),
+                        builder: (context) => JobDetailScreen.placeholder(),
                       ),
                     );
                   },
@@ -160,7 +160,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
           width: 38,
           height: 38,
           decoration: BoxDecoration(
-            color: AppColors.primaryBlue,
+            color: _HubColors.primaryBlue,
             borderRadius: BorderRadius.circular(10),
           ),
           child: const Icon(Icons.work_rounded, color: Colors.white, size: 22),
@@ -171,7 +171,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: AppColors.appBarText,
+            color: _HubColors.appBarText,
             letterSpacing: -0.2,
           ),
         ),
@@ -180,12 +180,12 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
           width: 42,
           height: 42,
           decoration: BoxDecoration(
-            color: AppColors.background,
+            color: _HubColors.background,
             shape: BoxShape.circle,
           ),
           child: const Icon(
             Icons.notifications_rounded,
-            color: AppColors.appBarText,
+            color: _HubColors.appBarText,
             size: 22,
           ),
         ),
@@ -198,19 +198,19 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
       height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColors.searchBg,
+        color: _HubColors.searchBg,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
         children: [
           const Icon(Icons.search_rounded,
-              color: AppColors.greyText, size: 22),
+              color: _HubColors.greyText, size: 22),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               l10n.text('careerhub_search_hint'),
               style: const TextStyle(
-                  color: AppColors.greyText, fontSize: 15),
+                  color: _HubColors.greyText, fontSize: 15),
             ),
           ),
         ],
@@ -240,12 +240,12 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
               duration: const Duration(milliseconds: 180),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: isActive ? AppColors.primaryBlue : AppColors.white,
+                color: isActive ? _HubColors.primaryBlue : _HubColors.white,
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(
                   color: isActive
-                      ? AppColors.primaryBlue
-                      : AppColors.borderGrey,
+                      ? _HubColors.primaryBlue
+                      : _HubColors.borderGrey,
                   width: 1.2,
                 ),
               ),
@@ -259,7 +259,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                       fontWeight: FontWeight.w600,
                       color: isActive
                           ? Colors.white
-                          : AppColors.inactiveTabText,
+                          : _HubColors.inactiveTabText,
                     ),
                   ),
                   if (i != 0) ...[
@@ -267,7 +267,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                     Icon(
                       Icons.keyboard_arrow_down_rounded,
                       size: 16,
-                      color: isActive ? Colors.white : AppColors.greyText,
+                      color: isActive ? Colors.white : _HubColors.greyText,
                     ),
                   ],
                 ],
@@ -283,11 +283,11 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: _HubColors.white,
         borderRadius: BorderRadius.circular(22),
         boxShadow: const [
           BoxShadow(
-            color: AppColors.cardShadow,
+            color: _HubColors.cardShadow,
             blurRadius: 20,
             offset: Offset(0, 4),
           ),
@@ -307,8 +307,8 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                     ? Icons.bookmark_rounded
                     : Icons.bookmark_border_rounded,
                 color: job.bookmarked
-                    ? AppColors.bookmarkActive
-                    : AppColors.bookmarkInactive,
+                    ? _HubColors.bookmarkActive
+                    : _HubColors.bookmarkInactive,
                 size: 24,
               ),
             ],
@@ -320,7 +320,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
             style: const TextStyle(
               fontSize: 19,
               fontWeight: FontWeight.w800,
-              color: AppColors.jobTitleBlue,
+              color: _HubColors.jobTitleBlue,
               letterSpacing: -0.2,
             ),
           ),
@@ -330,7 +330,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
             '${job.company} • ${job.location}',
             style: const TextStyle(
               fontSize: 14,
-              color: AppColors.greyText,
+              color: _HubColors.greyText,
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -351,7 +351,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                 job.postedAgo,
                 style: const TextStyle(
                   fontSize: 13,
-                  color: AppColors.lightGreyText,
+                  color: _HubColors.lightGreyText,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -360,7 +360,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const JobDetailScreen(),
+                    builder: (context) => JobDetailScreen.placeholder(),
                   ),
                 );
               }),
@@ -387,7 +387,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.greyText,
+                  color: _HubColors.greyText,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -410,7 +410,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
-        color: isType ? AppColors.tagBg : AppColors.salaryTagBg,
+        color: isType ? _HubColors.tagBg : _HubColors.salaryTagBg,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -418,7 +418,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
         style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: isType ? AppColors.tagText : AppColors.salaryTagText,
+          color: isType ? _HubColors.tagText : _HubColors.salaryTagText,
         ),
       ),
     );
@@ -427,7 +427,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
   Widget _buildApplyButton(VoidCallback onTap) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.primaryBlue,
+        color: _HubColors.primaryBlue,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Material(

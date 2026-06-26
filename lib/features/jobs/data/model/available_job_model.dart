@@ -45,7 +45,7 @@ class AvailableJobModel {
   final int? stateId;
   final int? districtId;
   final int? localiteId;
-
+  final String? whatsappNumber;
   AvailableJobModel({
     required this.id,
     required this.employerId,
@@ -91,6 +91,7 @@ class AvailableJobModel {
     this.stateId,
     this.districtId,
     this.localiteId,
+    this.whatsappNumber,
   });
 
   factory AvailableJobModel.fromJson(Map<String, dynamic> json) {
@@ -208,6 +209,7 @@ class AvailableJobModel {
                 : (json['field_localite_id'] != null
                       ? _parseInt(json['field_localite_id'])
                       : null)),
+      whatsappNumber: json['contact_whatsapp']?.toString(),
     );
   }
 
@@ -263,6 +265,7 @@ class AvailableJobModel {
       stateId: stateId,
       districtId: districtId,
       localiteId: localiteId,
+      whatsappNumber: whatsappNumber,
     );
   }
 }

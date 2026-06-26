@@ -43,6 +43,7 @@ class AvailableJob {
   final int? stateId;
   final int? districtId;
   final int? localiteId;
+  final String? whatsappNumber;
 
   const AvailableJob({
     required this.id,
@@ -89,6 +90,7 @@ class AvailableJob {
     this.stateId,
     this.districtId,
     this.localiteId,
+    this.whatsappNumber,
   });
 
   /// Human-readable salary display string
