@@ -47,4 +47,10 @@ class ApiRoutes {
 
   // Missing Person
   static String get missingPersons => _buildUrl('missing-person');
+
+  // Profile
+  static String get myApplications => _buildUrl('my-applications');
+  static String get editProfile => _buildUrl('candidate/edit-profile');
+  static String get changePassword => _buildUrl('candidate/change-password');
+  static String get inquiry => _buildUrl('candidate/inquiry');
 }

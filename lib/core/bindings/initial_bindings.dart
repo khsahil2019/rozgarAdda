@@ -13,6 +13,7 @@ import '../../features/chat/presentation/bindings/chat_binding.dart';
 import '../../features/employer_auth/presentation/bindings/employer_auth_binding.dart';
 import '../../features/employer_dashboard/presentation/bindings/employer_dashboard_binding.dart';
 import '../../features/missing_person/presentation/bindings/missing_person_binding.dart';
+import '../../features/profile/presentation/bindings/profile_binding.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -50,6 +51,9 @@ class InitialBinding extends Bindings {
 
     // Register missing person dependencies
     MissingPersonBinding().dependencies();
+
+    // Register profile dependencies
+    ProfileBinding().dependencies();
   }
 }
 

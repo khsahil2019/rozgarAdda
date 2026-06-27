@@ -7,11 +7,14 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
+import 'package:rojgar/features/jobs/domain/entities/job_category.dart';
 import 'package:rojgar/features/jobs/domain/repository/jobs_repository.dart';
+import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/features/jobs/presentation/widgets/job_card_widget.dart';
 
 enum _FilterSection {
+  category,
   jobType,
   salary,
   education,
@@ -47,6 +50,7 @@ class RecentJobsScreen extends StatefulWidget {
 class _RecentJobsScreenState extends State<RecentJobsScreen> {
   late final PageController _pageController;
   final TextEditingController _searchController = TextEditingController();
+  late final JobsController _jobsController;
 
   bool _isLoading = true;
   String? _errorMessage;
@@ -59,6 +63,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   Timer? _autoSlideTimer;
 
   // Index-based filter state (matching available_jobs_screen.dart)
+  int _selectedCategoryIndex = 0; // 0 = All Categories
   int _selectedJobTypeIndex = 0;
   int _selectedSalaryIndex = 0;
   int _selectedEducationIndex = 0;
@@ -136,6 +141,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   @override
   void initState() {
     super.initState();
+    _jobsController = Get.find<JobsController>();
     _pageController = PageController(viewportFraction: 0.85);
     _pageController.addListener(() {
       if (_pageController.hasClients) {
@@ -271,6 +277,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
   void _filterJobs() {
     final query = _searchQuery.toLowerCase().trim();
+    final categories = _jobsController.categories;
     _filteredJobs = _recentJobs.where((job) {
       // 1. Search Query filter
       final matchesSearch =
@@ -281,7 +288,15 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
           job.jobTypeLabel.toLowerCase().contains(query);
       if (!matchesSearch) return false;
 
-      // 2. Job Type filter
+      // 2. Category filter
+      if (_selectedCategoryIndex != 0 && categories.isNotEmpty) {
+        final catIdx = _selectedCategoryIndex - 1; // -1 because index 0 = All
+        if (catIdx >= 0 && catIdx < categories.length) {
+          if (job.categoryId != categories[catIdx].id) return false;
+        }
+      }
+
+      // 3. Job Type filter
       if (_selectedJobTypeIndex != 0) {
         final selectedType = _jobTypeOptions[_selectedJobTypeIndex]
             .toLowerCase();
@@ -979,11 +994,22 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   }
 
   Widget _buildFilterChips(AppLocalizations l10n) {
+    final categories = _jobsController.categories;
+    final categoryLabel = _selectedCategoryIndex == 0 || categories.isEmpty
+        ? 'Job Category'
+        : categories[_selectedCategoryIndex - 1].name;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
       child: Row(
         children: [
+          _buildFilterChipButton(
+            label: categoryLabel,
+            onTap: () =>
+                _showFilterSheet(initialSection: _FilterSection.category),
+          ),
+          const SizedBox(width: 10),
           _buildFilterChipButton(
             label: _selectedJobTypeIndex == 0
                 ? 'Job Type'
@@ -1040,7 +1066,10 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final options = _optionsForSection(activeSection);
+            final categories = _jobsController.categories;
+            final options = activeSection == _FilterSection.category
+                ? <String>[] // not used for category (uses grid)
+                : _optionsForSection(activeSection);
             final currentIndex = _selectedIndexForSection(activeSection);
 
             return Align(
@@ -1145,82 +1174,116 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                             ),
                           ),
                           Expanded(
-                            child: ListView.separated(
-                              padding: const EdgeInsets.fromLTRB(
-                                16,
-                                14,
-                                16,
-                                16,
-                              ),
-                              itemCount: options.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(height: 8),
-                              itemBuilder: (_, index) {
-                                final option = options[index];
-                                final isSelected = index == currentIndex;
-                                return InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      _setSelectedIndexForSection(
-                                        activeSection,
-                                        index,
+                            child: activeSection == _FilterSection.category
+                                ? GridView.builder(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        16, 14, 16, 16),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      mainAxisSpacing: 12,
+                                      crossAxisSpacing: 12,
+                                      childAspectRatio: 0.92,
+                                    ),
+                                    itemCount: categories.length,
+                                    itemBuilder: (_, index) {
+                                      final cat = categories[index];
+                                      // index 0 in the chip = All, so cat index 0 → chip index 1
+                                      final isSelected =
+                                          _selectedCategoryIndex == index + 1;
+                                      return _RecentCategoryCard(
+                                        category: cat,
+                                        isSelected: isSelected,
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedCategoryIndex = index + 1;
+                                            _filterJobs();
+                                          });
+                                          setModalState(() {});
+                                        },
                                       );
-                                      _filterJobs();
-                                    });
-                                    setModalState(() {});
-                                  },
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 10,
+                                    },
+                                  )
+                                : ListView.separated(
+                                    padding: const EdgeInsets.fromLTRB(
+                                      16,
+                                      14,
+                                      16,
+                                      16,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? const Color(0xFFF7F8FC)
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            option,
-                                            style: TextStyle(
-                                              fontSize: 13.sp,
-                                              fontWeight: FontWeight.w700,
-                                              color: _Colors.darkText,
-                                            ),
+                                    itemCount: options.length,
+                                    separatorBuilder: (_, __) =>
+                                        const SizedBox(height: 8),
+                                    itemBuilder: (_, index) {
+                                      final option = options[index];
+                                      final isSelected = index == currentIndex;
+                                      return InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _setSelectedIndexForSection(
+                                              activeSection,
+                                              index,
+                                            );
+                                            _filterJobs();
+                                          });
+                                          setModalState(() {});
+                                        },
+                                        borderRadius:
+                                            BorderRadius.circular(16),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 10,
                                           ),
-                                        ),
-                                        Container(
-                                          width: 30,
-                                          height: 30,
                                           decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: isSelected
-                                                  ? _Colors.darkText
-                                                  : const Color(0xFF8A8E97),
-                                              width: 2,
-                                            ),
+                                            color: isSelected
+                                                ? const Color(0xFFF7F8FC)
+                                                : Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.circular(16),
                                           ),
-                                          child: isSelected
-                                              ? const Center(
-                                                  child: Icon(
-                                                    Icons.circle_rounded,
-                                                    size: 14,
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  option,
+                                                  style: TextStyle(
+                                                    fontSize: 13.sp,
+                                                    fontWeight: FontWeight.w700,
                                                     color: _Colors.darkText,
                                                   ),
-                                                )
-                                              : null,
+                                                ),
+                                              ),
+                                              Container(
+                                                width: 30,
+                                                height: 30,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: isSelected
+                                                        ? _Colors.darkText
+                                                        : const Color(
+                                                            0xFF8A8E97),
+                                                    width: 2,
+                                                  ),
+                                                ),
+                                                child: isSelected
+                                                    ? const Center(
+                                                        child: Icon(
+                                                          Icons.circle_rounded,
+                                                          size: 14,
+                                                          color:
+                                                              _Colors.darkText,
+                                                        ),
+                                                      )
+                                                    : null,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ],
-                                    ),
+                                      );
+                                    },
                                   ),
-                                );
-                              },
-                            ),
                           ),
                         ],
                       ),
@@ -1235,6 +1298,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                             child: OutlinedButton(
                               onPressed: () {
                                 setState(() {
+                                  _selectedCategoryIndex = 0;
                                   _selectedJobTypeIndex = 0;
                                   _selectedSalaryIndex = 0;
                                   _selectedEducationIndex = 0;
@@ -1308,6 +1372,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
   String _sectionTitle(_FilterSection section) {
     return switch (section) {
+      _FilterSection.category => 'Job Category',
       _FilterSection.jobType => 'Job Type',
       _FilterSection.salary => 'Salary Range',
       _FilterSection.education => 'Education',
@@ -1319,6 +1384,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
   List<String> _optionsForSection(_FilterSection section) {
     return switch (section) {
+      _FilterSection.category => [], // rendered as grid, not list
       _FilterSection.jobType => _jobTypeOptions,
       _FilterSection.salary => _salaryOptions,
       _FilterSection.education => _educationOptions,
@@ -1330,6 +1396,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
   int _selectedIndexForSection(_FilterSection section) {
     return switch (section) {
+      _FilterSection.category => _selectedCategoryIndex,
       _FilterSection.jobType => _selectedJobTypeIndex,
       _FilterSection.salary => _selectedSalaryIndex,
       _FilterSection.education => _selectedEducationIndex,
@@ -1341,6 +1408,9 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
   void _setSelectedIndexForSection(_FilterSection section, int index) {
     switch (section) {
+      case _FilterSection.category:
+        _selectedCategoryIndex = index;
+        break;
       case _FilterSection.jobType:
         _selectedJobTypeIndex = index;
         break;
@@ -1791,6 +1861,108 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => JobDetailScreen(job: job)),
+    );
+  }
+}
+
+// ── Category grid card (mirrors _CategoryFilterCard in available_jobs_screen) ──
+class _RecentCategoryCard extends StatelessWidget {
+  final JobCategory category;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _RecentCategoryCard({
+    required this.category,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFFF7F8FC) : _Colors.cardBg,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: isSelected ? _Colors.primaryBlue : _Colors.borderGrey,
+              width: isSelected ? 1.6 : 1.1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(17),
+                  ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      NetworkImageService(
+                        imageUrl: category.imageUrl,
+                        fit: BoxFit.cover,
+                        errorWidget: Container(
+                          color: _Colors.chipBg,
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.category_rounded,
+                            color: _Colors.primaryBlue,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                      if (isSelected)
+                        Container(
+                          color: _Colors.primaryBlue.withValues(alpha: 0.12),
+                        ),
+                      Positioned(
+                        right: 10,
+                        top: 10,
+                        child: Container(
+                          width: 26,
+                          height: 26,
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? _Colors.primaryBlue
+                                : Colors.white.withValues(alpha: 0.92),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isSelected ? Icons.check_rounded : Icons.add,
+                            size: 18,
+                            color: isSelected ? Colors.white : _Colors.darkText,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                child: Text(
+                  category.name,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: _Colors.darkText,
+                    height: 1.15,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

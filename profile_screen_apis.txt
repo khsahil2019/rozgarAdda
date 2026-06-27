@@ -1,0 +1,89 @@
+curl --location 'https://rozgaradda.com/api/my-applications' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer 262|WZUX5tq8mNppNSKhaneUhkOmPPbjuxRP904NFtX1ef6f2cf0' \
+--data ''
+
+response:-
+{
+    "status": true,
+    "message": "Applications fetched successfully",
+    "data": [
+        {
+            "id": 18,
+            "job_title": "Auditor",
+            "company_name": "N/A",
+            "applied_on": "27 Jun 2026",
+            "experience": "0y 0m",
+            "expected_salary": "50000.00",
+            "status": "pending"
+        },
+        {
+            "id": 17,
+            "job_title": "sostware developer",
+            "company_name": "N/A",
+            "applied_on": "23 Jun 2026",
+            "experience": "0y 0m",
+            "expected_salary": "67000.00",
+            "status": "rejected"
+        },
+        {
+            "id": 16,
+            "job_title": "Agriculture Engineer",
+            "company_name": "N/A",
+            "applied_on": "23 Jun 2026",
+            "experience": "0y 0m",
+            "expected_salary": "45000.00",
+            "status": "pending"
+        }
+    ],
+    "pagination": {
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 10,
+        "total": 3
+    }
+}
+
+curl --location 'https://rozgaradda.com/api/candidate/edit-profile' \
+--header 'Accept: application/json' \
+--header 'Content-Type: multipart/form-data' \
+--header 'Authorization: Bearer 262|WZUX5tq8mNppNSKhaneUhkOmPPbjuxRP904NFtX1ef6f2cf0' \
+--form 'full_name="mukund"' \
+--form 'email="user@gmail.com"' \
+--form 'phone="8976545678"' \
+--form 'state="3"' \
+--form 'district="17"' \
+--form 'locality="ghosi"' \
+--form 'pincode="556765"' \
+--form 'address="mau"' \
+--form 'id_proof=@"/C:/Users/balmu/Downloads/membership_BAT1010_BALMUKUND_CHAUHAN (2).png"' \
+--form 'resume=@"/C:/Users/balmu/Downloads/ramkesh.pdf"' \
+--form 'profile_photo=@"/C:/Users/balmu/Downloads/WhatsApp Image 2026-06-25 at 17.27.08 (1).jpeg"'
+Response :- 
+{
+    "status": true,
+    "message": "Profile updated successfully",
+    "candidate_id": 25
+}
+
+curl --location 'https://rozgaradda.com/api/candidate/inquiry' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "A Kumar",
+    "mobile": "9876543210",
+    "email": "Arun@gmail.com",
+    "subject": "Job Inquiry",
+    "message": "I want information about available jobs."
+}'
+
+curl --location 'https://rozgaradda.com/api/candidate/change-password' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer 262|WZUX5tq8mNppNSKhaneUhkOmPPbjuxRP904NFtX1ef6f2cf0' \
+--data '{
+   "current_password":"user0000",
+   "new_password":"user1111",
+   "new_password_confirmation":"user1111"
+}'

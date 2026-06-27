@@ -1365,42 +1365,43 @@ const List<_SidebarMenuItem> _kSidebarItems = [
     Color(0xFFEEDDFF),
     Color(0xFF8833CC),
   ),
-  _SidebarMenuItem(
-    Icons.sell_rounded,
-    'Sell Products',
-    Color(0xFFFFEDD5),
-    Color(0xFFDD6611),
-  ),
-  _SidebarMenuItem(
-    Icons.storefront_rounded,
-    'Marketplace',
-    Color(0xFFFFEDD5),
-    Color(0xFFDD6611),
-  ),
-  _SidebarMenuItem(
-    Icons.payments_rounded,
-    'Earnings',
-    Color(0xFFFFDDDD),
-    Color(0xFFDD3366),
-  ),
   // _SidebarMenuItem(
-  //   Icons.school_rounded,
-  //   'Skill Up',
-  //   Color(0xFFD5F5FF),
-  //   Color(0xFF0099CC),
+  //   Icons.sell_rounded,
+  //   'Sell Products',
+  //   Color(0xFFFFEDD5),
+  //   Color(0xFFDD6611),
   // ),
-  _SidebarMenuItem(
-    Icons.support_agent_rounded,
-    'Support',
-    Color(0xFFEDE8FF),
-    Color(0xFF5B2BE0),
-  ),
-  _SidebarMenuItem(
-    Icons.settings_rounded,
-    'Settings',
-    Color(0xFFF0F0F0),
-    Color(0xFF555577),
-  ),
+  // _SidebarMenuItem(
+  //   Icons.storefront_rounded,
+  //   'Marketplace',
+  //   Color(0xFFFFEDD5),
+  //   Color(0xFFDD6611),
+  // ),
+
+  // _SidebarMenuItem(
+  //   Icons.payments_rounded,
+  //   'Earnings',
+  //   Color(0xFFFFDDDD),
+  //   Color(0xFFDD3366),
+  // ),
+  // // _SidebarMenuItem(
+  // //   Icons.school_rounded,
+  // //   'Skill Up',
+  // //   Color(0xFFD5F5FF),
+  // //   Color(0xFF0099CC),
+  // // ),
+  // _SidebarMenuItem(
+  //   Icons.support_agent_rounded,
+  //   'Support',
+  //   Color(0xFFEDE8FF),
+  //   Color(0xFF5B2BE0),
+  // ),
+  // _SidebarMenuItem(
+  //   Icons.settings_rounded,
+  //   'Settings',
+  //   Color(0xFFF0F0F0),
+  //   Color(0xFF555577),
+  // ),
 ];
 
 class _CollapsibleSidebar extends StatefulWidget {
@@ -1552,27 +1553,28 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            AppLocalizations.of(
-                              context,
-                            ).text('worker_kyc_verified'),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
+
+                        // const SizedBox(height: 4),
+                        // Container(
+                        //   padding: const EdgeInsets.symmetric(
+                        //     horizontal: 8,
+                        //     vertical: 3,
+                        //   ),
+                        //   decoration: BoxDecoration(
+                        //     color: Colors.white.withOpacity(0.2),
+                        //     borderRadius: BorderRadius.circular(20),
+                        //   ),
+                        //   child: Text(
+                        //     AppLocalizations.of(
+                        //       context,
+                        //     ).text('worker_kyc_verified'),
+                        //     style: const TextStyle(
+                        //       color: Colors.white,
+                        //       fontSize: 11,
+                        //       fontWeight: FontWeight.w500,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ],
