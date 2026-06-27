@@ -52,6 +52,18 @@ class JobsRepositoryImpl implements JobsRepository {
   }
 
   @override
+  Future<Either<Failure, List<AvailableJob>>> getLatestJobs() async {
+    try {
+      final models = await remoteDataSource.getLatestJobs();
+      final entities = models.map((model) => model.toEntity()).toList();
+      return Right(entities);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(Failure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, bool>> applyJob({
     required int jobId,
     required String fullName,

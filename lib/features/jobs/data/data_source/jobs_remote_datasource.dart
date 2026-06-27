@@ -1,6 +1,8 @@
 import 'package:rojgar/core/exceptions/exceptions.dart';
 import 'package:rojgar/core/network/api_services.dart';
 import 'package:rojgar/core/network/api_routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../services/storage_service.dart';
 import '../model/available_job_model.dart';
 import '../model/job_category_model.dart';
 import '../model/job_role_model.dart';
@@ -9,6 +11,7 @@ abstract class JobsRemoteDataSource {
   Future<List<JobCategoryModel>> getCategories();
   Future<List<JobRoleModel>> getJobRoles(int categoryId);
   Future<List<AvailableJobModel>> getAvailableJobs(int roleId);
+  Future<List<AvailableJobModel>> getLatestJobs();
   Future<bool> applyJob({
     required int jobId,
     required String token,
@@ -74,6 +77,29 @@ class JobsRemoteDataSourceImpl implements JobsRemoteDataSource {
     } catch (e) {
       if (e is Failure) rethrow;
       throw Failure('Failed to fetch available jobs. Please check your connection.');
+    }
+  }
+
+  @override
+  Future<List<AvailableJobModel>> getLatestJobs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString(StorageService.keyAccessToken);
+      final res = await ApiService.get(
+        ApiRoutes.latestJobs,
+        accessToken: token,
+      );
+      if (res['statusCode'] == 200 && res['status'] == true) {
+        final List<dynamic> dataList = res['data'] as List<dynamic>? ?? [];
+        return dataList
+            .map((e) => AvailableJobModel.fromJson(e as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw Failure(res['message'] ?? 'Failed to fetch latest jobs');
+      }
+    } catch (e) {
+      if (e is Failure) rethrow;
+      throw Failure('Failed to fetch latest jobs. Please check your connection.');
     }
   }
 

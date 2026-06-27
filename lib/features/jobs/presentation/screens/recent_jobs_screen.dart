@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
+import 'package:rojgar/features/jobs/domain/repository/jobs_repository.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/features/jobs/presentation/widgets/job_card_widget.dart';
 
@@ -290,14 +291,23 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     });
 
     try {
-      // Simulate network latency
-      await Future.delayed(const Duration(milliseconds: 800));
-
-      setState(() {
-        _isLoading = false;
-        _recentJobs = List.from(_mockJobs);
-        _filterJobs();
-      });
+      final repository = Get.find<JobsRepository>();
+      final result = await repository.getLatestJobs();
+      result.fold(
+        (failure) {
+          setState(() {
+            _isLoading = false;
+            _errorMessage = failure.message;
+          });
+        },
+        (jobs) {
+          setState(() {
+            _isLoading = false;
+            _recentJobs = jobs;
+            _filterJobs();
+          });
+        },
+      );
     } catch (e) {
       setState(() {
         _isLoading = false;

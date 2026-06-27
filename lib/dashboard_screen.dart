@@ -1450,19 +1450,15 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                       Container(
                         width: 36,
                         height: 36,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF5B2BE0), Color(0xFF8B5CF6)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.bolt_rounded,
-                          color: Colors.white,
-                          size: 22,
-                        ),
+                        // decoration: BoxDecoration(
+                        //   gradient: const LinearGradient(
+                        //     colors: [Color(0xFF5B2BE0), Color(0xFF8B5CF6)],
+                        //     begin: Alignment.topLeft,
+                        //     end: Alignment.bottomRight,
+                        //   ),
+                        //   borderRadius: BorderRadius.circular(10),
+                        // ),
+                        child: Image.asset("assets/icons/logo.png"),
                       ),
                       const SizedBox(width: 10),
                       Text(
@@ -1654,9 +1650,10 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                             );
                           } else {
                             widget.onClose();
-                            final displayName = AppLocalizations.of(context).text(
-                              item.label.toLowerCase().replaceAll(' ', '_'),
-                            );
+                            final displayName = AppLocalizations.of(context)
+                                .text(
+                                  item.label.toLowerCase().replaceAll(' ', '_'),
+                                );
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text("$displayName coming soon"),

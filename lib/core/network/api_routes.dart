@@ -37,6 +37,7 @@ class ApiRoutes {
   static String availableJobs(int roleId) =>
       _buildUrl('candidate/available-jobs/$roleId');
   static String applyJob(int jobId) => _buildUrl('apply-job/$jobId');
+  static String get latestJobs => _buildUrl('latest-jobs');
 
   // Chat
   static String get startChat => _buildUrl('chat/start');
