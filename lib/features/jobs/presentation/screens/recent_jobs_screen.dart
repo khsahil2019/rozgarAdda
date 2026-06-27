@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:open_share_plus/open.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,17 +11,30 @@ import 'package:rojgar/features/jobs/domain/repository/jobs_repository.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/features/jobs/presentation/widgets/job_card_widget.dart';
 
+enum _FilterSection {
+  jobType,
+  salary,
+  education,
+  experience,
+  freshness,
+  location,
+}
+
 class _Colors {
   static const Color primaryBlue = Color(0xFF1400FF);
   static const Color darkText = Color(0xFF17181C);
   static const Color grey = Color(0xFF72757F);
+  static const Color lightGrey = Color(0xFF9AA0AA);
   static const Color borderGrey = Color(0xFFD7DADF);
   static const Color scaffoldBg = Color(0xFFF4F5F8);
   static const Color cardBg = Color(0xFFFFFFFF);
   static const Color chipBg = Color(0xFFF7F8FB);
+  static const Color chipText = Color(0xFF1E2228);
   static const Color chipAccent = Color(0xFFEAF2FF);
   static const Color green = Color(0xFF2E7D32);
   static const Color yellow = Color(0xFFFFC107);
+  static const Color yellowFilter = Color(0xFFFFC400);
+  static const Color red = Color(0xFFE84E5F);
 }
 
 class RecentJobsScreen extends StatefulWidget {
@@ -40,11 +55,64 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
   double _currentPage = 0.0;
   String _searchQuery = '';
-  String _selectedJobType = 'all';
-  String _selectedCategory = 'all';
-  String _selectedSalaryRange = 'all';
-  String _selectedQualification = 'all';
   int _selectedTabIndex = 0;
+  Timer? _autoSlideTimer;
+
+  // Index-based filter state (matching available_jobs_screen.dart)
+  int _selectedJobTypeIndex = 0;
+  int _selectedSalaryIndex = 0;
+  int _selectedEducationIndex = 0;
+  int _selectedExperienceIndex = 0;
+  int _selectedFreshnessIndex = 0;
+  int _selectedLocationIndex = 0;
+
+  static const List<String> _jobTypeOptions = [
+    'Any',
+    'Full-time',
+    'Part-time',
+    'Contract',
+    'Work From Home',
+  ];
+
+  static const List<String> _salaryOptions = [
+    'Salary Range',
+    '₹10k - ₹15k',
+    '₹15k - ₹18k',
+    '₹18k - ₹25k',
+  ];
+
+  static const List<String> _educationOptions = [
+    'Education',
+    '10th Pass',
+    '12th Pass',
+    'Graduate',
+    'Post Graduate',
+    'Other',
+  ];
+
+  static const List<String> _experienceOptions = [
+    'Work Experience',
+    'Fresher',
+    '1-2 Years',
+    '3-5 Years',
+    '5+ Years',
+  ];
+
+  static const List<String> _freshnessOptions = [
+    'Freshness',
+    'Last 4 days',
+    'Last 7 days',
+    'Last 14 days',
+    'Last 30 days',
+  ];
+
+  static const List<String> _locationOptions = [
+    'Location',
+    'Sangli',
+    'Pune',
+    'Ahmedabad',
+    'Hyderabad',
+  ];
 
   String _getJobImageUrl(AvailableJob job) {
     switch (job.id) {
@@ -85,202 +153,30 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     });
 
     _loadRecentJobs();
+    _startAutoSlide();
+  }
+
+  void _startAutoSlide() {
+    _autoSlideTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (!mounted || !_pageController.hasClients) return;
+      final itemCount = _recentJobs.take(5).length;
+      if (itemCount <= 1) return;
+      final nextPage = (_currentPage.round() + 1) % itemCount;
+      _pageController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
   }
 
   @override
   void dispose() {
+    _autoSlideTimer?.cancel();
     _pageController.dispose();
     _searchController.dispose();
     super.dispose();
   }
-
-  static final List<AvailableJob> _mockJobs = [
-    AvailableJob(
-      id: 101,
-      employerId: 1,
-      categoryId: 2,
-      roleId: 3,
-      title: 'Tempo Driver',
-      jobType: 'full_time',
-      shifts: const ['Day Shift'],
-      workLocationType: 'office',
-      stateName: 'Sangli, सांगली',
-      addressLine1: 'Rajhans Namkeen',
-      addressLine2: 'Sangli Gidc',
-      pincode: '416416',
-      payType: 'monthly',
-      minSalary: '13000',
-      maxSalary: '16000',
-      perks: const ['Cab', 'Meals'],
-      educationLevel: '10th Pass',
-      englishLevel: 'Basic',
-      experienceLevel: '1-3',
-      additionalRequirements: {},
-      skills: const ['Driving', 'GPS'],
-      languages: const ['Marathi', 'Hindi'],
-      vacancy: 3,
-      isWalkin: true,
-      contactPreference: 'call',
-      viewsCount: 120,
-      applicationsCount: 45,
-      status: 'active',
-      createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-    ),
-    AvailableJob(
-      id: 102,
-      employerId: 2,
-      categoryId: 2,
-      roleId: 4,
-      title: 'Clerk',
-      jobType: 'full_time',
-      shifts: const ['Day Shift'],
-      workLocationType: 'office',
-      stateName: 'Sangli, सांगली (-मिरज)',
-      addressLine1: 'Shri Janata Light House',
-      addressLine2: 'Link Road',
-      pincode: '416416',
-      payType: 'monthly',
-      minSalary: '8000',
-      maxSalary: '12000',
-      perks: const ['Insurance'],
-      educationLevel: '12th Pass',
-      englishLevel: 'Intermediate',
-      experienceLevel: '1-3',
-      additionalRequirements: {},
-      skills: const ['Excel', 'Data entry'],
-      languages: const ['Marathi', 'English'],
-      vacancy: 2,
-      isWalkin: false,
-      contactPreference: 'whatsapp',
-      viewsCount: 340,
-      applicationsCount: 112,
-      status: 'active',
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    AvailableJob(
-      id: 103,
-      employerId: 3,
-      categoryId: 2,
-      roleId: 5,
-      title: 'Office Executive',
-      jobType: 'full_time',
-      shifts: const ['Day Shift'],
-      workLocationType: 'office',
-      stateName: 'Sangli Nagar, सांगली मि',
-      addressLine1: 'SEVEN LAXMI CONSTRUCTION',
-      addressLine2: 'Nagar Road',
-      pincode: '416416',
-      payType: 'monthly',
-      minSalary: '8000',
-      maxSalary: '15000',
-      perks: const ['Fuel allowance'],
-      educationLevel: '12th Pass',
-      englishLevel: 'Basic',
-      experienceLevel: '1-3',
-      additionalRequirements: {},
-      skills: const ['Administration', 'Typing'],
-      languages: const ['Marathi', 'Hindi'],
-      vacancy: 1,
-      isWalkin: false,
-      contactPreference: 'call',
-      viewsCount: 140,
-      applicationsCount: 12,
-      status: 'active',
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
-    ),
-    AvailableJob(
-      id: 104,
-      employerId: 4,
-      categoryId: 3,
-      roleId: 8,
-      title: 'Graphic Designer',
-      jobType: 'full_time',
-      shifts: const ['Day Shift'],
-      workLocationType: 'hybrid',
-      stateName: 'Pune',
-      addressLine1: 'Kothrud',
-      addressLine2: 'Paud Road',
-      pincode: '411038',
-      payType: 'monthly',
-      minSalary: '25000',
-      maxSalary: '35000',
-      perks: const ['Free snacks', 'Annual bonus'],
-      educationLevel: 'Graduate',
-      englishLevel: 'Intermediate',
-      experienceLevel: '2',
-      additionalRequirements: const {},
-      skills: const ['Photoshop', 'Illustrator', 'Figma'],
-      languages: const ['English', 'Marathi'],
-      vacancy: 2,
-      isWalkin: false,
-      contactPreference: 'email',
-      viewsCount: 204,
-      applicationsCount: 38,
-      status: 'active',
-      createdAt: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-    AvailableJob(
-      id: 105,
-      employerId: 5,
-      categoryId: 4,
-      roleId: 10,
-      title: 'Warehouse Associate',
-      jobType: 'full_time',
-      shifts: const ['Night Shift'],
-      workLocationType: 'office',
-      stateName: 'Ahmedabad',
-      addressLine1: 'Sanand',
-      addressLine2: 'GIDC',
-      pincode: '382110',
-      payType: 'monthly',
-      fixedSalary: '16500',
-      perks: const ['Overtime pay', 'PF & ESIC'],
-      educationLevel: '10th Pass',
-      englishLevel: 'Basic',
-      experienceLevel: 'fresher',
-      additionalRequirements: {},
-      skills: const ['Inventory management', 'Packaging'],
-      languages: const ['Gujarati', 'Hindi'],
-      vacancy: 25,
-      isWalkin: true,
-      contactPreference: 'call',
-      viewsCount: 450,
-      applicationsCount: 156,
-      status: 'active',
-      createdAt: DateTime.now().subtract(const Duration(days: 5)),
-    ),
-    AvailableJob(
-      id: 106,
-      employerId: 6,
-      categoryId: 1,
-      roleId: 2,
-      title: 'Telecalling Agent',
-      jobType: 'part_time',
-      shifts: const ['Day Shift'],
-      workLocationType: 'office',
-      stateName: 'Hyderabad',
-      addressLine1: 'Madhapur',
-      addressLine2: 'Hitec City',
-      pincode: '500081',
-      payType: 'monthly',
-      minSalary: '10000',
-      maxSalary: '15000',
-      perks: const ['Performance incentive'],
-      educationLevel: '12th Pass',
-      englishLevel: 'Intermediate',
-      experienceLevel: '1',
-      additionalRequirements: const {},
-      skills: const ['Customer support', 'Telesales'],
-      languages: const ['Telugu', 'English', 'Hindi'],
-      vacancy: 15,
-      isWalkin: false,
-      contactPreference: 'whatsapp',
-      viewsCount: 310,
-      applicationsCount: 89,
-      status: 'active',
-      createdAt: DateTime.now().subtract(const Duration(days: 6)),
-    ),
-  ];
 
   Future<void> _loadRecentJobs() async {
     setState(() {
@@ -316,6 +212,63 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     }
   }
 
+  // ── Salary / Experience / Freshness helpers ──────────────────────────────
+  double? _parseSalary(String? value) {
+    if (value == null) return null;
+    return double.tryParse(value.replaceAll(RegExp(r'[^0-9.]'), ''));
+  }
+
+  bool _matchSalary(AvailableJob job, int index) {
+    double minLimit = 0;
+    double maxLimit = 999999999;
+    if (index == 1) {
+      minLimit = 10000;
+      maxLimit = 15000;
+    } else if (index == 2) {
+      minLimit = 15000;
+      maxLimit = 18000;
+    } else if (index == 3) {
+      minLimit = 18000;
+      maxLimit = 25000;
+    } else {
+      return true;
+    }
+    if (job.fixedSalary != null && job.fixedSalary!.isNotEmpty) {
+      final fs = _parseSalary(job.fixedSalary);
+      if (fs != null) return fs >= minLimit && fs <= maxLimit;
+    }
+    final minS = _parseSalary(job.minSalary);
+    final maxS = _parseSalary(job.maxSalary);
+    if (minS != null && maxS != null)
+      return !(maxS < minLimit || minS > maxLimit);
+    if (minS != null) return minS <= maxLimit;
+    return false;
+  }
+
+  int? _parseExp(String value) {
+    if (value.toLowerCase() == 'fresher') return 0;
+    return int.tryParse(value.replaceAll(RegExp(r'[^0-9]'), ''));
+  }
+
+  bool _matchExperience(AvailableJob job, int index) {
+    final expVal = _parseExp(job.experienceLevel);
+    if (expVal == null) return true;
+    if (index == 1) return expVal == 0;
+    if (index == 2) return expVal >= 1 && expVal <= 2;
+    if (index == 3) return expVal >= 3 && expVal <= 5;
+    if (index == 4) return expVal >= 5;
+    return true;
+  }
+
+  bool _matchFreshness(AvailableJob job, int index) {
+    final diff = DateTime.now().difference(job.createdAt).inDays;
+    if (index == 1) return diff <= 4;
+    if (index == 2) return diff <= 7;
+    if (index == 3) return diff <= 14;
+    if (index == 4) return diff <= 30;
+    return true;
+  }
+
   void _filterJobs() {
     final query = _searchQuery.toLowerCase().trim();
     _filteredJobs = _recentJobs.where((job) {
@@ -326,58 +279,51 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
           job.stateName.toLowerCase().contains(query) ||
           job.addressLine1.toLowerCase().contains(query) ||
           job.jobTypeLabel.toLowerCase().contains(query);
-
       if (!matchesSearch) return false;
 
-      // 2. Category filter
-      if (_selectedCategory != 'all') {
-        int expectedCatId = -1;
-        if (_selectedCategory == 'Driver') expectedCatId = 2;
-        if (_selectedCategory == 'Office') expectedCatId = 2;
-        if (_selectedCategory == 'Delivery') expectedCatId = 5;
-        if (_selectedCategory == 'Design') expectedCatId = 3;
-        if (_selectedCategory == 'Warehouse') expectedCatId = 4;
-        if (_selectedCategory == 'Support') expectedCatId = 1;
-
-        if (expectedCatId != -1 && job.categoryId != expectedCatId) {
-          if (_selectedCategory == 'Driver' &&
-              !job.title.toLowerCase().contains('driver')) {
-            return false;
-          }
-          if (_selectedCategory == 'Office' &&
-              !job.title.toLowerCase().contains('clerk')) {
-            return false;
-          }
-          if (expectedCatId != 2) return false;
-        }
+      // 2. Job Type filter
+      if (_selectedJobTypeIndex != 0) {
+        final selectedType = _jobTypeOptions[_selectedJobTypeIndex]
+            .toLowerCase();
+        final typeString = selectedType
+            .replaceAll('-', '_')
+            .replaceAll(' ', '_');
+        if (job.jobType.toLowerCase() != typeString) return false;
       }
 
-      // 3. Job Type filter
-      if (_selectedJobType != 'all') {
-        if (job.jobType != _selectedJobType) return false;
+      // 3. Salary filter
+      if (_selectedSalaryIndex != 0) {
+        if (!_matchSalary(job, _selectedSalaryIndex)) return false;
       }
 
-      // 4. Salary filter
-      if (_selectedSalaryRange != 'all') {
-        final double minSal = double.tryParse(job.minSalary ?? '0') ?? 0;
-        final double maxSal =
-            double.tryParse(job.maxSalary ?? '999999') ?? 999999;
-
-        if (_selectedSalaryRange == '10k-15k') {
-          if (maxSal < 10000 || minSal > 15000) return false;
-        } else if (_selectedSalaryRange == '15k-25k') {
-          if (maxSal < 15000 || minSal > 25000) return false;
-        } else if (_selectedSalaryRange == '25k+') {
-          if (minSal < 25000) return false;
-        }
-      }
-
-      // 5. Qualification filter
-      if (_selectedQualification != 'all') {
-        if (job.educationLevel.toLowerCase() !=
-            _selectedQualification.toLowerCase()) {
+      // 4. Education filter
+      if (_selectedEducationIndex != 0) {
+        final selectedEdu = _educationOptions[_selectedEducationIndex]
+            .toLowerCase();
+        if (!job.educationLevel.toLowerCase().contains(selectedEdu)) {
           return false;
         }
+      }
+
+      // 5. Experience filter
+      if (_selectedExperienceIndex != 0) {
+        if (!_matchExperience(job, _selectedExperienceIndex)) return false;
+      }
+
+      // 6. Freshness filter
+      if (_selectedFreshnessIndex != 0) {
+        if (!_matchFreshness(job, _selectedFreshnessIndex)) return false;
+      }
+
+      // 7. Location filter
+      if (_selectedLocationIndex != 0) {
+        final selectedLoc = _locationOptions[_selectedLocationIndex]
+            .toLowerCase();
+        final inLoc =
+            job.addressLine1.toLowerCase().contains(selectedLoc) ||
+            job.addressLine2.toLowerCase().contains(selectedLoc) ||
+            job.stateName.toLowerCase().contains(selectedLoc);
+        if (!inLoc) return false;
       }
 
       return true;
@@ -410,60 +356,6 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     if (lang == 'mr') return 'स्पॉन्सर जॉब्स';
     if (lang == 'hi') return 'प्रायोजित जॉब्स';
     return 'Sponsor Jobs';
-  }
-
-  Widget _buildCustomTabBar(AppLocalizations l10n) {
-    final lang = l10n.locale.languageCode;
-    final tabs = [_getTab1Label(lang), _getTab2Label(lang)];
-
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFE7E9EE), width: 1.0),
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: List.generate(tabs.length, (index) {
-          final isSelected = _selectedTabIndex == index;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedTabIndex = index;
-                });
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    tabs[index],
-                    style: TextStyle(
-                      color: isSelected ? _Colors.darkText : _Colors.grey,
-                      fontWeight: isSelected
-                          ? FontWeight.w800
-                          : FontWeight.w600,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    height: 3,
-                    width: isSelected ? 80 : 0,
-                    decoration: BoxDecoration(
-                      color: _Colors.darkText,
-                      borderRadius: BorderRadius.circular(1.5),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
-      ),
-    );
   }
 
   @override
@@ -1041,45 +933,43 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     );
   }
 
-  Widget _buildDropdownChip({
+  // ── Filter chip row ───────────────────────────────────────────────────────
+  Widget _buildFilterChipButton({
     required String label,
-    required String activeValue,
-    required List<PopupMenuEntry<String>> items,
-    required Function(String) onSelected,
+    required VoidCallback? onTap,
   }) {
-    final isFiltering = activeValue != 'all';
-    return Theme(
-      data: Theme.of(context).copyWith(cardColor: Colors.white),
-      child: PopupMenuButton<String>(
-        onSelected: onSelected,
-        itemBuilder: (context) => items,
-        offset: const Offset(0, 40),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          constraints: BoxConstraints(minWidth: 35.sp, maxWidth: 180.sp),
+          padding: EdgeInsets.symmetric(horizontal: 5.sp, vertical: 3.sp),
           decoration: BoxDecoration(
-            color: isFiltering ? _Colors.chipAccent : Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: isFiltering ? _Colors.primaryBlue : _Colors.borderGrey,
-              width: 1,
-            ),
+            color: _Colors.cardBg,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: _Colors.borderGrey, width: 1.2),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                isFiltering ? '$label: $activeValue' : label,
-                style: TextStyle(
-                  color: isFiltering ? _Colors.primaryBlue : _Colors.darkText,
-                  fontWeight: isFiltering ? FontWeight.w800 : FontWeight.w500,
-                  fontSize: 13,
+              Flexible(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: _Colors.chipText,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
-              const SizedBox(width: 4),
-              Icon(
+              SizedBox(width: 1.w),
+              const Icon(
                 Icons.keyboard_arrow_down_rounded,
-                size: 16,
-                color: isFiltering ? _Colors.primaryBlue : _Colors.grey,
+                color: _Colors.lightGrey,
+                size: 22,
               ),
             ],
           ),
@@ -1094,82 +984,382 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       physics: const BouncingScrollPhysics(),
       child: Row(
         children: [
-          _buildDropdownChip(
-            label: 'Category',
-            activeValue: _selectedCategory,
-            items: const [
-              PopupMenuItem(value: 'all', child: Text('All Categories')),
-              PopupMenuItem(value: 'Driver', child: Text('Driver')),
-              PopupMenuItem(value: 'Office', child: Text('Office / Clerk')),
-              PopupMenuItem(value: 'Delivery', child: Text('Delivery')),
-              PopupMenuItem(value: 'Design', child: Text('Graphic Design')),
-              PopupMenuItem(value: 'Warehouse', child: Text('Warehouse')),
-              PopupMenuItem(
-                value: 'Support',
-                child: Text('Telecalling / Support'),
-              ),
-            ],
-            onSelected: (val) {
-              setState(() {
-                _selectedCategory = val;
-                _filterJobs();
-              });
-            },
+          _buildFilterChipButton(
+            label: _selectedJobTypeIndex == 0
+                ? 'Job Type'
+                : _jobTypeOptions[_selectedJobTypeIndex],
+            onTap: () =>
+                _showFilterSheet(initialSection: _FilterSection.jobType),
           ),
-          const SizedBox(width: 8),
-          _buildDropdownChip(
-            label: 'Job Type',
-            activeValue: _selectedJobType,
-            items: const [
-              PopupMenuItem(value: 'all', child: Text('All Job Types')),
-              PopupMenuItem(value: 'full_time', child: Text('Full Time')),
-              PopupMenuItem(value: 'part_time', child: Text('Part Time')),
-              PopupMenuItem(value: 'contract', child: Text('Contract')),
-            ],
-            onSelected: (val) {
-              setState(() {
-                _selectedJobType = val;
-                _filterJobs();
-              });
-            },
+          const SizedBox(width: 10),
+          _buildFilterChipButton(
+            label: _salaryOptions[_selectedSalaryIndex],
+            onTap: () =>
+                _showFilterSheet(initialSection: _FilterSection.salary),
           ),
-          const SizedBox(width: 8),
-          _buildDropdownChip(
-            label: 'Salary',
-            activeValue: _selectedSalaryRange,
-            items: const [
-              PopupMenuItem(value: 'all', child: Text('All Salaries')),
-              PopupMenuItem(value: '10k-15k', child: Text('₹10k - ₹15k')),
-              PopupMenuItem(value: '15k-25k', child: Text('₹15k - ₹25k')),
-              PopupMenuItem(value: '25k+', child: Text('₹25k+')),
-            ],
-            onSelected: (val) {
-              setState(() {
-                _selectedSalaryRange = val;
-                _filterJobs();
-              });
-            },
+          const SizedBox(width: 10),
+          _buildFilterChipButton(
+            label: _educationOptions[_selectedEducationIndex],
+            onTap: () =>
+                _showFilterSheet(initialSection: _FilterSection.education),
           ),
-          const SizedBox(width: 8),
-          _buildDropdownChip(
-            label: 'Qualification',
-            activeValue: _selectedQualification,
-            items: const [
-              PopupMenuItem(value: 'all', child: Text('All Qualifications')),
-              PopupMenuItem(value: '10th Pass', child: Text('10th Pass')),
-              PopupMenuItem(value: '12th Pass', child: Text('12th Pass')),
-              PopupMenuItem(value: 'Graduate', child: Text('Graduate')),
-            ],
-            onSelected: (val) {
-              setState(() {
-                _selectedQualification = val;
-                _filterJobs();
-              });
-            },
+          const SizedBox(width: 10),
+          _buildFilterChipButton(
+            label: _experienceOptions[_selectedExperienceIndex],
+            onTap: () =>
+                _showFilterSheet(initialSection: _FilterSection.experience),
+          ),
+          const SizedBox(width: 10),
+          _buildFilterChipButton(
+            label: _freshnessOptions[_selectedFreshnessIndex],
+            onTap: () =>
+                _showFilterSheet(initialSection: _FilterSection.freshness),
+          ),
+          const SizedBox(width: 10),
+          _buildFilterChipButton(
+            label: _locationOptions[_selectedLocationIndex],
+            onTap: () =>
+                _showFilterSheet(initialSection: _FilterSection.location),
           ),
         ],
       ),
     );
+  }
+
+  // ── Bottom-sheet filter panel (mirrors available_jobs_screen.dart) ────────
+  Future<void> _showFilterSheet({
+    required _FilterSection initialSection,
+  }) async {
+    final selected = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        final sections = _FilterSection.values;
+        var activeSection = initialSection;
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final options = _optionsForSection(activeSection);
+            final currentIndex = _selectedIndexForSection(activeSection);
+
+            return Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.88,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 14, 12, 10),
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              'Filter',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                color: _Colors.darkText,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            icon: const Icon(
+                              Icons.close_rounded,
+                              color: _Colors.darkText,
+                              size: 26,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 135,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF8F8FA),
+                              border: Border(
+                                right: BorderSide(
+                                  color: Color(0xFFE8EAF0),
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: ListView.separated(
+                              itemCount: sections.length,
+                              separatorBuilder: (_, __) => const Divider(
+                                height: 1,
+                                thickness: 1,
+                                indent: 16,
+                                endIndent: 8,
+                              ),
+                              itemBuilder: (_, index) {
+                                final section = sections[index];
+                                final isActive = section == activeSection;
+                                return InkWell(
+                                  onTap: () {
+                                    setModalState(() {
+                                      activeSection = section;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 18,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isActive
+                                          ? Colors.white
+                                          : Colors.transparent,
+                                      border: Border(
+                                        left: BorderSide(
+                                          color: isActive
+                                              ? _Colors.primaryBlue
+                                              : Colors.transparent,
+                                          width: 4,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      _sectionTitle(section),
+                                      style: TextStyle(
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: isActive
+                                            ? _Colors.primaryBlue
+                                            : _Colors.darkText,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.separated(
+                              padding: const EdgeInsets.fromLTRB(
+                                16,
+                                14,
+                                16,
+                                16,
+                              ),
+                              itemCount: options.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 8),
+                              itemBuilder: (_, index) {
+                                final option = options[index];
+                                final isSelected = index == currentIndex;
+                                return InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _setSelectedIndexForSection(
+                                        activeSection,
+                                        index,
+                                      );
+                                      _filterJobs();
+                                    });
+                                    setModalState(() {});
+                                  },
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? const Color(0xFFF7F8FC)
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            option,
+                                            style: TextStyle(
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.w700,
+                                              color: _Colors.darkText,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          width: 30,
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: isSelected
+                                                  ? _Colors.darkText
+                                                  : const Color(0xFF8A8E97),
+                                              width: 2,
+                                            ),
+                                          ),
+                                          child: isSelected
+                                              ? const Center(
+                                                  child: Icon(
+                                                    Icons.circle_rounded,
+                                                    size: 14,
+                                                    color: _Colors.darkText,
+                                                  ),
+                                                )
+                                              : null,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 20.sp),
+                      height: 60.sp,
+                      padding: EdgeInsets.all(10.sp),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedJobTypeIndex = 0;
+                                  _selectedSalaryIndex = 0;
+                                  _selectedEducationIndex = 0;
+                                  _selectedExperienceIndex = 0;
+                                  _selectedFreshnessIndex = 0;
+                                  _selectedLocationIndex = 0;
+                                  _filterJobs();
+                                });
+                                setModalState(() {
+                                  activeSection = _FilterSection.jobType;
+                                });
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(
+                                  color: _Colors.primaryBlue,
+                                  width: 2,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 12.sp),
+                              ),
+                              child: Text(
+                                'Clear filter',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: _Colors.darkText,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10.sp),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                backgroundColor: _Colors.primaryBlue,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: EdgeInsets.symmetric(vertical: 12.sp),
+                              ),
+                              child: Text(
+                                'Submit',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    if (selected == true) {
+      setState(() {});
+    }
+  }
+
+  String _sectionTitle(_FilterSection section) {
+    return switch (section) {
+      _FilterSection.jobType => 'Job Type',
+      _FilterSection.salary => 'Salary Range',
+      _FilterSection.education => 'Education',
+      _FilterSection.experience => 'Work Experience',
+      _FilterSection.freshness => 'Freshness',
+      _FilterSection.location => 'Location',
+    };
+  }
+
+  List<String> _optionsForSection(_FilterSection section) {
+    return switch (section) {
+      _FilterSection.jobType => _jobTypeOptions,
+      _FilterSection.salary => _salaryOptions,
+      _FilterSection.education => _educationOptions,
+      _FilterSection.experience => _experienceOptions,
+      _FilterSection.freshness => _freshnessOptions,
+      _FilterSection.location => _locationOptions,
+    };
+  }
+
+  int _selectedIndexForSection(_FilterSection section) {
+    return switch (section) {
+      _FilterSection.jobType => _selectedJobTypeIndex,
+      _FilterSection.salary => _selectedSalaryIndex,
+      _FilterSection.education => _selectedEducationIndex,
+      _FilterSection.experience => _selectedExperienceIndex,
+      _FilterSection.freshness => _selectedFreshnessIndex,
+      _FilterSection.location => _selectedLocationIndex,
+    };
+  }
+
+  void _setSelectedIndexForSection(_FilterSection section, int index) {
+    switch (section) {
+      case _FilterSection.jobType:
+        _selectedJobTypeIndex = index;
+        break;
+      case _FilterSection.salary:
+        _selectedSalaryIndex = index;
+        break;
+      case _FilterSection.education:
+        _selectedEducationIndex = index;
+        break;
+      case _FilterSection.experience:
+        _selectedExperienceIndex = index;
+        break;
+      case _FilterSection.freshness:
+        _selectedFreshnessIndex = index;
+        break;
+      case _FilterSection.location:
+        _selectedLocationIndex = index;
+        break;
+    }
   }
 
   Widget _buildProfileView(AppLocalizations l10n) {

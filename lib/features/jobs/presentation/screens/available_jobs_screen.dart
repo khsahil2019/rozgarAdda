@@ -1166,7 +1166,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                               },
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(
-                                  color: Color(0xFFF0C000),
+                                  color: _C.primaryBlue,
                                   width: 2,
                                 ),
                                 shape: RoundedRectangleBorder(
@@ -1190,7 +1190,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                               onPressed: () => Navigator.pop(context, true),
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
-                                backgroundColor: _C.yellow,
+                                backgroundColor: _C.primaryBlue,
                                 foregroundColor: _C.darkText,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
