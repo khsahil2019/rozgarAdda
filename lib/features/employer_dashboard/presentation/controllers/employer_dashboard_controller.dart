@@ -1,8 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/exceptions/exceptions.dart';
 import '../../../../core/network/api_routes.dart';
 import '../../../../core/network/api_services.dart';
+import '../../../../splash_screen.dart';
 import '../../../jobs/data/model/available_job_model.dart';
 import '../../../jobs/domain/entities/available_job_entity.dart';
 import '../../data/models/mock_employer_database.dart';
@@ -111,13 +113,17 @@ class EmployerDashboardController extends GetxController {
         'education_level': newJob.educationLevel,
         'english_level': newJob.englishLevel,
         'experience_level': newJob.experienceLevel,
-        'plan_id': 1,
+        'plan_id': 2,
         'skills': newJob.skills,
         'languages': newJob.languages,
         'perks': newJob.perks,
         'shifts': newJob.shifts,
         'is_walkin': newJob.isWalkin ? 1 : 0,
-        'contact_preference': newJob.contactPreference,
+        'apply_only': newJob.applyOnly ? 1 : 0,
+        'enable_call': newJob.enableCall ? 1 : 0,
+        'enable_chat': newJob.enableChat ? 1 : 0,
+        'contact_phone': newJob.contactPhone ?? '',
+        'contact_whatsapp': newJob.whatsappNumber ?? '',
       };
 
       // Add conditional location fields
@@ -162,9 +168,10 @@ class EmployerDashboardController extends GetxController {
       }
 
       // Add conditional contact fields
-      if (newJob.contactPreference == 'other') {
+      if (newJob.contactPerson != null && newJob.contactPerson!.isNotEmpty) {
         body['contact_person'] = newJob.contactPerson;
-        body['contact_phone'] = newJob.contactPhone;
+      }
+      if (newJob.contactEmail != null && newJob.contactEmail!.isNotEmpty) {
         body['contact_email'] = newJob.contactEmail;
       }
 
@@ -207,5 +214,79 @@ class EmployerDashboardController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('employer_id');
     await prefs.remove('employer_token');
+    Get.offAll(() => const SplashScreen());
+  }
+
+  Future<void> checkStatusAndNavigateToPost(VoidCallback onApproved) async {
+    try {
+      // Show loading overlay
+      await Get.showOverlay(
+        asyncFunction: () async {
+          final prefs = await SharedPreferences.getInstance();
+          final token = prefs.getString('employer_token');
+
+          if (token == null || token.isEmpty) {
+            throw Failure(
+              'Authentication token not found. Please login again.',
+            );
+          }
+
+          // Call employer status check API
+          final res = await ApiService.get(
+            ApiRoutes.employerStatus,
+
+            accessToken: token,
+          );
+
+          if (res['status'] == true) {
+            final approvalStatus = res['approval_status'] ?? 'pending';
+            final canPostJob =
+                res['can_post_job'] == true || res['can_post_job'] == 1;
+
+            if (approvalStatus == 'approved' && canPostJob) {
+              onApproved();
+            } else {
+              String message =
+                  'Your account is under verification. You can post a job once your profile is approved.';
+              if (approvalStatus == 'rejected') {
+                message =
+                    'Your registration request has been rejected. Please contact support.';
+              }
+
+              Get.dialog(
+                AlertDialog(
+                  title: const Text('Verification Pending'),
+                  content: Text(message),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Get.back(),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+            }
+          } else {
+            throw Failure(
+              res['message'] ??
+                  res['error'] ??
+                  'Failed to verify account status',
+            );
+          }
+        },
+        loadingWidget: const Center(
+          child: CircularProgressIndicator(color: Colors.blue),
+        ),
+      );
+    } catch (err) {
+      Get.snackbar(
+        'Verification Error',
+        err is Failure ? err.message : err.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+      );
+    }
   }
 }

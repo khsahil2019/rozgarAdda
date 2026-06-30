@@ -59,7 +59,7 @@ class EmployerLoginScreen extends GetView<EmployerLoginController> {
         _showErrorDialog(context, errorMsg);
       },
       onSuccess: () {
-        Get.off(
+        Get.offAll(
           () => const EmployerDashboardScreen(),
           binding: EmployerDashboardBinding(),
         );

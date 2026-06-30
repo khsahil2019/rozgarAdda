@@ -60,7 +60,7 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
       },
       onSuccess: () {
         // Direct route to Employer Dashboard upon successful signup
-        Get.off(
+        Get.offAll(
           () => const EmployerDashboardScreen(),
           binding: EmployerDashboardBinding(),
         );
@@ -114,7 +114,7 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: size.height * 0.03),
-                
+
                 Center(
                   child: Text(
                     l10n.text('employer_register_subtitle'),
@@ -127,11 +127,13 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                
+
                 SizedBox(height: size.height * 0.03),
 
                 // Form Fields
-                _buildFieldLabel('${l10n.text('registration_personal_info')} - Company Name'),
+                _buildFieldLabel(
+                  '${l10n.text('registration_personal_info')} - Company Name',
+                ),
                 const SizedBox(height: 6),
                 _buildInputField(
                   hintText: 'Enter company name',

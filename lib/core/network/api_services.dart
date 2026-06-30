@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../exceptions/exceptions.dart';
 
@@ -13,7 +14,24 @@ class ApiService {
       contentType: Headers.jsonContentType,
       responseType: ResponseType.json,
     ),
-  );
+  )..interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          if (!options.headers.containsKey(HttpHeaders.authorizationHeader)) {
+            try {
+              final prefs = await SharedPreferences.getInstance();
+              final token = prefs.getString('access_token');
+              if (token != null && token.isNotEmpty) {
+                options.headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
+              }
+            } catch (_) {
+              // Ignore preference reading issues in interceptor
+            }
+          }
+          return handler.next(options);
+        },
+      ),
+    );
 
   /// Configure base URL, interceptors, and HTTP client adapter
   static void configure({

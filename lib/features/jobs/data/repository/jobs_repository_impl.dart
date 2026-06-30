@@ -28,7 +28,9 @@ class JobsRepositoryImpl implements JobsRepository {
   }
 
   @override
-  Future<Either<Failure, List<JobRoleEntity>>> getJobRoles(int categoryId) async {
+  Future<Either<Failure, List<JobRoleEntity>>> getJobRoles(
+    int categoryId,
+  ) async {
     try {
       final models = await remoteDataSource.getJobRoles(categoryId);
       final entities = models.map((model) => model.toEntity()).toList();
@@ -40,7 +42,9 @@ class JobsRepositoryImpl implements JobsRepository {
   }
 
   @override
-  Future<Either<Failure, List<AvailableJob>>> getAvailableJobs(int roleId) async {
+  Future<Either<Failure, List<AvailableJob>>> getAvailableJobs(
+    int roleId,
+  ) async {
     try {
       final models = await remoteDataSource.getAvailableJobs(roleId);
       final entities = models.map((model) => model.toEntity()).toList();
@@ -136,4 +140,3 @@ class JobsRepositoryImpl implements JobsRepository {
     }
   }
 }
-

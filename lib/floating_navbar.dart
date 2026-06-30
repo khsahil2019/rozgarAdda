@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:rojgar/dashboard_screen.dart';
-import 'package:rojgar/features/app/app_controller.dart';
+import 'package:rojgar/features/news/prsentation/screens/news_screen.dart';
 import 'package:rojgar/localization/app_localizations.dart';
-import 'package:rojgar/splash_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'profile_screen.dart';
 
@@ -16,105 +13,43 @@ class FloatingNavbarScreen extends StatefulWidget {
 }
 
 class _FloatingNavbarScreenState extends State<FloatingNavbarScreen> {
-  int _selectedIndex = 0; // Default to Explore as in the image
+  int _selectedIndex = 0;
 
   final Color _selectedColor = const Color(0xFF1E38FC); // Deep vibrant blue
   final Color _unselectedColor = const Color(0xFF9EABC0); // Greyish-blue
-  final Color _fabColor = const Color(0xFF0015FF); // Pure blue for FAB
 
   // Define the screens for each tab
   final List<Widget> _screens = [
-    const HomeScreen(), // 0: Home index
-    const Center(
-      child: Text(
-        'Explore Screen',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      ),
-    ),
-    const Center(
-      child: Text(
-        'Saved Screen',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      ),
-    ),
-    const ProfileScreen(), // 3: Profile
+    const HomeScreen(),
+    const NewsScreen(showBackButton: false),
+    const ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(
-        0xFFF0F2F5,
-      ), // Light background to contrast white navbar
+      backgroundColor: const Color(0xFFF0F2F5),
       body: IndexedStack(index: _selectedIndex, children: _screens),
-      // FAB
-      floatingActionButton: Container(
-        height: 68.0,
-        width: 68.0,
+      bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          shape: BoxShape.circle,
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: _fabColor.withValues(alpha: 0.4),
-              blurRadius: 15,
-              spreadRadius: 2,
-              offset: const Offset(0, 8),
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, -2),
             ),
           ],
         ),
-        child: FittedBox(
-          child: FloatingActionButton(
-            onPressed: () {
-              // Add action here
-            },
-            backgroundColor: _fabColor,
-            elevation: 0,
-            shape: const CircleBorder(
-              side: BorderSide(color: Colors.white, width: 4.0),
-            ),
-            child: const Icon(Icons.add, color: Colors.white, size: 32),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      // Bottom Navigation Bar
-      bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(
-          splashColor: Colors.transparent,
-          highlightColor:
-              Colors.transparent, // Disable click highlights for exact match
-        ),
-        child: BottomAppBar(
-          color: Colors.white,
-          elevation: 10,
-          shadowColor: Colors.black45,
-          padding: EdgeInsets.zero,
-          shape: const CircularNotchedRectangle(),
-          notchMargin: 8.0,
+        child: SafeArea(
           child: SizedBox(
-            height: 75,
+            height: 70,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildNavItem(0, Icons.home_rounded, 'HOME'),
-                      _buildNavItem(1, Icons.widgets, 'EXPLORE'),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 64), // Space for centered FAB notch
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildNavItem(2, Icons.bookmark_rounded, 'SAVED'),
-                      _buildNavItem(3, Icons.person_rounded, 'PROFILE'),
-                    ],
-                  ),
-                ),
+                _buildNavItem(0, Icons.home_rounded, 'HOME'),
+                _buildNavItem(1, Icons.newspaper_rounded, 'NEWS'),
+                _buildNavItem(2, Icons.person_rounded, 'PROFILE'),
               ],
             ),
           ),
@@ -130,11 +65,8 @@ class _FloatingNavbarScreenState extends State<FloatingNavbarScreen> {
       case 'HOME':
         localizedLabel = l10n.text('nav_home');
         break;
-      case 'EXPLORE':
-        localizedLabel = l10n.text('nav_explore');
-        break;
-      case 'SAVED':
-        localizedLabel = l10n.text('nav_saved');
+      case 'NEWS':
+        localizedLabel = l10n.text('nav_news');
         break;
       case 'PROFILE':
         localizedLabel = l10n.text('nav_profile');
@@ -157,8 +89,8 @@ class _FloatingNavbarScreenState extends State<FloatingNavbarScreen> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 6),
+          Icon(icon, color: color, size: 26),
+          const SizedBox(height: 5),
           Text(
             localizedLabel,
             style: TextStyle(

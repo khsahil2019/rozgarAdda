@@ -49,7 +49,9 @@ class EmployerDashboardScreen extends GetView<EmployerDashboardController> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Get.to(() => const PostJobFormScreen());
+          controller.checkStatusAndNavigateToPost(() {
+            Get.to(() => const PostJobFormScreen());
+          });
         },
         backgroundColor: primaryBlue,
         foregroundColor: Colors.white,

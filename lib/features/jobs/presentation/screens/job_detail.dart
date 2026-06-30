@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
+import 'applyjob_form.dart';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────
 class AppColors {
@@ -585,76 +586,176 @@ class JobDetailScreen extends StatelessWidget {
 
   // ── Bottom Bar ───────────────────────────────────────────────────────────────
   Widget _buildBottomBar(BuildContext context, double bottomPad) {
+    final bool showCall = job.enableCall && job.contactPhone != null && job.contactPhone!.isNotEmpty;
+    final bool showChat = job.enableChat && ((job.whatsappNumber != null && job.whatsappNumber!.isNotEmpty) || (job.contactPhone != null && job.contactPhone!.isNotEmpty));
+    final bool showApply = job.applyOnly || (!showCall && !showChat);
+
+    final List<Widget> buttons = [];
+
+    if (showApply) {
+      buttons.add(
+        Expanded(
+          child: SizedBox(
+            height: 52,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => JobApplicationScreen(
+                      jobId: job.id,
+                      jobTitle: job.title,
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryBlue,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: EdgeInsets.zero,
+              ),
+              icon: const Icon(Icons.send_rounded, size: 18),
+              label: const Text(
+                'Apply Now',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (showChat) {
+      buttons.add(
+        Expanded(
+          child: SizedBox(
+            height: 52,
+            child: OutlinedButton.icon(
+              onPressed: () => _openWhatsApp(job.whatsappNumber ?? job.contactPhone, job.title),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFF25D366), width: 1.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                foregroundColor: const Color(0xFF25D366),
+                padding: EdgeInsets.zero,
+              ),
+              icon: SizedBox(
+                width: 20,
+                height: 20,
+                child: Image.asset(
+                  'assets/icons/whatsapp.png',
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.chat_bubble_outline_rounded,
+                    size: 18,
+                    color: Color(0xFF25D366),
+                  ),
+                ),
+              ),
+              label: const Text(
+                'Chat',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (showCall) {
+      buttons.add(
+        Expanded(
+          child: SizedBox(
+            height: 52,
+            child: ElevatedButton.icon(
+              onPressed: () => _makeCall(job.contactPhone),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.yellow,
+                foregroundColor: AppColors.darkText,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: EdgeInsets.zero,
+              ),
+              icon: const Icon(Icons.phone_rounded, size: 18),
+              label: const Text(
+                'Call HR',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Add spacing between buttons
+    final List<Widget> spacedButtons = [];
+    for (int i = 0; i < buttons.length; i++) {
+      spacedButtons.add(buttons[i]);
+      if (i < buttons.length - 1) {
+        spacedButtons.add(const SizedBox(width: 12));
+      }
+    }
+
+    // If no buttons are enabled, default to Apply Now as fallback
+    if (spacedButtons.isEmpty) {
+      return Container(
+        color: AppColors.white,
+        padding: EdgeInsets.fromLTRB(16, 12, 16, bottomPad + 12),
+        child: SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => JobApplicationScreen(
+                    jobId: job.id,
+                    jobTitle: job.title,
+                  ),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryBlue,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            icon: const Icon(Icons.send_rounded, size: 18),
+            label: const Text(
+              'Apply Now',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Container(
       color: AppColors.white,
       padding: EdgeInsets.fromLTRB(16, 12, 16, bottomPad + 12),
-      child: Row(
-        children: [
-          // Chat (WhatsApp) button
-          Expanded(
-            child: SizedBox(
-              height: 52,
-              child: OutlinedButton.icon(
-                onPressed: () => _openWhatsApp(job.contactPhone, job.title),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFF25D366), width: 1.5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  foregroundColor: const Color(0xFF25D366),
-                  padding: EdgeInsets.zero,
-                ),
-                icon: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: Image.asset(
-                    'assets/icons/whatsapp.png',
-                    errorBuilder: (context, error, stackTrace) => const Icon(
-                      Icons.chat_bubble_outline_rounded,
-                      size: 18,
-                      color: Color(0xFF25D366),
-                    ),
-                  ),
-                ),
-                label: const Text(
-                  'Chat',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Call HR button (yellow)
-          Expanded(
-            child: SizedBox(
-              height: 52,
-              child: ElevatedButton.icon(
-                onPressed: () => _makeCall(job.contactPhone),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.yellow,
-                  foregroundColor: AppColors.darkText,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  padding: EdgeInsets.zero,
-                ),
-                icon: const Icon(Icons.phone_rounded, size: 18),
-                label: const Text(
-                  'Call HR',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      child: Row(children: spacedButtons),
     );
   }
 

@@ -198,7 +198,7 @@ class JobCardWidget extends StatelessWidget {
   }
 
   Future<void> _openWhatsApp() async {
-    final phone = job.contactPhone;
+    final phone = job.whatsappNumber ?? job.contactPhone;
     if (phone == null || phone.isEmpty) {
       Get.snackbar(
         'Unavailable',
@@ -244,6 +244,10 @@ class JobCardWidget extends StatelessWidget {
       lang,
     );
     final localizedEducation = _getLocalizedEducation(job.educationLevel, lang);
+
+    final bool showCall = job.enableCall && job.contactPhone != null && job.contactPhone!.isNotEmpty;
+    final bool showChat = job.enableChat && ((job.whatsappNumber != null && job.whatsappNumber!.isNotEmpty) || (job.contactPhone != null && job.contactPhone!.isNotEmpty));
+    final bool showApply = job.applyOnly || (!showCall && !showChat);
 
     return Container(
       color: Colors.white,
@@ -447,79 +451,130 @@ class JobCardWidget extends StatelessWidget {
                 ],
               ),
               const SizedBox(width: 8),
-              Expanded(
-                flex: 4,
-                child: SizedBox(
-                  height: 40,
-                  child: OutlinedButton.icon(
-                    onPressed: onWhatsAppTap ?? () => _openWhatsApp(),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
-                        color: Color(0xFFD7DADF),
-                        width: 1.2,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      foregroundColor: _CardColors.darkText,
-                      padding: EdgeInsets.zero,
-                    ),
-                    icon: SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: Image.asset(
-                        'assets/icons/whatsapp.png',
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(
-                              Icons.chat_bubble_outline_rounded,
-                              size: 16,
-                              color: Color(0xFF25D366),
+              ...() {
+                final List<Widget> activeButtons = [];
+                if (showApply) {
+                  activeButtons.add(
+                    Expanded(
+                      child: SizedBox(
+                        height: 40,
+                        child: ElevatedButton.icon(
+                          onPressed: onTap ?? () => _navigateToDetail(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _CardColors.primaryBlue,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          icon: const Icon(
+                            Icons.check_circle_outline_rounded,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            l10n.text('jobs_apply'),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                    label: const Text(
-                      'Chat',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: _CardColors.darkText,
+                  );
+                }
+                if (showChat) {
+                  activeButtons.add(
+                    Expanded(
+                      child: SizedBox(
+                        height: 40,
+                        child: OutlinedButton.icon(
+                          onPressed: onWhatsAppTap ?? () => _openWhatsApp(),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(
+                              color: Color(0xFFD7DADF),
+                              width: 1.2,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            foregroundColor: _CardColors.darkText,
+                            padding: EdgeInsets.zero,
+                          ),
+                          icon: SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: Image.asset(
+                              'assets/icons/whatsapp.png',
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                    Icons.chat_bubble_outline_rounded,
+                                    size: 16,
+                                    color: Color(0xFF25D366),
+                                  ),
+                            ),
+                          ),
+                          label: const Text(
+                            'Chat',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: _CardColors.darkText,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                flex: 4,
-                child: SizedBox(
-                  height: 40,
-                  child: ElevatedButton.icon(
-                    onPressed: onCallTap ?? () => _makeCall(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _CardColors.primaryBlue,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  );
+                }
+                if (showCall) {
+                  activeButtons.add(
+                    Expanded(
+                      child: SizedBox(
+                        height: 40,
+                        child: ElevatedButton.icon(
+                          onPressed: onCallTap ?? () => _makeCall(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _CardColors.primaryBlue,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          icon: const Icon(
+                            Icons.phone_rounded,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            lang == 'mr' ? 'कॉल' : 'Call',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
-                      padding: EdgeInsets.zero,
                     ),
-                    icon: const Icon(
-                      Icons.phone_rounded,
-                      size: 16,
-                      color: Colors.white,
-                    ),
-                    label: Text(
-                      lang == 'mr' ? 'कॉल' : 'Call',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+                  );
+                }
+
+                final List<Widget> rowChildren = [];
+                for (int i = 0; i < activeButtons.length; i++) {
+                  rowChildren.add(activeButtons[i]);
+                  if (i < activeButtons.length - 1) {
+                    rowChildren.add(const SizedBox(width: 8));
+                  }
+                }
+                return rowChildren;
+              }(),
             ],
           ),
         ],

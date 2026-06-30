@@ -17,7 +17,9 @@ class _NC {
 }
 
 class NewsScreen extends GetView<NewsController> {
-  const NewsScreen({super.key});
+  final bool showBackButton;
+
+  const NewsScreen({super.key, this.showBackButton = true});
 
   Future<void> _launchUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
@@ -89,11 +91,13 @@ class NewsScreen extends GetView<NewsController> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.maybePop(context),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-          ),
-          const SizedBox(width: 14),
+          if (showBackButton) ...[
+            GestureDetector(
+              onTap: () => Navigator.maybePop(context),
+              child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 14),
+          ],
           Text(
             l10n.text('news_title'),
             style: const TextStyle(

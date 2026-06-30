@@ -44,6 +44,9 @@ class AvailableJob {
   final int? districtId;
   final int? localiteId;
   final String? whatsappNumber;
+  final bool applyOnly;
+  final bool enableCall;
+  final bool enableChat;
 
   const AvailableJob({
     required this.id,
@@ -91,6 +94,9 @@ class AvailableJob {
     this.districtId,
     this.localiteId,
     this.whatsappNumber,
+    this.applyOnly = true,
+    this.enableCall = false,
+    this.enableChat = false,
   });
 
   /// Human-readable salary display string

@@ -46,6 +46,10 @@ class AvailableJobModel {
   final int? districtId;
   final int? localiteId;
   final String? whatsappNumber;
+  final bool applyOnly;
+  final bool enableCall;
+  final bool enableChat;
+
   AvailableJobModel({
     required this.id,
     required this.employerId,
@@ -92,6 +96,9 @@ class AvailableJobModel {
     this.districtId,
     this.localiteId,
     this.whatsappNumber,
+    this.applyOnly = true,
+    this.enableCall = false,
+    this.enableChat = false,
   });
 
   factory AvailableJobModel.fromJson(Map<String, dynamic> json) {
@@ -210,7 +217,24 @@ class AvailableJobModel {
                       ? _parseInt(json['field_localite_id'])
                       : null)),
       whatsappNumber: json['contact_whatsapp']?.toString(),
+      applyOnly: _parseBool(json['apply_only'] ?? true),
+      enableCall: json['enable_call'] != null
+          ? _parseBool(json['enable_call'])
+          : (json['contact_number'] ?? '').toString().isNotEmpty,
+      enableChat: json['enable_chat'] != null
+          ? _parseBool(json['enable_chat'])
+          : (json['contact_whatsapp'] ?? '').toString().isNotEmpty,
     );
+  }
+
+  static bool _parseBool(dynamic value) {
+    if (value == null) return false;
+    if (value is bool) return value;
+    if (value is num) return value == 1;
+    if (value is String) {
+      return value == '1' || value.toLowerCase() == 'true';
+    }
+    return false;
   }
 
   static int _parseInt(dynamic value) {
@@ -266,6 +290,9 @@ class AvailableJobModel {
       districtId: districtId,
       localiteId: localiteId,
       whatsappNumber: whatsappNumber,
+      applyOnly: applyOnly,
+      enableCall: enableCall,
+      enableChat: enableChat,
     );
   }
 }

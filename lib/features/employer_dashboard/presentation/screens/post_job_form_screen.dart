@@ -59,9 +59,17 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
   String _educationLevel = 'Graduate';
   String _englishLevel = 'none';
   String _experienceLevel = 'fresher';
-  String _contactPreference = 'self';
   String _selectedShift = 'day';
   bool _isWalkin = false;
+
+  // Contact preferences options
+  bool _applyOnly = true;
+  bool _enableCall = false;
+  bool _enableChat = false;
+  final _contactWhatsappCtrl = TextEditingController();
+
+  int get _selectedContactOptionsCount =>
+      (_applyOnly ? 1 : 0) + (_enableCall ? 1 : 0) + (_enableChat ? 1 : 0);
 
   // Dynamic Category & Role
   List<dynamic> _categories = [];
@@ -93,8 +101,12 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
     if (!mounted) return;
     setState(() => _isCategoriesLoading = true);
     try {
-      final res = await ApiService.get(ApiRoutes.dashboard);
-      if (res['status'] == true && res['data'] != null) {
+      final res = await ApiService.get(
+        ApiRoutes.dashboard,
+        queryParameters: {'lang': Get.locale?.languageCode ?? 'en'},
+      );
+      if ((res['status'] == true || res['success'] == true) &&
+          res['data'] != null) {
         final data = res['data'] as Map<String, dynamic>;
         final rawList = data['categories'] as List<dynamic>? ?? [];
         if (mounted) {
@@ -129,6 +141,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
       final res = await ApiService.post(
         ApiRoutes.jobRoles,
         body: {'category_id': categoryId},
+        // queryParameters: {'lang': Get.locale?.languageCode ?? 'en'},
       );
       if (res['status'] == true || res['success'] == true) {
         final List<dynamic> rawList = res['data'] as List<dynamic>? ?? [];
@@ -294,6 +307,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
     _walkinVenueCtrl.dispose();
     _languagesCtrl.dispose();
     _perksCtrl.dispose();
+    _contactWhatsappCtrl.dispose();
     super.dispose();
   }
 
@@ -325,6 +339,52 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
       }
     }
     if (!_formKey.currentState!.validate()) return;
+
+    final selectedOptionsCount = _selectedContactOptionsCount;
+    if (selectedOptionsCount == 0) {
+      Get.snackbar(
+        'Error',
+        'Please select at least one contact preference.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+      );
+      return;
+    }
+    if (selectedOptionsCount > 2) {
+      Get.snackbar(
+        'Error',
+        'You can select at most 2 contact preferences.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+      );
+      return;
+    }
+    if (_enableCall && _contactPhoneCtrl.text.trim().isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please enter a contact phone number.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+      );
+      return;
+    }
+    if (_enableChat && _contactWhatsappCtrl.text.trim().isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please enter a WhatsApp number.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+      );
+      return;
+    }
 
     final List<String> skillsList = _skillsCtrl.text
         .split(',')
@@ -394,16 +454,10 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
       walkinTime: _isWalkin ? _walkinTimeCtrl.text.trim() : null,
       walkinEndTime: _isWalkin ? _walkinEndTimeCtrl.text.trim() : null,
       walkinVenue: _isWalkin ? _walkinVenueCtrl.text.trim() : null,
-      contactPreference: _contactPreference,
-      contactPerson: _contactPreference == 'other'
-          ? _contactPersonCtrl.text.trim()
-          : null,
-      contactPhone: _contactPreference == 'other'
-          ? _contactPhoneCtrl.text.trim()
-          : null,
-      contactEmail: _contactPreference == 'other'
-          ? _contactEmailCtrl.text.trim()
-          : null,
+      contactPreference: '',
+      contactPerson: null,
+      contactPhone: _enableCall ? _contactPhoneCtrl.text.trim() : null,
+      contactEmail: null,
       viewsCount: 0,
       applicationsCount: 0,
       status: 'active',
@@ -411,6 +465,10 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
       stateId: _selectedStateId,
       districtId: _selectedDistrictId,
       localiteId: _selectedLocalityId,
+      whatsappNumber: _enableChat ? _contactWhatsappCtrl.text.trim() : null,
+      applyOnly: _applyOnly,
+      enableCall: _enableCall,
+      enableChat: _enableChat,
     );
 
     controller
@@ -489,22 +547,36 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                   ),
                 )
               else if (_categories.isNotEmpty)
-                _buildDropdownField<int?>(
+                _buildSelectorField(
                   label: 'Job Category *',
-                  value: _selectedCategoryId,
-                  items: _categories.map((c) {
-                    return DropdownMenuItem<int?>(
-                      value: c['id'] as int?,
-                      child: Text((c['name'] ?? '').toString()),
+                  valueText:
+                      _categories
+                          .firstWhere(
+                            (c) => c['id'] == _selectedCategoryId,
+                            orElse: () => {'name': ''},
+                          )['name']
+                          ?.toString() ??
+                      '',
+                  onTap: () {
+                    final items = _categories
+                        .map(
+                          (c) => MapEntry(
+                            c['id'] as int,
+                            (c['name'] ?? '').toString(),
+                          ),
+                        )
+                        .toList();
+                    _showSearchBottomSheet(
+                      title: 'Select Job Category',
+                      items: items,
+                      selectedId: _selectedCategoryId,
+                      onSelected: (val) {
+                        setState(() {
+                          _selectedCategoryId = val;
+                        });
+                        _fetchRoles(val);
+                      },
                     );
-                  }).toList(),
-                  onChanged: (val) {
-                    if (val != null) {
-                      setState(() {
-                        _selectedCategoryId = val;
-                      });
-                      _fetchRoles(val);
-                    }
                   },
                 ),
 
@@ -717,22 +789,29 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                     ),
                   )
                 else
-                  _buildDropdownField<int?>(
+                  _buildSelectorField(
                     label: 'State *',
-                    value: _selectedStateId,
-                    items: _states.map((s) {
-                      return DropdownMenuItem<int?>(
-                        value: s.id,
-                        child: Text(s.name),
+                    valueText: _states
+                        .firstWhere(
+                          (s) => s.id == _selectedStateId,
+                          orElse: () => const DropdownItem(id: 0, name: ''),
+                        )
+                        .name,
+                    onTap: () {
+                      final items = _states
+                          .map((s) => MapEntry(s.id, s.name))
+                          .toList();
+                      _showSearchBottomSheet(
+                        title: 'Select State',
+                        items: items,
+                        selectedId: _selectedStateId,
+                        onSelected: (val) {
+                          setState(() {
+                            _selectedStateId = val;
+                          });
+                          _fetchDistricts(val);
+                        },
                       );
-                    }).toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        setState(() {
-                          _selectedStateId = val;
-                        });
-                        _fetchDistricts(val);
-                      }
                     },
                   ),
 
@@ -980,49 +1059,121 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
 
               const SizedBox(height: 20),
               _buildSectionTitle('Contact Details'),
-              _buildDropdownField<String>(
-                label: 'Candidate Contact Preference *',
-                value: _contactPreference,
-                items: const [
-                  DropdownMenuItem(
-                    value: 'self',
-                    child: Text('Contact Me (Self)'),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: Text(
+                  'Select how candidates can apply/contact you (Select 1 or 2 options):',
+                  style: TextStyle(
+                    color: greyText,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
-                  DropdownMenuItem(
-                    value: 'other',
-                    child: Text('Contact Someone Else (Other)'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'none',
-                    child: Text('No Contact Preference (Direct Application)'),
-                  ),
-                ],
-                onChanged: (val) => setState(() => _contactPreference = val!),
+                ),
               ),
 
-              if (_contactPreference == 'other') ...[
-                _buildTextField(
-                  label: 'Contact Person Name *',
-                  hint: 'e.g. Raman Khanna',
-                  controller: _contactPersonCtrl,
-                  validator: (val) =>
-                      val!.trim().isEmpty ? 'Required field' : null,
-                ),
+              _buildContactOptionTile(
+                title: 'Direct Application (Apply Only)',
+                subtitle: 'Candidates apply directly through the app',
+                value: _applyOnly,
+                onChanged: (val) {
+                  if (val == null) return;
+                  final currentCount = _selectedContactOptionsCount;
+                  if (val) {
+                    if (currentCount < 2) {
+                      setState(() => _applyOnly = true);
+                    } else {
+                      _showMaxOptionsWarning();
+                    }
+                  } else {
+                    if (currentCount > 1) {
+                      setState(() => _applyOnly = false);
+                    } else {
+                      _showMinOptionsWarning();
+                    }
+                  }
+                },
+              ),
+              const SizedBox(height: 10),
+
+              _buildContactOptionTile(
+                title: 'Allow Calls (Phone Call)',
+                subtitle: 'Show phone number for candidates to call',
+                value: _enableCall,
+                onChanged: (val) {
+                  if (val == null) return;
+                  final currentCount = _selectedContactOptionsCount;
+                  if (val) {
+                    if (currentCount < 2) {
+                      setState(() => _enableCall = true);
+                    } else {
+                      _showMaxOptionsWarning();
+                    }
+                  } else {
+                    if (currentCount > 1) {
+                      setState(() => _enableCall = false);
+                    } else {
+                      _showMinOptionsWarning();
+                    }
+                  }
+                },
+              ),
+              const SizedBox(height: 10),
+
+              _buildContactOptionTile(
+                title: 'Allow WhatsApp Chat',
+                subtitle: 'Enable WhatsApp chat for candidates',
+                value: _enableChat,
+                onChanged: (val) {
+                  if (val == null) return;
+                  final currentCount = _selectedContactOptionsCount;
+                  if (val) {
+                    if (currentCount < 2) {
+                      setState(() => _enableChat = true);
+                    } else {
+                      _showMaxOptionsWarning();
+                    }
+                  } else {
+                    if (currentCount > 1) {
+                      setState(() => _enableChat = false);
+                    } else {
+                      _showMinOptionsWarning();
+                    }
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+
+              if (_enableCall)
                 _buildTextField(
                   label: 'Contact Phone Number *',
-                  hint: '10-digit number',
+                  hint: 'Enter 10-digit phone number for calls',
                   controller: _contactPhoneCtrl,
                   keyboardType: TextInputType.phone,
-                  validator: (val) =>
-                      val!.trim().length != 10 ? 'Enter valid phone' : null,
+                  validator: (val) {
+                    if (_enableCall) {
+                      if (val == null || val.trim().length != 10) {
+                        return 'Enter valid 10-digit phone number';
+                      }
+                    }
+                    return null;
+                  },
                 ),
+
+              if (_enableChat)
                 _buildTextField(
-                  label: 'Contact Email Address',
-                  hint: 'e.g. jobs@company.com',
-                  controller: _contactEmailCtrl,
-                  keyboardType: TextInputType.emailAddress,
+                  label: 'WhatsApp Number *',
+                  hint: 'Enter 10-digit WhatsApp number',
+                  controller: _contactWhatsappCtrl,
+                  keyboardType: TextInputType.phone,
+                  validator: (val) {
+                    if (_enableChat) {
+                      if (val == null || val.trim().length != 10) {
+                        return 'Enter valid 10-digit WhatsApp number';
+                      }
+                    }
+                    return null;
+                  },
                 ),
-              ],
 
               const SizedBox(height: 32),
               SizedBox(
@@ -1219,6 +1370,271 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showMaxOptionsWarning() {
+    Get.snackbar(
+      'Limit Reached',
+      'You can select a maximum of 2 contact preferences.',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.orange,
+      colorText: Colors.white,
+      margin: const EdgeInsets.all(16),
+    );
+  }
+
+  void _showMinOptionsWarning() {
+    Get.snackbar(
+      'Selection Required',
+      'You must select at least 1 contact preference.',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.orange,
+      colorText: Colors.white,
+      margin: const EdgeInsets.all(16),
+    );
+  }
+
+  Widget _buildContactOptionTile({
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool?> onChanged,
+  }) {
+    final count = _selectedContactOptionsCount;
+    final bool isDisabled = (!value && count >= 2) || (value && count <= 1);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: fieldBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: value ? primaryBlue : borderColor,
+          width: value ? 2 : 1.5,
+        ),
+      ),
+      child: CheckboxListTile(
+        activeColor: primaryBlue,
+        title: Text(
+          title,
+          style: TextStyle(
+            color: isDisabled ? greyText : darkText,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: const TextStyle(color: greyText, fontSize: 12),
+        ),
+        value: value,
+        onChanged: onChanged,
+        controlAffinity: ListTileControlAffinity.trailing,
+      ),
+    );
+  }
+
+  Widget _buildSelectorField({
+    required String label,
+    required String valueText,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: darkText,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 6),
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: fieldBg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: borderColor, width: 1.5),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    valueText.isNotEmpty
+                        ? valueText
+                        : 'Select ${label.replaceAll(' *', '')}',
+                    style: TextStyle(
+                      color: valueText.isNotEmpty ? darkText : greyText,
+                      fontSize: 15,
+                      fontWeight: valueText.isNotEmpty
+                          ? FontWeight.w500
+                          : FontWeight.normal,
+                    ),
+                  ),
+                ),
+                const Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: greyText,
+                  size: 22,
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  void _showSearchBottomSheet({
+    required String title,
+    required List<MapEntry<int, String>> items,
+    required int? selectedId,
+    required ValueChanged<int> onSelected,
+  }) {
+    String searchQuery = '';
+
+    Get.bottomSheet(
+      StatefulBuilder(
+        builder: (context, setSheetState) {
+          final filteredItems = items
+              .where(
+                (item) => item.value.toLowerCase().contains(
+                  searchQuery.toLowerCase(),
+                ),
+              )
+              .toList();
+
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.6,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[350],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: darkText,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: () => Get.back(),
+                        icon: const Icon(Icons.close_rounded, color: greyText),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF3F4F6),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: TextField(
+                      autofocus: false,
+                      onChanged: (val) {
+                        setSheetState(() {
+                          searchQuery = val;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        hintText: 'Search...',
+                        hintStyle: TextStyle(color: greyText),
+                        prefixIcon: Icon(Icons.search_rounded, color: greyText),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: filteredItems.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'No items found',
+                            style: TextStyle(color: greyText, fontSize: 15),
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          itemCount: filteredItems.length,
+                          itemBuilder: (context, index) {
+                            final item = filteredItems[index];
+                            final isSelected = item.key == selectedId;
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 2,
+                                horizontal: 8,
+                              ),
+                              child: ListTile(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                tileColor: isSelected
+                                    ? const Color(0xFFEEEEFF)
+                                    : Colors.transparent,
+                                title: Text(
+                                  item.value,
+                                  style: TextStyle(
+                                    color: isSelected ? primaryBlue : darkText,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                trailing: isSelected
+                                    ? const Icon(
+                                        Icons.check_rounded,
+                                        color: primaryBlue,
+                                      )
+                                    : null,
+                                onTap: () {
+                                  onSelected(item.key);
+                                  Get.back();
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
     );
   }
 }

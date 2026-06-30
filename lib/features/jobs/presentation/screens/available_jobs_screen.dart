@@ -779,7 +779,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     return JobCardWidget(
       job: job,
       imageUrl: categoryImageUrl,
-      onWhatsAppTap: () => _openWhatsApp(job.whatsappNumber, job.title),
+      onWhatsAppTap: () => _openWhatsApp(job.whatsappNumber ?? job.contactPhone, job.title),
       onCallTap: () => _makeCall(job.contactPhone),
       onShareTap: () => _shareJob(job),
     );

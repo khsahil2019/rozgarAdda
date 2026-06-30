@@ -187,6 +187,13 @@ class MockEmployerDatabase {
       walkinEndTime: job.walkinEndTime,
       walkinVenue: job.walkinVenue,
       createdAt: job.createdAt,
+      stateId: job.stateId,
+      districtId: job.districtId,
+      localiteId: job.localiteId,
+      whatsappNumber: job.whatsappNumber,
+      applyOnly: job.applyOnly,
+      enableCall: job.enableCall,
+      enableChat: job.enableChat,
     );
 
     _jobs.add(jobWithId);
@@ -267,6 +274,13 @@ class MockEmployerDatabase {
         walkinEndTime: oldJob.walkinEndTime,
         walkinVenue: oldJob.walkinVenue,
         createdAt: oldJob.createdAt,
+        stateId: oldJob.stateId,
+        districtId: oldJob.districtId,
+        localiteId: oldJob.localiteId,
+        whatsappNumber: oldJob.whatsappNumber,
+        applyOnly: oldJob.applyOnly,
+        enableCall: oldJob.enableCall,
+        enableChat: oldJob.enableChat,
       );
     }
 
@@ -344,6 +358,10 @@ class MockEmployerDatabase {
       'state_id': job.stateId,
       'district_id': job.districtId,
       'localite_id': job.localiteId,
+      'apply_only': job.applyOnly ? 1 : 0,
+      'enable_call': job.enableCall ? 1 : 0,
+      'enable_chat': job.enableChat ? 1 : 0,
+      'contact_whatsapp': job.whatsappNumber,
     };
   }
 
@@ -410,6 +428,10 @@ class MockEmployerDatabase {
       stateId: json['state_id'] as int?,
       districtId: json['district_id'] as int?,
       localiteId: json['localite_id'] as int?,
+      whatsappNumber: json['contact_whatsapp']?.toString(),
+      applyOnly: json['apply_only'] == 1 || json['apply_only'] == true || json['apply_only'] == null,
+      enableCall: json['enable_call'] == 1 || json['enable_call'] == true,
+      enableChat: json['enable_chat'] == 1 || json['enable_chat'] == true,
     );
   }
 }

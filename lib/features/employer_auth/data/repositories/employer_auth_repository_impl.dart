@@ -29,6 +29,7 @@ class EmployerAuthRepositoryImpl implements EmployerAuthRepository {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt(_keySessionId, employer.id);
         await prefs.setString(_keySessionToken, employer.token);
+        await prefs.setString('access_token', employer.token);
         
         // Clear candidate session to avoid conflict
         await prefs.remove('candidate_id');
@@ -84,6 +85,7 @@ class EmployerAuthRepositoryImpl implements EmployerAuthRepository {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt(_keySessionId, employer.id);
         await prefs.setString(_keySessionToken, employer.token);
+        await prefs.setString('access_token', employer.token);
 
         // Clear candidate session to avoid conflict
         await prefs.remove('candidate_id');
@@ -109,5 +111,6 @@ class EmployerAuthRepositoryImpl implements EmployerAuthRepository {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keySessionId);
     await prefs.remove(_keySessionToken);
+    await prefs.remove('access_token');
   }
 }

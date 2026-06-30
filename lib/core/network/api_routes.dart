@@ -11,6 +11,7 @@ class ApiRoutes {
   static String get employerRegister => _buildUrl('emp/register');
   static String get employerJobs => _buildUrl('emp/jobs');
   static String get postJob => _buildUrl('emp/post-job');
+  static String get employerStatus => _buildUrl('emp/status');
   static String get forgotPassword => _buildUrl('candidate/forgot-password');
   static String get resetPassword => _buildUrl('candidate/reset-password');
   static String get verifyEmail => _buildUrl('candidate/verify-email');
@@ -29,7 +30,8 @@ class ApiRoutes {
   static String get subcategories => _buildUrl('subcategories');
   static String get addProduct => _buildUrl('sell/add');
   static String get getProducts => _buildUrl('get-products');
-  static String productDetails(int productId) => _buildUrl('product-details/$productId');
+  static String productDetails(int productId) =>
+      _buildUrl('product-details/$productId');
 
   // Jobs
   static String get dashboard => _buildUrl('candidate/dashboard');

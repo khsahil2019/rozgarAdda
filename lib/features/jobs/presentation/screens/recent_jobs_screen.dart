@@ -708,6 +708,10 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     final localizedLocation = job.stateName;
     final localizedEducation = _getLocalizedEducation(job.educationLevel, lang);
 
+    final bool showCall = job.enableCall && job.contactPhone != null && job.contactPhone!.isNotEmpty;
+    final bool showChat = job.enableChat && ((job.whatsappNumber != null && job.whatsappNumber!.isNotEmpty) || (job.contactPhone != null && job.contactPhone!.isNotEmpty));
+    final bool showApply = job.applyOnly || (!showCall && !showChat);
+
     double scale = 1.0;
     if (_pageController.hasClients && _pageController.position.haveDimensions) {
       double diff = _currentPage - index;
@@ -875,35 +879,132 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
             ),
             const SizedBox(height: 10),
             // Bottom Part: Full-width blue Call button
-            SizedBox(
-              width: double.infinity,
-              height: 38,
-              child: ElevatedButton.icon(
-                onPressed: () => _makeCall(job.contactPhone),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _Colors.primaryBlue,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: EdgeInsets.zero,
-                ),
-                icon: const Icon(
-                  Icons.phone_rounded,
-                  size: 16,
-                  color: Colors.white,
-                ),
-                label: Text(
-                  lang == 'mr' ? 'कॉल' : 'Call',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+            Row(
+              children: () {
+                final List<Widget> activeButtons = [];
+                if (showApply) {
+                  activeButtons.add(
+                    Expanded(
+                      child: SizedBox(
+                        height: 38,
+                        child: ElevatedButton.icon(
+                          onPressed: () => _navigateToDetail(job),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _Colors.primaryBlue,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          icon: const Icon(
+                            Icons.check_circle_outline_rounded,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            l10n.text('jobs_apply'),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                if (showChat) {
+                  activeButtons.add(
+                    Expanded(
+                      child: SizedBox(
+                        height: 38,
+                        child: OutlinedButton.icon(
+                          onPressed: () => _openWhatsApp(job.whatsappNumber ?? job.contactPhone, job.title),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(
+                              color: Color(0xFFD7DADF),
+                              width: 1.2,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            foregroundColor: _Colors.darkText,
+                            padding: EdgeInsets.zero,
+                          ),
+                          icon: SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: Image.asset(
+                              'assets/icons/whatsapp.png',
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                    Icons.chat_bubble_outline_rounded,
+                                    size: 16,
+                                    color: Color(0xFF25D366),
+                                  ),
+                            ),
+                          ),
+                          label: const Text(
+                            'Chat',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: _Colors.darkText,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                if (showCall) {
+                  activeButtons.add(
+                    Expanded(
+                      child: SizedBox(
+                        height: 38,
+                        child: ElevatedButton.icon(
+                          onPressed: () => _makeCall(job.contactPhone),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _Colors.primaryBlue,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          icon: const Icon(
+                            Icons.phone_rounded,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            lang == 'mr' ? 'कॉल' : 'Call',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                final List<Widget> rowChildren = [];
+                for (int i = 0; i < activeButtons.length; i++) {
+                  rowChildren.add(activeButtons[i]);
+                  if (i < activeButtons.length - 1) {
+                    rowChildren.add(const SizedBox(width: 8));
+                  }
+                }
+                return rowChildren;
+              }(),
+            )
           ],
         ),
       ),
@@ -914,7 +1015,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     return JobCardWidget(
       job: job,
       onTap: () => _navigateToDetail(job),
-      onWhatsAppTap: () => _openWhatsApp(job.contactPhone, job.title),
+      onWhatsAppTap: () => _openWhatsApp(job.whatsappNumber ?? job.contactPhone, job.title),
       onCallTap: () => _makeCall(job.contactPhone),
       onShareTap: () => _shareJob(job),
     );
