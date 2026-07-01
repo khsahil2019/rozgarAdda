@@ -167,7 +167,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       if (!mounted || !_pageController.hasClients) return;
       final itemCount = _recentJobs.take(5).length;
       if (itemCount <= 1) return;
-      final nextPage = (_currentPage.round() + 1) % itemCount;
+      final nextPage = _currentPage.round() + 1;
       _pageController.animateToPage(
         nextPage,
         duration: const Duration(milliseconds: 500),
@@ -497,7 +497,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                     InkWell(
                       onTap: () {},
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.min, 
                         children: [
                           Text(
                             _getSeeAllLabel(l10n.locale.languageCode),
@@ -523,9 +523,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 height: 200,
                 child: PageView.builder(
                   controller: _pageController,
-                  itemCount: _recentJobs.take(5).length,
+                  physics: const ForwardOnlyScrollPhysics(),
                   itemBuilder: (context, index) {
-                    final job = _recentJobs[index];
+                    final itemCount = _recentJobs.take(5).length;
+                    if (itemCount == 0) return const SizedBox.shrink();
+                    final job = _recentJobs[index % itemCount];
                     return _buildSliderCard(job, index);
                   },
                 ),
@@ -708,8 +710,14 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     final localizedLocation = job.stateName;
     final localizedEducation = _getLocalizedEducation(job.educationLevel, lang);
 
-    final bool showCall = job.enableCall && job.contactPhone != null && job.contactPhone!.isNotEmpty;
-    final bool showChat = job.enableChat && ((job.whatsappNumber != null && job.whatsappNumber!.isNotEmpty) || (job.contactPhone != null && job.contactPhone!.isNotEmpty));
+    final bool showCall =
+        job.enableCall &&
+        job.contactPhone != null &&
+        job.contactPhone!.isNotEmpty;
+    final bool showChat =
+        job.enableChat &&
+        ((job.whatsappNumber != null && job.whatsappNumber!.isNotEmpty) ||
+            (job.contactPhone != null && job.contactPhone!.isNotEmpty));
     final bool showApply = job.applyOnly || (!showCall && !showChat);
 
     double scale = 1.0;
@@ -922,7 +930,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                       child: SizedBox(
                         height: 38,
                         child: OutlinedButton.icon(
-                          onPressed: () => _openWhatsApp(job.whatsappNumber ?? job.contactPhone, job.title),
+                          onPressed: () => _openWhatsApp(
+                            job.whatsappNumber ?? job.contactPhone,
+                            job.title,
+                            job.id,
+                          ),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
                               color: Color(0xFFD7DADF),
@@ -966,7 +978,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                       child: SizedBox(
                         height: 38,
                         child: ElevatedButton.icon(
-                          onPressed: () => _makeCall(job.contactPhone),
+                          onPressed: () => _makeCall(job.contactPhone, job.id),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _Colors.primaryBlue,
                             foregroundColor: Colors.white,
@@ -1004,7 +1016,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                 }
                 return rowChildren;
               }(),
-            )
+            ),
           ],
         ),
       ),
@@ -1015,8 +1027,12 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     return JobCardWidget(
       job: job,
       onTap: () => _navigateToDetail(job),
-      onWhatsAppTap: () => _openWhatsApp(job.whatsappNumber ?? job.contactPhone, job.title),
-      onCallTap: () => _makeCall(job.contactPhone),
+      onWhatsAppTap: () => _openWhatsApp(
+        job.whatsappNumber ?? job.contactPhone,
+        job.title,
+        job.id,
+      ),
+      onCallTap: () => _makeCall(job.contactPhone, job.id),
       onShareTap: () => _shareJob(job),
     );
   }
@@ -1025,10 +1041,15 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     int slideCount = _recentJobs.take(5).length;
     if (slideCount <= 1) return const SizedBox.shrink();
 
+    double normalizedPage = _currentPage % slideCount;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(slideCount, (index) {
-        double diff = (_currentPage - index).abs();
+        double diff = (normalizedPage - index).abs();
+        if (diff > slideCount / 2) {
+          diff = slideCount - diff;
+        }
         bool isActive = diff < 0.5;
 
         return AnimatedContainer(
@@ -1278,14 +1299,18 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                             child: activeSection == _FilterSection.category
                                 ? GridView.builder(
                                     padding: const EdgeInsets.fromLTRB(
-                                        16, 14, 16, 16),
+                                      16,
+                                      14,
+                                      16,
+                                      16,
+                                    ),
                                     gridDelegate:
                                         const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      mainAxisSpacing: 12,
-                                      crossAxisSpacing: 12,
-                                      childAspectRatio: 0.92,
-                                    ),
+                                          crossAxisCount: 2,
+                                          mainAxisSpacing: 12,
+                                          crossAxisSpacing: 12,
+                                          childAspectRatio: 0.92,
+                                        ),
                                     itemCount: categories.length,
                                     itemBuilder: (_, index) {
                                       final cat = categories[index];
@@ -1329,8 +1354,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                                           });
                                           setModalState(() {});
                                         },
-                                        borderRadius:
-                                            BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(16),
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 12,
@@ -1340,8 +1364,9 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                                             color: isSelected
                                                 ? const Color(0xFFF7F8FC)
                                                 : Colors.transparent,
-                                            borderRadius:
-                                                BorderRadius.circular(16),
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
                                           ),
                                           child: Row(
                                             children: [
@@ -1364,7 +1389,8 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                                                     color: isSelected
                                                         ? _Colors.darkText
                                                         : const Color(
-                                                            0xFF8A8E97),
+                                                            0xFF8A8E97,
+                                                          ),
                                                     width: 2,
                                                   ),
                                                 ),
@@ -1905,7 +1931,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     );
   }
 
-  Future<void> _makeCall(String? phone) async {
+  Future<void> _makeCall(String? phone, int jobId) async {
     if (phone == null || phone.isEmpty) {
       Get.snackbar(
         'Unavailable',
@@ -1913,6 +1939,15 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
+    }
+    try {
+      await _jobsController.logCallAndChatApply(
+        jobId: jobId,
+        type: 'call',
+        phone: phone,
+      );
+    } catch (e) {
+      debugPrint('Error logging call application: $e');
     }
     final Uri url = Uri.parse('tel:$phone');
     if (await canLaunchUrl(url)) {
@@ -1926,7 +1961,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     }
   }
 
-  Future<void> _openWhatsApp(String? phone, String title) async {
+  Future<void> _openWhatsApp(String? phone, String title, int jobId) async {
     if (phone == null || phone.isEmpty) {
       Get.snackbar(
         'Unavailable',
@@ -1934,6 +1969,15 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
+    }
+    try {
+      await _jobsController.logCallAndChatApply(
+        jobId: jobId,
+        type: 'chat',
+        phone: phone,
+      );
+    } catch (e) {
+      debugPrint('Error logging chat application: $e');
     }
     final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
     final message = 'Hello, I am interested in your job posting: "$title".';
@@ -2065,5 +2109,32 @@ class _RecentCategoryCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class ForwardOnlyScrollPhysics extends ScrollPhysics {
+  const ForwardOnlyScrollPhysics({super.parent});
+
+  @override
+  ForwardOnlyScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return ForwardOnlyScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  @override
+  double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
+    // Prevent scrolling backwards (user swiping left-to-right is offset > 0)
+    if (offset > 0) {
+      return 0.0;
+    }
+    return super.applyPhysicsToUserOffset(position, offset);
+  }
+
+  @override
+  double applyBoundaryConditions(ScrollMetrics position, double value) {
+    // Prevent any decrease in scroll pixels (going backward)
+    if (value < position.pixels) {
+      return value - position.pixels;
+    }
+    return super.applyBoundaryConditions(position, value);
   }
 }

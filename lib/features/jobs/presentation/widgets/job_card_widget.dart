@@ -5,6 +5,7 @@ import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
+import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dart';
 
 class _CardColors {
   static const Color primaryBlue = Color(0xFF1400FF);
@@ -185,6 +186,17 @@ class JobCardWidget extends StatelessWidget {
       );
       return;
     }
+    try {
+      if (Get.isRegistered<JobsController>()) {
+        Get.find<JobsController>().logCallAndChatApply(
+          jobId: job.id,
+          type: 'call',
+          phone: phone,
+        );
+      }
+    } catch (e) {
+      debugPrint('Error logging call application: $e');
+    }
     final Uri url = Uri.parse('tel:$phone');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
@@ -206,6 +218,17 @@ class JobCardWidget extends StatelessWidget {
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
+    }
+    try {
+      if (Get.isRegistered<JobsController>()) {
+        Get.find<JobsController>().logCallAndChatApply(
+          jobId: job.id,
+          type: 'chat',
+          phone: phone,
+        );
+      }
+    } catch (e) {
+      debugPrint('Error logging chat application: $e');
     }
     final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
     final message = Uri.encodeComponent(
@@ -245,8 +268,14 @@ class JobCardWidget extends StatelessWidget {
     );
     final localizedEducation = _getLocalizedEducation(job.educationLevel, lang);
 
-    final bool showCall = job.enableCall && job.contactPhone != null && job.contactPhone!.isNotEmpty;
-    final bool showChat = job.enableChat && ((job.whatsappNumber != null && job.whatsappNumber!.isNotEmpty) || (job.contactPhone != null && job.contactPhone!.isNotEmpty));
+    final bool showCall =
+        job.enableCall &&
+        job.contactPhone != null &&
+        job.contactPhone!.isNotEmpty;
+    final bool showChat =
+        job.enableChat &&
+        ((job.whatsappNumber != null && job.whatsappNumber!.isNotEmpty) ||
+            (job.contactPhone != null && job.contactPhone!.isNotEmpty));
     final bool showApply = job.applyOnly || (!showCall && !showChat);
 
     return Container(

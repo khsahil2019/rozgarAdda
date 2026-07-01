@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:rojgar/core/exceptions/exceptions.dart';
 import '../../domain/entities/available_job_entity.dart';
 import '../../domain/entities/job_category.dart';
 import '../../domain/entities/job_role_entity.dart';
@@ -107,5 +109,13 @@ class JobsController extends GetxController {
     selectedRole.value = role;
     availableJobs.clear();
     fetchAvailableJobs(role.id);
+  }
+
+  Future<Either<Failure, bool>> logCallAndChatApply({
+    required int jobId,
+    required String type,
+    required String phone
+  }) async {
+    return await repository.logCallAndChatApply(jobId: jobId, type: type, phone: phone);
   }
 }

@@ -12,6 +12,12 @@ class ApiRoutes {
   static String get employerJobs => _buildUrl('emp/jobs');
   static String get postJob => _buildUrl('emp/post-job');
   static String get employerStatus => _buildUrl('emp/status');
+  static String employerApplications(int jobId) =>
+      _buildUrl('emp/applications/$jobId');
+  static String employerApplicationDetails(int applicationId) =>
+      _buildUrl('emp/get-details/$applicationId');
+  static String employerExportApplications(int jobId) =>
+      _buildUrl('emp/jobs/$jobId/applications/export');
   static String get forgotPassword => _buildUrl('candidate/forgot-password');
   static String get resetPassword => _buildUrl('candidate/reset-password');
   static String get verifyEmail => _buildUrl('candidate/verify-email');
@@ -39,6 +45,8 @@ class ApiRoutes {
   static String availableJobs(int roleId) =>
       _buildUrl('candidate/available-jobs/$roleId');
   static String applyJob(int jobId) => _buildUrl('apply-job/$jobId');
+  static String callAndChatApply(int jobId) =>
+      _buildUrl('call-and-chat-apply/$jobId');
   static String get latestJobs => _buildUrl('latest-jobs');
 
   // Chat

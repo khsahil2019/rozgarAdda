@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
 import 'applyjob_form.dart';
+import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dart';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────
 class AppColors {
@@ -27,11 +28,7 @@ class JobDetailScreen extends StatelessWidget {
   final AvailableJob job;
   final String? imageUrl;
 
-  const JobDetailScreen({
-    super.key,
-    required this.job,
-    this.imageUrl,
-  });
+  const JobDetailScreen({super.key, required this.job, this.imageUrl});
 
   // Legacy constructor for backwards compatibility (e.g. careear_hub.dart)
   static Widget placeholder({
@@ -125,7 +122,11 @@ class JobDetailScreen extends StatelessWidget {
         children: [
           // Back button
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.darkText, size: 22),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: AppColors.darkText,
+              size: 22,
+            ),
             onPressed: () => Navigator.pop(context),
           ),
           // Center decorative line
@@ -162,7 +163,11 @@ class JobDetailScreen extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           IconButton(
-            icon: const Icon(Icons.more_vert, color: AppColors.darkText, size: 22),
+            icon: const Icon(
+              Icons.more_vert,
+              color: AppColors.darkText,
+              size: 22,
+            ),
             onPressed: () {},
           ),
         ],
@@ -305,9 +310,7 @@ class JobDetailScreen extends StatelessWidget {
       children: [
         Icon(icon, size: 18, color: AppColors.greyText),
         const SizedBox(width: 8),
-        Expanded(
-          child: Text(text, style: textStyle),
-        ),
+        Expanded(child: Text(text, style: textStyle)),
       ],
     );
   }
@@ -316,7 +319,9 @@ class JobDetailScreen extends StatelessWidget {
   Widget _buildHighlightsCard() {
     // Parse gender from additionalRequirements
     final gender = (job.additionalRequirements['gender'] ?? '').toString();
-    final genderLabel = gender.isNotEmpty ? _capitalizeFirst(gender) : 'Any Gender';
+    final genderLabel = gender.isNotEmpty
+        ? _capitalizeFirst(gender)
+        : 'Any Gender';
 
     // Experience label
     final experienceLabel = job.experienceLevel.toLowerCase() == 'fresher'
@@ -326,12 +331,14 @@ class JobDetailScreen extends StatelessWidget {
     // Shift label
     final shiftLabel = job.shifts.isNotEmpty
         ? job.shifts
-            .map((s) => s
-                .replaceAll('_', ' ')
-                .split(' ')
-                .map(_capitalizeFirst)
-                .join(' '))
-            .join(', ')
+              .map(
+                (s) => s
+                    .replaceAll('_', ' ')
+                    .split(' ')
+                    .map(_capitalizeFirst)
+                    .join(' '),
+              )
+              .join(', ')
         : 'Any Shift';
 
     return Container(
@@ -481,22 +488,26 @@ class JobDetailScreen extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: job.skills
-                .map((s) => Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEAEAF8),
-                        borderRadius: BorderRadius.circular(20),
+                .map(
+                  (s) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAEAF8),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      s,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryBlue,
                       ),
-                      child: Text(
-                        s,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryBlue,
-                        ),
-                      ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         ],
@@ -516,22 +527,30 @@ class JobDetailScreen extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: job.perks
-                .map((p) => Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEAF8EA),
-                        borderRadius: BorderRadius.circular(20),
+                .map(
+                  (p) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAF8EA),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      p
+                          .replaceAll('_', ' ')
+                          .split(' ')
+                          .map(_capitalizeFirst)
+                          .join(' '),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2E7D32),
                       ),
-                      child: Text(
-                        p.replaceAll('_', ' ').split(' ').map(_capitalizeFirst).join(' '),
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF2E7D32),
-                        ),
-                      ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         ],
@@ -561,20 +580,26 @@ class JobDetailScreen extends StatelessWidget {
                   Text(
                     'Date: ${job.walkinDate}',
                     style: const TextStyle(
-                        fontSize: 13, color: AppColors.greyText),
+                      fontSize: 13,
+                      color: AppColors.greyText,
+                    ),
                   ),
                 ],
                 if (job.walkinTime != null)
                   Text(
                     'Time: ${job.walkinTime}${job.walkinEndTime != null ? " - ${job.walkinEndTime}" : ""}',
                     style: const TextStyle(
-                        fontSize: 13, color: AppColors.greyText),
+                      fontSize: 13,
+                      color: AppColors.greyText,
+                    ),
                   ),
                 if (job.walkinVenue != null)
                   Text(
                     'Venue: ${job.walkinVenue}',
                     style: const TextStyle(
-                        fontSize: 13, color: AppColors.greyText),
+                      fontSize: 13,
+                      color: AppColors.greyText,
+                    ),
                   ),
               ],
             ),
@@ -586,8 +611,14 @@ class JobDetailScreen extends StatelessWidget {
 
   // ── Bottom Bar ───────────────────────────────────────────────────────────────
   Widget _buildBottomBar(BuildContext context, double bottomPad) {
-    final bool showCall = job.enableCall && job.contactPhone != null && job.contactPhone!.isNotEmpty;
-    final bool showChat = job.enableChat && ((job.whatsappNumber != null && job.whatsappNumber!.isNotEmpty) || (job.contactPhone != null && job.contactPhone!.isNotEmpty));
+    final bool showCall =
+        job.enableCall &&
+        job.contactPhone != null &&
+        job.contactPhone!.isNotEmpty;
+    final bool showChat =
+        job.enableChat &&
+        ((job.whatsappNumber != null && job.whatsappNumber!.isNotEmpty) ||
+            (job.contactPhone != null && job.contactPhone!.isNotEmpty));
     final bool showApply = job.applyOnly || (!showCall && !showChat);
 
     final List<Widget> buttons = [];
@@ -621,10 +652,7 @@ class JobDetailScreen extends StatelessWidget {
               icon: const Icon(Icons.send_rounded, size: 18),
               label: const Text(
                 'Apply Now',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
               ),
             ),
           ),
@@ -638,7 +666,11 @@ class JobDetailScreen extends StatelessWidget {
           child: SizedBox(
             height: 52,
             child: OutlinedButton.icon(
-              onPressed: () => _openWhatsApp(job.whatsappNumber ?? job.contactPhone, job.title),
+              onPressed: () => _openWhatsApp(
+                job.whatsappNumber ?? job.contactPhone,
+                job.title,
+                job.id,
+              ),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFF25D366), width: 1.5),
                 shape: RoundedRectangleBorder(
@@ -661,10 +693,7 @@ class JobDetailScreen extends StatelessWidget {
               ),
               label: const Text(
                 'Chat',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -678,7 +707,7 @@ class JobDetailScreen extends StatelessWidget {
           child: SizedBox(
             height: 52,
             child: ElevatedButton.icon(
-              onPressed: () => _makeCall(job.contactPhone),
+              onPressed: () => _makeCall(job.contactPhone, job.id),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.yellow,
                 foregroundColor: AppColors.darkText,
@@ -691,10 +720,7 @@ class JobDetailScreen extends StatelessWidget {
               icon: const Icon(Icons.phone_rounded, size: 18),
               label: const Text(
                 'Call HR',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
               ),
             ),
           ),
@@ -724,10 +750,8 @@ class JobDetailScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => JobApplicationScreen(
-                    jobId: job.id,
-                    jobTitle: job.title,
-                  ),
+                  builder: (context) =>
+                      JobApplicationScreen(jobId: job.id, jobTitle: job.title),
                 ),
               );
             },
@@ -742,10 +766,7 @@ class JobDetailScreen extends StatelessWidget {
             icon: const Icon(Icons.send_rounded, size: 18),
             label: const Text(
               'Apply Now',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
             ),
           ),
         ),
@@ -765,7 +786,7 @@ class JobDetailScreen extends StatelessWidget {
     return s[0].toUpperCase() + s.substring(1);
   }
 
-  Future<void> _makeCall(String? phone) async {
+  Future<void> _makeCall(String? phone, int jobId) async {
     if (phone == null || phone.isEmpty) {
       Get.snackbar(
         'Unavailable',
@@ -773,6 +794,17 @@ class JobDetailScreen extends StatelessWidget {
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
+    }
+    try {
+      if (Get.isRegistered<JobsController>()) {
+        await Get.find<JobsController>().logCallAndChatApply(
+          jobId: jobId,
+          type: 'call',
+          phone: phone,
+        );
+      }
+    } catch (e) {
+      debugPrint('Error logging call application: $e');
     }
     final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
     final Uri url = Uri.parse('tel:$cleanPhone');
@@ -787,7 +819,7 @@ class JobDetailScreen extends StatelessWidget {
     }
   }
 
-  Future<void> _openWhatsApp(String? phone, String title) async {
+  Future<void> _openWhatsApp(String? phone, String title, int jobId) async {
     if (phone == null || phone.isEmpty) {
       Get.snackbar(
         'Unavailable',
@@ -795,6 +827,17 @@ class JobDetailScreen extends StatelessWidget {
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
+    }
+    try {
+      if (Get.isRegistered<JobsController>()) {
+        await Get.find<JobsController>().logCallAndChatApply(
+          jobId: jobId,
+          type: 'chat',
+          phone: phone,
+        );
+      }
+    } catch (e) {
+      debugPrint('Error logging chat application: $e');
     }
     final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
     final message = Uri.encodeComponent(

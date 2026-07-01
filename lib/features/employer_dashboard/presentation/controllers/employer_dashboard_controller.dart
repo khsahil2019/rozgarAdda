@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/exceptions/exceptions.dart';
 import '../../../../core/network/api_routes.dart';
-import '../../../../core/network/api_services.dart';
+import 'package:rojgar/core/network/api_services.dart';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../../../splash_screen.dart';
 import '../../../jobs/data/model/available_job_model.dart';
 import '../../../jobs/domain/entities/available_job_entity.dart';
@@ -17,6 +19,8 @@ class EmployerDashboardController extends GetxController {
   final RxList<AvailableJob> postedJobs = <AvailableJob>[].obs;
   final RxMap<int, List<JobApplication>> jobApplications =
       <int, List<JobApplication>>{}.obs;
+  final RxMap<int, Map<String, int>> jobStats = <int, Map<String, int>>{}.obs;
+  final RxMap<int, int> jobVisitorCounts = <int, int>{}.obs;
   final RxBool isLoading = false.obs;
 
   @override
@@ -72,7 +76,52 @@ class EmployerDashboardController extends GetxController {
 
       // Load applications for each job
       for (final job in jobs) {
-        final apps = await db.getJobApplications(job.id);
+        List<JobApplication> apps = [];
+        if (token != null && token.isNotEmpty) {
+          try {
+            final res = await ApiService.get(
+              ApiRoutes.employerApplications(job.id),
+              accessToken: token,
+            );
+            if (res['success'] == true &&
+                res['applications'] != null &&
+                res['applications']['data'] != null) {
+              final List<dynamic> dataList = res['applications']['data'] ?? [];
+              apps = dataList
+                  .map<JobApplication>(
+                    (item) => JobApplication.fromJson(
+                      item as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList();
+
+              if (res['stats'] != null) {
+                final statsMap = Map<String, dynamic>.from(res['stats'] as Map);
+                jobStats[job.id] = statsMap.map(
+                  (k, v) => MapEntry(k, int.tryParse(v.toString()) ?? 0),
+                );
+              } else {
+                _calculateMockStats(job.id, apps, job.viewsCount);
+              }
+
+              if (res['job'] != null && res['job']['visitor_count'] != null) {
+                jobVisitorCounts[job.id] =
+                    int.tryParse(res['job']['visitor_count'].toString()) ?? 0;
+              } else {
+                jobVisitorCounts[job.id] = job.viewsCount;
+              }
+            } else {
+              apps = await db.getJobApplications(job.id);
+              _calculateMockStats(job.id, apps, job.viewsCount);
+            }
+          } catch (e) {
+            apps = await db.getJobApplications(job.id);
+            _calculateMockStats(job.id, apps, job.viewsCount);
+          }
+        } else {
+          apps = await db.getJobApplications(job.id);
+          _calculateMockStats(job.id, apps, job.viewsCount);
+        }
         jobApplications[job.id] = apps;
       }
     } finally {
@@ -288,5 +337,87 @@ class EmployerDashboardController extends GetxController {
         margin: const EdgeInsets.all(16),
       );
     }
+  }
+
+  Future<JobApplication?> getApplicationDetails(int appId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('employer_token');
+
+      if (token != null && token.isNotEmpty) {
+        final res = await ApiService.get(
+          ApiRoutes.employerApplicationDetails(appId),
+          accessToken: token,
+        );
+        if (res['success'] == true && res['application'] != null) {
+          return JobApplication.fromJson(
+            res['application'] as Map<String, dynamic>,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching application details from API: $e');
+    }
+    // Fallback to local search in loaded applications
+    for (final apps in jobApplications.values) {
+      final found = apps.firstWhereOrNull((a) => a.id == appId);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
+  Future<String?> exportApplications(int jobId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('employer_token');
+
+      if (token == null || token.isEmpty) {
+        throw Failure('Authentication token not found.');
+      }
+
+      final url = ApiRoutes.employerExportApplications(jobId);
+      final directory = await getTemporaryDirectory();
+      final filePath = '${directory.path}/applicants_job_$jobId.xlsx';
+
+      final dio = Dio();
+      final response = await dio.download(
+        url,
+        filePath,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': '*/*',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return filePath;
+      } else {
+        throw Failure(
+          'Failed to download export file. Status: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      debugPrint('Error exporting applications: $e');
+      throw Failure('Export failed: ${e.toString()}');
+    }
+  }
+
+  void _calculateMockStats(int jobId, List<JobApplication> apps, int views) {
+    final total = apps.length;
+    final newCount = apps.where((a) => a.status == 'pending').length;
+    final reviewed = apps.where((a) => a.status == 'reviewed').length;
+    final shortlisted = apps.where((a) => a.status == 'accepted' || a.status == 'shortlisted').length;
+    final rejected = apps.where((a) => a.status == 'rejected').length;
+    jobStats[jobId] = {
+      'total': total,
+      'new': newCount,
+      'reviewed': reviewed,
+      'shortlisted': shortlisted,
+      'rejected': rejected,
+      'hired': 0,
+    };
+    jobVisitorCounts[jobId] = views;
   }
 }

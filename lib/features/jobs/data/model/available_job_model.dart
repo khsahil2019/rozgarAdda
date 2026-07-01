@@ -185,7 +185,7 @@ class AvailableJobModel {
       contactPerson: json['contact_person']?.toString(),
       contactPhone: json['contact_phone']?.toString(),
       contactEmail: json['contact_email']?.toString(),
-      viewsCount: _parseInt(json['views_count']),
+      viewsCount: _parseInt(json['views_count'] ?? json['visitor_count']),
       applicationsCount: _parseInt(json['applications_count']),
       status: (json['status'] ?? '').toString(),
       walkinDate: json['walkin_date']?.toString(),

@@ -6,32 +6,37 @@ import '../exceptions/exceptions.dart';
 
 /// Base API service class that handles all HTTP requests using Dio
 class ApiService {
-  static final Dio _dio = Dio(
-    BaseOptions(
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-      sendTimeout: const Duration(seconds: 30),
-      contentType: Headers.jsonContentType,
-      responseType: ResponseType.json,
-    ),
-  )..interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          if (!options.headers.containsKey(HttpHeaders.authorizationHeader)) {
-            try {
-              final prefs = await SharedPreferences.getInstance();
-              final token = prefs.getString('access_token');
-              if (token != null && token.isNotEmpty) {
-                options.headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
+  static final Dio _dio =
+      Dio(
+          BaseOptions(
+            connectTimeout: const Duration(seconds: 30),
+            receiveTimeout: const Duration(seconds: 30),
+            sendTimeout: const Duration(seconds: 30),
+            contentType: Headers.jsonContentType,
+            responseType: ResponseType.json,
+          ),
+        )
+        ..interceptors.add(
+          InterceptorsWrapper(
+            onRequest: (options, handler) async {
+              if (!options.headers.containsKey(
+                HttpHeaders.authorizationHeader,
+              )) {
+                try {
+                  final prefs = await SharedPreferences.getInstance();
+                  final token = prefs.getString('access_token');
+                  if (token != null && token.isNotEmpty) {
+                    options.headers[HttpHeaders.authorizationHeader] =
+                        'Bearer $token';
+                  }
+                } catch (_) {
+                  // Ignore preference reading issues in interceptor
+                }
               }
-            } catch (_) {
-              // Ignore preference reading issues in interceptor
-            }
-          }
-          return handler.next(options);
-        },
-      ),
-    );
+              return handler.next(options);
+            },
+          ),
+        );
 
   /// Configure base URL, interceptors, and HTTP client adapter
   static void configure({
@@ -255,6 +260,8 @@ class ApiService {
         return Failure('Invalid SSL certificate');
 
       case DioExceptionType.unknown:
+        return Failure('Network error: ${error.message}');
+      default:
         return Failure('Network error: ${error.message}');
     }
   }

@@ -23,4 +23,9 @@ abstract class JobsRepository {
     required String keySkills,
     required String resumePath,
   });
+  Future<Either<Failure, bool>> logCallAndChatApply({
+    required int jobId,
+    required String type,
+    required String phone
+  });
 }

@@ -139,4 +139,23 @@ class JobsRepositoryImpl implements JobsRepository {
       return Left(Failure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> logCallAndChatApply({
+    required int jobId,
+    required String type,
+    required String phone,
+  }) async {
+    try {
+      final result = await remoteDataSource.logCallAndChatApply(
+        jobId: jobId,
+        type: type,
+        phoneNo: phone
+      );
+      return Right(result);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(Failure(e.toString()));
+    }
+  }
 }

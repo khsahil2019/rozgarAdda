@@ -12,6 +12,8 @@ class JobApplication {
   final String resumePath;
   final String status; // 'pending', 'accepted', 'rejected'
   final DateTime appliedAt;
+  final String expectedSalary;
+  final String noticePeriod;
 
   const JobApplication({
     required this.id,
@@ -27,6 +29,8 @@ class JobApplication {
     required this.resumePath,
     required this.status,
     required this.appliedAt,
+    this.expectedSalary = '',
+    this.noticePeriod = '',
   });
 
   Map<String, dynamic> toJson() {
@@ -44,14 +48,16 @@ class JobApplication {
       'resume_path': resumePath,
       'status': status,
       'applied_at': appliedAt.toIso8601String(),
+      'expected_salary': expectedSalary,
+      'notice_period': noticePeriod,
     };
   }
 
   factory JobApplication.fromJson(Map<String, dynamic> json) {
     return JobApplication(
       id: json['id'] as int? ?? 0,
-      jobId: json['job_id'] as int? ?? 0,
-      candidateName: (json['candidate_name'] ?? '').toString(),
+      jobId: json['job_id'] as int? ?? (json['job_post_id'] as int? ?? 0),
+      candidateName: (json['candidate_name'] ?? (json['full_name'] ?? '')).toString(),
       email: (json['email'] ?? '').toString(),
       phone: (json['phone'] ?? '').toString(),
       experienceYears: (json['experience_years'] ?? '0').toString(),
@@ -62,6 +68,8 @@ class JobApplication {
       resumePath: (json['resume_path'] ?? '').toString(),
       status: (json['status'] ?? 'pending').toString(),
       appliedAt: DateTime.tryParse((json['applied_at'] ?? '').toString()) ?? DateTime.now(),
+      expectedSalary: (json['expected_salary'] ?? '').toString(),
+      noticePeriod: (json['notice_period'] ?? '').toString(),
     );
   }
 }

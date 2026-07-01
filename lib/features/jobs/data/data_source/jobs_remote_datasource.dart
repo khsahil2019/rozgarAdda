@@ -18,6 +18,11 @@ abstract class JobsRemoteDataSource {
     required Map<String, String> fields,
     required String resumePath,
   });
+  Future<bool> logCallAndChatApply({
+    required int jobId,
+    required String type,
+    required String phoneNo,
+  });
 }
 
 class JobsRemoteDataSourceImpl implements JobsRemoteDataSource {
@@ -36,7 +41,9 @@ class JobsRemoteDataSourceImpl implements JobsRemoteDataSource {
       }
     } catch (e) {
       if (e is Failure) rethrow;
-      throw Failure('Failed to fetch categories. Please check your connection.');
+      throw Failure(
+        'Failed to fetch categories. Please check your connection.',
+      );
     }
   }
 
@@ -76,7 +83,9 @@ class JobsRemoteDataSourceImpl implements JobsRemoteDataSource {
       }
     } catch (e) {
       if (e is Failure) rethrow;
-      throw Failure('Failed to fetch available jobs. Please check your connection.');
+      throw Failure(
+        'Failed to fetch available jobs. Please check your connection.',
+      );
     }
   }
 
@@ -99,7 +108,9 @@ class JobsRemoteDataSourceImpl implements JobsRemoteDataSource {
       }
     } catch (e) {
       if (e is Failure) rethrow;
-      throw Failure('Failed to fetch latest jobs. Please check your connection.');
+      throw Failure(
+        'Failed to fetch latest jobs. Please check your connection.',
+      );
     }
   }
 
@@ -126,8 +137,34 @@ class JobsRemoteDataSourceImpl implements JobsRemoteDataSource {
       }
     } catch (e) {
       if (e is Failure) rethrow;
-      throw Failure('Failed to submit application. Please check your connection.');
+      throw Failure(
+        'Failed to submit application. Please check your connection.',
+      );
+    }
+  }
+
+  @override
+  Future<bool> logCallAndChatApply({
+    required int jobId,
+    required String type,
+    required String phoneNo,
+  }) async {
+    try {
+      final res = await ApiService.post(
+        ApiRoutes.callAndChatApply(jobId),
+        body: {'type': type, 'phone': phoneNo},
+      );
+      if (res['statusCode'] == 200 &&
+          (res['status'] == true || res['success'] == true)) {
+        return true;
+      } else {
+        throw Failure(res['message'] ?? 'Failed to log call/chat apply');
+      }
+    } catch (e) {
+      if (e is Failure) rethrow;
+      throw Failure(
+        'Failed to log call/chat apply. Please check your connection.',
+      );
     }
   }
 }
-

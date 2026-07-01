@@ -287,7 +287,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     return true;
   }
 
-  Future<void> _makeCall(String? phone) async {
+  Future<void> _makeCall(String? phone, int jobId) async {
     if (phone == null || phone.isEmpty) {
       Get.snackbar(
         'Unavailable',
@@ -295,6 +295,15 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
+    }
+    try {
+      await controller.logCallAndChatApply(
+        jobId: jobId,
+        type: 'call',
+        phone: phone,
+      );
+    } catch (e) {
+      debugPrint('Error logging call application: $e');
     }
     final Uri url = Uri.parse('tel:$phone');
     if (await canLaunchUrl(url)) {
@@ -308,7 +317,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     }
   }
 
-  Future<void> _openWhatsApp(String? phone, String title) async {
+  Future<void> _openWhatsApp(String? phone, String title, int jobId) async {
     if (phone == null || phone.isEmpty) {
       Get.snackbar(
         'Unavailable',
@@ -317,21 +326,18 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
       );
       return;
     }
+    try {
+      await controller.logCallAndChatApply(
+        jobId: jobId,
+        type: 'chat',
+        phone: phone,
+      );
+    } catch (e) {
+      debugPrint('Error logging chat application: $e');
+    }
     final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
     final message = "Hello, I am interested in your job posting: \"$title\".";
     Open.whatsApp(whatsAppNumber: cleanPhone, text: message);
-
-    // FlutterOpenWhatsapp.sendSingleMessage(cleanPhone, message);
-
-    // if (true) {
-    //   await launchUrl(url);
-    // } else {
-    //   Get.snackbar(
-    //     'Error',
-    //     'Could not open WhatsApp. Please check if WhatsApp is installed.',
-    //     snackPosition: SnackPosition.BOTTOM,
-    //   );
-    // }
   }
 
   Future<void> _shareJob(AvailableJob job) async {
@@ -779,8 +785,12 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     return JobCardWidget(
       job: job,
       imageUrl: categoryImageUrl,
-      onWhatsAppTap: () => _openWhatsApp(job.whatsappNumber ?? job.contactPhone, job.title),
-      onCallTap: () => _makeCall(job.contactPhone),
+      onWhatsAppTap: () => _openWhatsApp(
+        job.whatsappNumber ?? job.contactPhone,
+        job.title,
+        job.id,
+      ),
+      onCallTap: () => _makeCall(job.contactPhone, job.id),
       onShareTap: () => _shareJob(job),
     );
   }
