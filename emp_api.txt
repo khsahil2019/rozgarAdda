@@ -1,3 +1,4 @@
+//appliactions on job
 curl --location --request GET 'https://rozgaradda.com/api/emp/applications/49' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
@@ -107,6 +108,8 @@ Response :-
     }
 }
 
+
+// get appliant detail
 curl --location 'https://rozgaradda.com/api/emp/get-details/17' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer 209|PELVAsUMrmpSzld6vLU8K3xXlqwvfK1eJQxL5r1P2721af16'
@@ -147,8 +150,208 @@ curl --location 'https://rozgaradda.com/api/emp/jobs/19/applications/export' \
 --header 'Accept;' \
 --header 'Authorization: Bearer 298|swp06oj8My7T9PyRImAKoqUN6zIfBhlWd7linddce6dea6ae'
 
-curl --location 'https://rozgaradda.com/api/emp/jobs/19/applications/export' \
---header 'Accept;' \
---header 'Authorization: Bearer 298|swp06oj8My7T9PyRImAKoqUN6zIfBhlWd7linddce6dea6ae'
 
-Response :- EXCEL FILE/data (use excel viewer etc)
+
+curl --location 'https://rozgaradda.com/api/emp/jobs' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer 212|BDqW856Qub7YaHtXSVrpMrM2AbPchOZhmmuZ7req1bde84b7' \
+--data ''
+
+Response:-
+{
+    "status": true,
+    "statistics": {
+        "total_jobs": 4,
+        "active_jobs": 1,
+        "pending_jobs": 0
+    },
+    "jobs": {
+        "current_page": 1,
+        "data": [
+            {
+                "id": 27,
+                "employer_id": 41,
+                "subadmin_id": null,
+                "category_id": 177,
+                "role_id": 765,
+                "title": "dfwdwadfawf",
+                "job_type": "full_time",
+                "shifts": [
+                    "day"
+                ],
+                "work_location_type": "office",
+                "state_id": 9,
+                "district_id": 252,
+                "localite_id": 4459,
+                "address_line1": "fawfawf",
+                "address_line2": "fawfaw",
+                "landmark": null,
+                "pincode": "110018",
+                "pay_type": "fixed",
+                "min_salary": "52000.00",
+                "max_salary": "85000.00",
+                "fixed_salary": null,
+                "avg_incentive": null,
+                "estimated_incentive": null,
+                "perks": [
+                    "wdaadw"
+                ],
+                "education_level": "Graduate",
+                "english_level": "none",
+                "experience_level": "fresher",
+                "additional_requirements": [],
+                "skills": [
+                    "wadawddwada"
+                ],
+                "languages": [
+                    "Hindi",
+                    "English"
+                ],
+                "job_description": null,
+                "vacancy": 1,
+                "is_walkin": false,
+                "contact_preference": "self",
+                "apply_only": 0,
+                "contact_person": null,
+                "contact_phone": null,
+                "contact_whatsapp": null,
+                "contact_email": null,
+                "plan_id": 1,
+                "plan_expires_at": null,
+                "views_count": 0,
+                "walkin_date": null,
+                "walkin_time": null,
+                "walkin_venue": null,
+                "applications_count": 0,
+                "visitor_count": 0,
+                "status": "pending",
+                "created_at": "2026-06-20T07:16:50.000000Z",
+                "updated_at": "2026-06-20T07:16:50.000000Z",
+                "walkin_end_time": null,
+                "category": {
+                    "id": 177,
+                    "name": "Accommodation",
+                    "image": "1772186522_YqOzo.jpg",
+                    "created_at": "2026-02-27T10:02:02.000000Z",
+                    "updated_at": "2026-02-27T10:02:02.000000Z"
+                },
+                "role": {
+                    "id": 765,
+                    "name": "Concierge",
+                    "category_id": 177,
+                    "created_at": "2026-02-27T10:04:01.000000Z",
+                    "updated_at": "2026-02-27T10:04:01.000000Z"
+                },
+                "employer": null
+            },
+            {
+                "id": 25,
+                "employer_id": 41,
+                "subadmin_id": null,
+                "category_id": 177,
+                "role_id": 765,
+                "title": "dwadwadaw",
+                "job_type": "full_time",
+                "shifts": [
+                    "day"
+                ],
+                "work_location_type": "office",
+                "state_id": 9,
+                "district_id": 243,
+                "localite_id": 4187,
+                "address_line1": "wdadad",
+                "address_line2": "dawdad",
+                "landmark": null,
+                "pincode": "110018",
+                "pay_type": "fixed",
+                "min_salary": "52000.00",
+                "max_salary": "68500.00",
+                "fixed_salary": null,
+                "avg_incentive": null,
+                "estimated_incentive": null,
+                "perks": [
+                    "dwadawd"
+                ],
+                "education_level": "Graduate",
+                "english_level": "none",
+                "experience_level": "fresher",
+                "additional_requirements": [],
+                "skills": [
+                    "adwadawdaw"
+                ],
+                "languages": [
+                    "Hindi",
+                    "English"
+                ],
+                "job_description": null,
+                "vacancy": 1,
+                "is_walkin": false,
+                "contact_preference": "self",
+                "apply_only": 0,
+                "contact_person": null,
+                "contact_phone": null,
+                "contact_whatsapp": null,
+                "contact_email": null,
+                "plan_id": 1,
+                "plan_expires_at": null,
+                "views_count": 0,
+                "walkin_date": null,
+                "walkin_time": null,
+                "walkin_venue": null,
+                "applications_count": 0,
+                "visitor_count": 0,
+                "status": "pending",
+                "created_at": "2026-06-20T06:19:55.000000Z",
+                "updated_at": "2026-06-20T06:19:55.000000Z",
+                "walkin_end_time": null,
+                "category": {
+                    "id": 177,
+                    "name": "Accommodation",
+                    "image": "1772186522_YqOzo.jpg",
+                    "created_at": "2026-02-27T10:02:02.000000Z",
+                    "updated_at": "2026-02-27T10:02:02.000000Z"
+                },
+                "role": {
+                    "id": 765,
+                    "name": "Concierge",
+                    "category_id": 177,
+                    "created_at": "2026-02-27T10:04:01.000000Z",
+                    "updated_at": "2026-02-27T10:04:01.000000Z"
+                },
+                "employer": null
+            },
+          
+          
+        ],
+        "first_page_url": "https://rozgaradda.com/api/emp/jobs?page=1",
+        "from": 1,
+        "last_page": 1,
+        "last_page_url": "https://rozgaradda.com/api/emp/jobs?page=1",
+        "links": [
+            {
+                "url": null,
+                "label": "&laquo; Previous",
+                "page": null,
+                "active": false
+            },
+            {
+                "url": "https://rozgaradda.com/api/emp/jobs?page=1",
+                "label": "1",
+                "page": 1,
+                "active": true
+            },
+            {
+                "url": null,
+                "label": "Next &raquo;",
+                "page": null,
+                "active": false
+            }
+        ],
+        "next_page_url": null,
+        "path": "https://rozgaradda.com/api/emp/jobs",
+        "per_page": 10,
+        "prev_page_url": null,
+        "to": 4,
+        "total": 4
+    }
+}

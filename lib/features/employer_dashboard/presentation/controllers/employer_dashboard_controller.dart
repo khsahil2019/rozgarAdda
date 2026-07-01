@@ -9,12 +9,9 @@ import 'package:path_provider/path_provider.dart';
 import '../../../../splash_screen.dart';
 import '../../../jobs/data/model/available_job_model.dart';
 import '../../../jobs/domain/entities/available_job_entity.dart';
-import '../../data/models/mock_employer_database.dart';
 import '../../domain/entities/job_application_entity.dart';
 
 class EmployerDashboardController extends GetxController {
-  final MockEmployerDatabase db = MockEmployerDatabase();
-
   final RxInt employerId = 0.obs;
   final RxList<AvailableJob> postedJobs = <AvailableJob>[].obs;
   final RxMap<int, List<JobApplication>> jobApplications =
@@ -22,6 +19,9 @@ class EmployerDashboardController extends GetxController {
   final RxMap<int, Map<String, int>> jobStats = <int, Map<String, int>>{}.obs;
   final RxMap<int, int> jobVisitorCounts = <int, int>{}.obs;
   final RxBool isLoading = false.obs;
+  
+  // Track status updates locally since backend update is simulated
+  final RxMap<int, String> localApplicationStatuses = <int, String>{}.obs;
 
   @override
   void onInit() {
@@ -57,17 +57,10 @@ class EmployerDashboardController extends GetxController {
                   ).toEntity(),
                 )
                 .toList();
-          } else {
-            await db.init();
-            jobs = await db.getEmployerJobs(empId);
           }
         } catch (e) {
-          await db.init();
-          jobs = await db.getEmployerJobs(empId);
+          debugPrint('Error fetching employer jobs: $e');
         }
-      } else {
-        await db.init();
-        jobs = await db.getEmployerJobs(empId);
       }
 
       // Sort jobs by createdAt descending
@@ -89,9 +82,32 @@ class EmployerDashboardController extends GetxController {
               final List<dynamic> dataList = res['applications']['data'] ?? [];
               apps = dataList
                   .map<JobApplication>(
-                    (item) => JobApplication.fromJson(
-                      item as Map<String, dynamic>,
-                    ),
+                    (item) {
+                      final app = JobApplication.fromJson(
+                        item as Map<String, dynamic>,
+                      );
+                      // Apply local status override if stored in memory
+                      if (localApplicationStatuses.containsKey(app.id)) {
+                        return JobApplication(
+                          id: app.id,
+                          jobId: app.jobId,
+                          candidateName: app.candidateName,
+                          email: app.email,
+                          phone: app.phone,
+                          experienceYears: app.experienceYears,
+                          experienceMonths: app.experienceMonths,
+                          educationLevel: app.educationLevel,
+                          educationDetails: app.educationDetails,
+                          keySkills: app.keySkills,
+                          resumePath: app.resumePath,
+                          status: localApplicationStatuses[app.id]!,
+                          appliedAt: app.appliedAt,
+                          expectedSalary: app.expectedSalary,
+                          noticePeriod: app.noticePeriod,
+                        );
+                      }
+                      return app;
+                    },
                   )
                   .toList();
 
@@ -111,15 +127,13 @@ class EmployerDashboardController extends GetxController {
                 jobVisitorCounts[job.id] = job.viewsCount;
               }
             } else {
-              apps = await db.getJobApplications(job.id);
               _calculateMockStats(job.id, apps, job.viewsCount);
             }
           } catch (e) {
-            apps = await db.getJobApplications(job.id);
+            debugPrint('Error loading applications for job ${job.id}: $e');
             _calculateMockStats(job.id, apps, job.viewsCount);
           }
         } else {
-          apps = await db.getJobApplications(job.id);
           _calculateMockStats(job.id, apps, job.viewsCount);
         }
         jobApplications[job.id] = apps;
@@ -245,17 +259,80 @@ class EmployerDashboardController extends GetxController {
     int appId,
     String status,
   ) async {
-    await db.updateApplicationStatus(appId, status);
+    isLoading.value = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('employer_token');
 
-    // Refresh applicants
-    final apps = await db.getJobApplications(jobId);
-    jobApplications[jobId] = apps;
+      // Call dummy endpoint
+      try {
+        final dummyUrl = '${ApiRoutes.baseUrl}/emp/applications/$appId/update-status';
+        await ApiService.post(
+          dummyUrl,
+          body: {
+            'status': status,
+          },
+          accessToken: token,
+        );
+      } catch (e) {
+        // Log error but ignore for simulation
+        debugPrint('Dummy status update API error (expected): $e');
+      }
 
-    // Update local applications count or lists
-    final jobIndex = postedJobs.indexWhere((j) => j.id == jobId);
-    if (jobIndex != -1) {
-      // Reload dashboard entirely to sync state
-      await loadDashboard();
+      // Update in local memory
+      localApplicationStatuses[appId] = status;
+
+      // Refresh stats and apps list for the job in our local variables
+      if (jobApplications.containsKey(jobId)) {
+        final List<JobApplication> apps = jobApplications[jobId] ?? [];
+        final updatedApps = apps.map((app) {
+          if (app.id == appId) {
+            return JobApplication(
+              id: app.id,
+              jobId: app.jobId,
+              candidateName: app.candidateName,
+              email: app.email,
+              phone: app.phone,
+              experienceYears: app.experienceYears,
+              experienceMonths: app.experienceMonths,
+              educationLevel: app.educationLevel,
+              educationDetails: app.educationDetails,
+              keySkills: app.keySkills,
+              resumePath: app.resumePath,
+              status: status,
+              appliedAt: app.appliedAt,
+              expectedSalary: app.expectedSalary,
+              noticePeriod: app.noticePeriod,
+            );
+          }
+          return app;
+        }).toList();
+
+        jobApplications[jobId] = updatedApps;
+
+        // Recalculate stats for this job
+        final views = jobVisitorCounts[jobId] ?? 0;
+        _calculateMockStats(jobId, updatedApps, views);
+      }
+
+      Get.snackbar(
+        'Status Updated',
+        'Applicant status updated to $status (simulated).',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.withValues(alpha: 0.9),
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to update status: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -350,9 +427,29 @@ class EmployerDashboardController extends GetxController {
           accessToken: token,
         );
         if (res['success'] == true && res['application'] != null) {
-          return JobApplication.fromJson(
+          final app = JobApplication.fromJson(
             res['application'] as Map<String, dynamic>,
           );
+          if (localApplicationStatuses.containsKey(appId)) {
+            return JobApplication(
+              id: app.id,
+              jobId: app.jobId,
+              candidateName: app.candidateName,
+              email: app.email,
+              phone: app.phone,
+              experienceYears: app.experienceYears,
+              experienceMonths: app.experienceMonths,
+              educationLevel: app.educationLevel,
+              educationDetails: app.educationDetails,
+              keySkills: app.keySkills,
+              resumePath: app.resumePath,
+              status: localApplicationStatuses[appId]!,
+              appliedAt: app.appliedAt,
+              expectedSalary: app.expectedSalary,
+              noticePeriod: app.noticePeriod,
+            );
+          }
+          return app;
         }
       }
     } catch (e) {
@@ -420,4 +517,49 @@ class EmployerDashboardController extends GetxController {
     };
     jobVisitorCounts[jobId] = views;
   }
+
+  // Search & Filter observables for dashboard
+  final RxString searchQuery = ''.obs;
+  final RxString statusFilter = 'all'.obs; // 'all', 'active', 'pending'
+
+  List<AvailableJob> get filteredJobs {
+    if (searchQuery.isEmpty && statusFilter.value == 'all') {
+      return postedJobs;
+    }
+    return postedJobs.where((job) {
+      final matchesSearch = searchQuery.isEmpty ||
+          job.title.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          job.addressLine1.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
+          job.stateName.toLowerCase().contains(searchQuery.value.toLowerCase());
+      
+      final matchesStatus = statusFilter.value == 'all' || 
+          job.status.toLowerCase() == statusFilter.value.toLowerCase();
+      
+      return matchesSearch && matchesStatus;
+    }).toList();
+  }
+
+  // Search & Filter observables for applicants
+  final RxString applicantSearchQuery = ''.obs;
+  final RxString applicantStatusFilter = 'all'.obs; // 'all', 'pending', 'accepted', 'rejected'
+
+  List<JobApplication> getFilteredApplicants(int jobId) {
+    final List<JobApplication> apps = jobApplications[jobId] ?? [];
+    if (applicantSearchQuery.isEmpty && applicantStatusFilter.value == 'all') {
+      return apps;
+    }
+    return apps.where((app) {
+      final matchesSearch = applicantSearchQuery.isEmpty ||
+          app.candidateName.toLowerCase().contains(applicantSearchQuery.value.toLowerCase()) ||
+          app.keySkills.toLowerCase().contains(applicantSearchQuery.value.toLowerCase()) ||
+          app.educationDetails.toLowerCase().contains(applicantSearchQuery.value.toLowerCase());
+      
+      final matchesStatus = applicantStatusFilter.value == 'all' || 
+          app.status.toLowerCase() == applicantStatusFilter.value.toLowerCase() ||
+          (applicantStatusFilter.value == 'accepted' && app.status.toLowerCase() == 'shortlisted'); // handle accepted/shortlisted mapping
+      
+      return matchesSearch && matchesStatus;
+    }).toList();
+  }
 }
+

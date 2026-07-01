@@ -189,6 +189,14 @@ class RegisterController extends GetxController {
     }
   }
 
+  void resetPhoneVerification() {
+    isPhoneVerified.value = false;
+    isOtpSent.value = false;
+    _clearOtpFields();
+    _resendTimer?.cancel();
+    resendCountdown.value = 0;
+  }
+
   // ── Dropdowns ──────────────────────────────────────────────────────────────
   Future<void> fetchStates() async {
     isStatesLoading.value = true;

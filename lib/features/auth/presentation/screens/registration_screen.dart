@@ -518,29 +518,79 @@ class RegistrationFormScreen extends GetView<RegisterController> {
             ),
           ),
           Expanded(
-            child: TextField(
-              controller: controller.phoneController,
-              keyboardType: TextInputType.phone,
-              style: TextStyle(color: colors.textPrimary, fontSize: 14),
-              decoration: const InputDecoration(
-                hintText: '00000 00000',
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 14,
+            child: Obx(() {
+              final isVerified = controller.isPhoneVerified.value;
+              return TextField(
+                controller: controller.phoneController,
+                keyboardType: TextInputType.phone,
+                enabled: !isVerified,
+                style: TextStyle(
+                  color: isVerified ? colors.textSecondary : colors.textPrimary,
+                  fontSize: 14,
                 ),
-              ),
-            ),
+                decoration: const InputDecoration(
+                  hintText: '00000 00000',
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
+                ),
+              );
+            }),
           ),
           // ── Send OTP button inside the phone row ──────────────────────────
           Obx(() {
             final isVerified = controller.isPhoneVerified.value;
             final isSending = controller.isSendingOtp.value;
+            if (isVerified) {
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade600,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      context.l10n.text('registration_phone_verified'),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  TextButton(
+                    onPressed: () => controller.resetPhoneVerification(),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      foregroundColor: colors.brandColor,
+                    ),
+                    child: Text(
+                      context.l10n.text('sell_change'),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+              );
+            }
             return Container(
               margin: const EdgeInsets.only(right: 8),
               child: ElevatedButton(
-                onPressed: (isVerified || isSending)
+                onPressed: isSending
                     ? null
                     : () async {
                         final err = await controller.sendOtp();
@@ -556,13 +606,11 @@ class RegistrationFormScreen extends GetView<RegisterController> {
                         }
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isVerified
-                      ? Colors.green.shade600
-                      : colors.warning,
+                  backgroundColor: colors.warning,
                   foregroundColor: colors.textPrimary,
-                  disabledBackgroundColor: isVerified
-                      ? Colors.green.shade600
-                      : colors.warning.withValues(alpha: 0.5),
+                  disabledBackgroundColor: colors.warning.withValues(
+                    alpha: 0.5,
+                  ),
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -586,13 +634,11 @@ class RegistrationFormScreen extends GetView<RegisterController> {
                         ),
                       )
                     : Text(
-                        isVerified
-                            ? context.l10n.text('registration_phone_verified')
-                            : context.l10n.text('registration_send_otp'),
+                        context.l10n.text('registration_send_otp'),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: isVerified ? Colors.white : colors.textPrimary,
+                          color: colors.textPrimary,
                         ),
                       ),
               ),

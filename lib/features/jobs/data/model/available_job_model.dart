@@ -174,8 +174,8 @@ class AvailableJobModel {
       experienceLevel: (json['experience_level'] ?? '').toString(),
       additionalRequirements:
           json['additional_requirements'] is Map<String, dynamic>
-          ? json['additional_requirements']
-          : {},
+              ? json['additional_requirements']
+              : {},
       skills: parseSkills(json['skills']),
       languages: parseStringList(json['languages']),
       jobDescription: json['job_description']?.toString(),
@@ -185,7 +185,7 @@ class AvailableJobModel {
       contactPerson: json['contact_person']?.toString(),
       contactPhone: json['contact_phone']?.toString(),
       contactEmail: json['contact_email']?.toString(),
-      viewsCount: _parseInt(json['views_count'] ?? json['visitor_count']),
+      viewsCount: _parseInt(json['visitor_count'] ?? json['views_count']),
       applicationsCount: _parseInt(json['applications_count']),
       status: (json['status'] ?? '').toString(),
       walkinDate: json['walkin_date']?.toString(),
@@ -195,35 +195,40 @@ class AvailableJobModel {
       createdAt:
           DateTime.tryParse((json['created_at'] ?? '').toString()) ??
           DateTime.now(),
-      stateId: json['state_id'] != null
-          ? _parseInt(json['state_id'])
-          : (json['office_state_id'] != null
-                ? _parseInt(json['office_state_id'])
-                : (json['field_state_id'] != null
+      stateId:
+          json['state_id'] != null
+              ? _parseInt(json['state_id'])
+              : (json['office_state_id'] != null
+                  ? _parseInt(json['office_state_id'])
+                  : (json['field_state_id'] != null
                       ? _parseInt(json['field_state_id'])
                       : null)),
-      districtId: json['district_id'] != null
-          ? _parseInt(json['district_id'])
-          : (json['office_district_id'] != null
-                ? _parseInt(json['office_district_id'])
-                : (json['field_district_id'] != null
+      districtId:
+          json['district_id'] != null
+              ? _parseInt(json['district_id'])
+              : (json['office_district_id'] != null
+                  ? _parseInt(json['office_district_id'])
+                  : (json['field_district_id'] != null
                       ? _parseInt(json['field_district_id'])
                       : null)),
-      localiteId: json['localite_id'] != null
-          ? _parseInt(json['localite_id'])
-          : (json['office_localite_id'] != null
-                ? _parseInt(json['office_localite_id'])
-                : (json['field_localite_id'] != null
+      localiteId:
+          json['localite_id'] != null
+              ? _parseInt(json['localite_id'])
+              : (json['office_localite_id'] != null
+                  ? _parseInt(json['office_localite_id'])
+                  : (json['field_localite_id'] != null
                       ? _parseInt(json['field_localite_id'])
                       : null)),
       whatsappNumber: json['contact_whatsapp']?.toString(),
       applyOnly: _parseBool(json['apply_only'] ?? true),
-      enableCall: json['enable_call'] != null
-          ? _parseBool(json['enable_call'])
-          : (json['contact_number'] ?? '').toString().isNotEmpty,
-      enableChat: json['enable_chat'] != null
-          ? _parseBool(json['enable_chat'])
-          : (json['contact_whatsapp'] ?? '').toString().isNotEmpty,
+      enableCall:
+          json['enable_call'] != null
+              ? _parseBool(json['enable_call'])
+              : (json['contact_number'] ?? '').toString().isNotEmpty,
+      enableChat:
+          json['enable_chat'] != null
+              ? _parseBool(json['enable_chat'])
+              : (json['contact_whatsapp'] ?? '').toString().isNotEmpty,
     );
   }
 
