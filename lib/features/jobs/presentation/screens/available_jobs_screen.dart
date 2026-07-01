@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:rojgar/features/auth/data/data_source/model/dropdown_item.dart';
 import 'package:open_share_plus/open.dart';
 // import 'package:open_whatsapp/open_whatsapp.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
@@ -59,7 +60,12 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
   int _selectedEducationIndex = 0;
   int _selectedExperienceIndex = 0;
   int _selectedFreshnessIndex = 0;
-  int _selectedLocationIndex = 0;
+  int? _filterStateId;
+  int? _filterDistrictId;
+  int? _filterLocalityId;
+  String? _filterStateName;
+  String? _filterDistrictName;
+  String? _filterLocalityName;
   // String _currentLocation = 'Fetching location...';
   static const List<String> _jobTypeOptions = [
     'Any',
@@ -101,13 +107,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
     'Last 30 days',
   ];
 
-  static const List<String> _locationOptions = [
-    'Location',
-    'Noida',
-    'Greater Noida',
-    'Delhi',
-    'Gurugram',
-  ];
+
 
   // Future<void> _getCurrentLocation() async {
   //   try {
@@ -436,19 +436,6 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                     }
                   }
 
-                  // 6. Location
-                  if (_selectedLocationIndex != 0) {
-                    final selectedLoc = _locationOptions[_selectedLocationIndex]
-                        .toLowerCase();
-                    final inLoc =
-                        job.addressLine1.toLowerCase().contains(selectedLoc) ||
-                        job.addressLine2.toLowerCase().contains(selectedLoc) ||
-                        job.stateName.toLowerCase().contains(selectedLoc);
-                    if (!inLoc) {
-                      return false;
-                    }
-                  }
-
                   return true;
                 }).toList();
 
@@ -660,7 +647,10 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
           ),
           const SizedBox(width: 10),
           _buildFilterChip(
-            label: _locationOptions[_selectedLocationIndex],
+            label: _filterLocalityName ??
+                _filterDistrictName ??
+                _filterStateName ??
+                'Location',
             onTap: () => _showFilterSheet(
               categories: categories,
               initialSection: _FilterSection.location,
@@ -906,6 +896,23 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
         final sections = _FilterSection.values;
         var activeSection = initialSection;
 
+        int? tempStateId = _filterStateId;
+        int? tempDistrictId = _filterDistrictId;
+        int? tempLocalityId = _filterLocalityId;
+        String? tempStateName = _filterStateName;
+        String? tempDistrictName = _filterDistrictName;
+        String? tempLocalityName = _filterLocalityName;
+
+        if (controller.states.isEmpty) {
+          controller.fetchStates();
+        }
+        if (tempStateId != null && controller.districts.isEmpty) {
+          controller.fetchDistricts(tempStateId);
+        }
+        if (tempDistrictId != null && controller.localities.isEmpty) {
+          controller.fetchLocalities(tempDistrictId);
+        }
+
         return StatefulBuilder(
           builder: (context, setModalState) {
             final options = _optionsForSection(activeSection, categories);
@@ -1057,6 +1064,32 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                             );
                                           },
                                         )
+                                      : activeSection == _FilterSection.location
+                                      ? _buildLocationFilterView(
+                                          context,
+                                          setModalState,
+                                          tempStateId,
+                                          tempDistrictId,
+                                          tempLocalityId,
+                                          (stateId, stateName) {
+                                            tempStateId = stateId;
+                                            tempStateName = stateName;
+                                            tempDistrictId = null;
+                                            tempDistrictName = null;
+                                            tempLocalityId = null;
+                                            tempLocalityName = null;
+                                          },
+                                          (districtId, districtName) {
+                                            tempDistrictId = districtId;
+                                            tempDistrictName = districtName;
+                                            tempLocalityId = null;
+                                            tempLocalityName = null;
+                                          },
+                                          (localityId, localityName) {
+                                            tempLocalityId = localityId;
+                                            tempLocalityName = localityName;
+                                          },
+                                        )
                                       : ListView.separated(
                                           padding: const EdgeInsets.fromLTRB(
                                             16,
@@ -1165,14 +1198,26 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                                   _selectedEducationIndex = 0;
                                   _selectedExperienceIndex = 0;
                                   _selectedFreshnessIndex = 0;
-                                  _selectedLocationIndex = 0;
+                                  _filterStateId = null;
+                                  _filterDistrictId = null;
+                                  _filterLocalityId = null;
+                                  _filterStateName = null;
+                                  _filterDistrictName = null;
+                                  _filterLocalityName = null;
                                 });
                                 setModalState(() {
+                                  tempStateId = null;
+                                  tempDistrictId = null;
+                                  tempLocalityId = null;
+                                  tempStateName = null;
+                                  tempDistrictName = null;
+                                  tempLocalityName = null;
                                   activeSection = _FilterSection.category;
                                 });
                                 if (categories.isNotEmpty) {
                                   _changeCategory(categories.first);
                                 }
+                                controller.fetchAvailableJobs(widget.role.id);
                               },
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(
@@ -1197,7 +1242,23 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                           SizedBox(width: 10.sp),
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: () => Navigator.pop(context, true),
+                              onPressed: () {
+                                setState(() {
+                                  _filterStateId = tempStateId;
+                                  _filterDistrictId = tempDistrictId;
+                                  _filterLocalityId = tempLocalityId;
+                                  _filterStateName = tempStateName;
+                                  _filterDistrictName = tempDistrictName;
+                                  _filterLocalityName = tempLocalityName;
+                                });
+                                controller.fetchAvailableJobs(
+                                  widget.role.id,
+                                  stateId: _filterStateId,
+                                  districtId: _filterDistrictId,
+                                  localityId: _filterLocalityId,
+                                );
+                                Navigator.pop(context, true);
+                              },
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
                                 backgroundColor: _C.primaryBlue,
@@ -1261,7 +1322,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
       _FilterSection.education => _educationOptions,
       _FilterSection.experience => _experienceOptions,
       _FilterSection.freshness => _freshnessOptions,
-      _FilterSection.location => _locationOptions,
+      _FilterSection.location => [],
     };
   }
 
@@ -1285,7 +1346,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
       _FilterSection.education => _selectedEducationIndex,
       _FilterSection.experience => _selectedExperienceIndex,
       _FilterSection.freshness => _selectedFreshnessIndex,
-      _FilterSection.location => _selectedLocationIndex,
+      _FilterSection.location => 0,
     };
   }
 
@@ -1328,9 +1389,195 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
         _selectedFreshnessIndex = index;
         return;
       case _FilterSection.location:
-        _selectedLocationIndex = index;
         return;
     }
+  }
+
+  Widget _buildLocationFilterView(
+    BuildContext context,
+    void Function(void Function()) setModalState,
+    int? currentStateId,
+    int? currentDistrictId,
+    int? currentLocalityId,
+    void Function(int?, String?) onStateChanged,
+    void Function(int?, String?) onDistrictChanged,
+    void Function(int?, String?) onLocalityChanged,
+  ) {
+    return Obx(() {
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // State Selection
+            const Text(
+              'State',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _C.darkText),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF7F8FB),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _C.borderGrey, width: 1.2),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int?>(
+                  value: currentStateId,
+                  isExpanded: true,
+                  hint: Text(
+                    controller.isLoadingStates.value
+                        ? 'Loading states...'
+                        : 'Select State',
+                    style: const TextStyle(color: _C.grey, fontSize: 14),
+                  ),
+                  dropdownColor: Colors.white,
+                  items: [
+                    const DropdownMenuItem<int?>(
+                      value: null,
+                      child: Text('Any State'),
+                    ),
+                    ...controller.states.map(
+                      (state) => DropdownMenuItem<int?>(
+                        value: state.id,
+                        child: Text(state.name, overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                  ],
+                  onChanged: controller.isLoadingStates.value
+                      ? null
+                      : (value) {
+                          String? name;
+                          if (value != null) {
+                            name = controller.states.firstWhere((s) => s.id == value).name;
+                          }
+                          onStateChanged(value, name);
+                          if (value != null) {
+                            controller.fetchDistricts(value);
+                          }
+                          setModalState(() {});
+                        },
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // District Selection
+            const Text(
+              'District',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _C.darkText),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF7F8FB),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _C.borderGrey, width: 1.2),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int?>(
+                  value: currentStateId == null ? null : currentDistrictId,
+                  isExpanded: true,
+                  hint: Text(
+                    currentStateId == null
+                        ? 'Select state first'
+                        : controller.isLoadingDistricts.value
+                            ? 'Loading districts...'
+                            : 'Select District',
+                    style: const TextStyle(color: _C.grey, fontSize: 14),
+                  ),
+                  dropdownColor: Colors.white,
+                  items: currentStateId == null
+                      ? []
+                      : [
+                          const DropdownMenuItem<int?>(
+                            value: null,
+                            child: Text('Any District'),
+                          ),
+                          ...controller.districts.map(
+                            (district) => DropdownMenuItem<int?>(
+                              value: district.id,
+                              child: Text(district.name, overflow: TextOverflow.ellipsis),
+                            ),
+                          ),
+                        ],
+                  onChanged: (currentStateId == null || controller.isLoadingDistricts.value)
+                      ? null
+                      : (value) {
+                          String? name;
+                          if (value != null) {
+                            name = controller.districts.firstWhere((d) => d.id == value).name;
+                          }
+                          onDistrictChanged(value, name);
+                          if (value != null) {
+                            controller.fetchLocalities(value);
+                          }
+                          setModalState(() {});
+                        },
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Locality Selection
+            const Text(
+              'Locality',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _C.darkText),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF7F8FB),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _C.borderGrey, width: 1.2),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int?>(
+                  value: currentDistrictId == null ? null : currentLocalityId,
+                  isExpanded: true,
+                  hint: Text(
+                    currentDistrictId == null
+                        ? 'Select district first'
+                        : controller.isLoadingLocalities.value
+                            ? 'Loading localities...'
+                            : 'Select Locality',
+                    style: const TextStyle(color: _C.grey, fontSize: 14),
+                  ),
+                  dropdownColor: Colors.white,
+                  items: currentDistrictId == null
+                      ? []
+                      : [
+                          const DropdownMenuItem<int?>(
+                            value: null,
+                            child: Text('Any Locality'),
+                          ),
+                          ...controller.localities.map(
+                            (locality) => DropdownMenuItem<int?>(
+                              value: locality.id,
+                              child: Text(locality.name, overflow: TextOverflow.ellipsis),
+                            ),
+                          ),
+                        ],
+                  onChanged: (currentDistrictId == null || controller.isLoadingLocalities.value)
+                      ? null
+                      : (value) {
+                          String? name;
+                          if (value != null) {
+                            name = controller.localities.firstWhere((l) => l.id == value).name;
+                          }
+                          onLocalityChanged(value, name);
+                          setModalState(() {});
+                        },
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 

@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:rojgar/core/exceptions/exceptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../services/storage_service.dart';
+import '../../../auth/data/data_source/model/dropdown_item.dart';
 import '../../domain/entities/available_job_entity.dart';
 import '../../domain/entities/job_category.dart';
 import '../../domain/entities/job_role_entity.dart';
@@ -41,10 +42,18 @@ class JobsRepositoryImpl implements JobsRepository {
 
   @override
   Future<Either<Failure, List<AvailableJob>>> getAvailableJobs(
-    int roleId,
-  ) async {
+    int roleId, {
+    int? stateId,
+    int? districtId,
+    int? localityId,
+  }) async {
     try {
-      final models = await remoteDataSource.getAvailableJobs(roleId);
+      final models = await remoteDataSource.getAvailableJobs(
+        roleId,
+        stateId: stateId,
+        districtId: districtId,
+        localityId: localityId,
+      );
       final entities = models.map((model) => model.toEntity()).toList();
       return Right(entities);
     } catch (e) {
@@ -54,9 +63,17 @@ class JobsRepositoryImpl implements JobsRepository {
   }
 
   @override
-  Future<Either<Failure, List<AvailableJob>>> getLatestJobs() async {
+  Future<Either<Failure, List<AvailableJob>>> getLatestJobs({
+    int? stateId,
+    int? districtId,
+    int? localityId,
+  }) async {
     try {
-      final models = await remoteDataSource.getLatestJobs();
+      final models = await remoteDataSource.getLatestJobs(
+        stateId: stateId,
+        districtId: districtId,
+        localityId: localityId,
+      );
       final entities = models.map((model) => model.toEntity()).toList();
       return Right(entities);
     } catch (e) {
@@ -128,6 +145,39 @@ class JobsRepositoryImpl implements JobsRepository {
         type: type,
         phoneNo: phone
       );
+      return Right(result);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<DropdownItem>>> getStates() async {
+    try {
+      final result = await remoteDataSource.getStates();
+      return Right(result);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<DropdownItem>>> getDistricts(int stateId) async {
+    try {
+      final result = await remoteDataSource.getDistricts(stateId);
+      return Right(result);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<DropdownItem>>> getLocalities(int districtId) async {
+    try {
+      final result = await remoteDataSource.getLocalities(districtId);
       return Right(result);
     } catch (e) {
       if (e is Failure) return Left(e);

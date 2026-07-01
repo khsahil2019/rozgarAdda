@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:rojgar/core/exceptions/exceptions.dart';
+import '../../../auth/data/data_source/model/dropdown_item.dart';
 import '../../domain/entities/available_job_entity.dart';
 import '../../domain/entities/job_category.dart';
 import '../../domain/entities/job_role_entity.dart';
@@ -10,6 +11,15 @@ class JobsController extends GetxController {
   final JobsRepository repository;
 
   JobsController({required this.repository});
+
+  // ── Location Filter Data ───────────────────────────────────────────────────
+  final RxList<DropdownItem> states = <DropdownItem>[].obs;
+  final RxList<DropdownItem> districts = <DropdownItem>[].obs;
+  final RxList<DropdownItem> localities = <DropdownItem>[].obs;
+
+  final RxBool isLoadingStates = false.obs;
+  final RxBool isLoadingDistricts = false.obs;
+  final RxBool isLoadingLocalities = false.obs;
 
   // ── Categories ──────────────────────────────────────────────────────────────
   final RxList<JobCategory> categories = <JobCategory>[].obs;
@@ -85,12 +95,22 @@ class JobsController extends GetxController {
 
   // ── Available Jobs ──────────────────────────────────────────────────────────
 
-  Future<void> fetchAvailableJobs(int roleId) async {
+  Future<void> fetchAvailableJobs(
+    int roleId, {
+    int? stateId,
+    int? districtId,
+    int? localityId,
+  }) async {
     try {
       isLoadingAvailableJobs.value = true;
       availableJobsError.value = null;
 
-      final result = await repository.getAvailableJobs(roleId);
+      final result = await repository.getAvailableJobs(
+        roleId,
+        stateId: stateId,
+        districtId: districtId,
+        localityId: localityId,
+      );
       result.fold(
         (failure) {
           availableJobsError.value = failure.message;
@@ -109,6 +129,50 @@ class JobsController extends GetxController {
     selectedRole.value = role;
     availableJobs.clear();
     fetchAvailableJobs(role.id);
+  }
+
+  // ── Location Fetching ──────────────────────────────────────────────────────
+
+  Future<void> fetchStates() async {
+    try {
+      isLoadingStates.value = true;
+      final result = await repository.getStates();
+      result.fold(
+        (failure) => states.clear(),
+        (items) => states.assignAll(items),
+      );
+    } finally {
+      isLoadingStates.value = false;
+    }
+  }
+
+  Future<void> fetchDistricts(int stateId) async {
+    try {
+      isLoadingDistricts.value = true;
+      districts.clear();
+      localities.clear();
+      final result = await repository.getDistricts(stateId);
+      result.fold(
+        (failure) => districts.clear(),
+        (items) => districts.assignAll(items),
+      );
+    } finally {
+      isLoadingDistricts.value = false;
+    }
+  }
+
+  Future<void> fetchLocalities(int districtId) async {
+    try {
+      isLoadingLocalities.value = true;
+      localities.clear();
+      final result = await repository.getLocalities(districtId);
+      result.fold(
+        (failure) => localities.clear(),
+        (items) => localities.assignAll(items),
+      );
+    } finally {
+      isLoadingLocalities.value = false;
+    }
   }
 
   Future<Either<Failure, bool>> logCallAndChatApply({

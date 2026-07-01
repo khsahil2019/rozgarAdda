@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:rojgar/features/auth/data/data_source/model/dropdown_item.dart';
 import 'package:open_share_plus/open.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
@@ -69,7 +70,12 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   int _selectedEducationIndex = 0;
   int _selectedExperienceIndex = 0;
   int _selectedFreshnessIndex = 0;
-  int _selectedLocationIndex = 0;
+  int? _filterStateId;
+  int? _filterDistrictId;
+  int? _filterLocalityId;
+  String? _filterStateName;
+  String? _filterDistrictName;
+  String? _filterLocalityName;
 
   static const List<String> _jobTypeOptions = [
     'Any',
@@ -111,13 +117,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     'Last 30 days',
   ];
 
-  static const List<String> _locationOptions = [
-    'Location',
-    'Sangli',
-    'Pune',
-    'Ahmedabad',
-    'Hyderabad',
-  ];
+
 
   String _getJobImageUrl(AvailableJob job) {
     switch (job.id) {
@@ -184,7 +184,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     super.dispose();
   }
 
-  Future<void> _loadRecentJobs() async {
+  Future<void> _loadRecentJobs({
+    int? stateId,
+    int? districtId,
+    int? localityId,
+  }) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -194,7 +198,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
     try {
       final repository = Get.find<JobsRepository>();
-      final result = await repository.getLatestJobs();
+      final result = await repository.getLatestJobs(
+        stateId: stateId,
+        districtId: districtId,
+        localityId: localityId,
+      );
       result.fold(
         (failure) {
           setState(() {
@@ -330,16 +338,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
         if (!_matchFreshness(job, _selectedFreshnessIndex)) return false;
       }
 
-      // 7. Location filter
-      if (_selectedLocationIndex != 0) {
-        final selectedLoc = _locationOptions[_selectedLocationIndex]
-            .toLowerCase();
-        final inLoc =
-            job.addressLine1.toLowerCase().contains(selectedLoc) ||
-            job.addressLine2.toLowerCase().contains(selectedLoc) ||
-            job.stateName.toLowerCase().contains(selectedLoc);
-        if (!inLoc) return false;
-      }
+
 
       return true;
     }).toList();
@@ -1165,7 +1164,10 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
           ),
           const SizedBox(width: 10),
           _buildFilterChipButton(
-            label: _locationOptions[_selectedLocationIndex],
+            label: _filterLocalityName ??
+                _filterDistrictName ??
+                _filterStateName ??
+                'Location',
             onTap: () =>
                 _showFilterSheet(initialSection: _FilterSection.location),
           ),
@@ -1185,6 +1187,23 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       builder: (context) {
         final sections = _FilterSection.values;
         var activeSection = initialSection;
+
+        int? tempStateId = _filterStateId;
+        int? tempDistrictId = _filterDistrictId;
+        int? tempLocalityId = _filterLocalityId;
+        String? tempStateName = _filterStateName;
+        String? tempDistrictName = _filterDistrictName;
+        String? tempLocalityName = _filterLocalityName;
+
+        if (_jobsController.states.isEmpty) {
+          _jobsController.fetchStates();
+        }
+        if (tempStateId != null && _jobsController.districts.isEmpty) {
+          _jobsController.fetchDistricts(tempStateId);
+        }
+        if (tempDistrictId != null && _jobsController.localities.isEmpty) {
+          _jobsController.fetchLocalities(tempDistrictId);
+        }
 
         return StatefulBuilder(
           builder: (context, setModalState) {
@@ -1330,87 +1349,113 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                                       );
                                     },
                                   )
-                                : ListView.separated(
-                                    padding: const EdgeInsets.fromLTRB(
-                                      16,
-                                      14,
-                                      16,
-                                      16,
-                                    ),
-                                    itemCount: options.length,
-                                    separatorBuilder: (_, __) =>
-                                        const SizedBox(height: 8),
-                                    itemBuilder: (_, index) {
-                                      final option = options[index];
-                                      final isSelected = index == currentIndex;
-                                      return InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            _setSelectedIndexForSection(
-                                              activeSection,
-                                              index,
-                                            );
-                                            _filterJobs();
-                                          });
-                                          setModalState(() {});
+                                : activeSection == _FilterSection.location
+                                    ? _buildLocationFilterView(
+                                        context,
+                                        setModalState,
+                                        tempStateId,
+                                        tempDistrictId,
+                                        tempLocalityId,
+                                        (stateId, stateName) {
+                                          tempStateId = stateId;
+                                          tempStateName = stateName;
+                                          tempDistrictId = null;
+                                          tempDistrictName = null;
+                                          tempLocalityId = null;
+                                          tempLocalityName = null;
                                         },
-                                        borderRadius: BorderRadius.circular(16),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 10,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: isSelected
-                                                ? const Color(0xFFF7F8FC)
-                                                : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(
-                                              16,
-                                            ),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  option,
-                                                  style: TextStyle(
-                                                    fontSize: 13.sp,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: _Colors.darkText,
-                                                  ),
-                                                ),
-                                              ),
-                                              Container(
-                                                width: 30,
-                                                height: 30,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                    color: isSelected
-                                                        ? _Colors.darkText
-                                                        : const Color(
-                                                            0xFF8A8E97,
-                                                          ),
-                                                    width: 2,
-                                                  ),
-                                                ),
-                                                child: isSelected
-                                                    ? const Center(
-                                                        child: Icon(
-                                                          Icons.circle_rounded,
-                                                          size: 14,
-                                                          color:
-                                                              _Colors.darkText,
-                                                        ),
-                                                      )
-                                                    : null,
-                                              ),
-                                            ],
-                                          ),
+                                        (districtId, districtName) {
+                                          tempDistrictId = districtId;
+                                          tempDistrictName = districtName;
+                                          tempLocalityId = null;
+                                          tempLocalityName = null;
+                                        },
+                                        (localityId, localityName) {
+                                          tempLocalityId = localityId;
+                                          tempLocalityName = localityName;
+                                        },
+                                      )
+                                    : ListView.separated(
+                                        padding: const EdgeInsets.fromLTRB(
+                                          16,
+                                          14,
+                                          16,
+                                          16,
                                         ),
-                                      );
-                                    },
-                                  ),
+                                        itemCount: options.length,
+                                        separatorBuilder: (_, __) =>
+                                            const SizedBox(height: 8),
+                                        itemBuilder: (_, index) {
+                                          final option = options[index];
+                                          final isSelected = index == currentIndex;
+                                          return InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                _setSelectedIndexForSection(
+                                                  activeSection,
+                                                  index,
+                                                );
+                                                _filterJobs();
+                                              });
+                                              setModalState(() {});
+                                            },
+                                            borderRadius: BorderRadius.circular(16),
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 12,
+                                                vertical: 10,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: isSelected
+                                                    ? const Color(0xFFF7F8FC)
+                                                    : Colors.transparent,
+                                                borderRadius: BorderRadius.circular(
+                                                  16,
+                                                ),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      option,
+                                                      style: TextStyle(
+                                                        fontSize: 13.sp,
+                                                        fontWeight: FontWeight.w700,
+                                                        color: _Colors.darkText,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    width: 30,
+                                                    height: 30,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                        color: isSelected
+                                                            ? _Colors.darkText
+                                                            : const Color(
+                                                                0xFF8A8E97,
+                                                              ),
+                                                        width: 2,
+                                                      ),
+                                                    ),
+                                                    child: isSelected
+                                                        ? const Center(
+                                                            child: Icon(
+                                                              Icons.circle_rounded,
+                                                              size: 14,
+                                                              color:
+                                                                  _Colors.darkText,
+                                                            ),
+                                                          )
+                                                        : null,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
                           ),
                         ],
                       ),
@@ -1431,12 +1476,23 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                                   _selectedEducationIndex = 0;
                                   _selectedExperienceIndex = 0;
                                   _selectedFreshnessIndex = 0;
-                                  _selectedLocationIndex = 0;
-                                  _filterJobs();
+                                  _filterStateId = null;
+                                  _filterDistrictId = null;
+                                  _filterLocalityId = null;
+                                  _filterStateName = null;
+                                  _filterDistrictName = null;
+                                  _filterLocalityName = null;
                                 });
                                 setModalState(() {
+                                  tempStateId = null;
+                                  tempDistrictId = null;
+                                  tempLocalityId = null;
+                                  tempStateName = null;
+                                  tempDistrictName = null;
+                                  tempLocalityName = null;
                                   activeSection = _FilterSection.jobType;
                                 });
+                                _loadRecentJobs();
                               },
                               style: OutlinedButton.styleFrom(
                                 side: const BorderSide(
@@ -1461,7 +1517,22 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
                           SizedBox(width: 10.sp),
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: () => Navigator.pop(context, true),
+                              onPressed: () {
+                                setState(() {
+                                  _filterStateId = tempStateId;
+                                  _filterDistrictId = tempDistrictId;
+                                  _filterLocalityId = tempLocalityId;
+                                  _filterStateName = tempStateName;
+                                  _filterDistrictName = tempDistrictName;
+                                  _filterLocalityName = tempLocalityName;
+                                });
+                                _loadRecentJobs(
+                                  stateId: _filterStateId,
+                                  districtId: _filterDistrictId,
+                                  localityId: _filterLocalityId,
+                                );
+                                Navigator.pop(context, true);
+                              },
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
                                 backgroundColor: _Colors.primaryBlue,
@@ -1517,7 +1588,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       _FilterSection.education => _educationOptions,
       _FilterSection.experience => _experienceOptions,
       _FilterSection.freshness => _freshnessOptions,
-      _FilterSection.location => _locationOptions,
+      _FilterSection.location => [],
     };
   }
 
@@ -1529,7 +1600,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       _FilterSection.education => _selectedEducationIndex,
       _FilterSection.experience => _selectedExperienceIndex,
       _FilterSection.freshness => _selectedFreshnessIndex,
-      _FilterSection.location => _selectedLocationIndex,
+      _FilterSection.location => 0,
     };
   }
 
@@ -1554,7 +1625,6 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
         _selectedFreshnessIndex = index;
         break;
       case _FilterSection.location:
-        _selectedLocationIndex = index;
         break;
     }
   }
@@ -2007,6 +2077,193 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       context,
       MaterialPageRoute(builder: (_) => JobDetailScreen(job: job)),
     );
+  }
+
+  Widget _buildLocationFilterView(
+    BuildContext context,
+    void Function(void Function()) setModalState,
+    int? currentStateId,
+    int? currentDistrictId,
+    int? currentLocalityId,
+    void Function(int?, String?) onStateChanged,
+    void Function(int?, String?) onDistrictChanged,
+    void Function(int?, String?) onLocalityChanged,
+  ) {
+    return Obx(() {
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // State Selection
+            const Text(
+              'State',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _Colors.darkText),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF7F8FB),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _Colors.borderGrey, width: 1.2),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int?>(
+                  value: currentStateId,
+                  isExpanded: true,
+                  hint: Text(
+                    _jobsController.isLoadingStates.value
+                        ? 'Loading states...'
+                        : 'Select State',
+                    style: const TextStyle(color: _Colors.grey, fontSize: 14),
+                  ),
+                  dropdownColor: Colors.white,
+                  items: [
+                    const DropdownMenuItem<int?>(
+                      value: null,
+                      child: Text('Any State'),
+                    ),
+                    ..._jobsController.states.map(
+                      (state) => DropdownMenuItem<int?>(
+                        value: state.id,
+                        child: Text(state.name, overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                  ],
+                  onChanged: _jobsController.isLoadingStates.value
+                      ? null
+                      : (value) {
+                          String? name;
+                          if (value != null) {
+                            name = _jobsController.states.firstWhere((s) => s.id == value).name;
+                          }
+                          onStateChanged(value, name);
+                          if (value != null) {
+                            _jobsController.fetchDistricts(value);
+                          }
+                          setModalState(() {});
+                        },
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // District Selection
+            const Text(
+              'District',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _Colors.darkText),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF7F8FB),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _Colors.borderGrey, width: 1.2),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int?>(
+                  value: currentStateId == null ? null : currentDistrictId,
+                  isExpanded: true,
+                  hint: Text(
+                    currentStateId == null
+                        ? 'Select state first'
+                        : _jobsController.isLoadingDistricts.value
+                            ? 'Loading districts...'
+                            : 'Select District',
+                    style: const TextStyle(color: _Colors.grey, fontSize: 14),
+                  ),
+                  dropdownColor: Colors.white,
+                  items: currentStateId == null
+                      ? []
+                      : [
+                          const DropdownMenuItem<int?>(
+                            value: null,
+                            child: Text('Any District'),
+                          ),
+                          ..._jobsController.districts.map(
+                            (district) => DropdownMenuItem<int?>(
+                              value: district.id,
+                              child: Text(district.name, overflow: TextOverflow.ellipsis),
+                            ),
+                          ),
+                        ],
+                  onChanged: (currentStateId == null || _jobsController.isLoadingDistricts.value)
+                      ? null
+                      : (value) {
+                          String? name;
+                          if (value != null) {
+                            name = _jobsController.districts.firstWhere((d) => d.id == value).name;
+                          }
+                          onDistrictChanged(value, name);
+                          if (value != null) {
+                            _jobsController.fetchLocalities(value);
+                          }
+                          setModalState(() {});
+                        },
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Locality Selection
+            const Text(
+              'Locality',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _Colors.darkText),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF7F8FB),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _Colors.borderGrey, width: 1.2),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<int?>(
+                  value: currentDistrictId == null ? null : currentLocalityId,
+                  isExpanded: true,
+                  hint: Text(
+                    currentDistrictId == null
+                        ? 'Select district first'
+                        : _jobsController.isLoadingLocalities.value
+                            ? 'Loading localities...'
+                            : 'Select Locality',
+                    style: const TextStyle(color: _Colors.grey, fontSize: 14),
+                  ),
+                  dropdownColor: Colors.white,
+                  items: currentDistrictId == null
+                      ? []
+                      : [
+                          const DropdownMenuItem<int?>(
+                            value: null,
+                            child: Text('Any Locality'),
+                          ),
+                          ..._jobsController.localities.map(
+                            (locality) => DropdownMenuItem<int?>(
+                              value: locality.id,
+                              child: Text(locality.name, overflow: TextOverflow.ellipsis),
+                            ),
+                          ),
+                        ],
+                  onChanged: (currentDistrictId == null || _jobsController.isLoadingLocalities.value)
+                      ? null
+                      : (value) {
+                          String? name;
+                          if (value != null) {
+                            name = _jobsController.localities.firstWhere((l) => l.id == value).name;
+                          }
+                          onLocalityChanged(value, name);
+                          setModalState(() {});
+                        },
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 
