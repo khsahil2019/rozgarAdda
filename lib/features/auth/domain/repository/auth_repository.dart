@@ -16,6 +16,7 @@ abstract class AuthRepository {
     required String locality,
     required String pincode,
     required String address,
+    required String otp,
     String? identityProofPath,
     String? termsAccepted,
   });

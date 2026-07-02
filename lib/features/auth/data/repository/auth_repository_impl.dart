@@ -36,6 +36,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String locality,
     required String pincode,
     required String address,
+    required String otp,
     String? identityProofPath,
     String? termsAccepted,
   }) async {
@@ -51,6 +52,7 @@ class AuthRepositoryImpl implements AuthRepository {
         locality: locality,
         pincode: pincode,
         address: address,
+        otp: otp,
         identityProofPath: identityProofPath,
         termsAccepted: termsAccepted ?? '0',
       );

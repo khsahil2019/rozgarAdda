@@ -7,10 +7,7 @@ class AuthController extends GetxController {
 
   Future<AuthResponse> login(String email, String password) async {
     final either = await authRepository.login(email, password);
-    return either.fold(
-      (failure) => throw failure,
-      (res) => res,
-    );
+    return either.fold((failure) => throw failure, (res) => res);
   }
 
   Future<AuthResponse> register({
@@ -24,6 +21,7 @@ class AuthController extends GetxController {
     required String locality,
     required String pincode,
     required String address,
+    required String otp,
   }) async {
     final either = await authRepository.register(
       fullName: fullName,
@@ -36,10 +34,8 @@ class AuthController extends GetxController {
       locality: locality,
       pincode: pincode,
       address: address,
+      otp: otp,
     );
-    return either.fold(
-      (failure) => throw failure,
-      (res) => res,
-    );
+    return either.fold((failure) => throw failure, (res) => res);
   }
 }

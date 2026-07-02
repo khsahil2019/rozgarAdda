@@ -19,6 +19,7 @@ abstract class AuthRemoteDataSource {
     required String address,
     String? identityProofPath,
     required String termsAccepted,
+    required String otp,
   });
   Future<List<DropdownItem>> getStates();
   Future<List<DropdownItem>> getDistricts(int stateId);
@@ -64,6 +65,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String address,
     String? identityProofPath,
     String termsAccepted = '0',
+    required String otp,
   }) async {
     try {
       final fields = {
@@ -78,6 +80,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'pincode': pincode,
         'address': address,
         "terms_accepted": termsAccepted,
+        "otp": otp,
       };
 
       Map<String, dynamic> res;

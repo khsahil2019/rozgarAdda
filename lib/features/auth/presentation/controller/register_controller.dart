@@ -285,6 +285,7 @@ class RegisterController extends GetxController {
         address: address.value.trim(),
         identityProofPath: identityProofPath.value,
         termsAccepted: acceptedTerms.value ? '1' : '0',
+        otp: otpValue,
       );
 
       return either.fold((failure) => throw failure, (result) {

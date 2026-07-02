@@ -212,8 +212,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Obx(() {
-                    final currentFilter =
-                        controller.applicantStatusFilter.value.toUpperCase();
+                    final currentFilter = controller.applicantStatusFilter.value
+                        .toUpperCase();
                     return Text(
                       'SHOWING: $currentFilter',
                       style: const TextStyle(
@@ -238,17 +238,16 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
 
             // List of candidates
             Expanded(
-              child:
-                  apps.isEmpty
-                      ? _buildEmptyState(context, l10n)
-                      : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-                        itemCount: apps.length,
-                        itemBuilder: (ctx, index) {
-                          final app = apps[index];
-                          return _buildApplicantCard(context, app);
-                        },
-                      ),
+              child: apps.isEmpty
+                  ? _buildEmptyState(context, l10n)
+                  : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                      itemCount: apps.length,
+                      itemBuilder: (ctx, index) {
+                        final app = apps[index];
+                        return _buildApplicantCard(context, app);
+                      },
+                    ),
             ),
           ],
         );
@@ -362,10 +361,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
             decoration: BoxDecoration(
-              color:
-                  isSelected
-                      ? color.withValues(alpha: 0.12)
-                      : color.withValues(alpha: 0.04),
+              color: isSelected
+                  ? color.withValues(alpha: 0.12)
+                  : color.withValues(alpha: 0.04),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: isSelected ? color : color.withValues(alpha: 0.1),
@@ -485,8 +483,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                             app.candidateName.isEmpty
                                 ? '?'
                                 : app.candidateName
-                                    .substring(0, 1)
-                                    .toUpperCase(),
+                                      .substring(0, 1)
+                                      .toUpperCase(),
                             style: const TextStyle(
                               color: primaryBlue,
                               fontSize: 18,
@@ -564,32 +562,29 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                               Wrap(
                                 spacing: 6,
                                 runSpacing: 4,
-                                children:
-                                    app.keySkills.split(',').take(3).map((
-                                      skill,
-                                    ) {
-                                      return Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 3,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: lightBg,
-                                          borderRadius: BorderRadius.circular(
-                                            6,
-                                          ),
-                                          border: Border.all(color: borderGrey),
-                                        ),
-                                        child: Text(
-                                          skill.trim(),
-                                          style: const TextStyle(
-                                            color: darkText,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
+                                children: app.keySkills.split(',').take(3).map((
+                                  skill,
+                                ) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: lightBg,
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: borderGrey),
+                                    ),
+                                    child: Text(
+                                      skill.trim(),
+                                      style: const TextStyle(
+                                        color: darkText,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
                               ),
                             ],
                           ],
@@ -614,26 +609,37 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   children: [
                     // Communication Shortcuts
                     _buildContactButton(
-                      icon: Icons.phone_in_talk_rounded,
+                      icon: Icon(
+                        Icons.phone_in_talk_rounded,
+                        size: 16,
+                        color: Colors.green,
+                      ),
                       color: Colors.green,
                       onPressed: () => _makeCall(app.phone),
                       tooltip: 'Call',
                     ),
                     const SizedBox(width: 8),
                     _buildContactButton(
-                      icon: Icons.chat_bubble_rounded,
+                      icon: Image.asset(
+                        "assets/icons/whatsapp.png",
+                        width: 16,
+                        height: 16,
+                      ),
                       color: const Color(0xFF25D366),
-                      onPressed:
-                          () => _sendWhatsApp(
-                            app.phone,
-                            app.candidateName,
-                            widget.jobTitle,
-                          ),
+                      onPressed: () => _sendWhatsApp(
+                        app.phone,
+                        app.candidateName,
+                        widget.jobTitle,
+                      ),
                       tooltip: 'WhatsApp',
                     ),
                     const SizedBox(width: 8),
                     _buildContactButton(
-                      icon: Icons.mail_rounded,
+                      icon: Icon(
+                        Icons.mail_rounded,
+                        size: 16,
+                        color: Colors.redAccent,
+                      ),
                       color: Colors.redAccent,
                       onPressed: () => _sendEmail(app.email, widget.jobTitle),
                       tooltip: 'Email',
@@ -644,12 +650,11 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                     // Reject/Accept Decision Buttons
                     if (app.status == 'pending') ...[
                       TextButton(
-                        onPressed:
-                            () => controller.updateApplicationStatus(
-                              widget.jobId,
-                              app.id,
-                              'rejected',
-                            ),
+                        onPressed: () => controller.updateApplicationStatus(
+                          widget.jobId,
+                          app.id,
+                          'rejected',
+                        ),
                         child: const Text(
                           'Reject',
                           style: TextStyle(
@@ -661,12 +666,11 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       ),
                       const SizedBox(width: 10),
                       ElevatedButton(
-                        onPressed:
-                            () => controller.updateApplicationStatus(
-                              widget.jobId,
-                              app.id,
-                              'accepted',
-                            ),
+                        onPressed: () => controller.updateApplicationStatus(
+                          widget.jobId,
+                          app.id,
+                          'accepted',
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryBlue,
                           foregroundColor: Colors.white,
@@ -720,7 +724,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   }
 
   Widget _buildContactButton({
-    required IconData icon,
+    required Widget icon,
     required Color color,
     required VoidCallback onPressed,
     required String tooltip,
@@ -735,7 +739,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       ),
       child: IconButton(
         onPressed: onPressed,
-        icon: Icon(icon, color: color, size: 16),
+        icon: icon,
         padding: EdgeInsets.zero,
         tooltip: tooltip,
       ),

@@ -23,6 +23,7 @@ class RegistrationFormScreen extends GetView<RegisterController> {
     final locality = controller.locality.value.trim();
     final pincode = controller.pincode.value.trim();
     final address = controller.address.value.trim();
+    final otp = controller.otpValue.trim();
 
     if (fullName.isEmpty ||
         phone.isEmpty ||
@@ -31,7 +32,8 @@ class RegistrationFormScreen extends GetView<RegisterController> {
         password.isEmpty ||
         locality.isEmpty ||
         pincode.isEmpty ||
-        address.isEmpty) {
+        address.isEmpty ||
+        otp.isEmpty) {
       _showMessage(context, l10n.text('registration_error_fields'));
       return;
     }
