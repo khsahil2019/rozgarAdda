@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/core/exceptions/exceptions.dart';
 import 'package:rojgar/core/theme/theme.extension.dart';
+import 'package:rojgar/features/auth/data/data_source/model/dropdown_item.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/features/auth/presentation/controller/register_controller.dart';
 import 'package:rojgar/dashboard_screen.dart';
@@ -264,7 +265,7 @@ class RegistrationFormScreen extends GetView<RegisterController> {
                               l10n.text('registration_state'),
                             ),
                             const SizedBox(height: 6),
-                            _stateDropdown(context),
+                            _stateField(context),
                           ],
                         ),
                       ),
@@ -278,7 +279,7 @@ class RegistrationFormScreen extends GetView<RegisterController> {
                               l10n.text('registration_district'),
                             ),
                             const SizedBox(height: 6),
-                            _districtDropdown(context),
+                            _districtField(context),
                           ],
                         ),
                       ),
@@ -299,11 +300,7 @@ class RegistrationFormScreen extends GetView<RegisterController> {
                               l10n.text('registration_area'),
                             ),
                             const SizedBox(height: 6),
-                            _inputField(
-                              context,
-                              hint: l10n.text('registration_area_hint'),
-                              controller: controller.localityController,
-                            ),
+                            _localityField(context),
                           ],
                         ),
                       ),
@@ -863,82 +860,254 @@ class RegistrationFormScreen extends GetView<RegisterController> {
     });
   }
 
-  Widget _stateDropdown(BuildContext context) {
+  Widget _selectorField(
+    BuildContext context, {
+    required String hint,
+    required String value,
+    required VoidCallback onTap,
+  }) {
     final colors = context.colors;
-    final l10n = context.l10n;
-    return Obx(
-      () => Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
         decoration: BoxDecoration(
           color: colors.fieldBg,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: colors.border, width: 1.2),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<int>(
-            value: controller.selectedStateId.value,
-            isExpanded: true,
-            hint: Text(
-              controller.isStatesLoading.value
-                  ? 'Loading states...'
-                  : l10n.text('registration_select_state'),
-              style: TextStyle(color: colors.textSecondary, fontSize: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                value.isNotEmpty ? value : hint,
+                style: TextStyle(
+                  color: value.isNotEmpty
+                      ? colors.textPrimary
+                      : colors.textSecondary,
+                  fontSize: 14,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            items: controller.states
-                .map(
-                  (state) => DropdownMenuItem<int>(
-                    value: state.id,
-                    child: Text(state.name, overflow: TextOverflow.ellipsis),
-                  ),
-                )
-                .toList(),
-            onChanged: controller.isStatesLoading.value
-                ? null
-                : (value) => controller.selectState(value),
-          ),
+            Icon(Icons.arrow_drop_down, color: colors.textSecondary),
+          ],
         ),
       ),
     );
   }
 
-  Widget _districtDropdown(BuildContext context) {
+  Widget _stateField(BuildContext context) {
+    return Obx(() {
+      final selectedStateName =
+          controller.states
+              .firstWhereOrNull((s) => s.id == controller.selectedStateId.value)
+              ?.name ??
+          '';
+      return _selectorField(
+        context,
+        hint: context.l10n.text('registration_select_state'),
+        value: selectedStateName,
+        onTap: () {
+          _showSearchableBottomSheet(
+            context: context,
+            title: context.l10n.text('registration_select_state'),
+            searchHint: 'Search state...',
+            items: controller.states,
+            isLoading: controller.isStatesLoading,
+            onSelected: (state) => controller.selectState(state.id),
+          );
+        },
+      );
+    });
+  }
+
+  Widget _districtField(BuildContext context) {
+    return Obx(() {
+      final selectedDistrictName =
+          controller.districts
+              .firstWhereOrNull(
+                (d) => d.id == controller.selectedDistrictId.value,
+              )
+              ?.name ??
+          '';
+      return _selectorField(
+        context,
+        hint: 'Select District',
+        value: selectedDistrictName,
+        onTap: () {
+          if (controller.selectedStateId.value == null) {
+            _showMessage(context, 'Please select a state first');
+            return;
+          }
+          _showSearchableBottomSheet(
+            context: context,
+            title: 'Select District',
+            searchHint: 'Search district...',
+            items: controller.districts,
+            isLoading: controller.isDistrictsLoading,
+            onSelected: (district) => controller.selectDistrict(district.id),
+          );
+        },
+      );
+    });
+  }
+
+  Widget _localityField(BuildContext context) {
+    return Obx(() {
+      return _selectorField(
+        context,
+        hint: context.l10n.text('registration_area_hint'),
+        value: controller.selectedLocalityName.value ?? '',
+        onTap: () {
+          if (controller.selectedDistrictId.value == null) {
+            _showMessage(context, 'Please select a district first');
+            return;
+          }
+          _showSearchableBottomSheet(
+            context: context,
+            title: context.l10n.text('registration_area'),
+            searchHint: 'Search locality...',
+            items: controller.localities,
+            isLoading: controller.isLocalitiesLoading,
+            onSelected: (loc) => controller.selectLocality(loc),
+            emptyMessage: 'No localities found',
+          );
+        },
+      );
+    });
+  }
+
+  void _showSearchableBottomSheet({
+    required BuildContext context,
+    required String title,
+    required String searchHint,
+    required RxList<DropdownItem> items,
+    required RxBool isLoading,
+    required Function(DropdownItem) onSelected,
+    String? emptyMessage,
+  }) {
+    final size = MediaQuery.of(context).size;
     final colors = context.colors;
-    return Obx(
-      () => Container(
-        decoration: BoxDecoration(
-          color: colors.fieldBg,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colors.border, width: 1.2),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<int>(
-            value: controller.selectedDistrictId.value,
-            isExpanded: true,
-            hint: Text(
-              controller.selectedStateId.value == null
-                  ? 'Select state first'
-                  : controller.isDistrictsLoading.value
-                  ? 'Loading districts...'
-                  : 'Select District',
-              style: TextStyle(color: colors.textSecondary, fontSize: 14),
-            ),
-            items: controller.districts
-                .map(
-                  (district) => DropdownMenuItem<int>(
-                    value: district.id,
-                    child: Text(district.name, overflow: TextOverflow.ellipsis),
-                  ),
-                )
-                .toList(),
-            onChanged:
-                (controller.selectedStateId.value == null ||
-                    controller.isDistrictsLoading.value)
-                ? null
-                : (value) => controller.selectDistrict(value),
-          ),
-        ),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: colors.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      builder: (ct) {
+        final searchRx = ''.obs;
+        return Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ct).viewInsets.bottom),
+          child: Container(
+            height: size.height * 0.7,
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+            child: Column(
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colors.divider,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: colors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                    color: colors.fieldBg,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: colors.border, width: 1.2),
+                  ),
+                  child: TextField(
+                    onChanged: (val) => searchRx.value = val,
+                    style: TextStyle(color: colors.textPrimary, fontSize: 14),
+                    decoration: InputDecoration(
+                      hintText: searchHint,
+                      hintStyle: TextStyle(
+                        color: colors.textSecondary,
+                        fontSize: 14,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: colors.textSecondary,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: Obx(() {
+                    if (isLoading.value) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: colors.brandColor,
+                        ),
+                      );
+                    }
+                    final filtered = items
+                        .where(
+                          (item) => item.name.toLowerCase().contains(
+                            searchRx.value.toLowerCase().trim(),
+                          ),
+                        )
+                        .toList();
+                    if (filtered.isEmpty) {
+                      return Center(
+                        child: Text(
+                          emptyMessage ?? 'No items found',
+                          style: TextStyle(
+                            color: colors.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      );
+                    }
+                    return ListView.separated(
+                      itemCount: filtered.length,
+                      separatorBuilder: (_, __) =>
+                          Divider(height: 1, color: colors.divider),
+                      itemBuilder: (context, idx) {
+                        final item = filtered[idx];
+                        return ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          title: Text(
+                            item.name,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: colors.textPrimary,
+                            ),
+                          ),
+                          onTap: () {
+                            onSelected(item);
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1087,28 +1256,35 @@ class RegistrationFormScreen extends GetView<RegisterController> {
   Widget _passwordField(BuildContext context) {
     final colors = context.colors;
     final l10n = context.l10n;
-    return Container(
-      decoration: BoxDecoration(
-        color: colors.fieldBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colors.border, width: 1.2),
-      ),
-      child: TextField(
-        controller: controller.passwordController,
-        obscureText: true,
-        style: TextStyle(color: colors.textPrimary, fontSize: 14),
-        decoration: InputDecoration(
-          hintText: l10n.text('registration_password_hint'),
-          hintStyle: TextStyle(color: colors.textSecondary, fontSize: 14),
-          suffixIcon: Icon(
-            Icons.remove_red_eye_outlined,
-            color: colors.textSecondary,
-            size: 20,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 14,
+    return Obx(
+      () => Container(
+        decoration: BoxDecoration(
+          color: colors.fieldBg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colors.border, width: 1.2),
+        ),
+        child: TextField(
+          controller: controller.passwordController,
+          obscureText: controller.isPasswordObscured.value,
+          style: TextStyle(color: colors.textPrimary, fontSize: 14),
+          decoration: InputDecoration(
+            hintText: l10n.text('registration_password_hint'),
+            hintStyle: TextStyle(color: colors.textSecondary, fontSize: 14),
+            suffixIcon: IconButton(
+              icon: Icon(
+                controller.isPasswordObscured.value
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: colors.textSecondary,
+                size: 20,
+              ),
+              onPressed: controller.togglePasswordObscurity,
+            ),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 14,
+            ),
           ),
         ),
       ),

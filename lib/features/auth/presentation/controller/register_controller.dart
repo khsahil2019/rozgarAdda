@@ -42,12 +42,16 @@ class RegisterController extends GetxController {
   // ── Dropdown data ──────────────────────────────────────────────────────────
   final RxList<DropdownItem> states = <DropdownItem>[].obs;
   final RxList<DropdownItem> districts = <DropdownItem>[].obs;
+  final RxList<DropdownItem> localities = <DropdownItem>[].obs;
   final RxnInt selectedStateId = RxnInt();
   final RxnInt selectedDistrictId = RxnInt();
+  final RxnInt selectedLocalityId = RxnInt();
+  final RxnString selectedLocalityName = RxnString();
 
   // ── Loading flags ──────────────────────────────────────────────────────────
   final RxBool isStatesLoading = false.obs;
   final RxBool isDistrictsLoading = false.obs;
+  final RxBool isLocalitiesLoading = false.obs;
   final RxBool isLoading = false.obs;
 
   // ── OTP state ──────────────────────────────────────────────────────────────
@@ -56,6 +60,13 @@ class RegisterController extends GetxController {
 
   /// True after the server confirms the OTP is correct.
   final RxBool isPhoneVerified = false.obs;
+
+  /// Password visibility toggler.
+  final RxBool isPasswordObscured = true.obs;
+
+  void togglePasswordObscurity() {
+    isPasswordObscured.value = !isPasswordObscured.value;
+  }
 
   /// Loading spinner for Send OTP button.
   final RxBool isSendingOtp = false.obs;
@@ -222,14 +233,46 @@ class RegisterController extends GetxController {
     }
   }
 
+  Future<void> fetchLocalities(int districtId) async {
+    isLocalitiesLoading.value = true;
+    selectedLocalityId.value = null;
+    selectedLocalityName.value = null;
+    localities.clear();
+    try {
+      final either = await authRepository.getLocalities(districtId);
+      either.fold((_) {}, (res) => localities.assignAll(res));
+    } catch (_) {
+    } finally {
+      isLocalitiesLoading.value = false;
+    }
+  }
+
   void selectState(int? stateId) {
     if (stateId == null) return;
     selectedStateId.value = stateId;
+    selectedDistrictId.value = null;
+    selectedLocalityId.value = null;
+    selectedLocalityName.value = null;
+    districts.clear();
+    localities.clear();
     fetchDistricts(stateId);
   }
 
   void selectDistrict(int? districtId) {
+    if (districtId == null) return;
     selectedDistrictId.value = districtId;
+    selectedLocalityId.value = null;
+    selectedLocalityName.value = null;
+    localities.clear();
+    fetchLocalities(districtId);
+  }
+
+  void selectLocality(DropdownItem? localityItem) {
+    if (localityItem == null) return;
+    selectedLocalityId.value = localityItem.id;
+    selectedLocalityName.value = localityItem.name;
+    locality.value = localityItem.name;
+    localityController.text = localityItem.name;
   }
 
   void toggleTermsAcceptance() {

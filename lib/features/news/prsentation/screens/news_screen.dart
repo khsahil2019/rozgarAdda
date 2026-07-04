@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../domain/entities/news_item.dart';
 import '../controller/news_controller.dart';
 import 'news_detail_screen.dart';
+import 'youtube_player_screen.dart';
 
 // Colors constant configuration
 class _NC {
@@ -302,37 +303,49 @@ class NewsScreen extends GetView<NewsController> {
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (thumbnailUrl != null)
-                    Image.network(
-                      thumbnailUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFD8E8F0)),
-                    )
-                  else
-                    Container(
-                      color: const Color(0xFFE3E5ED),
-                      child: const Center(
-                        child: Icon(
-                          Icons.play_circle_outline_rounded,
-                          size: 64,
-                          color: _NC.navy,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          if (isYoutube && item is YoutubeNews) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => YoutubePlayerScreen(news: item),
+              ),
+            );
+          } else {
+            _launchUrl(mediaUrl);
+          }
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (thumbnailUrl != null)
+                      Image.network(
+                        thumbnailUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(color: const Color(0xFFD8E8F0)),
+                      )
+                    else
+                      Container(
+                        color: const Color(0xFFE3E5ED),
+                        child: const Center(
+                          child: Icon(
+                            Icons.play_circle_outline_rounded,
+                            size: 64,
+                            color: _NC.navy,
+                          ),
                         ),
                       ),
-                    ),
-                  Container(color: Colors.black26),
-                  Center(
-                    child: GestureDetector(
-                      onTap: () => _launchUrl(mediaUrl),
+                    Container(color: Colors.black26),
+                    Center(
                       child: Container(
                         width: 52,
                         height: 52,
@@ -347,31 +360,30 @@ class NewsScreen extends GetView<NewsController> {
                         ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: 12,
-                    left: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: isYoutube ? Colors.red : _NC.navy,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        isYoutube ? 'YOUTUBE' : 'VIDEO',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
+                    Positioned(
+                      top: 12,
+                      left: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: isYoutube ? Colors.red : _NC.navy,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          isYoutube ? 'YOUTUBE' : 'VIDEO',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
           Padding(
             padding: const EdgeInsets.all(14.0),
             child: Column(
@@ -417,8 +429,9 @@ class NewsScreen extends GetView<NewsController> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   // ── Helper state selectors ───────────────────────────────────────────────
   List<NewsItem> _getCurrentList() {

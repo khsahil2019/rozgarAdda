@@ -22,6 +22,7 @@ abstract class AuthRepository {
   });
   Future<Either<Failure, List<DropdownItem>>> getStates();
   Future<Either<Failure, List<DropdownItem>>> getDistricts(int stateId);
+  Future<Either<Failure, List<DropdownItem>>> getLocalities(int districtId);
 
   /// Sends OTP to [phone].
   Future<Either<Failure, Unit>> sendOtp(String phone);

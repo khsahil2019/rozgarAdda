@@ -28,7 +28,6 @@ class _SplashScreenState extends State<SplashScreen> {
   static const Color lightWhite = Color(0xAAFFFFFF);
   static const Color innerBlue = Color(0xFF1400EE);
 
-
   Future<void> _navigateWithAuthCheck({
     required BuildContext context,
     required Widget loggedInScreen,
@@ -191,13 +190,13 @@ class _SplashScreenState extends State<SplashScreen> {
                           replace: true,
                         ),
                       ),
-                      _SplashMenuItem(
-                        icon: Icons.info_outline_rounded,
-                        label: l10n.text('splash_menu_about'),
-                        onTap: () {
-                          // TODO: navigate to About Us screen
-                        },
-                      ),
+                      // _SplashMenuItem(
+                      //   icon: Icons.info_outline_rounded,
+                      //   label: l10n.text('splash_menu_about'),
+                      //   onTap: () {
+                      //     // TODO: navigate to About Us screen
+                      //   },
+                      // ),
                       _SplashMenuItem(
                         icon: Icons.report_gmailerrorred_rounded,
                         label: l10n.text('splash_menu_missing'),

@@ -10,8 +10,14 @@ import '../../../../splash_screen.dart';
 import '../../../jobs/data/model/available_job_model.dart';
 import '../../../jobs/domain/entities/available_job_entity.dart';
 import '../../domain/entities/job_application_entity.dart';
+import '../../domain/repository/employer_dashboard_repository.dart';
 
 class EmployerDashboardController extends GetxController {
+  final EmployerDashboardRepository _repository;
+
+  EmployerDashboardController({required EmployerDashboardRepository repository})
+      : _repository = repository;
+
   final RxInt employerId = 0.obs;
   final RxList<AvailableJob> postedJobs = <AvailableJob>[].obs;
   final RxMap<int, List<JobApplication>> jobApplications =
@@ -257,27 +263,21 @@ class EmployerDashboardController extends GetxController {
   Future<void> updateApplicationStatus(
     int jobId,
     int appId,
-    String status,
-  ) async {
+    String status, {
+    String? comments,
+  }) async {
     isLoading.value = true;
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('employer_token');
+      final result = await _repository.changeApplicationStatus(
+        applicationId: appId,
+        status: status,
+        comments: comments,
+      );
 
-      // Call dummy endpoint
-      try {
-        final dummyUrl = '${ApiRoutes.baseUrl}/emp/applications/$appId/update-status';
-        await ApiService.post(
-          dummyUrl,
-          body: {
-            'status': status,
-          },
-          accessToken: token,
-        );
-      } catch (e) {
-        // Log error but ignore for simulation
-        debugPrint('Dummy status update API error (expected): $e');
-      }
+      result.fold(
+        (failure) => throw failure,
+        (_) => null,
+      );
 
       // Update in local memory
       localApplicationStatuses[appId] = status;
@@ -317,7 +317,7 @@ class EmployerDashboardController extends GetxController {
 
       Get.snackbar(
         'Status Updated',
-        'Applicant status updated to $status (simulated).',
+        'Applicant status updated to $status.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green.withValues(alpha: 0.9),
         colorText: Colors.white,
@@ -326,7 +326,7 @@ class EmployerDashboardController extends GetxController {
     } catch (e) {
       Get.snackbar(
         'Error',
-        'Failed to update status: $e',
+        e is Failure ? e.message : 'Failed to update status: $e',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,

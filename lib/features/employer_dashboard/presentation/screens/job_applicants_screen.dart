@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:open_share_plus/open.dart';
 import 'package:rojgar/localization/app_localizations.dart';
@@ -106,13 +107,12 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             margin: const EdgeInsets.only(right: 12),
             decoration: BoxDecoration(
               color: primaryBlue.withValues(alpha: 0.05),
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
-              icon: const Icon(
-                Icons.file_download_outlined,
-                color: primaryBlue,
-                size: 20,
+              icon: Text(
+                "Export Excel",
+                style: TextStyle(color: primaryBlue, fontSize: 12.sp),
               ),
               tooltip: 'Export Applicants',
               onPressed: () async {
@@ -435,9 +435,15 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   // Modern Applicant Card UI
   Widget _buildApplicantCard(BuildContext context, JobApplication app) {
     Color statusColor = statusOrange;
-    if (app.status == 'accepted' || app.status == 'shortlisted')
+    if (app.status == 'accepted' || app.status == 'shortlisted') {
       statusColor = statusGreen;
-    if (app.status == 'rejected') statusColor = statusRed;
+    } else if (app.status == 'rejected') {
+      statusColor = statusRed;
+    } else if (app.status == 'reviewed') {
+      statusColor = primaryBlue;
+    } else if (app.status == 'hired') {
+      statusColor = Colors.teal;
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -522,14 +528,28 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                                     color: statusColor.withValues(alpha: 0.08),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: Text(
-                                    app.status.toUpperCase(),
-                                    style: TextStyle(
-                                      color: statusColor,
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: 0.5,
-                                    ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        statusColor == statusGreen
+                                            ? Icons.check_circle_rounded
+                                            : (statusColor == statusRed
+                                                  ? Icons.cancel_rounded
+                                                  : Icons.info_rounded),
+                                        color: statusColor,
+                                        size: 13.sp,
+                                      ),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        'STATUS: ${app.status.toUpperCase()}',
+                                        style: TextStyle(
+                                          color: statusColor,
+                                          fontSize: 10.sp,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -602,117 +622,183 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical: 10,
+                  vertical: 12,
                 ),
                 color: const Color(0xFFFAFBFC),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Communication Shortcuts
-                    _buildContactButton(
-                      icon: Icon(
-                        Icons.phone_in_talk_rounded,
-                        size: 16,
-                        color: Colors.green,
-                      ),
-                      color: Colors.green,
-                      onPressed: () => _makeCall(app.phone),
-                      tooltip: 'Call',
-                    ),
-                    const SizedBox(width: 8),
-                    _buildContactButton(
-                      icon: Image.asset(
-                        "assets/icons/whatsapp.png",
-                        width: 16,
-                        height: 16,
-                      ),
-                      color: const Color(0xFF25D366),
-                      onPressed: () => _sendWhatsApp(
-                        app.phone,
-                        app.candidateName,
-                        widget.jobTitle,
-                      ),
-                      tooltip: 'WhatsApp',
-                    ),
-                    const SizedBox(width: 8),
-                    _buildContactButton(
-                      icon: Icon(
-                        Icons.mail_rounded,
-                        size: 16,
-                        color: Colors.redAccent,
-                      ),
-                      color: Colors.redAccent,
-                      onPressed: () => _sendEmail(app.email, widget.jobTitle),
-                      tooltip: 'Email',
-                    ),
-
-                    const Spacer(),
-
-                    // Reject/Accept Decision Buttons
-                    if (app.status == 'pending') ...[
-                      TextButton(
-                        onPressed: () => controller.updateApplicationStatus(
-                          widget.jobId,
-                          app.id,
-                          'rejected',
-                        ),
-                        child: const Text(
-                          'Reject',
-                          style: TextStyle(
-                            color: statusRed,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: () => controller.updateApplicationStatus(
-                          widget.jobId,
-                          app.id,
-                          'accepted',
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryBlue,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          minimumSize: const Size(0, 0),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 8,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          'Accept',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                    ] else
-                      Row(
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
                         children: [
-                          Icon(
-                            app.status == 'rejected'
-                                ? Icons.cancel_rounded
-                                : Icons.check_circle_rounded,
-                            color: statusColor,
-                            size: 16,
+                          // Call Button with Phone Number
+                          GestureDetector(
+                            onTap: () => _makeCall(app.phone),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withValues(alpha: 0.06),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.green.withValues(alpha: 0.15),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.phone_in_talk_rounded,
+                                    size: 20.sp,
+                                    color: Colors.green,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    app.phone,
+                                    style: TextStyle(
+                                      color: Colors.green.shade800,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            app.status == 'rejected' ? 'Rejected' : 'Accepted',
-                            style: TextStyle(
-                              color: statusColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(width: 8),
+
+                          // WhatsApp Button with "Chat" Label
+                          GestureDetector(
+                            onTap: () => _sendWhatsApp(
+                              app.phone,
+                              app.candidateName,
+                              widget.jobTitle,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFF25D366,
+                                ).withValues(alpha: 0.06),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: const Color(
+                                    0xFF25D366,
+                                  ).withValues(alpha: 0.15),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(
+                                    "assets/icons/whatsapp.png",
+                                    width: 20.sp,
+                                    height: 20.sp,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Chat',
+                                    style: TextStyle(
+                                      color: const Color(0xFF075E54),
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+
+                          // Email Button with "Open Mail" Label
+                          GestureDetector(
+                            onTap: () => _sendEmail(app.email, widget.jobTitle),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.redAccent.withValues(alpha: 0.06),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.redAccent.withValues(
+                                    alpha: 0.15,
+                                  ),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.mail_rounded,
+                                    size: 20.sp,
+                                    color: Colors.redAccent,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Open Mail',
+                                    style: TextStyle(
+                                      color: Colors.red.shade800,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Status and Update Button in the next line
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        // Current Status Indicator
+
+                        // Update Button
+                        ElevatedButton.icon(
+                          onPressed: () =>
+                              _showStatusUpdateDialog(context, app),
+                          icon: Icon(
+                            Icons.edit_note_rounded,
+                            size: 18.sp,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            'Update Status',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryBlue,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            minimumSize: const Size(0, 0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 8,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -857,6 +943,30 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       app.resumePath.split('/').last,
                     ),
 
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Get.back(); // close applicant details sheet
+                        _showStatusUpdateDialog(context, app);
+                      },
+                      icon: const Icon(
+                        Icons.edit_note_rounded,
+                        color: Colors.white,
+                      ),
+                      label: const Text('Update Status'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryBlue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -872,6 +982,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     Color color = statusOrange;
     if (status == 'accepted' || status == 'shortlisted') color = statusGreen;
     if (status == 'rejected') color = statusRed;
+    if (status == 'reviewed') color = primaryBlue;
+    if (status == 'hired') color = Colors.teal;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -886,6 +998,223 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           fontSize: 11,
           fontWeight: FontWeight.w900,
           letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  void _showStatusUpdateDialog(BuildContext context, JobApplication app) {
+    final selectedStatus = app.status.obs;
+    final commentsController = TextEditingController();
+
+    // Set initial status selection (if it's one of the valid enums, otherwise default to reviewed or shortlisted)
+    if ([
+      'shortlisted',
+      'reviewed',
+      'rejected',
+      'hired',
+    ].contains(app.status.toLowerCase())) {
+      selectedStatus.value = app.status.toLowerCase();
+    } else {
+      selectedStatus.value = 'reviewed';
+    }
+
+    Get.bottomSheet(
+      Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Update Application Status',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: darkText,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: greyText),
+                    onPressed: () => Get.back(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Select Status',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: darkText,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Obx(
+                () => Column(
+                  children: [
+                    _buildStatusOption(
+                      title: 'Shortlisted',
+                      statusVal: 'shortlisted',
+                      selectedVal: selectedStatus.value,
+                      color: statusGreen,
+                      onTap: () => selectedStatus.value = 'shortlisted',
+                    ),
+                    _buildStatusOption(
+                      title: 'Reviewed',
+                      statusVal: 'reviewed',
+                      selectedVal: selectedStatus.value,
+                      color: primaryBlue,
+                      onTap: () => selectedStatus.value = 'reviewed',
+                    ),
+                    _buildStatusOption(
+                      title: 'Rejected',
+                      statusVal: 'rejected',
+                      selectedVal: selectedStatus.value,
+                      color: statusRed,
+                      onTap: () => selectedStatus.value = 'rejected',
+                    ),
+                    _buildStatusOption(
+                      title: 'Hired',
+                      statusVal: 'hired',
+                      selectedVal: selectedStatus.value,
+                      color: Colors.teal,
+                      onTap: () => selectedStatus.value = 'hired',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Comments (Optional)',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: darkText,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: commentsController,
+                maxLines: 3,
+                style: const TextStyle(color: darkText, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Enter comments here...',
+                  hintStyle: const TextStyle(color: greyText, fontSize: 13),
+                  filled: true,
+                  fillColor: lightBg,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.all(12),
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    Get.back();
+                    await controller.updateApplicationStatus(
+                      widget.jobId,
+                      app.id,
+                      selectedStatus.value,
+                      comments: commentsController.text.trim(),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryBlue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Update Status',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  Widget _buildStatusOption({
+    required String title,
+    required String statusVal,
+    required String selectedVal,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    final isSelected = statusVal == selectedVal;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withValues(alpha: 0.05) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? color : borderGrey,
+            width: isSelected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? color : greyText,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? Center(
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: color,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                color: darkText,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
         ),
       ),
     );

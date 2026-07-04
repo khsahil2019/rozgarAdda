@@ -283,50 +283,49 @@ class LoginScreen extends GetView<LoginController> {
               SizedBox(height: size.height * 0.032),
 
               // OR CONTINUE WITH divider
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(height: 1, color: const Color(0xFFE0E0E0)),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
-                      l10n.text('login_or_continue'),
-                      style: const TextStyle(
-                        color: greyText,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(height: 1, color: const Color(0xFFE0E0E0)),
-                  ),
-                ],
-              ),
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: Container(height: 1, color: const Color(0xFFE0E0E0)),
+              //     ),
+              //     Padding(
+              //       padding: const EdgeInsets.symmetric(horizontal: 12),
+              //       child: Text(
+              //         l10n.text('login_or_continue'),
+              //         style: const TextStyle(
+              //           color: greyText,
+              //           fontSize: 12,
+              //           fontWeight: FontWeight.w500,
+              //           letterSpacing: 0.8,
+              //         ),
+              //       ),
+              //     ),
+              //     Expanded(
+              //       child: Container(height: 1, color: const Color(0xFFE0E0E0)),
+              //     ),
+              //   ],
+              // ),
 
-              SizedBox(height: size.height * 0.028),
+              // SizedBox(height: size.height * 0.028),
 
               // Social Buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildSocialButton(
-                      icon: _googleIcon(),
-                      label: 'Google',
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildSocialButton(
-                      icon: _linkedInIcon(),
-                      label: 'LinkedIn',
-                    ),
-                  ),
-                ],
-              ),
-
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: _buildSocialButton(
+              //         icon: _googleIcon(),
+              //         label: 'Google',
+              //       ),
+              //     ),
+              //     const SizedBox(width: 16),
+              //     Expanded(
+              //       child: _buildSocialButton(
+              //         icon: _linkedInIcon(),
+              //         label: 'LinkedIn',
+              //       ),
+              //     ),
+              //   ],
+              // ),
               SizedBox(height: size.height * 0.04),
 
               // Register text

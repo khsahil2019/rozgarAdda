@@ -23,6 +23,7 @@ abstract class AuthRemoteDataSource {
   });
   Future<List<DropdownItem>> getStates();
   Future<List<DropdownItem>> getDistricts(int stateId);
+  Future<List<DropdownItem>> getLocalities(int districtId);
 
   /// Sends an OTP to [phone]. Throws [Failure] on error.
   Future<void> sendOtp(String phone);
@@ -142,6 +143,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       if (e is Failure) rethrow;
       throw Failure("Failed to fetch districts");
+    }
+  }
+
+  @override
+  Future<List<DropdownItem>> getLocalities(int districtId) async {
+    try {
+      final res = await ApiService.get(
+        'https://rozgaradda.com/api/localities/$districtId',
+      );
+      if (res['statusCode'] == 200) {
+        final List<dynamic> data = res['data'] as List<dynamic>? ?? <dynamic>[];
+        return data
+            .map((e) => DropdownItem.fromJson(e as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw Failure(res['message'] ?? 'Failed to fetch localities');
+      }
+    } catch (e) {
+      if (e is Failure) rethrow;
+      throw Failure("Failed to fetch localities");
     }
   }
 

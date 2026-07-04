@@ -86,6 +86,19 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, List<DropdownItem>>> getLocalities(
+    int districtId,
+  ) async {
+    try {
+      final result = await remoteDataSource.getLocalities(districtId);
+      return Right(result);
+    } catch (e) {
+      if (e is Failure) return Left(e);
+      return Left(Failure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, Unit>> sendOtp(String phone) async {
     try {
       await remoteDataSource.sendOtp(phone);
