@@ -169,21 +169,21 @@ class ProfileScreen extends StatelessWidget {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const EditProfileScreen()),
+                      builder: (_) => const EditProfileScreen(),
+                    ),
                   ),
                 ),
-                _ProfileTile(
-                  icon: Icons.verified_outlined,
-                  label: context.l10n.text('profile_kyc_status'),
-                  onTap: () {},
-                ),
+                // _ProfileTile(
+                //   icon: Icons.verified_outlined,
+                //   label: context.l10n.text('profile_kyc_status'),
+                //   onTap: () {},
+                // ),
                 _ProfileTile(
                   icon: Icons.storefront_outlined,
                   label: context.l10n.text('profile_my_products'),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (_) => const MyProductsScreen()),
+                    MaterialPageRoute(builder: (_) => const MyProductsScreen()),
                   ),
                 ),
                 _ProfileTile(
@@ -192,7 +192,8 @@ class ProfileScreen extends StatelessWidget {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const MyApplicationsScreen()),
+                      builder: (_) => const MyApplicationsScreen(),
+                    ),
                   ),
                 ),
                 _ProfileTile(
@@ -201,7 +202,8 @@ class ProfileScreen extends StatelessWidget {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const ChangePasswordScreen()),
+                      builder: (_) => const ChangePasswordScreen(),
+                    ),
                   ),
                 ),
                 _ProfileTile(
@@ -210,7 +212,8 @@ class ProfileScreen extends StatelessWidget {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const HelpSupportScreen()),
+                      builder: (_) => const HelpSupportScreen(),
+                    ),
                   ),
                 ),
 

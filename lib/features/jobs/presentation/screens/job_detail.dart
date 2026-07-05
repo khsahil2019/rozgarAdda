@@ -5,6 +5,7 @@ import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
 import 'applyjob_form.dart';
 import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dart';
+import 'package:rojgar/localization/app_localizations.dart';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────
 class AppColors {
@@ -78,6 +79,7 @@ class JobDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomPad = MediaQuery.of(context).padding.bottom;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -100,6 +102,8 @@ class JobDetailScreen extends StatelessWidget {
                     _buildHighlightsCard(),
                     const SizedBox(height: 24),
                     _buildJobDescription(),
+                    const SizedBox(height: 24),
+                    _buildDisclaimerSection(context, l10n),
                     const SizedBox(height: 100),
                   ],
                 ),
@@ -605,6 +609,84 @@ class JobDetailScreen extends StatelessWidget {
             ),
           ),
         ],
+      ],
+    );
+  }
+
+  Widget _buildDisclaimerSection(BuildContext context, AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.text('jobdetail_disclaimer_fee_title'),
+          style: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w800,
+            color: AppColors.titleDark,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF7F8FB),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.borderLight, width: 1),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.info,
+                    color: Colors.orange,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.text('jobdetail_disclaimer_avoid_fees'),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.darkText,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.text('jobdetail_disclaimer_fee_desc'),
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.darkText,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        const Divider(color: AppColors.dividerColor, height: 1),
+        const SizedBox(height: 20),
+        Text(
+          l10n.text('jobdetail_disclaimer_title'),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.titleDark,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          l10n.text('jobdetail_disclaimer_desc'),
+          style: const TextStyle(
+            fontSize: 14,
+            color: AppColors.greyText,
+            height: 1.5,
+          ),
+        ),
       ],
     );
   }
