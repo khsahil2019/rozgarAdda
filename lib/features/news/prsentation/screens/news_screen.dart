@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:rojgar/localization/app_localizations.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../domain/entities/news_item.dart';
 import '../controller/news_controller.dart';
 import 'news_detail_screen.dart';
 import 'youtube_player_screen.dart';
+import 'local_video_player_screen.dart';
 
 // Colors constant configuration
 class _NC {
@@ -21,19 +21,6 @@ class NewsScreen extends GetView<NewsController> {
   final bool showBackButton;
 
   const NewsScreen({super.key, this.showBackButton = true});
-
-  Future<void> _launchUrl(String urlString) async {
-    final Uri url = Uri.parse(urlString);
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      Get.snackbar(
-        'Error',
-        'Could not open video URL',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withValues(alpha: 0.8),
-        colorText: Colors.white,
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -281,7 +268,6 @@ class NewsScreen extends GetView<NewsController> {
     String title = '';
     String description = '';
     String? thumbnailUrl;
-    String mediaUrl = '';
     bool isYoutube = false;
     final formattedDate = DateFormat('dd MMM yyyy').format(item.createdAt);
 
@@ -289,12 +275,10 @@ class NewsScreen extends GetView<NewsController> {
       title = item.title;
       description = item.description;
       thumbnailUrl = item.thumbnailUrl;
-      mediaUrl = item.youtubeUrl;
       isYoutube = true;
     } else if (item is VideoNews) {
       title = item.title;
       description = item.subject;
-      mediaUrl = item.videoUrl;
       isYoutube = false;
     }
 
@@ -313,8 +297,13 @@ class NewsScreen extends GetView<NewsController> {
                 builder: (context) => YoutubePlayerScreen(news: item),
               ),
             );
-          } else {
-            _launchUrl(mediaUrl);
+          } else if (item is VideoNews) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LocalVideoPlayerScreen(news: item),
+              ),
+            );
           }
         },
         child: Column(

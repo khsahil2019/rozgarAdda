@@ -9,6 +9,7 @@ import 'features/profile/presentation/screens/change_password_screen.dart';
 import 'features/profile/presentation/screens/edit_profile_screen.dart';
 import 'features/profile/presentation/screens/help_support_screen.dart';
 import 'features/profile/presentation/screens/my_applications_screen.dart';
+import 'features/profile/presentation/screens/my_products_screen.dart';
 import 'localization/app_localizations.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -179,7 +180,11 @@ class ProfileScreen extends StatelessWidget {
                 _ProfileTile(
                   icon: Icons.storefront_outlined,
                   label: context.l10n.text('profile_my_products'),
-                  onTap: () {},
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const MyProductsScreen()),
+                  ),
                 ),
                 _ProfileTile(
                   icon: Icons.work_outline_rounded,

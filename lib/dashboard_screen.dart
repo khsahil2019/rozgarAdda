@@ -1343,7 +1343,7 @@ const List<_SidebarMenuItem> _kSidebarItems = [
   ),
   _SidebarMenuItem(
     Icons.storefront_rounded,
-    'Products',
+    'Buy Products',
     Color(0xFFDEEAFF),
     Color(0xFF2255DD),
   ),
@@ -1621,7 +1621,7 @@ class _CollapsibleSidebarState extends State<_CollapsibleSidebar> {
                           });
                           if (item.label == 'Home') {
                             widget.onClose();
-                          } else if (item.label == 'Products') {
+                          } else if (item.label == 'Buy Products') {
                             Get.to(
                               () => const ProductCategoryListScreen(),
                               binding: BuyProductBinding(),

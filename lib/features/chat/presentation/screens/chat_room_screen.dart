@@ -187,22 +187,22 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 ],
               ),
             ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.videocam_outlined,
-                color: Colors.white,
-                size: 26,
-              ),
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.call_outlined,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
+            // IconButton(
+            //   onPressed: () {},
+            //   icon: const Icon(
+            //     Icons.videocam_outlined,
+            //     color: Colors.white,
+            //     size: 26,
+            //   ),
+            // ),
+            // IconButton(
+            //   onPressed: () {},
+            //   icon: const Icon(
+            //     Icons.call_outlined,
+            //     color: Colors.white,
+            //     size: 24,
+            //   ),
+            // ),
             IconButton(
               onPressed: () {},
               icon: const Icon(Icons.more_vert, color: Colors.white, size: 24),

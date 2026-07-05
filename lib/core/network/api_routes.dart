@@ -36,6 +36,7 @@ class ApiRoutes {
   static String get subcategories => _buildUrl('subcategories');
   static String get addProduct => _buildUrl('sell/add');
   static String get getProducts => _buildUrl('get-products');
+  static String get myProducts => _buildUrl('sell/my-products');
   static String productDetails(int productId) =>
       _buildUrl('product-details/$productId');
 
