@@ -173,6 +173,8 @@
   "splash_menu_product": "ಉತ್ಪನ್ನ",
   "splash_menu_register": "ಅಭ್ಯರ್ಥಿ ನೋಂದಣಿ",
   "splash_menu_login": "ಅಭ್ಯರ್ಥಿ ಲಾಗಿನ್",
+  "splash_menu_employer_login": "ಉದ್ಯೋಗದಾತ ಲಾಗಿನ್",
+  "splash_menu_employer_register": "ಉದ್ಯೋಗದಾತ ನೋಂದಣಿ",
   "login_terms_agree": "ನಾನು ಸೇವಾ ನಿಯಮಗಳು ಮತ್ತು ಗೌಪ್ಯತೆ ನೀತಿಯನ್ನು ಒಪ್ಪುತ್ತೇನೆ.",
   "login_terms_error": "ಮುಂದುವರೆಯಲು ದಯವಿಟ್ಟು ನಿಯಮಗಳು ಮತ್ತು ಗೌಪ್ಯತೆ ನೀತಿಯನ್ನು ಒಪ್ಪಿಕೊಳ್ಳಿ.",
   "login_or_continue": "ಅಥವಾ ಇದರೊಂದಿಗೆ ಮುಂದುವರೆಯಿರಿ",

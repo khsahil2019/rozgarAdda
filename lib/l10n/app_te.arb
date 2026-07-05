@@ -173,6 +173,8 @@
   "splash_menu_product": "ఉత్పత్తి",
   "splash_menu_register": "అభ్యర్థి రిజిస్ట్రేషన్",
   "splash_menu_login": "అభ్యర్థి లాగిన్",
+  "splash_menu_employer_login": "నియోక్త లాగిన్",
+  "splash_menu_employer_register": "నియోక్త రిజిస్ట్రేషన్",
   "login_terms_agree": "నేను సేవా నిబంధనలు మరియు గోప్యతా విధానాన్ని అంగీకరిస్తున్నాను.",
   "login_terms_error": "కొనసాగడానికి దయచేసి నిబంధనలు మరియు గోప్యతా విధానాన్ని అంగీకరించండి.",
   "login_or_continue": "లేదా దీనితో కొనసాగండి",

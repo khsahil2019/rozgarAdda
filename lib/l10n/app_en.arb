@@ -173,6 +173,8 @@
   "splash_menu_product": "Product",
   "splash_menu_register": "Candidate Register",
   "splash_menu_login": "Candidate Login",
+  "splash_menu_employer_login": "Employer Login",
+  "splash_menu_employer_register": "Employer Register",
   "login_terms_agree": "I agree to Terms of Service and Privacy Policy.",
   "login_terms_error": "Please accept Terms and Privacy Policy to continue.",
   "login_or_continue": "OR CONTINUE WITH",

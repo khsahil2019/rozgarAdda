@@ -173,6 +173,8 @@
   "splash_menu_product": "தயாரிப்பு",
   "splash_menu_register": "வேட்பாளர் பதிவு",
   "splash_menu_login": "வேட்பாளர் உள்நுழைவு",
+  "splash_menu_employer_login": "நிறுவன உள்நுழைவு",
+  "splash_menu_employer_register": "நிறுவனப் பதிவு",
   "login_terms_agree": "சேவை விதிமுறைகள் மற்றும் தனியுரிமைக் கொள்கையை நான் ஒப்புக்கொள்கிறேன்.",
   "login_terms_error": "தொடர, விதிமுறைகள் மற்றும் தனியுரிமைக் கொள்கையை ஏற்கவும்.",
   "login_or_continue": "அல்லது இதனுடன் தொடரவும்",

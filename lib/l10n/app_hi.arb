@@ -173,6 +173,8 @@
   "splash_menu_product": "उत्पाद",
   "splash_menu_register": "उम्मीदवार पंजीकरण",
   "splash_menu_login": "उम्मीदवार लॉगिन",
+  "splash_menu_employer_login": "नियोक्ता लॉगिन",
+  "splash_menu_employer_register": "नियोक्ता पंजीकरण",
   "login_terms_agree": "मैं सेवा की शर्तें और गोपनीयता नीति से सहमत हूँ।",
   "login_terms_error": "कृपया आगे बढ़ने के लिए नियम और गोपनीयता नीति स्वीकार करें।",
   "login_or_continue": "या इसके साथ जारी रखें",

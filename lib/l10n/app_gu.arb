@@ -173,6 +173,8 @@
   "splash_menu_product": "પ્રોડક્ટ",
   "splash_menu_register": "ઉમેદવાર રજીસ્ટ્રેશન",
   "splash_menu_login": "ઉમેદવાર લોગિન",
+  "splash_menu_employer_login": "એમ્પ્લોયર લોગિન",
+  "splash_menu_employer_register": "એમ્પ્લોયર રજીસ્ટ્રેશન",
   "login_terms_agree": "હું સેવાની શરતો અને ગોપનીયતા નીતિ સાથે સંમત છું.",
   "login_terms_error": "આગળ વધવા માટે કૃપા કરીને નિયમો અને ગોપનીયતા નીતિ સ્વીકારો.",
   "login_or_continue": "અથવા આના દ્વારા ચાલુ રાખો",

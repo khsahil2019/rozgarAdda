@@ -173,6 +173,8 @@
   "splash_menu_product": "उत्पादन",
   "splash_menu_register": "उमेदवार नोंदणी",
   "splash_menu_login": "उमेदवार लॉगिन",
+  "splash_menu_employer_login": "नियोक्ता लॉगिन",
+  "splash_menu_employer_register": "नियोक्ता नोंदणी",
   "login_terms_agree": "मी सेवा अटी आणि गोपनीयता धोरणाशी सहमत आहे.",
   "login_terms_error": "कृपया पुढे जाण्यासाठी नियम आणि गोपनीयता धोरण स्वीकारा.",
   "login_or_continue": "किंवा यासह सुरू ठेवा",
