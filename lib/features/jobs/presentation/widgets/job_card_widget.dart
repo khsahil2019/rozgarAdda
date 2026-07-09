@@ -6,6 +6,7 @@ import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dart';
+import 'package:share_plus/share_plus.dart';
 
 class _CardColors {
   static const Color primaryBlue = Color(0xFF1400FF);
@@ -247,11 +248,7 @@ class JobCardWidget extends StatelessWidget {
   }
 
   Future<void> _shareJob() async {
-    Get.snackbar(
-      'Shared',
-      'Job link shared successfully!',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    await Share.share('https://rozgaradda.com/job-details/${job.id}');
   }
 
   @override
@@ -377,15 +374,15 @@ class JobCardWidget extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: onFavoriteTap,
-                      child: const Icon(
-                        Icons.favorite_border_rounded,
-                        color: Colors.grey,
-                        size: 24,
-                      ),
-                    ),
+                    // const SizedBox(width: 8),
+                    // GestureDetector(
+                    //   onTap: onFavoriteTap,
+                    //   child: const Icon(
+                    //     Icons.favorite_border_rounded,
+                    //     color: Colors.grey,
+                    //     size: 24,
+                    //   ),
+                    // ),
                   ],
                 ),
                 const SizedBox(height: 8),

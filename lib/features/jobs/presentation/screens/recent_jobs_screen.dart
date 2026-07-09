@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/features/auth/data/data_source/model/dropdown_item.dart';
 import 'package:open_share_plus/open.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/localization/app_localizations.dart';
@@ -2065,11 +2066,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   }
 
   Future<void> _shareJob(AvailableJob job) async {
-    Get.snackbar(
-      'Shared',
-      'Job link shared successfully!',
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    await Share.share('https://rozgaradda.com/job-details/${job.id}');
   }
 
   void _navigateToDetail(AvailableJob job) {

@@ -6,6 +6,7 @@ import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
 import 'applyjob_form.dart';
 import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dart';
 import 'package:rojgar/localization/app_localizations.dart';
+import 'package:share_plus/share_plus.dart';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────
 class AppColors {
@@ -148,7 +149,9 @@ class JobDetailScreen extends StatelessWidget {
           ),
           // Share button
           OutlinedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              Share.share('https://rozgaradda.com/job-details/${job.id}');
+            },
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: AppColors.primaryBlue, width: 1.2),
               shape: RoundedRectangleBorder(
@@ -225,12 +228,12 @@ class JobDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.favorite_border_rounded,
-              color: AppColors.greyText,
-              size: 24,
-            ),
+            // const SizedBox(width: 8),
+            // const Icon(
+            //   Icons.favorite_border_rounded,
+            //   color: AppColors.greyText,
+            //   size: 24,
+            // ),
           ],
         ),
         const SizedBox(height: 14),
@@ -639,11 +642,7 @@ class JobDetailScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(
-                    Icons.info,
-                    color: Colors.orange,
-                    size: 20,
-                  ),
+                  const Icon(Icons.info, color: Colors.orange, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     l10n.text('jobdetail_disclaimer_avoid_fees'),
