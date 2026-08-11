@@ -592,10 +592,27 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
             : SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 0),
                 sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final job = _filteredJobs[index];
-                    return _buildVerticalJobCard(job, l10n);
-                  }, childCount: _filteredJobs.length),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final isBanner = (index + 1) % 4 == 0;
+                      if (isBanner) {
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: Image.asset(
+                            'assets/icons/warning.png',
+                            width: double.infinity,
+                            fit: BoxFit.fitWidth,
+                          ),
+                        );
+                      }
+                      final jobIndex = index - (index ~/ 4);
+                      final job = _filteredJobs[jobIndex];
+                      return _buildVerticalJobCard(job, l10n);
+                    },
+                    childCount: _filteredJobs.isEmpty
+                        ? 0
+                        : _filteredJobs.length + (_filteredJobs.length - 1) ~/ 3,
+                  ),
                 ),
               ),
 

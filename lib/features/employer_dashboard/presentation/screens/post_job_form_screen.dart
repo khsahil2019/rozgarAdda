@@ -268,12 +268,12 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
     BuildContext context,
     TextEditingController ctrl,
   ) async {
+    final localizations = MaterialLocalizations.of(context);
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
     if (picked != null) {
-      final localizations = MaterialLocalizations.of(context);
       final formattedTime = localizations.formatTimeOfDay(
         picked,
         alwaysUse24HourFormat: false,
@@ -312,10 +312,11 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
   }
 
   void _submit() {
+    final l10n = context.l10n;
     if (_selectedCategoryId == null || _selectedRoleId == null) {
       Get.snackbar(
-        'Error',
-        'Please select a Job Category and Job Role.',
+        l10n.text('post_job_error_title'),
+        l10n.text('post_job_error_category_role'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -328,8 +329,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
           _selectedDistrictId == null ||
           _selectedLocalityId == null) {
         Get.snackbar(
-          'Error',
-          'Please select State, District and Locality.',
+          l10n.text('post_job_error_title'),
+          l10n.text('post_job_error_location'),
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -343,8 +344,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
     final selectedOptionsCount = _selectedContactOptionsCount;
     if (selectedOptionsCount == 0) {
       Get.snackbar(
-        'Error',
-        'Please select at least one contact preference.',
+        l10n.text('post_job_error_title'),
+        l10n.text('post_job_error_contact_min'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -354,8 +355,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
     }
     if (selectedOptionsCount > 2) {
       Get.snackbar(
-        'Error',
-        'You can select at most 2 contact preferences.',
+        l10n.text('post_job_error_title'),
+        l10n.text('post_job_error_contact_max'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -365,8 +366,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
     }
     if (_enableCall && _contactPhoneCtrl.text.trim().isEmpty) {
       Get.snackbar(
-        'Error',
-        'Please enter a contact phone number.',
+        l10n.text('post_job_error_title'),
+        l10n.text('post_job_error_phone_required'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -376,8 +377,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
     }
     if (_enableChat && _contactWhatsappCtrl.text.trim().isEmpty) {
       Get.snackbar(
-        'Error',
-        'Please enter a WhatsApp number.',
+        l10n.text('post_job_error_title'),
+        l10n.text('post_job_error_whatsapp_required'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -476,8 +477,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
         .then((_) {
           Get.back();
           Get.snackbar(
-            'Success',
-            'Job posted successfully!',
+            l10n.text('post_job_success_title'),
+            l10n.text('post_job_success_message'),
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.green,
             colorText: Colors.white,
@@ -486,7 +487,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
         })
         .catchError((error) {
           Get.snackbar(
-            'Error',
+            l10n.text('post_job_error_title'),
             error is Failure ? error.message : error.toString(),
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.red,
@@ -530,13 +531,13 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSectionTitle('Job Details'),
+              _buildSectionTitle(l10n.text('post_job_section_job_details')),
               _buildTextField(
-                label: 'Job Title *',
-                hint: 'e.g. Delivery Executive, Telecaller',
+                label: l10n.text('post_job_title_label'),
+                hint: l10n.text('post_job_title_hint'),
                 controller: _titleCtrl,
                 validator: (val) =>
-                    val!.trim().isEmpty ? 'Please enter job title' : null,
+                    val!.trim().isEmpty ? l10n.text('post_job_title_error') : null,
               ),
 
               if (_isCategoriesLoading)
@@ -548,7 +549,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                 )
               else if (_categories.isNotEmpty)
                 _buildSelectorField(
-                  label: 'Job Category *',
+                  label: l10n.text('post_job_category_label'),
                   valueText:
                       _categories
                           .firstWhere(
@@ -567,7 +568,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                         )
                         .toList();
                     _showSearchBottomSheet(
-                      title: 'Select Job Category',
+                      title: l10n.text('post_job_category_select'),
                       items: items,
                       selectedId: _selectedCategoryId,
                       onSelected: (val) {
@@ -589,7 +590,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                 )
               else if (_roles.isNotEmpty)
                 _buildDropdownField<int?>(
-                  label: 'Job Role *',
+                  label: l10n.text('post_job_role_label'),
                   value: _selectedRoleId,
                   items: _roles.map((r) {
                     return DropdownMenuItem<int?>(
@@ -610,18 +611,18 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                 children: [
                   Expanded(
                     child: _buildDropdownField<String>(
-                      label: 'Job Type *',
+                      label: l10n.text('post_job_type_label'),
                       value: _jobType,
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: 'full_time',
-                          child: Text('Full Time'),
+                          child: Text(l10n.text('post_job_type_full_time')),
                         ),
                         DropdownMenuItem(
                           value: 'part_time',
-                          child: Text('Part Time'),
+                          child: Text(l10n.text('post_job_type_part_time')),
                         ),
-                        DropdownMenuItem(value: 'both', child: Text('Both')),
+                        DropdownMenuItem(value: 'both', child: Text(l10n.text('post_job_type_both'))),
                       ],
                       onChanged: (val) => setState(() => _jobType = val!),
                     ),
@@ -629,18 +630,18 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: _buildDropdownField<String>(
-                      label: 'Work Location *',
+                      label: l10n.text('post_job_work_location_label'),
                       value: _workLocationType,
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: 'office',
-                          child: Text('Office'),
+                          child: Text(l10n.text('post_job_work_location_office')),
                         ),
                         DropdownMenuItem(
                           value: 'home',
-                          child: Text('Home / Remote'),
+                          child: Text(l10n.text('post_job_work_location_home')),
                         ),
-                        DropdownMenuItem(value: 'field', child: Text('Field')),
+                        DropdownMenuItem(value: 'field', child: Text(l10n.text('post_job_work_location_field'))),
                       ],
                       onChanged: (val) =>
                           setState(() => _workLocationType = val!),
@@ -653,36 +654,36 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                 children: [
                   Expanded(
                     child: _buildTextField(
-                      label: 'Vacancies *',
-                      hint: 'e.g. 5',
+                      label: l10n.text('post_job_vacancies_label'),
+                      hint: l10n.text('post_job_vacancies_hint'),
                       controller: _vacancyCtrl,
                       keyboardType: TextInputType.number,
                       validator: (val) => int.tryParse(val ?? '') == null
-                          ? 'Enter valid number'
+                          ? l10n.text('post_job_vacancies_error')
                           : null,
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: _buildDropdownField<String>(
-                      label: 'Preferred Shift *',
+                      label: l10n.text('post_job_shift_label'),
                       value: _selectedShift,
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: 'day',
-                          child: Text('Day Shift'),
+                          child: Text(l10n.text('post_job_shift_day')),
                         ),
                         DropdownMenuItem(
                           value: 'night',
-                          child: Text('Night Shift'),
+                          child: Text(l10n.text('post_job_shift_night')),
                         ),
                         DropdownMenuItem(
                           value: 'rotational',
-                          child: Text('Rotational Shift'),
+                          child: Text(l10n.text('post_job_shift_rotational')),
                         ),
                         DropdownMenuItem(
                           value: 'flexible',
-                          child: Text('Flexible Shift'),
+                          child: Text(l10n.text('post_job_shift_flexible')),
                         ),
                       ],
                       onChanged: (val) => setState(() => _selectedShift = val!),
@@ -692,22 +693,22 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               ),
 
               const SizedBox(height: 20),
-              _buildSectionTitle('Salary Details'),
+              _buildSectionTitle(l10n.text('post_job_section_salary')),
               _buildDropdownField<String>(
-                label: 'Salary Model *',
+                label: l10n.text('post_job_salary_model_label'),
                 value: _payType,
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: 'fixed',
-                    child: Text('Fixed Monthly Pay Range'),
+                    child: Text(l10n.text('post_job_salary_fixed')),
                   ),
                   DropdownMenuItem(
                     value: 'fixed_inc',
-                    child: Text('Fixed Monthly Pay + Incentives'),
+                    child: Text(l10n.text('post_job_salary_fixed_inc')),
                   ),
                   DropdownMenuItem(
                     value: 'inc_only',
-                    child: Text('Incentives Only'),
+                    child: Text(l10n.text('post_job_salary_inc_only')),
                   ),
                 ],
                 onChanged: (val) => setState(() => _payType = val!),
@@ -718,23 +719,23 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                   children: [
                     Expanded(
                       child: _buildTextField(
-                        label: 'Min Salary (₹) *',
-                        hint: 'e.g. 10000',
+                        label: l10n.text('post_job_min_salary_label'),
+                        hint: l10n.text('post_job_min_salary_hint'),
                         controller: _minSalaryCtrl,
                         keyboardType: TextInputType.number,
                         validator: (val) =>
-                            val!.trim().isEmpty ? 'Enter min salary' : null,
+                            val!.trim().isEmpty ? l10n.text('post_job_min_salary_error') : null,
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: _buildTextField(
-                        label: 'Max Salary (₹) *',
-                        hint: 'e.g. 15000',
+                        label: l10n.text('post_job_max_salary_label'),
+                        hint: l10n.text('post_job_max_salary_hint'),
                         controller: _maxSalaryCtrl,
                         keyboardType: TextInputType.number,
                         validator: (val) =>
-                            val!.trim().isEmpty ? 'Enter max salary' : null,
+                            val!.trim().isEmpty ? l10n.text('post_job_max_salary_error') : null,
                       ),
                     ),
                   ],
@@ -744,41 +745,41 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                   children: [
                     Expanded(
                       child: _buildTextField(
-                        label: 'Fixed Salary (₹) *',
-                        hint: 'e.g. 15000',
+                        label: l10n.text('post_job_fixed_salary_label'),
+                        hint: l10n.text('post_job_fixed_salary_hint'),
                         controller: _fixedSalaryCtrl,
                         keyboardType: TextInputType.number,
                         validator: (val) =>
-                            val!.trim().isEmpty ? 'Enter fixed salary' : null,
+                            val!.trim().isEmpty ? l10n.text('post_job_fixed_salary_error') : null,
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: _buildTextField(
-                        label: 'Avg. Incentive (₹) *',
-                        hint: 'e.g. 3000',
+                        label: l10n.text('post_job_avg_incentive_label'),
+                        hint: l10n.text('post_job_avg_incentive_hint'),
                         controller: _avgIncentiveCtrl,
                         keyboardType: TextInputType.number,
                         validator: (val) =>
-                            val!.trim().isEmpty ? 'Enter avg incentive' : null,
+                            val!.trim().isEmpty ? l10n.text('post_job_avg_incentive_error') : null,
                       ),
                     ),
                   ],
                 )
               else if (_payType == 'inc_only')
                 _buildTextField(
-                  label: 'Estimated Incentive (₹) *',
-                  hint: 'e.g. 12000',
+                  label: l10n.text('post_job_estimated_incentive_label'),
+                  hint: l10n.text('post_job_estimated_incentive_hint'),
                   controller: _estimatedIncentiveCtrl,
                   keyboardType: TextInputType.number,
                   validator: (val) =>
-                      val!.trim().isEmpty ? 'Enter estimated incentive' : null,
+                      val!.trim().isEmpty ? l10n.text('post_job_estimated_incentive_error') : null,
                 ),
 
               if (_workLocationType != 'home') ...[
                 const SizedBox(height: 20),
                 _buildSectionTitle(
-                  '${_workLocationType.toUpperCase()} Location Address',
+                  '${_workLocationType.toUpperCase()} ${l10n.text('post_job_section_location')}',
                 ),
 
                 if (_isStatesLoading)
@@ -790,7 +791,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                   )
                 else
                   _buildSelectorField(
-                    label: 'State *',
+                    label: l10n.text('post_job_state_label'),
                     valueText: _states
                         .firstWhere(
                           (s) => s.id == _selectedStateId,
@@ -802,7 +803,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                           .map((s) => MapEntry(s.id, s.name))
                           .toList();
                       _showSearchBottomSheet(
-                        title: 'Select State',
+                        title: l10n.text('post_job_state_select'),
                         items: items,
                         selectedId: _selectedStateId,
                         onSelected: (val) {
@@ -824,7 +825,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                   )
                 else if (_districts.isNotEmpty)
                   _buildDropdownField<int?>(
-                    label: 'District *',
+                    label: l10n.text('post_job_district_label'),
                     value: _selectedDistrictId,
                     items: _districts.map((d) {
                       return DropdownMenuItem<int?>(
@@ -851,7 +852,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                   )
                 else if (_localities.isNotEmpty)
                   _buildDropdownField<int?>(
-                    label: 'Locality / Area *',
+                    label: l10n.text('post_job_locality_label'),
                     value: _selectedLocalityId,
                     items: _localities.map((l) {
                       return DropdownMenuItem<int?>(
@@ -867,56 +868,56 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                   ),
 
                 _buildTextField(
-                  label: 'Address Line 1 *',
-                  hint: 'Building / Shop No / Lane Name',
+                  label: l10n.text('post_job_address1_label'),
+                  hint: l10n.text('post_job_address1_hint'),
                   controller: _addressCtrl,
                   validator: (val) =>
-                      val!.trim().isEmpty ? 'Address line 1 is required' : null,
+                      val!.trim().isEmpty ? l10n.text('post_job_address1_error') : null,
                 ),
                 _buildTextField(
-                  label: 'Address Line 2 (Optional)',
-                  hint: 'Landmark / Area details',
+                  label: l10n.text('post_job_address2_label'),
+                  hint: l10n.text('post_job_address2_hint'),
                   controller: _address2Ctrl,
                 ),
                 _buildTextField(
-                  label: 'Pin Code *',
-                  hint: 'e.g. 302017',
+                  label: l10n.text('post_job_pincode_label'),
+                  hint: l10n.text('post_job_pincode_hint'),
                   controller: _pincodeCtrl,
                   keyboardType: TextInputType.number,
                   validator: (val) => val!.trim().length != 6
-                      ? 'Must be exactly 6 digits'
+                      ? l10n.text('post_job_pincode_error')
                       : null,
                 ),
               ],
 
               const SizedBox(height: 20),
-              _buildSectionTitle('Candidate Requirements'),
+              _buildSectionTitle(l10n.text('post_job_section_requirements')),
               Row(
                 children: [
                   Expanded(
                     child: _buildDropdownField<String>(
-                      label: 'Min Education *',
+                      label: l10n.text('post_job_education_label'),
                       value: _educationLevel,
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: 'Below 10th',
-                          child: Text('Below 10th'),
+                          child: Text(l10n.text('post_job_education_below_10')),
                         ),
                         DropdownMenuItem(
                           value: '10th Pass',
-                          child: Text('10th Pass'),
+                          child: Text(l10n.text('post_job_education_10_pass')),
                         ),
                         DropdownMenuItem(
                           value: '12th Pass',
-                          child: Text('12th Pass'),
+                          child: Text(l10n.text('post_job_education_12_pass')),
                         ),
                         DropdownMenuItem(
                           value: 'Graduate',
-                          child: Text('Graduate'),
+                          child: Text(l10n.text('post_job_education_graduate')),
                         ),
                         DropdownMenuItem(
                           value: 'Post Graduate',
-                          child: Text('Post Graduate'),
+                          child: Text(l10n.text('post_job_education_post_graduate')),
                         ),
                       ],
                       onChanged: (val) =>
@@ -926,17 +927,17 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: _buildDropdownField<String>(
-                      label: 'Experience Required *',
+                      label: l10n.text('post_job_experience_label'),
                       value: _experienceLevel,
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: 'fresher',
-                          child: Text('Fresher (0 Years)'),
+                          child: Text(l10n.text('post_job_experience_fresher')),
                         ),
-                        DropdownMenuItem(value: '1', child: Text('1 Year')),
-                        DropdownMenuItem(value: '2', child: Text('2 Years')),
-                        DropdownMenuItem(value: '3', child: Text('3 Years')),
-                        DropdownMenuItem(value: '5', child: Text('5+ Years')),
+                        DropdownMenuItem(value: '1', child: Text(l10n.text('post_job_experience_1'))),
+                        DropdownMenuItem(value: '2', child: Text(l10n.text('post_job_experience_2'))),
+                        DropdownMenuItem(value: '3', child: Text(l10n.text('post_job_experience_3'))),
+                        DropdownMenuItem(value: '5', child: Text(l10n.text('post_job_experience_5plus'))),
                       ],
                       onChanged: (val) =>
                           setState(() => _experienceLevel = val!),
@@ -945,51 +946,51 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                 ],
               ),
               _buildDropdownField<String>(
-                label: 'English Requirements *',
+                label: l10n.text('post_job_english_label'),
                 value: _englishLevel,
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: 'none',
-                    child: Text('No English required'),
+                    child: Text(l10n.text('post_job_english_none')),
                   ),
                   DropdownMenuItem(
                     value: 'basic',
-                    child: Text('Basic English (Speak/Read)'),
+                    child: Text(l10n.text('post_job_english_basic')),
                   ),
                   DropdownMenuItem(
                     value: 'good',
-                    child: Text('Good English (Fluent)'),
+                    child: Text(l10n.text('post_job_english_good')),
                   ),
                 ],
                 onChanged: (val) => setState(() => _englishLevel = val!),
               ),
               _buildTextField(
-                label: 'Key Skills (comma separated) *',
-                hint: 'e.g. Driving License, Typing, MS Excel',
+                label: l10n.text('post_job_skills_label'),
+                hint: l10n.text('post_job_skills_hint'),
                 controller: _skillsCtrl,
                 validator: (val) =>
-                    val!.trim().isEmpty ? 'Add at least one skill' : null,
+                    val!.trim().isEmpty ? l10n.text('post_job_skills_error') : null,
               ),
               _buildTextField(
-                label: 'Languages (comma separated)',
-                hint: 'e.g. Hindi, English, Gujarati',
+                label: l10n.text('post_job_languages_label'),
+                hint: l10n.text('post_job_languages_hint'),
                 controller: _languagesCtrl,
               ),
               _buildTextField(
-                label: 'Perks / Benefits (comma separated)',
-                hint: 'e.g. PF, ESI, Free Food, Petrol Allowance',
+                label: l10n.text('post_job_perks_label'),
+                hint: l10n.text('post_job_perks_hint'),
                 controller: _perksCtrl,
               ),
               _buildTextField(
-                label: 'Job Description',
+                label: l10n.text('post_job_description_label'),
                 hint:
-                    'Briefly describe roles, responsibilities, and benefits...',
+                    l10n.text('post_job_description_hint'),
                 controller: _descCtrl,
                 maxLines: 4,
               ),
 
               const SizedBox(height: 20),
-              _buildSectionTitle('Walk-in Interview Details'),
+              _buildSectionTitle(l10n.text('post_job_section_walkin')),
               Container(
                 decoration: BoxDecoration(
                   color: fieldBg,
@@ -997,10 +998,10 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                   border: Border.all(color: borderColor, width: 1.5),
                 ),
                 child: SwitchListTile(
-                  activeColor: primaryBlue,
-                  title: const Text(
-                    'Is this a Walk-in Interview?',
-                    style: TextStyle(
+                  activeThumbColor: primaryBlue,
+                  title: Text(
+                    l10n.text('post_job_walkin_switch'),
+                    style: const TextStyle(
                       color: darkText,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -1014,56 +1015,56 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               if (_isWalkin) ...[
                 const SizedBox(height: 16),
                 _buildTapToSelectField(
-                  label: 'Walk-in Date *',
-                  hint: 'Select Date',
+                  label: l10n.text('post_job_walkin_date_label'),
+                  hint: l10n.text('post_job_walkin_date_hint'),
                   controller: _walkinDateCtrl,
                   onTap: () => _selectDate(context),
                   validator: (val) =>
-                      val!.trim().isEmpty ? 'Walk-in Date is required' : null,
+                      val!.trim().isEmpty ? l10n.text('post_job_walkin_date_error') : null,
                 ),
                 Row(
                   children: [
                     Expanded(
                       child: _buildTapToSelectField(
-                        label: 'Start Time *',
-                        hint: 'Select Time',
+                        label: l10n.text('post_job_walkin_start_label'),
+                        hint: l10n.text('post_job_walkin_time_hint'),
                         controller: _walkinTimeCtrl,
                         onTap: () => _selectTime(context, _walkinTimeCtrl),
                         validator: (val) => val!.trim().isEmpty
-                            ? 'Start Time is required'
+                            ? l10n.text('post_job_walkin_start_error')
                             : null,
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: _buildTapToSelectField(
-                        label: 'End Time *',
-                        hint: 'Select Time',
+                        label: l10n.text('post_job_walkin_end_label'),
+                        hint: l10n.text('post_job_walkin_time_hint'),
                         controller: _walkinEndTimeCtrl,
                         onTap: () => _selectTime(context, _walkinEndTimeCtrl),
                         validator: (val) =>
-                            val!.trim().isEmpty ? 'End Time is required' : null,
+                            val!.trim().isEmpty ? l10n.text('post_job_walkin_end_error') : null,
                       ),
                     ),
                   ],
                 ),
                 _buildTextField(
-                  label: 'Walk-in Venue *',
-                  hint: 'Enter full address of walk-in venue',
+                  label: l10n.text('post_job_walkin_venue_label'),
+                  hint: l10n.text('post_job_walkin_venue_hint'),
                   controller: _walkinVenueCtrl,
                   maxLines: 2,
                   validator: (val) =>
-                      val!.trim().isEmpty ? 'Venue is required' : null,
+                      val!.trim().isEmpty ? l10n.text('post_job_walkin_venue_error') : null,
                 ),
               ],
 
               const SizedBox(height: 20),
-              _buildSectionTitle('Contact Details'),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
+              _buildSectionTitle(l10n.text('post_job_section_contact')),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
-                  'Select how candidates can apply/contact you (Select 1 or 2 options):',
-                  style: TextStyle(
+                  l10n.text('post_job_contact_instruction'),
+                  style: const TextStyle(
                     color: greyText,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -1072,8 +1073,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               ),
 
               _buildContactOptionTile(
-                title: 'Direct Application (Apply Only)',
-                subtitle: 'Candidates apply directly through the app',
+                title: l10n.text('post_job_contact_apply_title'),
+                subtitle: l10n.text('post_job_contact_apply_subtitle'),
                 value: _applyOnly,
                 onChanged: (val) {
                   if (val == null) return;
@@ -1096,8 +1097,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               const SizedBox(height: 10),
 
               _buildContactOptionTile(
-                title: 'Allow Calls (Phone Call)',
-                subtitle: 'Show phone number for candidates to call',
+                title: l10n.text('post_job_contact_call_title'),
+                subtitle: l10n.text('post_job_contact_call_subtitle'),
                 value: _enableCall,
                 onChanged: (val) {
                   if (val == null) return;
@@ -1120,8 +1121,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               const SizedBox(height: 10),
 
               _buildContactOptionTile(
-                title: 'Allow WhatsApp Chat',
-                subtitle: 'Enable WhatsApp chat for candidates',
+                title: l10n.text('post_job_contact_whatsapp_title'),
+                subtitle: l10n.text('post_job_contact_whatsapp_subtitle'),
                 value: _enableChat,
                 onChanged: (val) {
                   if (val == null) return;
@@ -1145,14 +1146,14 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
 
               if (_enableCall)
                 _buildTextField(
-                  label: 'Contact Phone Number *',
-                  hint: 'Enter 10-digit phone number for calls',
+                  label: l10n.text('post_job_contact_phone_label'),
+                  hint: l10n.text('post_job_contact_phone_hint'),
                   controller: _contactPhoneCtrl,
                   keyboardType: TextInputType.phone,
                   validator: (val) {
                     if (_enableCall) {
                       if (val == null || val.trim().length != 10) {
-                        return 'Enter valid 10-digit phone number';
+                        return l10n.text('post_job_contact_phone_error');
                       }
                     }
                     return null;
@@ -1161,14 +1162,14 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
 
               if (_enableChat)
                 _buildTextField(
-                  label: 'WhatsApp Number *',
-                  hint: 'Enter 10-digit WhatsApp number',
+                  label: l10n.text('post_job_whatsapp_label'),
+                  hint: l10n.text('post_job_whatsapp_hint'),
                   controller: _contactWhatsappCtrl,
                   keyboardType: TextInputType.phone,
                   validator: (val) {
                     if (_enableChat) {
                       if (val == null || val.trim().length != 10) {
-                        return 'Enter valid 10-digit WhatsApp number';
+                        return l10n.text('post_job_whatsapp_error');
                       }
                     }
                     return null;
@@ -1189,9 +1190,9 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                     ),
                     elevation: 4,
                   ),
-                  child: const Text(
-                    'Post Job Now',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  child: Text(
+                    l10n.text('post_job_submit_button'),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -1374,9 +1375,10 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
   }
 
   void _showMaxOptionsWarning() {
+    final l10n = context.l10n;
     Get.snackbar(
-      'Limit Reached',
-      'You can select a maximum of 2 contact preferences.',
+      l10n.text('post_job_limit_title'),
+      l10n.text('post_job_limit_message'),
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.orange,
       colorText: Colors.white,
@@ -1385,9 +1387,10 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
   }
 
   void _showMinOptionsWarning() {
+    final l10n = context.l10n;
     Get.snackbar(
-      'Selection Required',
-      'You must select at least 1 contact preference.',
+      l10n.text('post_job_selection_title'),
+      l10n.text('post_job_selection_message'),
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.orange,
       colorText: Colors.white,
@@ -1498,6 +1501,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
     required int? selectedId,
     required ValueChanged<int> onSelected,
   }) {
+    final l10n = context.l10n;
     String searchQuery = '';
 
     Get.bottomSheet(
@@ -1566,22 +1570,22 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                           searchQuery = val;
                         });
                       },
-                      decoration: const InputDecoration(
-                        hintText: 'Search...',
-                        hintStyle: TextStyle(color: greyText),
-                        prefixIcon: Icon(Icons.search_rounded, color: greyText),
+                      decoration: InputDecoration(
+                        hintText: l10n.text('post_job_search_hint'),
+                        hintStyle: const TextStyle(color: greyText),
+                        prefixIcon: const Icon(Icons.search_rounded, color: greyText),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                     ),
                   ),
                 ),
                 Expanded(
                   child: filteredItems.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
-                            'No items found',
-                            style: TextStyle(color: greyText, fontSize: 15),
+                            l10n.text('post_job_no_items'),
+                            style: const TextStyle(color: greyText, fontSize: 15),
                           ),
                         )
                       : ListView.builder(

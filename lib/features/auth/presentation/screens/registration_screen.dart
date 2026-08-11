@@ -217,17 +217,27 @@ class RegistrationFormScreen extends GetView<RegisterController> {
                     controller: controller.fullNameController,
                   ),
 
+                  // const SizedBox(height: 14),
+                  // _sectionHeader(
+                  //   context,
+                  //   Icons.lock_outline_rounded,
+                  //   l10n.text('registration_account_credentials'),
+                  // ),
                   const SizedBox(height: 14),
 
-                  // Phone Number
-                  _fieldLabel(context, l10n.text('registration_phone_number')),
+                  _fieldLabel(context, l10n.text('registration_username')),
                   const SizedBox(height: 6),
-                  _phoneField(context),
+                  _inputField(
+                    context,
+                    hint: l10n.text('registration_username_hint'),
+                    controller: controller.usernameController,
+                  ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 14),
 
-                  // OTP Box
-                  _otpSection(context, size),
+                  _fieldLabel(context, l10n.text('registration_password')),
+                  const SizedBox(height: 6),
+                  _passwordField(context),
 
                   const SizedBox(height: 14),
 
@@ -356,27 +366,16 @@ class RegistrationFormScreen extends GetView<RegisterController> {
                   // ════════════════════════════
                   // ACCOUNT CREDENTIALS
                   // ════════════════════════════
-                  _sectionHeader(
-                    context,
-                    Icons.lock_outline_rounded,
-                    l10n.text('registration_account_credentials'),
-                  ),
-                  const SizedBox(height: 14),
 
-                  _fieldLabel(context, l10n.text('registration_username')),
+                  // Phone Number
+                  _fieldLabel(context, l10n.text('registration_phone_number')),
                   const SizedBox(height: 6),
-                  _inputField(
-                    context,
-                    hint: l10n.text('registration_username_hint'),
-                    controller: controller.usernameController,
-                  ),
+                  _phoneField(context),
 
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
 
-                  _fieldLabel(context, l10n.text('registration_password')),
-                  const SizedBox(height: 6),
-                  _passwordField(context),
-
+                  // OTP Box
+                  _otpSection(context, size),
                   const SizedBox(height: 16),
 
                   // Terms checkbox

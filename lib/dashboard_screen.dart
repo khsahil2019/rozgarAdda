@@ -727,36 +727,42 @@ class _HomeScreenState extends State<HomeScreen>
         color: const Color(0xFF8ED8D4),
         child: Stack(
           children: [
-            // Background office scene illustration
-            CustomPaint(
-              size: Size(size.width, size.height * 0.25),
-              painter: _OfficePainter(),
+            Image.asset(
+              'assets/icons/banner.jpeg',
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
 
+            // Background office scene illustration
+            // CustomPaint(
+            //   size: Size(size.width, size.height * 0.25),
+            //   painter: _OfficePainter(),
+            // ),
+
             // NEW JOB badge
-            Positioned(
-              top: 14,
-              left: 14,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  l10n.text('dashboard_new_job_badge'),
-                  style: const TextStyle(
-                    color: AC.primaryPurple,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ),
+            // Positioned(
+            //   top: 14,
+            //   left: 14,
+            //   child: Container(
+            //     padding: const EdgeInsets.symmetric(
+            //       horizontal: 12,
+            //       vertical: 5,
+            //     ),
+            //     decoration: BoxDecoration(
+            //       color: Colors.white,
+            //       borderRadius: BorderRadius.circular(20),
+            //     ),
+            //     child: Text(
+            //       l10n.text('dashboard_new_job_badge'),
+            //       style: const TextStyle(
+            //         color: AC.primaryPurple,
+            //         fontSize: 12,
+            //         fontWeight: FontWeight.w800,
+            //         letterSpacing: 0.5,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -988,330 +994,330 @@ class _QuickLinkCard extends StatelessWidget {
 // ─────────────────────────────────────────────
 // OFFICE SCENE PAINTER
 // ─────────────────────────────────────────────
-class _OfficePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size s) {
-    // Teal background
-    canvas.drawRect(Offset.zero & s, Paint()..color = const Color(0xFF8ED8D4));
+// class _OfficePainter extends CustomPainter {
+//   @override
+//   void paint(Canvas canvas, Size s) {
+//     // Teal background
+//     canvas.drawRect(Offset.zero & s, Paint()..color = const Color(0xFF8ED8D4));
 
-    // Floor
-    canvas.drawRect(
-      Rect.fromLTWH(0, s.height * 0.78, s.width, s.height * 0.22),
-      Paint()..color = const Color(0xFF7BC8C4),
-    );
+//     // Floor
+//     canvas.drawRect(
+//       Rect.fromLTWH(0, s.height * 0.78, s.width, s.height * 0.22),
+//       Paint()..color = const Color(0xFF7BC8C4),
+//     );
 
-    // Table
-    final tablePaint = Paint()..color = const Color(0xFFE8C87A);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          s.width * 0.08,
-          s.height * 0.58,
-          s.width * 0.72,
-          s.height * 0.06,
-        ),
-        const Radius.circular(4),
-      ),
-      tablePaint,
-    );
-    // Table legs
-    for (final lx in [s.width * 0.12, s.width * 0.72]) {
-      canvas.drawRect(
-        Rect.fromLTWH(lx, s.height * 0.64, s.width * 0.03, s.height * 0.16),
-        tablePaint,
-      );
-    }
+//     // Table
+//     final tablePaint = Paint()..color = const Color(0xFFE8C87A);
+//     canvas.drawRRect(
+//       RRect.fromRectAndRadius(
+//         Rect.fromLTWH(
+//           s.width * 0.08,
+//           s.height * 0.58,
+//           s.width * 0.72,
+//           s.height * 0.06,
+//         ),
+//         const Radius.circular(4),
+//       ),
+//       tablePaint,
+//     );
+//     // Table legs
+//     for (final lx in [s.width * 0.12, s.width * 0.72]) {
+//       canvas.drawRect(
+//         Rect.fromLTWH(lx, s.height * 0.64, s.width * 0.03, s.height * 0.16),
+//         tablePaint,
+//       );
+//     }
 
-    // Laptop on table
-    final lapPaint = Paint()..color = const Color(0xFF9999BB);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          s.width * 0.35,
-          s.height * 0.42,
-          s.width * 0.18,
-          s.height * 0.16,
-        ),
-        const Radius.circular(3),
-      ),
-      lapPaint,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          s.width * 0.32,
-          s.height * 0.57,
-          s.width * 0.24,
-          s.height * 0.03,
-        ),
-        const Radius.circular(2),
-      ),
-      lapPaint,
-    );
+//     // Laptop on table
+//     final lapPaint = Paint()..color = const Color(0xFF9999BB);
+//     canvas.drawRRect(
+//       RRect.fromRectAndRadius(
+//         Rect.fromLTWH(
+//           s.width * 0.35,
+//           s.height * 0.42,
+//           s.width * 0.18,
+//           s.height * 0.16,
+//         ),
+//         const Radius.circular(3),
+//       ),
+//       lapPaint,
+//     );
+//     canvas.drawRRect(
+//       RRect.fromRectAndRadius(
+//         Rect.fromLTWH(
+//           s.width * 0.32,
+//           s.height * 0.57,
+//           s.width * 0.24,
+//           s.height * 0.03,
+//         ),
+//         const Radius.circular(2),
+//       ),
+//       lapPaint,
+//     );
 
-    // Screen glow
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          s.width * 0.36,
-          s.height * 0.43,
-          s.width * 0.16,
-          s.height * 0.13,
-        ),
-        const Radius.circular(2),
-      ),
-      Paint()..color = const Color(0xFFCCDDFF),
-    );
+//     // Screen glow
+//     canvas.drawRRect(
+//       RRect.fromRectAndRadius(
+//         Rect.fromLTWH(
+//           s.width * 0.36,
+//           s.height * 0.43,
+//           s.width * 0.16,
+//           s.height * 0.13,
+//         ),
+//         const Radius.circular(2),
+//       ),
+//       Paint()..color = const Color(0xFFCCDDFF),
+//     );
 
-    // Blue divider / document
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          s.width * 0.42,
-          s.height * 0.38,
-          s.width * 0.12,
-          s.height * 0.22,
-        ),
-        const Radius.circular(3),
-      ),
-      Paint()..color = const Color(0xFFAAAAAFF).withOpacity(0.5),
-    );
+//     // Blue divider / document
+//     canvas.drawRRect(
+//       RRect.fromRectAndRadius(
+//         Rect.fromLTWH(
+//           s.width * 0.42,
+//           s.height * 0.38,
+//           s.width * 0.12,
+//           s.height * 0.22,
+//         ),
+//         const Radius.circular(3),
+//       ),
+//       Paint()..color = const Color(0xFFAAAAAFF).withOpacity(0.5),
+//     );
 
-    // Person 1 – left (leaning, yellow shirt)
-    _drawPerson(
-      canvas,
-      s,
-      cx: s.width * 0.14,
-      topY: s.height * 0.2,
-      bodyColor: const Color(0xFFE8A030),
-      pantsColor: const Color(0xFF3355AA),
-      skinColor: const Color(0xFFD4A080),
-      leaning: true,
-    );
+//     // Person 1 – left (leaning, yellow shirt)
+//     _drawPerson(
+//       canvas,
+//       s,
+//       cx: s.width * 0.14,
+//       topY: s.height * 0.2,
+//       bodyColor: const Color(0xFFE8A030),
+//       pantsColor: const Color(0xFF3355AA),
+//       skinColor: const Color(0xFFD4A080),
+//       leaning: true,
+//     );
 
-    // Person 2 – center-left (sitting, pink shirt)
-    _drawPerson(
-      canvas,
-      s,
-      cx: s.width * 0.36,
-      topY: s.height * 0.3,
-      bodyColor: const Color(0xFFDDAACF),
-      pantsColor: const Color(0xFF444466),
-      skinColor: const Color(0xFFD4A080),
-      sitting: true,
-    );
+//     // Person 2 – center-left (sitting, pink shirt)
+//     _drawPerson(
+//       canvas,
+//       s,
+//       cx: s.width * 0.36,
+//       topY: s.height * 0.3,
+//       bodyColor: const Color(0xFFDDAACF),
+//       pantsColor: const Color(0xFF444466),
+//       skinColor: const Color(0xFFD4A080),
+//       sitting: true,
+//     );
 
-    // Person 3 – center (standing, white shirt)
-    _drawPerson(
-      canvas,
-      s,
-      cx: s.width * 0.54,
-      topY: s.height * 0.18,
-      bodyColor: const Color(0xFFEEEEEE),
-      pantsColor: const Color(0xFF223366),
-      skinColor: const Color(0xFFD4A080),
-    );
+//     // Person 3 – center (standing, white shirt)
+//     _drawPerson(
+//       canvas,
+//       s,
+//       cx: s.width * 0.54,
+//       topY: s.height * 0.18,
+//       bodyColor: const Color(0xFFEEEEEE),
+//       pantsColor: const Color(0xFF223366),
+//       skinColor: const Color(0xFFD4A080),
+//     );
 
-    // Person 4 – right (sitting, orange/rust shirt)
-    _drawPerson(
-      canvas,
-      s,
-      cx: s.width * 0.76,
-      topY: s.height * 0.3,
-      bodyColor: const Color(0xFFCC7755),
-      pantsColor: const Color(0xFF334466),
-      skinColor: const Color(0xFFD4A080),
-      sitting: true,
-    );
+//     // Person 4 – right (sitting, orange/rust shirt)
+//     _drawPerson(
+//       canvas,
+//       s,
+//       cx: s.width * 0.76,
+//       topY: s.height * 0.3,
+//       bodyColor: const Color(0xFFCC7755),
+//       pantsColor: const Color(0xFF334466),
+//       skinColor: const Color(0xFFD4A080),
+//       sitting: true,
+//     );
 
-    // Hanging lamp 1
-    _drawLamp(canvas, s, s.width * 0.3, const Color(0xFFFFEE88));
-    // Hanging lamp 2
-    _drawLamp(canvas, s, s.width * 0.55, const Color(0xFFFFEE88));
+//     // Hanging lamp 1
+//     _drawLamp(canvas, s, s.width * 0.3, const Color(0xFFFFEE88));
+//     // Hanging lamp 2
+//     _drawLamp(canvas, s, s.width * 0.55, const Color(0xFFFFEE88));
 
-    // Plant (right side)
-    _drawPlant(canvas, s, s.width * 0.9);
-  }
+//     // Plant (right side)
+//     _drawPlant(canvas, s, s.width * 0.9);
+//   }
 
-  void _drawPerson(
-    Canvas canvas,
-    Size s, {
-    required double cx,
-    required double topY,
-    required Color bodyColor,
-    required Color pantsColor,
-    required Color skinColor,
-    bool leaning = false,
-    bool sitting = false,
-  }) {
-    final skin = Paint()..color = skinColor;
-    final body = Paint()..color = bodyColor;
-    final pants = Paint()..color = pantsColor;
-    final hair = Paint()..color = const Color(0xFF332211);
+//   void _drawPerson(
+//     Canvas canvas,
+//     Size s, {
+//     required double cx,
+//     required double topY,
+//     required Color bodyColor,
+//     required Color pantsColor,
+//     required Color skinColor,
+//     bool leaning = false,
+//     bool sitting = false,
+//   }) {
+//     final skin = Paint()..color = skinColor;
+//     final body = Paint()..color = bodyColor;
+//     final pants = Paint()..color = pantsColor;
+//     final hair = Paint()..color = const Color(0xFF332211);
 
-    final double headR = s.width * 0.045;
-    final double bodyH = s.height * 0.22;
-    final double bodyW = s.width * 0.1;
+//     final double headR = s.width * 0.045;
+//     final double bodyH = s.height * 0.22;
+//     final double bodyW = s.width * 0.1;
 
-    // Head
-    final headCx = cx + (leaning ? s.width * 0.05 : 0);
-    final headCy = topY + headR;
-    canvas.drawCircle(Offset(headCx, headCy), headR, skin);
-    // Hair
-    final hairP = Path();
-    hairP.addArc(
-      Rect.fromCircle(center: Offset(headCx, headCy), radius: headR),
-      3.14,
-      3.14,
-    );
-    canvas.drawPath(hairP, hair);
+//     // Head
+//     final headCx = cx + (leaning ? s.width * 0.05 : 0);
+//     final headCy = topY + headR;
+//     canvas.drawCircle(Offset(headCx, headCy), headR, skin);
+//     // Hair
+//     final hairP = Path();
+//     hairP.addArc(
+//       Rect.fromCircle(center: Offset(headCx, headCy), radius: headR),
+//       3.14,
+//       3.14,
+//     );
+//     canvas.drawPath(hairP, hair);
 
-    if (sitting) {
-      // Torso
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(cx - bodyW / 2, topY + headR * 2, bodyW, bodyH * 0.38),
-          const Radius.circular(4),
-        ),
-        body,
-      );
-      // Legs horizontal
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(
-            cx - bodyW * 0.8,
-            topY + headR * 2 + bodyH * 0.38,
-            bodyW * 1.6,
-            bodyH * 0.14,
-          ),
-          const Radius.circular(4),
-        ),
-        pants,
-      );
-    } else if (leaning) {
-      // Torso angled
-      final torsoPath = Path();
-      torsoPath.moveTo(cx, topY + headR * 2);
-      torsoPath.lineTo(cx + bodyW * 0.8, topY + headR * 2 + bodyH * 0.18);
-      torsoPath.lineTo(
-        cx + bodyW * 0.8 + bodyW * 0.6,
-        topY + headR * 2 + bodyH * 0.18,
-      );
-      torsoPath.lineTo(cx + bodyW * 0.6, topY + headR * 2);
-      torsoPath.close();
-      canvas.drawPath(torsoPath, body);
-      // Legs
-      for (final lx in [cx - bodyW * 0.15, cx + bodyW * 0.35]) {
-        canvas.drawRRect(
-          RRect.fromRectAndRadius(
-            Rect.fromLTWH(
-              lx,
-              topY + headR * 2 + bodyH * 0.18,
-              bodyW * 0.28,
-              bodyH * 0.45,
-            ),
-            const Radius.circular(4),
-          ),
-          pants,
-        );
-      }
-    } else {
-      // Normal standing
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(cx - bodyW / 2, topY + headR * 2, bodyW, bodyH * 0.38),
-          const Radius.circular(4),
-        ),
-        body,
-      );
-      for (final lx in [cx - bodyW * 0.32, cx + bodyW * 0.04]) {
-        canvas.drawRRect(
-          RRect.fromRectAndRadius(
-            Rect.fromLTWH(
-              lx,
-              topY + headR * 2 + bodyH * 0.38,
-              bodyW * 0.28,
-              bodyH * 0.4,
-            ),
-            const Radius.circular(4),
-          ),
-          pants,
-        );
-      }
-    }
-  }
+//     if (sitting) {
+//       // Torso
+//       canvas.drawRRect(
+//         RRect.fromRectAndRadius(
+//           Rect.fromLTWH(cx - bodyW / 2, topY + headR * 2, bodyW, bodyH * 0.38),
+//           const Radius.circular(4),
+//         ),
+//         body,
+//       );
+//       // Legs horizontal
+//       canvas.drawRRect(
+//         RRect.fromRectAndRadius(
+//           Rect.fromLTWH(
+//             cx - bodyW * 0.8,
+//             topY + headR * 2 + bodyH * 0.38,
+//             bodyW * 1.6,
+//             bodyH * 0.14,
+//           ),
+//           const Radius.circular(4),
+//         ),
+//         pants,
+//       );
+//     } else if (leaning) {
+//       // Torso angled
+//       final torsoPath = Path();
+//       torsoPath.moveTo(cx, topY + headR * 2);
+//       torsoPath.lineTo(cx + bodyW * 0.8, topY + headR * 2 + bodyH * 0.18);
+//       torsoPath.lineTo(
+//         cx + bodyW * 0.8 + bodyW * 0.6,
+//         topY + headR * 2 + bodyH * 0.18,
+//       );
+//       torsoPath.lineTo(cx + bodyW * 0.6, topY + headR * 2);
+//       torsoPath.close();
+//       canvas.drawPath(torsoPath, body);
+//       // Legs
+//       for (final lx in [cx - bodyW * 0.15, cx + bodyW * 0.35]) {
+//         canvas.drawRRect(
+//           RRect.fromRectAndRadius(
+//             Rect.fromLTWH(
+//               lx,
+//               topY + headR * 2 + bodyH * 0.18,
+//               bodyW * 0.28,
+//               bodyH * 0.45,
+//             ),
+//             const Radius.circular(4),
+//           ),
+//           pants,
+//         );
+//       }
+//     } else {
+//       // Normal standing
+//       canvas.drawRRect(
+//         RRect.fromRectAndRadius(
+//           Rect.fromLTWH(cx - bodyW / 2, topY + headR * 2, bodyW, bodyH * 0.38),
+//           const Radius.circular(4),
+//         ),
+//         body,
+//       );
+//       for (final lx in [cx - bodyW * 0.32, cx + bodyW * 0.04]) {
+//         canvas.drawRRect(
+//           RRect.fromRectAndRadius(
+//             Rect.fromLTWH(
+//               lx,
+//               topY + headR * 2 + bodyH * 0.38,
+//               bodyW * 0.28,
+//               bodyH * 0.4,
+//             ),
+//             const Radius.circular(4),
+//           ),
+//           pants,
+//         );
+//       }
+//     }
+//   }
 
-  void _drawLamp(Canvas canvas, Size s, double cx, Color lightColor) {
-    final cord = Paint()
-      ..color = const Color(0xFF888888)
-      ..strokeWidth = 1.5;
-    canvas.drawLine(Offset(cx, 0), Offset(cx, s.height * 0.22), cord);
+//   void _drawLamp(Canvas canvas, Size s, double cx, Color lightColor) {
+//     final cord = Paint()
+//       ..color = const Color(0xFF888888)
+//       ..strokeWidth = 1.5;
+//     canvas.drawLine(Offset(cx, 0), Offset(cx, s.height * 0.22), cord);
 
-    final shade = Paint()..color = const Color(0xFFEEEECC);
-    final shadePath = Path();
-    shadePath.moveTo(cx - s.width * 0.04, s.height * 0.22);
-    shadePath.lineTo(cx - s.width * 0.025, s.height * 0.32);
-    shadePath.lineTo(cx + s.width * 0.025, s.height * 0.32);
-    shadePath.lineTo(cx + s.width * 0.04, s.height * 0.22);
-    shadePath.close();
-    canvas.drawPath(shadePath, shade);
+//     final shade = Paint()..color = const Color(0xFFEEEECC);
+//     final shadePath = Path();
+//     shadePath.moveTo(cx - s.width * 0.04, s.height * 0.22);
+//     shadePath.lineTo(cx - s.width * 0.025, s.height * 0.32);
+//     shadePath.lineTo(cx + s.width * 0.025, s.height * 0.32);
+//     shadePath.lineTo(cx + s.width * 0.04, s.height * 0.22);
+//     shadePath.close();
+//     canvas.drawPath(shadePath, shade);
 
-    // Light glow
-    canvas.drawCircle(
-      Offset(cx, s.height * 0.32),
-      s.width * 0.04,
-      Paint()
-        ..color = lightColor.withOpacity(0.3)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
-    );
-  }
+//     // Light glow
+//     canvas.drawCircle(
+//       Offset(cx, s.height * 0.32),
+//       s.width * 0.04,
+//       Paint()
+//         ..color = lightColor.withOpacity(0.3)
+//         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
+//     );
+//   }
 
-  void _drawPlant(Canvas canvas, Size s, double cx) {
-    // Pot
-    final potPath = Path();
-    potPath.moveTo(cx - s.width * 0.04, s.height * 0.72);
-    potPath.lineTo(cx - s.width * 0.03, s.height * 0.84);
-    potPath.lineTo(cx + s.width * 0.03, s.height * 0.84);
-    potPath.lineTo(cx + s.width * 0.04, s.height * 0.72);
-    potPath.close();
-    canvas.drawPath(potPath, Paint()..color = const Color(0xFFDDDDDD));
+//   void _drawPlant(Canvas canvas, Size s, double cx) {
+//     // Pot
+//     final potPath = Path();
+//     potPath.moveTo(cx - s.width * 0.04, s.height * 0.72);
+//     potPath.lineTo(cx - s.width * 0.03, s.height * 0.84);
+//     potPath.lineTo(cx + s.width * 0.03, s.height * 0.84);
+//     potPath.lineTo(cx + s.width * 0.04, s.height * 0.72);
+//     potPath.close();
+//     canvas.drawPath(potPath, Paint()..color = const Color(0xFFDDDDDD));
 
-    // Stem
-    canvas.drawLine(
-      Offset(cx, s.height * 0.72),
-      Offset(cx, s.height * 0.3),
-      Paint()
-        ..color = const Color(0xFF44AA44)
-        ..strokeWidth = 3,
-    );
+//     // Stem
+//     canvas.drawLine(
+//       Offset(cx, s.height * 0.72),
+//       Offset(cx, s.height * 0.3),
+//       Paint()
+//         ..color = const Color(0xFF44AA44)
+//         ..strokeWidth = 3,
+//     );
 
-    // Leaves
-    final leafPaint = Paint()..color = const Color(0xFF44BB44);
-    for (int i = 0; i < 3; i++) {
-      final leafY = s.height * (0.66 - i * 0.14);
-      final side = i.isEven ? 1.0 : -1.0;
+//     // Leaves
+//     final leafPaint = Paint()..color = const Color(0xFF44BB44);
+//     for (int i = 0; i < 3; i++) {
+//       final leafY = s.height * (0.66 - i * 0.14);
+//       final side = i.isEven ? 1.0 : -1.0;
 
-      final lp = Path();
-      lp.moveTo(cx, leafY);
-      lp.quadraticBezierTo(
-        cx + side * s.width * 0.1,
-        leafY - s.height * 0.04,
-        cx + side * s.width * 0.08,
-        leafY - s.height * 0.1,
-      );
-      lp.quadraticBezierTo(
-        cx + side * s.width * 0.04,
-        leafY - s.height * 0.07,
-        cx,
-        leafY,
-      );
-      canvas.drawPath(lp, leafPaint);
-    }
-  }
+//       final lp = Path();
+//       lp.moveTo(cx, leafY);
+//       lp.quadraticBezierTo(
+//         cx + side * s.width * 0.1,
+//         leafY - s.height * 0.04,
+//         cx + side * s.width * 0.08,
+//         leafY - s.height * 0.1,
+//       );
+//       lp.quadraticBezierTo(
+//         cx + side * s.width * 0.04,
+//         leafY - s.height * 0.07,
+//         cx,
+//         leafY,
+//       );
+//       canvas.drawPath(lp, leafPaint);
+//     }
+//   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
+//   @override
+//   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+// }
 
 // ─────────────────────────────────────────────
 // HELPERS

@@ -465,11 +465,23 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                               ListView.separated(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
-                                itemCount: filteredJobs.length,
+                                itemCount: filteredJobs.isEmpty
+                                    ? 0
+                                    : filteredJobs.length +
+                                        (filteredJobs.length - 1) ~/ 3,
                                 separatorBuilder: (_, __) =>
                                     const SizedBox(height: 18),
                                 itemBuilder: (context, index) {
-                                  final job = filteredJobs[index];
+                                  final isBanner = (index + 1) % 4 == 0;
+                                  if (isBanner) {
+                                    return Image.asset(
+                                      'assets/icons/warning.png',
+                                      width: double.infinity,
+                                      fit: BoxFit.fitWidth,
+                                    );
+                                  }
+                                  final jobIndex = index - (index ~/ 4);
+                                  final job = filteredJobs[jobIndex];
                                   final categoryImg =
                                       selectedCategory?.imageUrl ?? '';
                                   return _buildJobCard(job, categoryImg, l10n);

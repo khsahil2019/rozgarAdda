@@ -307,7 +307,6 @@ class RegisterController extends GetxController {
       password.value.isNotEmpty &&
       selectedStateId.value != null &&
       selectedDistrictId.value != null &&
-      identityProofPath.value != null &&
       acceptedTerms.value &&
       !isLoading.value;
 

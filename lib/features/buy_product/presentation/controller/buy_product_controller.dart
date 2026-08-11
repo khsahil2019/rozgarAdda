@@ -18,7 +18,8 @@ class BuyProductController extends GetxController {
 
   // Cache & reactive state for active subcategory
   final Map<int, List<BuyProductSubCategory>> _subCategoryCache = {};
-  final RxList<BuyProductSubCategory> subCategories = <BuyProductSubCategory>[].obs;
+  final RxList<BuyProductSubCategory> subCategories =
+      <BuyProductSubCategory>[].obs;
   final RxBool isLoadingSubCategories = false.obs;
   final RxnString subCategoriesError = RxnString();
 
@@ -75,13 +76,12 @@ class BuyProductController extends GetxController {
       final lang = Get.locale?.languageCode ?? 'en';
       final result = await repository.getSubCategories(categoryId, lang);
 
-      result.fold(
-        (failure) => subCategoriesError.value = failure.message,
-        (data) {
-          _subCategoryCache[categoryId] = data;
-          subCategories.assignAll(data);
-        },
-      );
+      result.fold((failure) => subCategoriesError.value = failure.message, (
+        data,
+      ) {
+        _subCategoryCache[categoryId] = data;
+        subCategories.assignAll(data);
+      });
     } catch (e) {
       subCategoriesError.value = 'Failed to load sub-categories';
     } finally {
@@ -138,13 +138,10 @@ class BuyProductController extends GetxController {
 
       final result = await repository.getProductDetails(productId, lang);
 
-      result.fold(
-        (failure) => detailError.value = failure.message,
-        (data) {
-          productDetail.value = data.product;
-          relatedProducts.assignAll(data.relatedProducts);
-        },
-      );
+      result.fold((failure) => detailError.value = failure.message, (data) {
+        productDetail.value = data.product;
+        relatedProducts.assignAll(data.relatedProducts);
+      });
     } catch (e) {
       detailError.value = 'Failed to load product details';
     } finally {
@@ -155,5 +152,11 @@ class BuyProductController extends GetxController {
   // Set selected image index
   void selectImage(int index) {
     selectedImageIndex.value = index;
+  }
+
+  // Select subcategory filter and fetch products
+  void selectSubCategoryFilter(int? categoryId, int? subcategoryId) {
+    selectedSubCategoryId.value = subcategoryId;
+    fetchProducts(categoryId, subcategoryId);
   }
 }
