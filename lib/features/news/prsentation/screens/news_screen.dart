@@ -622,11 +622,13 @@ class NewsScreen extends GetView<NewsController> {
   // ── Empty View ───────────────────────────────────────────────────────────
   Widget _buildEmptyState(AppLocalizations l10n) {
     return LayoutBuilder(
-      builder: (context, constraints) => ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          SizedBox(
-            height: constraints.maxHeight,
+      builder: (context, constraints) {
+        final height =
+            constraints.maxHeight.isFinite ? constraints.maxHeight : 300.0;
+        return SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: height,
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -645,8 +647,8 @@ class NewsScreen extends GetView<NewsController> {
               ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

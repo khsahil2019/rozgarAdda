@@ -131,6 +131,7 @@ class AppController extends GetxController {
     _storageService.saveAccessToken(authResponse.token);
     _isLoggedIn.value = true;
     _user.value = authResponse.user.toEntity();
+    fetchAndSyncUserData();
   }
 
   void logout() {

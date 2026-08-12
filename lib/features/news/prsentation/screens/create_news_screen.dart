@@ -54,9 +54,10 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
           return Stack(
             children: [
               SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (controller.errorMessage.isNotEmpty) ...[
                       _buildErrorBanner(controller.errorMessage.value),
@@ -64,6 +65,7 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
                     ],
                     _buildCard(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           _buildCategoryField(context, l10n),
                           const SizedBox(height: 14),
@@ -93,10 +95,12 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
                 ),
               ),
               if (controller.isSubmitting.value)
-                Container(
-                  color: Colors.black26,
-                  child: const Center(
-                    child: CircularProgressIndicator(color: _CNC.accent),
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black26,
+                    child: const Center(
+                      child: CircularProgressIndicator(color: _CNC.accent),
+                    ),
                   ),
                 ),
             ],
@@ -146,9 +150,14 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
       label: l10n.text('news_form_category'),
       child: Obx(() {
         final categories = controller.categories;
+        final selectedId = controller.selectedCategoryId.value;
+        final validValue =
+            (selectedId != null && categories.any((c) => c.id == selectedId))
+            ? selectedId
+            : null;
         return DropdownButtonHideUnderline(
           child: DropdownButton<int>(
-            value: controller.selectedCategoryId.value,
+            value: validValue,
             isExpanded: true,
             isDense: true,
             hint: Text(
@@ -180,9 +189,14 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
       label: l10n.text('news_form_state'),
       child: Obx(() {
         final states = controller.states;
+        final selectedId = controller.selectedStateId.value;
+        final validValue =
+            (selectedId != null && states.any((s) => s.id == selectedId))
+            ? selectedId
+            : null;
         return DropdownButtonHideUnderline(
           child: DropdownButton<int>(
-            value: controller.selectedStateId.value,
+            value: validValue,
             isExpanded: true,
             isDense: true,
             hint: Text(
@@ -318,6 +332,8 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
                   backgroundColor: const Color(0xFFF0F1F6),
                   foregroundColor: _CNC.navy,
                   elevation: 0,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
@@ -366,23 +382,18 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
   }
 
   Widget _buildSubmitButton(BuildContext context, AppLocalizations l10n) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _CNC.navy,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 2,
-        ),
-        onPressed: () => _submit(context, l10n),
-        child: Text(
-          l10n.text('news_form_submit'),
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-        ),
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _CNC.navy,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 2,
+      ),
+      onPressed: () => _submit(context, l10n),
+      child: Text(
+        l10n.text('news_form_submit'),
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
       ),
     );
   }

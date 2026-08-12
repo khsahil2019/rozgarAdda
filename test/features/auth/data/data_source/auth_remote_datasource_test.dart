@@ -198,6 +198,7 @@ void main() {
           locality: tLocality,
           pincode: tPincode,
           address: tAddress,
+          otp: '123456',
         );
 
         // Assert
@@ -239,6 +240,7 @@ void main() {
             locality: tLocality,
             pincode: tPincode,
             address: tAddress,
+            otp: '123456',
           ),
           throwsA(
             isA<Failure>().having(

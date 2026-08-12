@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rojgar/features/app/app_controller.dart';
 import 'package:rojgar/features/auth/data/data_source/model/auth_response.dart';
 import 'package:rojgar/features/auth/domain/repository/auth_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,11 +62,15 @@ class LoginController extends GetxController {
       return await eitherResult.fold(
         (failure) => throw failure,
         (result) async {
-          // Persist user properties
+          // Persist user properties and update AppController state
           try {
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setInt('candidate_id', result.id);
-            await prefs.setString('access_token', result.token);
+            if (Get.isRegistered<AppController>()) {
+              AppController.to.login(result);
+            } else {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setInt('candidate_id', result.id);
+              await prefs.setString('access_token', result.token);
+            }
           } catch (_) {
             // Ignore persistence issues
           }

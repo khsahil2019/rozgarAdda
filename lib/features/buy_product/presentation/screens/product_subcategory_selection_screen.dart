@@ -46,10 +46,7 @@ class _ProductSubCategorySelectionScreenState
         foregroundColor: _darkText,
         title: Text(
           widget.categoryName,
-          style: const TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
@@ -97,12 +94,13 @@ class _ProductSubCategorySelectionScreenState
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: controller.subCategories.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 0.78,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.78,
+                        ),
                     itemBuilder: (context, index) {
                       final subCategory = controller.subCategories[index];
                       return _SubCategoryGridItem(
@@ -212,11 +210,7 @@ class _ProductSubCategorySelectionScreenState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.wifi_off_rounded,
-              size: 48,
-              color: _greyText,
-            ),
+            const Icon(Icons.wifi_off_rounded, size: 48, color: _greyText),
             const SizedBox(height: 16),
             Text(
               message,
@@ -248,10 +242,7 @@ class _SubCategoryGridItem extends StatelessWidget {
   final BuyProductSubCategory subCategory;
   final VoidCallback onTap;
 
-  const _SubCategoryGridItem({
-    required this.subCategory,
-    required this.onTap,
-  });
+  const _SubCategoryGridItem({required this.subCategory, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -263,7 +254,7 @@ class _SubCategoryGridItem extends StatelessWidget {
           Container(
             height: 72,
             width: 72,
-            padding: const EdgeInsets.all(12),
+            // padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -274,17 +265,14 @@ class _SubCategoryGridItem extends StatelessWidget {
                   offset: Offset(0, 3),
                 ),
               ],
-              border: Border.all(
-                color: const Color(0xFFECEEF5),
-                width: 1,
-              ),
+              border: Border.all(color: const Color(0xFFECEEF5), width: 1),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: subCategory.imageUrl.isNotEmpty
                   ? Image.network(
                       subCategory.imageUrl,
-                      fit: BoxFit.contain,
+                      fit: BoxFit.fill,
                       errorBuilder: (_, __, ___) => const Icon(
                         Icons.subdirectory_arrow_right_rounded,
                         color: Color(0xFF1400FF),
