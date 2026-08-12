@@ -2,16 +2,23 @@ sealed class NewsItem {
   final int id;
   final String title;
   final DateTime createdAt;
+  final int categoryId;
+  final int stateId;
+  final String categoryName;
+  final String stateName;
 
   const NewsItem({
     required this.id,
     required this.title,
     required this.createdAt,
+    required this.categoryId,
+    required this.stateId,
+    required this.categoryName,
+    required this.stateName,
   });
 }
 
 class TextNews extends NewsItem {
-  final String category;
   final String description;
   final String imageUrl;
   final String imagePath;
@@ -23,7 +30,10 @@ class TextNews extends NewsItem {
     required super.id,
     required super.title,
     required super.createdAt,
-    required this.category,
+    required super.categoryId,
+    required super.stateId,
+    required super.categoryName,
+    required super.stateName,
     required this.description,
     required this.imageUrl,
     required this.imagePath,
@@ -34,9 +44,10 @@ class TextNews extends NewsItem {
 }
 
 class VideoNews extends NewsItem {
-  final String subject;
+  final String description;
   final String videoUrl;
   final String videoPath;
+  final String thumbnailUrl;
   final int addedBy;
   final String status;
 
@@ -44,29 +55,15 @@ class VideoNews extends NewsItem {
     required super.id,
     required super.title,
     required super.createdAt,
-    required this.subject,
+    required super.categoryId,
+    required super.stateId,
+    required super.categoryName,
+    required super.stateName,
+    required this.description,
     required this.videoUrl,
     required this.videoPath,
+    required this.thumbnailUrl,
     required this.addedBy,
     required this.status,
-  });
-}
-
-class YoutubeNews extends NewsItem {
-  final String youtubeUrl;
-  final String description;
-  final String thumbnailUrl;
-  final String youtubeId;
-  final DateTime updatedAt;
-
-  const YoutubeNews({
-    required super.id,
-    required super.title,
-    required super.createdAt,
-    required this.youtubeUrl,
-    required this.description,
-    required this.thumbnailUrl,
-    required this.youtubeId,
-    required this.updatedAt,
   });
 }

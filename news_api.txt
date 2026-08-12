@@ -1,0 +1,66 @@
+curl --location 'https://rozgaradda.com/api/news-categories' \
+--header 'Accept: application/json'
+Category News List
+{
+  "status": true,
+  "message": "News categories fetched successfully.",
+  "data": [
+    {
+      "id": 10,
+      "name": "Business",
+      "slug": "business"
+    },
+    {
+      "id": 13,
+      "name": "Crime",
+      "slug": "crime"
+    },
+    {
+      "id": 8,
+      "name": "International News",
+      "slug": "international-news"
+    },
+    {
+      "id": 7,
+      "name": "National News",
+      "slug": "national-news"
+    },
+    {
+      "id": 9,
+      "name": "Politics",
+      "slug": "politics"
+    },
+    {
+      "id": 12,
+      "name": "Sports",
+      "slug": "sports"
+    },
+    {
+      "id": 11,
+      "name": "Technology",
+      "slug": "technology"
+    }
+  ]
+}
+
+curl --location 'https://rozgaradda.com/api/store-news' \
+--header 'Accept: application/json' \
+--header 'Authorization: Bearer YOUR_TOKEN' \
+--form 'category_id="2"' \
+--form 'state_id="9"' \
+--form 'title="India Wins the Match"' \
+--form 'description="India won the match by 5 wickets."' \
+--form 'image=@"/path/to/news.jpg"'
+
+Updated api
+Stores News API With New Parameters
+
+curl --location 'https://rozgaradda.com/api/states' \
+--header 'Accept: application/json'
+
+State API List
+
+fetch news api (new)
+https://rozgaradda.com/api/videos-news?category_id=7&state_id=28&page=1&per_page=10
+https://rozgaradda.com/api/text-news?category_id=7&state_id=28&page=1&per_page=10
+https://rozgaradda.com/api/video-news?category_id=7&state_id=28&page=1&per_page=10

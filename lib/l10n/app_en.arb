@@ -288,7 +288,6 @@
   "no_recent_jobs": "No recent jobs available at the moment.",
   "post_job": "Post Job",
   "post_job_coming_soon": "Post Job feature coming soon!",
-
   "post_job_section_job_details": "Job Details",
   "post_job_title_label": "Job Title *",
   "post_job_title_hint": "e.g. Delivery Executive, Telecaller",
@@ -312,7 +311,6 @@
   "post_job_shift_night": "Night Shift",
   "post_job_shift_rotational": "Rotational Shift",
   "post_job_shift_flexible": "Flexible Shift",
-
   "post_job_section_salary": "Salary Details",
   "post_job_salary_model_label": "Salary Model *",
   "post_job_salary_fixed": "Fixed Monthly Pay Range",
@@ -333,7 +331,6 @@
   "post_job_estimated_incentive_label": "Estimated Incentive (₹) *",
   "post_job_estimated_incentive_hint": "e.g. 12000",
   "post_job_estimated_incentive_error": "Enter estimated incentive",
-
   "post_job_section_location": "Location Address",
   "post_job_state_label": "State *",
   "post_job_state_select": "Select State",
@@ -347,7 +344,6 @@
   "post_job_pincode_label": "Pin Code *",
   "post_job_pincode_hint": "e.g. 302017",
   "post_job_pincode_error": "Must be exactly 6 digits",
-
   "post_job_section_requirements": "Candidate Requirements",
   "post_job_education_label": "Min Education *",
   "post_job_education_below_10": "Below 10th",
@@ -374,7 +370,6 @@
   "post_job_perks_hint": "e.g. PF, ESI, Free Food, Petrol Allowance",
   "post_job_description_label": "Job Description",
   "post_job_description_hint": "Briefly describe roles, responsibilities, and benefits...",
-
   "post_job_section_walkin": "Walk-in Interview Details",
   "post_job_walkin_switch": "Is this a Walk-in Interview?",
   "post_job_walkin_date_label": "Walk-in Date *",
@@ -388,7 +383,6 @@
   "post_job_walkin_venue_label": "Walk-in Venue *",
   "post_job_walkin_venue_hint": "Enter full address of walk-in venue",
   "post_job_walkin_venue_error": "Venue is required",
-
   "post_job_section_contact": "Contact Details",
   "post_job_contact_instruction": "Select how candidates can apply/contact you (Select 1 or 2 options):",
   "post_job_contact_apply_title": "Direct Application (Apply Only)",
@@ -403,11 +397,9 @@
   "post_job_whatsapp_label": "WhatsApp Number *",
   "post_job_whatsapp_hint": "Enter 10-digit WhatsApp number",
   "post_job_whatsapp_error": "Enter valid 10-digit WhatsApp number",
-
   "post_job_submit_button": "Post Job Now",
   "post_job_search_hint": "Search...",
   "post_job_no_items": "No items found",
-
   "post_job_error_title": "Error",
   "post_job_error_category_role": "Please select a Job Category and Job Role.",
   "post_job_error_location": "Please select State, District and Locality.",
@@ -420,5 +412,31 @@
   "post_job_limit_title": "Limit Reached",
   "post_job_limit_message": "You can select a maximum of 2 contact preferences.",
   "post_job_selection_title": "Selection Required",
-  "post_job_selection_message": "You must select at least 1 contact preference."
+  "post_job_selection_message": "You must select at least 1 contact preference.",
+  "news_categories": "Categories",
+  "news_state": "State",
+  "news_select_state": "Select State",
+  "news_create": "Create News",
+  "news_login_required": "Please login to create news.",
+  "news_retry": "Retry",
+  "news_filters_error": "Unable to load news filters.",
+  "news_error_title": "Error",
+  "news_success_title": "Success",
+  "news_form_title": "Create News",
+  "news_form_category": "Category",
+  "news_form_state": "State",
+  "news_form_headline": "Title",
+  "news_form_headline_hint": "Enter news headline",
+  "news_form_description": "Description",
+  "news_form_description_hint": "Write the full news story...",
+  "news_form_image": "News Image",
+  "news_form_choose_image": "Choose Image",
+  "news_form_no_image": "No image selected",
+  "news_form_submit": "Submit News",
+  "news_form_error_category": "Please select a category.",
+  "news_form_error_state": "Please select a state.",
+  "news_form_error_title": "Please enter a news title.",
+  "news_form_error_description": "Please enter the news description.",
+  "news_form_error_image": "Please select a news image.",
+  "news_form_success": "News submitted successfully."
 }

@@ -1,8 +1,17 @@
 class ApiRoutes {
-  static const String baseUrl = 'https://rozgaradda.com/api';
+  static const String host = 'https://rozgaradda.com';
+  static const String baseUrl = '$host/api';
 
   // Helper method to build url
   static String _buildUrl(String path) => '$baseUrl/$path';
+
+  /// Resolves a possibly relative asset path returned by the API into a full
+  /// URL. Returns an empty string for empty input.
+  static String absoluteUrl(String path) {
+    if (path.isEmpty) return '';
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    return '$host/${path.replaceFirst(RegExp(r'^/+'), '')}';
+  }
 
   //endpoints
   static String get login => _buildUrl('candidate/login');
@@ -29,7 +38,11 @@ class ApiRoutes {
   // News
   static String get textNews => _buildUrl('text-news');
   static String get videoNews => _buildUrl('video-news');
-  static String get videosNews => _buildUrl('videos-news');
+  static String get newsCategories => _buildUrl('news-categories');
+  static String get storeNews => _buildUrl('store-news');
+
+  // States (id space used by the news APIs)
+  static String get states => _buildUrl('states');
 
   // Sell Product
   static String get categories => _buildUrl('categories');

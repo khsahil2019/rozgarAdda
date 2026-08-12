@@ -1,131 +1,278 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:rojgar/core/exceptions/exceptions.dart';
+import 'package:rojgar/features/news/domain/entities/news_category.dart';
 import 'package:rojgar/features/news/domain/entities/news_item.dart';
+import 'package:rojgar/features/news/domain/entities/news_page.dart';
+import 'package:rojgar/features/news/domain/entities/news_state.dart';
 import 'package:rojgar/features/news/domain/repository/news_repository.dart';
 import 'package:rojgar/features/news/prsentation/controller/news_controller.dart';
 
+NewsPage<T> _page<T>(List<T> items, {int currentPage = 1, int lastPage = 1}) {
+  return NewsPage<T>(
+    items: items,
+    pagination: NewsPagination(
+      currentPage: currentPage,
+      perPage: 10,
+      total: items.length,
+      lastPage: lastPage,
+    ),
+  );
+}
+
 class FakeNewsRepository implements NewsRepository {
-  Either<Failure, List<TextNews>> textNewsResult = const Right([]);
-  Either<Failure, List<VideoNews>> videoNewsResult = const Right([]);
-  Either<Failure, List<YoutubeNews>> youtubeNewsResult = const Right([]);
+  Either<Failure, List<NewsCategory>> categoriesResult = const Right([
+    NewsCategory(id: 7, name: 'National News', slug: 'national-news'),
+    NewsCategory(id: 12, name: 'Sports', slug: 'sports'),
+  ]);
+  Either<Failure, List<NewsState>> statesResult = const Right([
+    NewsState(id: 28, name: 'West Bengal'),
+    NewsState(id: 3, name: 'Uttar Pradesh'),
+  ]);
+
+  /// Results served per requested page, keyed by page number.
+  Map<int, Either<Failure, NewsPage<TextNews>>> textPages = {};
+  Map<int, Either<Failure, NewsPage<VideoNews>>> videoPages = {};
+
+  final List<String> createdNews = [];
+  int? lastTextCategoryId;
+  int? lastTextStateId;
 
   @override
-  Future<Either<Failure, List<TextNews>>> getTextNews() async => textNewsResult;
+  Future<Either<Failure, List<NewsCategory>>> getCategories() async =>
+      categoriesResult;
 
   @override
-  Future<Either<Failure, List<VideoNews>>> getVideoNews() async => videoNewsResult;
+  Future<Either<Failure, List<NewsState>>> getStates() async => statesResult;
 
   @override
-  Future<Either<Failure, List<YoutubeNews>>> getYoutubeNews() async => youtubeNewsResult;
+  Future<Either<Failure, NewsPage<TextNews>>> getTextNews({
+    required int categoryId,
+    required int stateId,
+    int page = 1,
+    int perPage = 10,
+  }) async {
+    lastTextCategoryId = categoryId;
+    lastTextStateId = stateId;
+    return textPages[page] ?? Right(_page<TextNews>(const []));
+  }
+
+  @override
+  Future<Either<Failure, NewsPage<VideoNews>>> getVideoNews({
+    required int categoryId,
+    required int stateId,
+    int page = 1,
+    int perPage = 10,
+  }) async {
+    return videoPages[page] ?? Right(_page<VideoNews>(const []));
+  }
+
+  @override
+  Future<Either<Failure, String>> createNews({
+    required int categoryId,
+    required int stateId,
+    required String title,
+    required String description,
+    String? imagePath,
+  }) async {
+    createdNews.add(title);
+    return const Right('ok');
+  }
 }
 
 void main() {
   late NewsController controller;
   late FakeNewsRepository fakeRepository;
 
-  final tTextNews = TextNews(
-    id: 1,
-    title: 'Text News Title',
-    createdAt: DateTime(2026, 6, 2, 10, 0),
-    category: 'Jobs',
-    description: 'Job description text',
-    imageUrl: 'http://image.jpg',
-    imagePath: '/path/to/img',
-    status: 'active',
-    isSeen: false,
-    addedBy: 1,
+  TextNews textNews({required int id, required DateTime createdAt}) => TextNews(
+    id: id,
+    title: 'Text News $id',
+    createdAt: createdAt,
+    categoryId: 7,
+    stateId: 28,
+    categoryName: 'National News',
+    stateName: 'West Bengal',
+    description: 'Description $id',
+    imageUrl: 'https://rozgaradda.com/news/$id.png',
+    imagePath: 'news/$id.png',
+    status: 'approved',
+    isSeen: true,
+    addedBy: 11,
   );
 
-  final tVideoNews = VideoNews(
-    id: 2,
-    title: 'Video News Title',
-    createdAt: DateTime(2026, 6, 2, 11, 0),
-    subject: 'Direct Upload Subject',
-    videoUrl: 'http://video.mp4',
-    videoPath: '/path/to/video',
-    status: 'active',
-    addedBy: 1,
-  );
-
-  final tYoutubeNews = YoutubeNews(
-    id: 3,
-    title: 'Youtube Video Title',
-    createdAt: DateTime(2026, 6, 2, 12, 0),
-    youtubeUrl: 'https://youtube.com/watch?v=123',
-    description: 'Youtube video description',
-    thumbnailUrl: 'http://yt-thumb.jpg',
-    youtubeId: '123',
-    updatedAt: DateTime(2026, 6, 2, 12, 0),
-  );
+  VideoNews videoNews({required int id, required DateTime createdAt}) =>
+      VideoNews(
+        id: id,
+        title: 'Video News $id',
+        createdAt: createdAt,
+        categoryId: 7,
+        stateId: 28,
+        categoryName: 'National News',
+        stateName: 'West Bengal',
+        description: 'Video description $id',
+        videoUrl: 'https://rozgaradda.com/videos/$id.mp4',
+        videoPath: 'videos/$id.mp4',
+        thumbnailUrl: '',
+        addedBy: 11,
+        status: 'approved',
+      );
 
   setUp(() {
     fakeRepository = FakeNewsRepository();
-    // Use controller without auto-init in test or allow it to run and re-run manually.
-    // By default, GetxController's onInit is called when registered, but we instantiate it directly here.
     controller = NewsController(repository: fakeRepository);
   });
 
+  group('bootstrap', () {
+    test(
+      'loads filters, defaults the selection and fetches the feed',
+      () async {
+        final article = textNews(id: 1, createdAt: DateTime(2026, 8, 1, 10));
+        final video = videoNews(id: 2, createdAt: DateTime(2026, 8, 1, 11));
+        fakeRepository.textPages = {
+          1: Right(_page([article])),
+        };
+        fakeRepository.videoPages = {
+          1: Right(_page([video])),
+        };
+
+        await controller.bootstrap();
+
+        expect(controller.categories.length, 2);
+        expect(controller.states.length, 2);
+        // Falls back to the first category/state when nothing is saved.
+        expect(controller.selectedCategoryId.value, 7);
+        expect(controller.selectedStateId.value, 28);
+        expect(fakeRepository.lastTextCategoryId, 7);
+        expect(fakeRepository.lastTextStateId, 28);
+        expect(controller.isLoading.value, false);
+        expect(controller.errorMessage.value, '');
+        // Newest first.
+        expect(controller.allNews.map((e) => e.id), [2, 1]);
+        expect(controller.textNews.length, 1);
+        expect(controller.videoNews.length, 1);
+      },
+    );
+
+    test('reports an error when the filters cannot be loaded', () async {
+      fakeRepository.categoriesResult = Left(Failure('no categories'));
+
+      await controller.bootstrap();
+
+      expect(controller.errorMessage.value, 'no categories');
+      expect(controller.isLoading.value, false);
+    });
+  });
+
   group('fetchNews', () {
-    test('should assign loaded and sorted lists on success', () async {
-      // Arrange
-      fakeRepository.textNewsResult = Right([tTextNews]);
-      fakeRepository.videoNewsResult = Right([tVideoNews]);
-      fakeRepository.youtubeNewsResult = Right([tYoutubeNews]);
+    setUp(() async {
+      await controller.bootstrap();
+    });
 
-      // Act
+    test('keeps the feed when only one listing fails', () async {
+      fakeRepository.textPages = {1: Left(Failure('text down'))};
+      fakeRepository.videoPages = {
+        1: Right(_page([videoNews(id: 5, createdAt: DateTime(2026, 8, 2))])),
+      };
+
       await controller.fetchNews();
 
-      // Assert
-      expect(controller.isLoading.value, false);
       expect(controller.errorMessage.value, '');
+      expect(controller.textNews, isEmpty);
+      expect(controller.videoNews.length, 1);
+      expect(controller.allNews.length, 1);
+    });
+
+    test('sets errorMessage when every listing fails', () async {
+      fakeRepository.textPages = {1: Left(Failure('text down'))};
+      fakeRepository.videoPages = {1: Left(Failure('video down'))};
+
+      await controller.fetchNews();
+
+      expect(controller.errorMessage.value, 'text down');
+      expect(controller.allNews, isEmpty);
+    });
+
+    test('refetches with the newly selected category', () async {
+      controller.selectCategory(12);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(controller.selectedCategoryId.value, 12);
+      expect(fakeRepository.lastTextCategoryId, 12);
+    });
+  });
+
+  group('loadMore', () {
+    test('appends the next page and stops at the last page', () async {
+      fakeRepository.textPages = {
+        1: Right(
+          _page(
+            [textNews(id: 1, createdAt: DateTime(2026, 8, 3))],
+            currentPage: 1,
+            lastPage: 2,
+          ),
+        ),
+        2: Right(
+          _page(
+            [textNews(id: 2, createdAt: DateTime(2026, 8, 2))],
+            currentPage: 2,
+            lastPage: 2,
+          ),
+        ),
+      };
+
+      await controller.bootstrap();
       expect(controller.textNews.length, 1);
-      expect(controller.textNews.first, tTextNews);
-      
-      // Video news tab list should contain both VideoNews and YoutubeNews sorted by date descending (YoutubeNews (12:00) first, then VideoNews (11:00))
-      expect(controller.videoNews.length, 2);
-      expect(controller.videoNews[0], tYoutubeNews);
-      expect(controller.videoNews[1], tVideoNews);
+      expect(controller.hasMore, isTrue);
 
-      // All news list should contain all three items sorted by date descending (YoutubeNews (12:00) -> VideoNews (11:00) -> TextNews (10:00))
-      expect(controller.allNews.length, 3);
-      expect(controller.allNews[0], tYoutubeNews);
-      expect(controller.allNews[1], tVideoNews);
-      expect(controller.allNews[2], tTextNews);
+      await controller.loadMore();
+
+      expect(controller.textNews.map((e) => e.id), [1, 2]);
+      expect(controller.hasMore, isFalse);
+
+      // No further requests once the last page is reached.
+      await controller.loadMore();
+      expect(controller.textNews.length, 2);
     });
 
-    test('should partial succeed when some APIs fail but others return data', () async {
-      // Arrange
-      fakeRepository.textNewsResult = Left(Failure('Failed to load text news'));
-      fakeRepository.videoNewsResult = Right([tVideoNews]);
-      fakeRepository.youtubeNewsResult = Right([tYoutubeNews]);
+    test(
+      'only pages the articles list while the articles tab is active',
+      () async {
+        fakeRepository.textPages = {
+          1: Right(
+            _page([
+              textNews(id: 1, createdAt: DateTime(2026, 8, 3)),
+            ], lastPage: 2),
+          ),
+          2: Right(
+            _page(
+              [textNews(id: 2, createdAt: DateTime(2026, 8, 2))],
+              currentPage: 2,
+              lastPage: 2,
+            ),
+          ),
+        };
+        fakeRepository.videoPages = {
+          1: Right(
+            _page([
+              videoNews(id: 3, createdAt: DateTime(2026, 8, 4)),
+            ], lastPage: 2),
+          ),
+          2: Right(
+            _page(
+              [videoNews(id: 4, createdAt: DateTime(2026, 8, 1))],
+              currentPage: 2,
+              lastPage: 2,
+            ),
+          ),
+        };
 
-      // Act
-      await controller.fetchNews();
+        await controller.bootstrap();
+        controller.selectTab(NewsTab.articles);
+        await controller.loadMore();
 
-      // Assert
-      expect(controller.isLoading.value, false);
-      expect(controller.errorMessage.value, ''); // Should not set error because we got video data
-      expect(controller.textNews.isEmpty, true);
-      expect(controller.videoNews.length, 2);
-      expect(controller.allNews.length, 2);
-    });
-
-    test('should set errorMessage on total failure (all APIs fail)', () async {
-      // Arrange
-      fakeRepository.textNewsResult = Left(Failure('API error 1'));
-      fakeRepository.videoNewsResult = Left(Failure('API error 2'));
-      fakeRepository.youtubeNewsResult = Left(Failure('API error 3'));
-
-      // Act
-      await controller.fetchNews();
-
-      // Assert
-      expect(controller.isLoading.value, false);
-      expect(controller.errorMessage.value, 'API error 1'); // Should take first error
-      expect(controller.allNews.isEmpty, true);
-      expect(controller.textNews.isEmpty, true);
-      expect(controller.videoNews.isEmpty, true);
-    });
+        expect(controller.textNews.length, 2);
+        expect(controller.videoNews.length, 1);
+      },
+    );
   });
 }

@@ -9,8 +9,10 @@ class NewsDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = DateFormat('dd MMM yyyy, hh:mm a').format(article.createdAt);
-    
+    final formattedDate = DateFormat(
+      'dd MMM yyyy, hh:mm a',
+    ).format(article.createdAt);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FC),
       body: CustomScrollView(
@@ -56,7 +58,7 @@ class NewsDetailScreen extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Article Content
           SliverToBoxAdapter(
             child: Padding(
@@ -77,7 +79,7 @@ class NewsDetailScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          article.category.toUpperCase(),
+                          article.categoryName.toUpperCase(),
                           style: const TextStyle(
                             color: Color(0xFF5B2BE0),
                             fontSize: 11,
@@ -103,7 +105,7 @@ class NewsDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Title
                   Text(
                     article.title,
@@ -114,8 +116,12 @@ class NewsDetailScreen extends StatelessWidget {
                       height: 1.35,
                     ),
                   ),
-                  const Divider(height: 32, thickness: 1.2, color: Color(0xFFE0E0EE)),
-                  
+                  const Divider(
+                    height: 32,
+                    thickness: 1.2,
+                    color: Color(0xFFE0E0EE),
+                  ),
+
                   // Description
                   Text(
                     article.description,

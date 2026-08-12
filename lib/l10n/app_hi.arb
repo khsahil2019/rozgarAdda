@@ -288,7 +288,6 @@
   "no_recent_jobs": "वर्तमान में कोई हालिया नौकरियां उपलब्ध नहीं हैं।",
   "post_job": "नौकरी पोस्ट करें",
   "post_job_coming_soon": "नौकरी पोस्ट करने की सुविधा जल्द ही आ रही है!",
-
   "post_job_section_job_details": "नौकरी विवरण",
   "post_job_title_label": "नौकरी का शीर्षक *",
   "post_job_title_hint": "जैसे डिलीवरी एग्जीक्यूटिव, टेलीकॉलर",
@@ -312,7 +311,6 @@
   "post_job_shift_night": "रात की शिफ्ट",
   "post_job_shift_rotational": "रोटेशनल शिफ्ट",
   "post_job_shift_flexible": "लचीली शिफ्ट",
-
   "post_job_section_salary": "वेतन विवरण",
   "post_job_salary_model_label": "वेतन मॉडल *",
   "post_job_salary_fixed": "निश्चित मासिक वेतन सीमा",
@@ -333,7 +331,6 @@
   "post_job_estimated_incentive_label": "अनुमानित प्रोत्साहन (₹) *",
   "post_job_estimated_incentive_hint": "जैसे 12000",
   "post_job_estimated_incentive_error": "अनुमानित प्रोत्साहन दर्ज करें",
-
   "post_job_section_location": "स्थान का पता",
   "post_job_state_label": "राज्य *",
   "post_job_state_select": "राज्य चुनें",
@@ -347,7 +344,6 @@
   "post_job_pincode_label": "पिन कोड *",
   "post_job_pincode_hint": "जैसे 302017",
   "post_job_pincode_error": "6 अंकों का होना चाहिए",
-
   "post_job_section_requirements": "उम्मीदवार आवश्यकताएं",
   "post_job_education_label": "न्यूनतम शिक्षा *",
   "post_job_education_below_10": "10वीं से कम",
@@ -374,7 +370,6 @@
   "post_job_perks_hint": "जैसे PF, ESI, मुफ्त भोजन, पेट्रोल भत्ता",
   "post_job_description_label": "नौकरी विवरण",
   "post_job_description_hint": "भूमिकाओं, जिम्मेदारियों और लाभों का संक्षेप में वर्णन करें...",
-
   "post_job_section_walkin": "वॉक-इन इंटरव्यू विवरण",
   "post_job_walkin_switch": "क्या यह वॉक-इन इंटरव्यू है?",
   "post_job_walkin_date_label": "वॉक-इन तिथि *",
@@ -388,7 +383,6 @@
   "post_job_walkin_venue_label": "वॉक-इन स्थान *",
   "post_job_walkin_venue_hint": "वॉक-इन स्थान का पूरा पता दर्ज करें",
   "post_job_walkin_venue_error": "स्थान आवश्यक है",
-
   "post_job_section_contact": "संपर्क विवरण",
   "post_job_contact_instruction": "उम्मीदवार आपसे कैसे संपर्क कर सकते हैं चुनें (1 या 2 विकल्प चुनें):",
   "post_job_contact_apply_title": "सीधी अर्जी (केवल आवेदन)",
@@ -403,11 +397,9 @@
   "post_job_whatsapp_label": "WhatsApp नंबर *",
   "post_job_whatsapp_hint": "10 अंकों का WhatsApp नंबर दर्ज करें",
   "post_job_whatsapp_error": "वैध 10 अंकों का WhatsApp नंबर दर्ज करें",
-
   "post_job_submit_button": "नौकरी पोस्ट करें",
   "post_job_search_hint": "खोजें...",
   "post_job_no_items": "कोई आइटम नहीं मिला",
-
   "post_job_error_title": "त्रुटि",
   "post_job_error_category_role": "कृपया नौकरी श्रेणी और भूमिका चुनें।",
   "post_job_error_location": "कृपया राज्य, जिला और इलाका चुनें।",
@@ -420,5 +412,31 @@
   "post_job_limit_title": "सीमा पूरी",
   "post_job_limit_message": "आप अधिकतम 2 संपर्क विकल्प चुन सकते हैं।",
   "post_job_selection_title": "चयन आवश्यक",
-  "post_job_selection_message": "आपको कम से कम 1 संपर्क विकल्प चुनना होगा।"
+  "post_job_selection_message": "आपको कम से कम 1 संपर्क विकल्प चुनना होगा।",
+  "news_categories": "श्रेणियाँ",
+  "news_state": "राज्य",
+  "news_select_state": "राज्य चुनें",
+  "news_create": "समाचार बनाएँ",
+  "news_login_required": "समाचार बनाने के लिए कृपया लॉगिन करें।",
+  "news_retry": "पुनः प्रयास करें",
+  "news_filters_error": "समाचार फ़िल्टर लोड नहीं हो सके।",
+  "news_error_title": "त्रुटि",
+  "news_success_title": "सफल",
+  "news_form_title": "समाचार बनाएँ",
+  "news_form_category": "श्रेणी",
+  "news_form_state": "राज्य",
+  "news_form_headline": "शीर्षक",
+  "news_form_headline_hint": "समाचार का शीर्षक दर्ज करें",
+  "news_form_description": "विवरण",
+  "news_form_description_hint": "पूरा समाचार यहाँ लिखें...",
+  "news_form_image": "समाचार चित्र",
+  "news_form_choose_image": "चित्र चुनें",
+  "news_form_no_image": "कोई चित्र नहीं चुना गया",
+  "news_form_submit": "समाचार भेजें",
+  "news_form_error_category": "कृपया एक श्रेणी चुनें।",
+  "news_form_error_state": "कृपया एक राज्य चुनें।",
+  "news_form_error_title": "कृपया समाचार का शीर्षक दर्ज करें।",
+  "news_form_error_description": "कृपया समाचार का विवरण दर्ज करें।",
+  "news_form_error_image": "कृपया समाचार का चित्र चुनें।",
+  "news_form_success": "समाचार सफलतापूर्वक भेजा गया।"
 }

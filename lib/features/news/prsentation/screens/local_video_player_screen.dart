@@ -30,7 +30,7 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
       final uri = Uri.parse(widget.news.videoUrl);
       _videoPlayerController = VideoPlayerController.networkUrl(uri);
       await _videoPlayerController.initialize();
-      
+
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         autoPlay: true,
@@ -46,9 +46,7 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
         placeholder: Container(
           color: Colors.black,
           child: const Center(
-            child: CircularProgressIndicator(
-              color: Color(0xFFD4A017),
-            ),
+            child: CircularProgressIndicator(color: Color(0xFFD4A017)),
           ),
         ),
         errorBuilder: (context, errorMessage) {
@@ -85,7 +83,9 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = DateFormat('dd MMM yyyy').format(widget.news.createdAt);
+    final formattedDate = DateFormat(
+      'dd MMM yyyy',
+    ).format(widget.news.createdAt);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FC),
@@ -95,7 +95,11 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.maybePop(context),
-          child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: Colors.white),
+          child: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 20,
+            color: Colors.white,
+          ),
         ),
         title: const Text(
           'Video Player',
@@ -120,24 +124,34 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.error_outline_rounded, color: Colors.red, size: 42),
+                          const Icon(
+                            Icons.error_outline_rounded,
+                            color: Colors.red,
+                            size: 42,
+                          ),
                           const SizedBox(height: 8),
                           Text(
                             'Failed to load video: $_errorMessage',
-                            style: const TextStyle(color: Colors.white70, fontSize: 13),
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 13,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ],
                       ),
                     )
                   : _chewieController != null &&
-                          _chewieController!.videoPlayerController.value.isInitialized
-                      ? Chewie(controller: _chewieController!)
-                      : const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xFFD4A017),
-                          ),
-                        ),
+                        _chewieController!
+                            .videoPlayerController
+                            .value
+                            .isInitialized
+                  ? Chewie(controller: _chewieController!)
+                  : const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFD4A017),
+                      ),
+                    ),
             ),
           ),
 
@@ -198,10 +212,14 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
                       height: 1.35,
                     ),
                   ),
-                  const Divider(height: 32, thickness: 1.2, color: Color(0xFFE0E0EE)),
+                  const Divider(
+                    height: 32,
+                    thickness: 1.2,
+                    color: Color(0xFFE0E0EE),
+                  ),
 
                   // Video Description (subject)
-                  if (widget.news.subject.isNotEmpty) ...[
+                  if (widget.news.description.isNotEmpty) ...[
                     const Text(
                       'Description',
                       style: TextStyle(
@@ -212,7 +230,7 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      widget.news.subject,
+                      widget.news.description,
                       style: const TextStyle(
                         color: Color(0xFF2C3248),
                         fontSize: 14,
