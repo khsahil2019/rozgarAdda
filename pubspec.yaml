@@ -31,7 +31,7 @@ dependencies:
   cached_network_image: ^3.4.1
   geolocator: ^14.0.2
   geocoding: ^4.0.0
-  open_share_plus: ^4.0.0
+  open_share_plus: ^3.0.0
   share_plus: ^10.1.2
   path_provider: ^2.1.6
   open_filex: ^4.7.0

@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl *)",
+      "Bash(python -c ' *)",
+      "Bash(python \"C:/Users/singh/AppData/Local/Temp/claude/D--Projects-TELSO-Rozgar/1e8bdfe7-a21a-44c1-b5a9-33729859d493/scratchpad/add_news_keys.py\")",
+      "Bash(dart run *)",
+      "Bash(flutter analyze *)",
+      "Bash(flutter test *)",
+      "Bash(dart format *)",
+      "PowerShell($t = \"C:\\\\Users\\\\singh\\\\.gradle\\\\caches\\\\8.14.1\\\\transforms\"; if \\(Test-Path $t\\) { $d = Get-ChildItem $t -Directory; \"transforms dirs: $\\($d.Count\\)\"; $files = Get-ChildItem $t -Recurse -File -ErrorAction SilentlyContinue; \"files: $\\($files.Count\\)\"; \"size MB: {0:N1}\" -f \\(\\($files | Measure-Object Length -Sum\\).Sum / 1MB\\) } else { \"MISSING: $t\" })",
+      "PowerShell(foreach \\($h in @\\(\"3a6658d21881c74264cd982d941e0ea0\",\"006c524bf4039896b1ef824630f875d5\",\"100c34eb5c822a9f28dea41e5d5a1589\",\"be93f441e72fc178bf7cefd9971b17b9\",\"2ed098bc66d20a32462fc893c2b62212\"\\)\\) { $p = \"C:\\\\Users\\\\singh\\\\.gradle\\\\caches\\\\8.14.1\\\\transforms\\\\$h\"; if \\(Test-Path $p\\) { $m = Join-Path $p \"metadata.bin\"; $len = if \\(Test-Path $m\\) { \\(Get-Item $m\\).Length } else { \"NO FILE\" }; \"$h -> metadata.bin bytes: $len; children: $\\(\\(Get-ChildItem $p -Force | Measure-Object\\).Count\\)\" } else { \"$h -> dir missing\" } })",
+      "PowerShell(Get-Process *)",
+      "PowerShell($t = \"C:\\\\Users\\\\singh\\\\.gradle\\\\caches\\\\8.14.1\\\\transforms\"; $dirs = Get-ChildItem $t -Directory; $bad = @\\(\\); foreach \\($d in $dirs\\) { if \\(-not \\(Test-Path \\(Join-Path $d.FullName \"metadata.bin\"\\)\\)\\) { $bad += $d } }; \"total: $\\($dirs.Count\\)  missing metadata.bin: $\\($bad.Count\\)\"; \"--- sample of broken entries ---\"; $bad | Select-Object -First 5 | ForEach-Object { \"$\\($_.Name\\): \" + \\(\\(Get-ChildItem $_.FullName -Force | Select-Object -ExpandProperty Name\\) -join \", \"\\) })",
+      "PowerShell($p = Get-Process -Id 36152 -ErrorAction SilentlyContinue; if \\($p\\) { \"cmdline:\"; \\(Get-CimInstance Win32_Process -Filter \"ProcessId = 36152\"\\).CommandLine.Substring\\(0, [Math]::Min\\(400, \\(Get-CimInstance Win32_Process -Filter \"ProcessId = 36152\"\\).CommandLine.Length\\)\\) } else { \"process 36152 gone\" })",
+      "PowerShell($t = \"C:\\\\Users\\\\singh\\\\.gradle\\\\caches\\\\8.14.1\\\\transforms\"; $bad = Get-ChildItem $t -Directory | Where-Object { -not \\(Test-Path \\(Join-Path $_.FullName \"metadata.bin\"\\)\\) }; \"deleting $\\($bad.Count\\) incomplete transform entries\"; $failed = @\\(\\); foreach \\($d in $bad\\) { try { Remove-Item $d.FullName -Recurse -Force -ErrorAction Stop } catch { $failed += $d.Name } }; if \\($failed.Count -gt 0\\) { \"FAILED to delete: $\\($failed -join ', '\\)\" } else { \"all removed\" }; $after = Get-ChildItem $t -Directory; \"remaining dirs: $\\($after.Count\\); still missing metadata.bin: $\\(\\($after | Where-Object { -not \\(Test-Path \\(Join-Path $_.FullName 'metadata.bin'\\)\\) }\\).Count\\)\")",
+      "Bash(flutter build *)",
+      "PowerShell(Test-Path *)",
+      "Bash(flutter clean *)",
+      "PowerShell($p = \"D:\\\\Projects\\\\TELSO\\\\Rozgar\\\\android\\\\.gradle\"; if \\(Test-Path $p\\) { Remove-Item $p -Recurse -Force -ErrorAction Stop; \"removed android\\\\.gradle\" } else { \"android\\\\.gradle already gone\" }; \"build exists: $\\(Test-Path 'D:\\\\Projects\\\\TELSO\\\\Rozgar\\\\build'\\)\"; \"kotlin incremental dirs left: $\\(\\(Get-ChildItem 'D:\\\\Projects\\\\TELSO\\\\Rozgar' -Recurse -Directory -Filter 'kotlin' -ErrorAction SilentlyContinue | Measure-Object\\).Count\\)\")",
+      "Bash(echo \"EXIT CODE: $?\")",
+      "PowerShell($apk = \"D:\\\\Projects\\\\TELSO\\\\Rozgar\\\\build\\\\app\\\\outputs\\\\flutter-apk\\\\app-debug.apk\"; if \\(Test-Path $apk\\) { $i = Get-Item $apk; \"APK: $\\($i.FullName\\)\"; \"size MB: {0:N1}\" -f \\($i.Length / 1MB\\); \"written: $\\($i.LastWriteTime\\)\" } else { \"APK NOT FOUND\" })",
+      "Bash(grep -Eo 'java\\\\.[a-zA-Z.]*\\(Exception|Error\\)[^:]*: .{0,90}' 'C:\\\\Users\\\\singh\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--Projects-TELSO-Rozgar\\\\1e8bdfe7-a21a-44c1-b5a9-33729859d493\\\\scratchpad\\\\build2.log')",
+      "PowerShell($procs = Get-CimInstance Win32_Process -Filter \"Name = 'java.exe'\"; foreach \\($p in $procs\\) { $cl = $p.CommandLine; $kind = if \\($cl -match \"KotlinCompileDaemon\"\\) { \"KOTLIN DAEMON\" } elseif \\($cl -match \"GradleDaemon\"\\) { \"GRADLE DAEMON\" } else { \"other java\" }; $started = \\([Management.ManagementDateTimeConverter]::ToDateTime\\($p.CreationDate\\)\\); \"PID $\\($p.ProcessId\\) | $kind | started $started\" })",
+      "PowerShell(Set-Location \"D:\\\\Projects\\\\TELSO\\\\Rozgar\\\\android\"; & .\\\\gradlew.bat --stop 2>&1 | Select-Object -Last 3 | Out-String; $k = Get-CimInstance Win32_Process -Filter \"Name = 'java.exe'\" | Where-Object { $_.CommandLine -match \"KotlinCompileDaemon\" }; foreach \\($p in $k\\) { Stop-Process -Id $p.ProcessId -Force; \"killed Kotlin daemon PID $\\($p.ProcessId\\)\" }; if \\(-not $k\\) { \"no Kotlin daemon running\" })",
+      "Bash(rm -rf build/*/kotlin)",
+      "PowerShell($apk = \"D:\\\\Projects\\\\TELSO\\\\Rozgar\\\\build\\\\app\\\\outputs\\\\flutter-apk\\\\app-debug.apk\"; if \\(Test-Path $apk\\) { $i = Get-Item $apk; \"APK size MB: {0:N1}\" -f \\($i.Length / 1MB\\); \"written: $\\($i.LastWriteTime\\)\" } else { \"APK NOT FOUND\" })",
+      "Bash(flutter --version)"
+    ]
+  }
+}
