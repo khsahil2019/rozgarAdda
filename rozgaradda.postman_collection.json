@@ -1,0 +1,433 @@
+{
+  "info": {
+    "_postman_id": "b9dcca94-06f1-41dd-b78e-455d6a17959f",
+    "name": "rozgaradda",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "31840822",
+    "_collection_link": "https://go.postman.co/collection/31840822-b9dcca94-06f1-41dd-b78e-455d6a17959f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Candidate Login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "username",
+              "value": "candidate",
+              "type": "text",
+              "uuid": "e24c1582-7ee7-48cb-b635-a181b1ecc0fb"
+            },
+            {
+              "key": "password",
+              "value": "Deepak@123",
+              "type": "text",
+              "uuid": "8518881f-428a-4ca5-8fc8-59164e5a09e1"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{server}}/candidate/login",
+          "host": [
+            "{{server}}"
+          ],
+          "path": [
+            "candidate",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Employer Login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "email",
+              "value": "deepak@gmail.com",
+              "type": "text",
+              "uuid": "e24c1582-7ee7-48cb-b635-a181b1ecc0fb"
+            },
+            {
+              "key": "password",
+              "value": "12345678",
+              "type": "text",
+              "uuid": "8518881f-428a-4ca5-8fc8-59164e5a09e1"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{server}}/emp/login",
+          "host": [
+            "{{server}}"
+          ],
+          "path": [
+            "emp",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Candidate Dashboard",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer 385|Ah4Wpc67uN0BAT2o8pMVCijRf2eb1rfNitiClLCRa88f7f1b"
+          }
+        ],
+        "url": {
+          "raw": "{{server}}/candidate/dashboard",
+          "host": [
+            "{{server}}"
+          ],
+          "path": [
+            "candidate",
+            "dashboard"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Filter Jobs",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_secret_09sz}}"
+          },
+          {
+            "key": "Cookie",
+            "value": "XSRF-TOKEN=eyJpdiI6Ik5rcGlHYUJPeE15NEl4OEVOVWlsUkE9PSIsInZhbHVlIjoiWnpYMm5sMzlXOCtPTlNHWS9kaWN0VU8vVEw1Qkx4T09lSjBrelhaZ014SlM5Z0dxbnRrdllVYXA1VmlxbWpjcXRwdE91dzVvdEZVWk8yajlFOXNRTkFrS3lUSDZ1VERobTgrcEhtQ1oyZUc0cTFJK1FpZmhEK1puQm4rWnBROWEiLCJtYWMiOiI0NWUyMDA0YmIwN2EwMDA4M2UyNmVkMDg1NzAwYzZhOTNmYjhiY2Y3OWJjNTk1NTlmMWY2NWExZDljYmY4NzViIiwidGFnIjoiIn0%3D; rozgaradda-session=eyJpdiI6Ilh3U0FFUlI0WHZIZmpiTW1YQy9oRFE9PSIsInZhbHVlIjoiUEUwL0Fpc2dxTm1TWnM5c1VqYlpCVERCbHRJV1ovQ3d1MitsZFdIb0MyTzhuMitQK3czaXJqRW5kczQrZ3RPNVpwSVFUYURyU0FySXNkMjRaeDZ4YzlTU0JHdThXMDZLOFhhT25qOGpCQzluT2xjYUY3TE5FaHJYb0NENHZYL1MiLCJtYWMiOiI0MGQxYWE1YTUxYzlhZTRjNjczNzU1ZDAxNjI4NjM4ZDVkZWVlMjZmZTFmOGZhYmFjZjQyY2Q0NGZmNTBmNGI4IiwidGFnIjoiIn0%3D"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"category_id\": 95,\n    \"role_id\": 347,\n    \"state_id\": \"\", //2\n    \"from_date\": \"2026-02-03\",\n    \"to_date\": \"2026-08-09\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{server}}/filter-jobs",
+          "host": [
+            "{{server}}"
+          ],
+          "path": [
+            "filter-jobs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "News Categories",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{server}}/news-categories",
+          "host": [
+            "{{server}}"
+          ],
+          "path": [
+            "news-categories"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Video News",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{server}}/video-news?category_id=7&state_id=3&page=1&per_page=2",
+          "host": [
+            "{{server}}"
+          ],
+          "path": [
+            "video-news"
+          ],
+          "query": [
+            {
+              "key": "category_id",
+              "value": "7"
+            },
+            {
+              "key": "state_id",
+              "value": "3"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "per_page",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "YouTube News",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{server}}/youtube-news?category_id=7&state_id=3&page=1&per_page=10",
+          "host": [
+            "{{server}}"
+          ],
+          "path": [
+            "youtube-news"
+          ],
+          "query": [
+            {
+              "key": "category_id",
+              "value": "7"
+            },
+            {
+              "key": "state_id",
+              "value": "3"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "per_page",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Text News",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{server}}/text-news?category_id=7&state_id=28&page=1&per_page=10",
+          "host": [
+            "{{server}}"
+          ],
+          "path": [
+            "text-news"
+          ],
+          "query": [
+            {
+              "key": "category_id",
+              "value": "7"
+            },
+            {
+              "key": "state_id",
+              "value": "28"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "per_page",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Store News",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer 427|ZQCGJeWqzN6HiYIsqbvgXEdbdbYNo2KzYSbziRiB55513cdf"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "type": "text",
+              "key": "category_id",
+              "value": "7"
+            },
+            {
+              "type": "text",
+              "key": "state_id",
+              "value": "4"
+            },
+            {
+              "type": "text",
+              "key": "title",
+              "value": "This is test news title shs"
+            },
+            {
+              "type": "text",
+              "key": "description",
+              "value": "This is the news description."
+            },
+            {
+              "type": "file",
+              "key": "image",
+              "src": "/C:/Users/shaban ali/Desktop/solar yojna.jpg"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{server}}/store-news",
+          "host": [
+            "{{server}}"
+          ],
+          "path": [
+            "store-news"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Store Video",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer 427|ZQCGJeWqzN6HiYIsqbvgXEdbdbYNo2KzYSbziRiB55513cdf"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "type": "text",
+              "key": "category_id",
+              "value": "7"
+            },
+            {
+              "type": "text",
+              "key": "state_id",
+              "value": "3"
+            },
+            {
+              "type": "text",
+              "key": "title",
+              "value": "Latest News Video shah"
+            },
+            {
+              "type": "text",
+              "key": "subject",
+              "value": "Today Latest News"
+            },
+            {
+              "type": "file",
+              "key": "video",
+              "src": "/C:/Users/shaban ali/Downloads/file_example_MP4_480_1_5MG.mp4"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{server}}/store-video",
+          "host": [
+            "{{server}}"
+          ],
+          "path": [
+            "store-video"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "value": ""
+    },
+    {
+      "key": "auth_secret_09sz",
+      "secret": true
+    },
+    {
+      "key": "server",
+      "value": ""
+    }
+  ]
+}
