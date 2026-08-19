@@ -97,10 +97,10 @@ class ProductCategoryListScreen extends GetView<BuyProductController> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: controller.categories.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    mainAxisSpacing: 16,
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
-                    childAspectRatio: 0.72,
+                    childAspectRatio: 0.85,
                   ),
                   itemBuilder: (context, index) {
                     final category = controller.categories[index];
@@ -118,6 +118,9 @@ class ProductCategoryListScreen extends GetView<BuyProductController> {
                     );
                   },
                 ),
+            
+            
+            
               ],
             ),
           ),
@@ -294,62 +297,80 @@ class _CategoryGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Column(
-        children: [
-          Container(
-            height: 64,
-            width: 64,
-            padding: const EdgeInsets.all(0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x06000000),
-                  blurRadius: 8,
-                  offset: Offset(0, 3),
-                ),
-              ],
-              border: Border.all(color: const Color(0xFFECEEF5), width: 1),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: category.imageUrl.isNotEmpty
-                  ? Image.network(
-                      category.imageUrl,
-                      fit: BoxFit.fill,
-                      errorBuilder: (_, __, ___) => const Icon(
-                        Icons.category_rounded,
-                        color: Color(0xFF1400FF),
-                        size: 28,
-                      ),
-                    )
-                  : const Icon(
-                      Icons.category_rounded,
-                      color: Color(0xFF1400FF),
-                      size: 28,
-                    ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: Text(
-              category.name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Color(0xFF1A1A2E),
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                height: 1.1,
-              ),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
           ),
         ],
+        border: Border.all(color: const Color(0xFFECEEF5), width: 1),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 🖼️ Top Square Image Area (Fills upper card)
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                  child: Container(
+                    color: const Color(0xFF1400FF).withAlpha(12),
+                    child: category.imageUrl.isNotEmpty
+                        ? Image.network(
+                            category.imageUrl,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Center(
+                              child: Icon(
+                                Icons.category_rounded,
+                                color: Color(0xFF1400FF),
+                                size: 40,
+                              ),
+                            ),
+                          )
+                        : const Center(
+                            child: Icon(
+                              Icons.category_rounded,
+                              color: Color(0xFF1400FF),
+                              size: 40,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+
+              // 🤍 Bottom White Space for Category Name
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
+                ),
+                child: Text(
+                  category.name,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF1A1A2E),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

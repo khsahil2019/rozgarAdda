@@ -94,8 +94,9 @@ class NewsScreen extends GetView<NewsController> {
   Widget _buildAppBar(BuildContext context, AppLocalizations l10n) {
     return Container(
       color: _NC.navy,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (showBackButton) ...[
             GestureDetector(
@@ -152,11 +153,6 @@ class NewsScreen extends GetView<NewsController> {
                 }),
               ],
             ),
-          ),
-          IconButton(
-            onPressed: () => _showStatePicker(context, controller, l10n),
-            icon: const Icon(Icons.place_outlined, color: Colors.white),
-            tooltip: l10n.text('news_select_state'),
           ),
         ],
       ),
@@ -776,26 +772,71 @@ class _NewsCategoryDrawer extends StatelessWidget {
             Container(
               width: double.infinity,
               color: _NC.navy,
-              padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    l10n.text('news_title'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.text('news_title'),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          l10n.text('news_categories'),
+                          style: const TextStyle(
+                            color: Color(0xFFB9BFD6),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n.text('news_categories'),
-                    style: const TextStyle(
-                      color: Color(0xFFB9BFD6),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.4,
+                  // 📍 State Selector Chip at Top-Right of Drawer
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showStatePicker(
+                        hostContext,
+                        controller,
+                        AppLocalizations.of(hostContext),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(30),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white30, width: 1),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.place_outlined, color: Colors.white, size: 16),
+                          const SizedBox(width: 4),
+                          Obx(() {
+                            final state = controller.selectedState;
+                            return Text(
+                              state?.name ?? l10n.text('news_select_state'),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
                     ),
                   ),
                 ],

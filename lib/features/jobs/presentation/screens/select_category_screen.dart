@@ -154,7 +154,7 @@ class _SelectCategoryScreenState extends State<SelectCategoryScreen> {
                     crossAxisCount: 2,
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
-                    childAspectRatio: 0.95,
+                    childAspectRatio: 0.85,
                   ),
                   itemCount: filtered.length,
                   itemBuilder: (context, index) {

@@ -96,10 +96,10 @@ class _ProductSubCategorySelectionScreenState
                     itemCount: controller.subCategories.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 16,
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
                           crossAxisSpacing: 12,
-                          childAspectRatio: 0.78,
+                          childAspectRatio: 0.85,
                         ),
                     itemBuilder: (context, index) {
                       final subCategory = controller.subCategories[index];
@@ -246,62 +246,80 @@ class _SubCategoryGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Column(
-        children: [
-          Container(
-            height: 72,
-            width: 72,
-            // padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x06000000),
-                  blurRadius: 8,
-                  offset: Offset(0, 3),
-                ),
-              ],
-              border: Border.all(color: const Color(0xFFECEEF5), width: 1),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: subCategory.imageUrl.isNotEmpty
-                  ? Image.network(
-                      subCategory.imageUrl,
-                      fit: BoxFit.fill,
-                      errorBuilder: (_, __, ___) => const Icon(
-                        Icons.subdirectory_arrow_right_rounded,
-                        color: Color(0xFF1400FF),
-                        size: 28,
-                      ),
-                    )
-                  : const Icon(
-                      Icons.subdirectory_arrow_right_rounded,
-                      color: Color(0xFF1400FF),
-                      size: 28,
-                    ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: Text(
-              subCategory.name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Color(0xFF1A1A2E),
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                height: 1.1,
-              ),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
           ),
         ],
+        border: Border.all(color: const Color(0xFFECEEF5), width: 1),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 🖼️ Top Square Image Area
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                  child: Container(
+                    color: const Color(0xFF1400FF).withAlpha(12),
+                    child: subCategory.imageUrl.isNotEmpty
+                        ? Image.network(
+                            subCategory.imageUrl,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Center(
+                              child: Icon(
+                                Icons.subdirectory_arrow_right_rounded,
+                                color: Color(0xFF1400FF),
+                                size: 36,
+                              ),
+                            ),
+                          )
+                        : const Center(
+                            child: Icon(
+                              Icons.subdirectory_arrow_right_rounded,
+                              color: Color(0xFF1400FF),
+                              size: 36,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+
+              // 🤍 Bottom White Space for SubCategory Name
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
+                ),
+                child: Text(
+                  subCategory.name,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF1A1A2E),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
