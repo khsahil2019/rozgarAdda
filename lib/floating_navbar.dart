@@ -15,10 +15,6 @@ class FloatingNavbarScreen extends StatefulWidget {
 class _FloatingNavbarScreenState extends State<FloatingNavbarScreen> {
   int _selectedIndex = 0;
 
-  final Color _selectedColor = const Color(0xFF1E38FC); // Deep vibrant blue
-  final Color _unselectedColor = const Color(0xFF9EABC0); // Greyish-blue
-
-  // Define the screens for each tab
   final List<Widget> _screens = [
     const HomeScreen(),
     const NewsScreen(showBackButton: false),
@@ -28,40 +24,55 @@ class _FloatingNavbarScreenState extends State<FloatingNavbarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F5),
-      body: IndexedStack(index: _selectedIndex, children: _screens),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, -2),
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _screens,
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+          height: 66,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+              color: const Color(0xFFE2E8F0).withValues(alpha: 0.8),
+              width: 1.2,
             ),
-          ],
-        ),
-        child: SafeArea(
-          child: SizedBox(
-            height: 70,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(0, Icons.home_rounded, 'HOME'),
-                _buildNavItem(1, Icons.newspaper_rounded, 'NEWS'),
-                _buildNavItem(2, Icons.person_rounded, 'PROFILE'),
-              ],
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF0F172A).withValues(alpha: 0.1),
+                blurRadius: 24,
+                spreadRadius: 0,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(0, Icons.home_rounded, Icons.home_outlined, 'HOME', 'Home'),
+              _buildNavItem(1, Icons.newspaper_rounded, Icons.newspaper_outlined, 'NEWS', 'News'),
+              _buildNavItem(2, Icons.person_rounded, Icons.person_outline_rounded, 'PROFILE', 'Profile'),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label) {
+  Widget _buildNavItem(
+    int index,
+    IconData activeIcon,
+    IconData inactiveIcon,
+    String translationKey,
+    String defaultLabel,
+  ) {
     final l10n = AppLocalizations.of(context);
     String localizedLabel;
-    switch (label) {
+    switch (translationKey) {
       case 'HOME':
         localizedLabel = l10n.text('nav_home');
         break;
@@ -72,11 +83,17 @@ class _FloatingNavbarScreenState extends State<FloatingNavbarScreen> {
         localizedLabel = l10n.text('nav_profile');
         break;
       default:
-        localizedLabel = label;
+        localizedLabel = defaultLabel;
+    }
+
+    if (localizedLabel.isEmpty || localizedLabel.contains('_')) {
+      localizedLabel = defaultLabel;
     }
 
     final isSelected = _selectedIndex == index;
-    final color = isSelected ? _selectedColor : _unselectedColor;
+    const activeColor = Color(0xFF4F46E5);
+    const activeBgColor = Color(0xFFEEF2FF);
+    const inactiveColor = Color(0xFF94A3B8);
 
     return GestureDetector(
       onTap: () {
@@ -85,22 +102,43 @@ class _FloatingNavbarScreenState extends State<FloatingNavbarScreen> {
         });
       },
       behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 26),
-          const SizedBox(height: 5),
-          Text(
-            localizedLabel,
-            style: TextStyle(
-              color: color,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.8,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOutCubic,
+        padding: EdgeInsets.symmetric(
+          horizontal: isSelected ? 16 : 12,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? activeBgColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: isSelected
+              ? Border.all(color: activeColor.withValues(alpha: 0.2), width: 1)
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? activeIcon : inactiveIcon,
+              color: isSelected ? activeColor : inactiveColor,
+              size: isSelected ? 24 : 22,
             ),
-          ),
-        ],
+            if (isSelected) ...[
+              const SizedBox(width: 8),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 200),
+                style: const TextStyle(
+                  color: activeColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.2,
+                ),
+                child: Text(localizedLabel),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

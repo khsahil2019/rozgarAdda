@@ -13,13 +13,16 @@ class CreateNewsController extends GetxController {
 
   final titleCtrl = TextEditingController();
   final descriptionCtrl = TextEditingController();
+  final subjectCtrl = TextEditingController();
 
   final RxList<NewsCategory> categories = <NewsCategory>[].obs;
   final RxList<NewsState> states = <NewsState>[].obs;
   final RxnInt selectedCategoryId = RxnInt();
   final RxnInt selectedStateId = RxnInt();
   final RxString imagePath = ''.obs;
+  final RxString videoPath = ''.obs;
 
+  final RxBool isPostTypeVideo = false.obs;
   final RxBool isLoadingOptions = false.obs;
   final RxBool isSubmitting = false.obs;
   final RxString errorMessage = ''.obs;
@@ -34,10 +37,10 @@ class CreateNewsController extends GetxController {
   void onClose() {
     titleCtrl.dispose();
     descriptionCtrl.dispose();
+    subjectCtrl.dispose();
     super.onClose();
   }
 
-  /// Reuses the feed's already-loaded filters when available, otherwise fetches.
   Future<void> loadOptions() async {
     isLoadingOptions.value = true;
     errorMessage.value = '';
@@ -88,42 +91,87 @@ class CreateNewsController extends GetxController {
     }
   }
 
+  Future<void> pickVideo(ImageSource source) async {
+    try {
+      final picked = await ImagePicker().pickVideo(
+        source: source,
+        maxDuration: const Duration(minutes: 5),
+      );
+      if (picked != null) videoPath.value = picked.path;
+    } catch (_) {
+      Get.snackbar('Error', 'Failed to pick video file');
+    }
+  }
+
   void clearImage() => imagePath.value = '';
+  void clearVideo() => videoPath.value = '';
 
   String? validate() {
     if (selectedCategoryId.value == null) return 'news_form_error_category';
     if (selectedStateId.value == null) return 'news_form_error_state';
     if (titleCtrl.text.trim().isEmpty) return 'news_form_error_title';
-    if (descriptionCtrl.text.trim().isEmpty) {
-      return 'news_form_error_description';
+
+    if (isPostTypeVideo.value) {
+      if (subjectCtrl.text.trim().isEmpty && descriptionCtrl.text.trim().isEmpty) {
+        return 'Please enter video subject or description';
+      }
+      if (videoPath.value.isEmpty) return 'Please select a video file to upload';
+    } else {
+      if (descriptionCtrl.text.trim().isEmpty) return 'news_form_error_description';
+      if (imagePath.value.isEmpty) return 'news_form_error_image';
     }
-    if (imagePath.value.isEmpty) return 'news_form_error_image';
     return null;
   }
 
   Future<String?> submit() async {
     isSubmitting.value = true;
-    final result = await repository.createNews(
-      categoryId: selectedCategoryId.value!,
-      stateId: selectedStateId.value!,
-      title: titleCtrl.text.trim(),
-      description: descriptionCtrl.text.trim(),
-      imagePath: imagePath.value.isEmpty ? null : imagePath.value,
-    );
-    isSubmitting.value = false;
 
-    return result.fold((failure) => failure.message, (_) {
-      _reset();
-      if (Get.isRegistered<NewsController>()) {
-        Get.find<NewsController>().fetchNews();
-      }
-      return null;
-    });
+    if (isPostTypeVideo.value) {
+      final subjectText = subjectCtrl.text.trim().isNotEmpty
+          ? subjectCtrl.text.trim()
+          : descriptionCtrl.text.trim();
+
+      final result = await repository.createVideoNews(
+        categoryId: selectedCategoryId.value!,
+        stateId: selectedStateId.value!,
+        title: titleCtrl.text.trim(),
+        subject: subjectText,
+        videoPath: videoPath.value,
+      );
+      isSubmitting.value = false;
+
+      return result.fold((failure) => failure.message, (_) {
+        _reset();
+        if (Get.isRegistered<NewsController>()) {
+          Get.find<NewsController>().fetchNews();
+        }
+        return null;
+      });
+    } else {
+      final result = await repository.createNews(
+        categoryId: selectedCategoryId.value!,
+        stateId: selectedStateId.value!,
+        title: titleCtrl.text.trim(),
+        description: descriptionCtrl.text.trim(),
+        imagePath: imagePath.value.isEmpty ? null : imagePath.value,
+      );
+      isSubmitting.value = false;
+
+      return result.fold((failure) => failure.message, (_) {
+        _reset();
+        if (Get.isRegistered<NewsController>()) {
+          Get.find<NewsController>().fetchNews();
+        }
+        return null;
+      });
+    }
   }
 
   void _reset() {
     titleCtrl.clear();
     descriptionCtrl.clear();
+    subjectCtrl.clear();
     imagePath.value = '';
+    videoPath.value = '';
   }
 }

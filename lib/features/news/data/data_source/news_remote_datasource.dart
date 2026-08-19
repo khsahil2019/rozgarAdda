@@ -37,6 +37,13 @@ abstract class NewsRemoteDataSource {
     required String description,
     String? imagePath,
   });
+  Future<String> createVideoNews({
+    required int categoryId,
+    required int stateId,
+    required String title,
+    required String subject,
+    required String videoPath,
+  });
 }
 
 class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
@@ -181,6 +188,39 @@ class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
     } catch (e) {
       if (e is Failure) rethrow;
       throw Failure('Failed to submit news');
+    }
+  }
+
+  @override
+  Future<String> createVideoNews({
+    required int categoryId,
+    required int stateId,
+    required String title,
+    required String subject,
+    required String videoPath,
+  }) async {
+    try {
+      final res = await ApiService.uploadFiles(
+        method: 'POST',
+        url: ApiRoutes.storeVideo,
+        fields: {
+          'category_id': categoryId.toString(),
+          'state_id': stateId.toString(),
+          'title': title,
+          'subject': subject,
+        },
+        files: {
+          if (videoPath.isNotEmpty) 'video': videoPath,
+        },
+      );
+      final statusCode = res['statusCode'] as int? ?? 0;
+      if ((statusCode == 200 || statusCode == 201) && res['status'] != false) {
+        return res['message']?.toString() ?? 'Video news submitted successfully.';
+      }
+      throw Failure(res['message']?.toString() ?? 'Failed to submit video news');
+    } catch (e) {
+      if (e is Failure) rethrow;
+      throw Failure('Failed to submit video news');
     }
   }
 }

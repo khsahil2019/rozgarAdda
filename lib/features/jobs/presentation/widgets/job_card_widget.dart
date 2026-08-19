@@ -275,9 +275,10 @@ class JobCardWidget extends StatelessWidget {
             (job.contactPhone != null && job.contactPhone!.isNotEmpty));
     final bool showApply = job.applyOnly || (!showCall && !showChat);
 
-    return Container(
-      color: Colors.white,
-      margin: const EdgeInsets.only(bottom: 8),
+    return RepaintBoundary(
+      child: Container(
+        color: Colors.white,
+        margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -605,6 +606,7 @@ class JobCardWidget extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

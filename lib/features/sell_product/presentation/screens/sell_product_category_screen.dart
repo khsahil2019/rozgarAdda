@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../localization/app_localizations.dart';
+import '../bindings/sell_product_binding.dart';
 import '../controller/sell_product_controller.dart';
 import 'sell_product_subcategory_screen.dart';
 
@@ -17,7 +18,18 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
   const SellProductCategoryScreen({super.key});
 
   @override
+  SellProductController get controller {
+    if (!Get.isRegistered<SellProductController>()) {
+      SellProductBinding().dependencies();
+    }
+    return Get.find<SellProductController>();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<SellProductController>()) {
+      SellProductBinding().dependencies();
+    }
     // Refresh categories when this screen is opened
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.fetchCategories();

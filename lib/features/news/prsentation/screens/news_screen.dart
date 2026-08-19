@@ -26,7 +26,18 @@ class NewsScreen extends GetView<NewsController> {
   const NewsScreen({super.key, this.showBackButton = true});
 
   @override
+  NewsController get controller {
+    if (!Get.isRegistered<NewsController>()) {
+      NewsBinding().dependencies();
+    }
+    return Get.find<NewsController>();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<NewsController>()) {
+      NewsBinding().dependencies();
+    }
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: _NC.bg,

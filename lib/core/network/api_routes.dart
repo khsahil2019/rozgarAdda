@@ -40,6 +40,7 @@ class ApiRoutes {
   static String get videoNews => _buildUrl('video-news');
   static String get newsCategories => _buildUrl('news-categories');
   static String get storeNews => _buildUrl('store-news');
+  static String get storeVideo => _buildUrl('store-video');
 
   // States (id space used by the news APIs)
   static String get states => _buildUrl('states');

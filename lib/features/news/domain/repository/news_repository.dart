@@ -32,4 +32,12 @@ abstract class NewsRepository {
     required String description,
     String? imagePath,
   });
+
+  Future<Either<Failure, String>> createVideoNews({
+    required int categoryId,
+    required int stateId,
+    required String title,
+    required String subject,
+    required String videoPath,
+  });
 }

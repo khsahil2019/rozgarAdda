@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../bindings/chat_binding.dart';
 import '../controller/chat_controller.dart';
 import 'chat_room_screen.dart';
 import '../../domain/entities/chat_entities.dart';
@@ -8,7 +9,18 @@ class ChatUserListScreen extends GetView<ChatController> {
   const ChatUserListScreen({super.key});
 
   @override
+  ChatController get controller {
+    if (!Get.isRegistered<ChatController>()) {
+      ChatBinding().dependencies();
+    }
+    return Get.find<ChatController>();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<ChatController>()) {
+      ChatBinding().dependencies();
+    }
     // Refresh chats whenever we load this screen
     controller.fetchEnquiries();
 

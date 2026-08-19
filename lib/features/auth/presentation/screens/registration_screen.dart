@@ -95,17 +95,27 @@ class RegistrationFormScreen extends GetView<RegisterController> {
     final hPad = size.width * 0.05;
 
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: const Color(0xFFF8FAFC),
       // ── AppBar ──────────────────────────────
       appBar: AppBar(
-        backgroundColor: colors.brandColor,
+        backgroundColor: const Color(0xFF4F46E5),
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: Padding(
-          padding: const EdgeInsets.only(left: 8),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-            onPressed: () => Navigator.of(context).pop(),
+          padding: const EdgeInsets.only(left: 12),
+          child: Center(
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
+              ),
+            ),
           ),
         ),
         centerTitle: true,
@@ -117,28 +127,32 @@ class RegistrationFormScreen extends GetView<RegisterController> {
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 17,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
                 height: 1.2,
               ),
             ),
             Text(
               l10n.text('registration_join_tagline'),
               style: const TextStyle(
-                color: Color(0xCCFFFFFF),
+                color: Color(0xFFE0E7FF),
                 fontSize: 11,
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
       ),
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
             // ── Progress bar row ───────────────
             Container(
-              color: colors.surface,
-              padding: EdgeInsets.fromLTRB(hPad, 14, hPad, 14),
+              padding: EdgeInsets.fromLTRB(hPad, 16, hPad, 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
+              ),
               child: Column(
                 children: [
                   Row(
@@ -146,41 +160,47 @@ class RegistrationFormScreen extends GetView<RegisterController> {
                     children: [
                       Text(
                         l10n.text('registration_progress'),
-                        style: TextStyle(
-                          color: colors.textPrimary,
+                        style: const TextStyle(
+                          color: Color(0xFF0F172A),
                           fontSize: 14,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
-                          vertical: 3,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEEF2FF),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           l10n.text('registration_step'),
-                          style: TextStyle(
-                            color: colors.brandColor,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                          style: const TextStyle(
+                            color: Color(0xFF4F46E5),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Container(
-                      height: 6,
+                      height: 8,
                       width: double.infinity,
-                      color: colors.divider,
+                      color: const Color(0xFFE2E8F0),
                       child: FractionallySizedBox(
                         alignment: Alignment.centerLeft,
                         widthFactor: 0.33,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: colors.warning,
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
+                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),

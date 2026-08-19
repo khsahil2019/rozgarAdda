@@ -37,6 +37,12 @@ class NetworkImageService extends StatelessWidget {
       width: width,
       height: height,
       fit: fit,
+      memCacheWidth: (width != null && width! > 0 && width! < 1000)
+          ? (width! * 2).toInt()
+          : 400,
+      memCacheHeight: (height != null && height! > 0 && height! < 1000)
+          ? (height! * 2).toInt()
+          : 400,
       placeholder: (context, url) => placeholder ?? _buildDefaultPlaceholder(),
       errorWidget: (context, url, error) =>
           errorWidget ?? _buildDefaultErrorWidget(),

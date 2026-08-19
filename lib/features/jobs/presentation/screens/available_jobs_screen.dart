@@ -16,6 +16,7 @@ import '../../domain/entities/job_role_entity.dart';
 import '../controller/jobs_controller.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import '../bindings/jobs_binding.dart';
 
 enum _FilterSection {
   category,
@@ -189,6 +190,9 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
   @override
   void initState() {
     super.initState();
+    if (!Get.isRegistered<JobsController>()) {
+      JobsBinding().dependencies();
+    }
     controller = Get.find<JobsController>();
 
     // Ensure selectedRole is set
@@ -440,6 +444,9 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                   children: [
                     Expanded(
                       child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
                         padding: const EdgeInsets.fromLTRB(0, 16, 0, 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -503,23 +510,36 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
 
   Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
     return Container(
-      color: _C.cardBg,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: Color(0xFFF1F5F9), width: 1),
+        ),
+      ),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Get.back(),
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: _C.scaffoldBg,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: _C.darkText,
-                size: 20,
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => Navigator.maybePop(context),
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFFE2E8F0),
+                    width: 1,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Color(0xFF0F172A),
+                  size: 18,
+                ),
               ),
             ),
           ),
@@ -532,55 +552,58 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l10n.text('jobs_available_title'),
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: _C.darkText,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
                     roleName,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: _C.primaryBlue,
-                      fontWeight: FontWeight.w600,
-                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0F172A),
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    l10n.text('jobs_available_title').isNotEmpty
+                        ? l10n.text('jobs_available_title')
+                        : 'Explore Active Job Openings',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF4F46E5),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               );
             }),
           ),
-
-          // const SizedBox(width: 10),
-          // ElevatedButton(
-          //   onPressed: () {
-          //     Get.snackbar(
-          //       'Post a Job',
-          //       'Post a job functionality coming soon!',
-          //       snackPosition: SnackPosition.BOTTOM,
-          //     );
-          //   },
-          //   style: ElevatedButton.styleFrom(
-          //     backgroundColor: _C.primaryBlue,
-          //     foregroundColor: Colors.white,
-          //     elevation: 0,
-          //     minimumSize: const Size(0, 32),
-          //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          //     shape: RoundedRectangleBorder(
-          //       borderRadius: BorderRadius.circular(20),
-          //     ),
-          //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          //   ),
-          //   child: const Text(
-          //     '+ Post a job',
-          //     style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
-          //   ),
-          // ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEEF2FF),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFC7D2FE), width: 1),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.verified_rounded,
+                  color: Color(0xFF4F46E5),
+                  size: 12,
+                ),
+                SizedBox(width: 4),
+                Text(
+                  'Verified',
+                  style: TextStyle(
+                    color: Color(0xFF4F46E5),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

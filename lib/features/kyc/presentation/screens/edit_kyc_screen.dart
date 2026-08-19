@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../dashboard_screen.dart';
 import '../../../../localization/app_localizations.dart';
+import '../bindings/kyc_binding.dart';
 import '../controller/kyc_controller.dart';
 import '../controller/uploaded_kyc_file.dart';
 
@@ -37,6 +38,14 @@ enum UploadType { image, file }
 // ─────────────────────────────────────────────
 class EditKycScreen extends GetView<KycController> {
   const EditKycScreen({super.key});
+
+  @override
+  KycController get controller {
+    if (!Get.isRegistered<KycController>()) {
+      KycBinding().dependencies();
+    }
+    return Get.find<KycController>();
+  }
 
   void _showSnackbar(BuildContext context, String message, {bool isSuccess = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -370,6 +379,9 @@ class EditKycScreen extends GetView<KycController> {
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<KycController>()) {
+      KycBinding().dependencies();
+    }
     final size = MediaQuery.of(context).size;
     final hPad = size.width * 0.05;
 

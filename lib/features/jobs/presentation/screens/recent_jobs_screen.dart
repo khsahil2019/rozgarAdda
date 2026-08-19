@@ -12,6 +12,7 @@ import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
 import 'package:rojgar/features/jobs/domain/entities/job_category.dart';
 import 'package:rojgar/features/jobs/domain/repository/jobs_repository.dart';
 import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dart';
+import 'package:rojgar/features/jobs/presentation/bindings/jobs_binding.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/features/jobs/presentation/widgets/job_card_widget.dart';
 
@@ -142,6 +143,9 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   @override
   void initState() {
     super.initState();
+    if (!Get.isRegistered<JobsController>()) {
+      JobsBinding().dependencies();
+    }
     _jobsController = Get.find<JobsController>();
     _pageController = PageController(viewportFraction: 0.85);
     _pageController.addListener(() {

@@ -1,12 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controller/buy_product_controller.dart';
+import '../../../../localization/app_localizations.dart';
 import '../../domain/entities/buy_product_entities.dart';
-import 'product_list_screen.dart';
+import '../bindings/buy_product_binding.dart';
+import '../controller/buy_product_controller.dart';
 import 'product_subcategory_selection_screen.dart';
+
+class _C {
+  static const Color primaryBlue = Color(0xFF1400FF);
+  static const Color yellow = Color(0xFFFFCC00);
+  static const Color darkText = Color(0xFF1A1A2E);
+  static const Color greyText = Color(0xFF8A8FA3);
+  static const Color scaffoldBg = Color(0xFFF5F6FA);
+  static const Color cardBg = Color(0xFFFFFFFF);
+}
 
 class ProductCategoryListScreen extends GetView<BuyProductController> {
   const ProductCategoryListScreen({super.key});
+
+  @override
+  BuyProductController get controller {
+    if (!Get.isRegistered<BuyProductController>()) {
+      BuyProductBinding().dependencies();
+    }
+    return Get.find<BuyProductController>();
+  }
 
   static const Color _primary = Color(0xFF1400FF);
   static const Color _scaffoldBg = Color(0xFFF5F6FA);
@@ -15,6 +33,9 @@ class ProductCategoryListScreen extends GetView<BuyProductController> {
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<BuyProductController>()) {
+      BuyProductBinding().dependencies();
+    }
     return Scaffold(
       backgroundColor: _scaffoldBg,
       appBar: AppBar(
@@ -297,6 +318,9 @@ class _CategoryGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<BuyProductController>()) {
+      BuyProductBinding().dependencies();
+    }
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,

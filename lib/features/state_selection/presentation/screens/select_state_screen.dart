@@ -378,31 +378,34 @@ Future<void> _showLanguageDialogAndContinue(
     builder: (ctx) {
       return AlertDialog(
         title: Text(l10n.text('language_dialog_title')),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.text('language_dialog_message')),
-            const SizedBox(height: 12),
-            StatefulBuilder(
-              builder: (context, setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: AppLocalizations.languages.map((lang) {
-                    return RadioListTile<String>(
-                      title: Text('${lang.nativeName} (${lang.englishName})'),
-                      value: lang.code,
-                      groupValue: selectedCode,
-                      onChanged: (v) {
-                        if (v == null) return;
-                        setState(() => selectedCode = v);
-                      },
-                    );
-                  }).toList(),
-                );
-              },
-            ),
-          ],
+        content: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.text('language_dialog_message')),
+              const SizedBox(height: 12),
+              StatefulBuilder(
+                builder: (context, setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: AppLocalizations.languages.map((lang) {
+                      return RadioListTile<String>(
+                        title: Text('${lang.nativeName} (${lang.englishName})'),
+                        value: lang.code,
+                        groupValue: selectedCode,
+                        onChanged: (v) {
+                          if (v == null) return;
+                          setState(() => selectedCode = v);
+                        },
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(

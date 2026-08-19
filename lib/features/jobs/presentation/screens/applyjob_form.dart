@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/localization/app_localizations.dart';
+import '../bindings/jobs_binding.dart';
 import '../controller/job_application_controller.dart';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────
@@ -38,7 +39,7 @@ class JobApplicationApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true),
-      home: JobApplicationScreen(),
+      home: const JobApplicationScreen(),
     );
   }
 }
@@ -47,17 +48,26 @@ class JobApplicationScreen extends GetView<JobApplicationController> {
   final int jobId;
   final String jobTitle;
 
-  JobApplicationScreen({
+  const JobApplicationScreen({
     super.key,
     this.jobId = 1,
     this.jobTitle = 'Senior Product Designer',
-  }) {
-    // Clear fields upon entering the screen to ensure a fresh form
-    Get.find<JobApplicationController>().clearFields();
+  });
+
+  @override
+  JobApplicationController get controller {
+    if (!Get.isRegistered<JobApplicationController>()) {
+      JobsBinding().dependencies();
+    }
+    return Get.find<JobApplicationController>();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<JobApplicationController>()) {
+      JobsBinding().dependencies();
+    }
+    controller.clearFields();
     final topPad = MediaQuery.of(context).padding.top;
     final bottomPad = MediaQuery.of(context).padding.bottom;
     final l10n = AppLocalizations.of(context);

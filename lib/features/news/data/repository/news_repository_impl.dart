@@ -89,6 +89,25 @@ class NewsRepositoryImpl implements NewsRepository {
     });
   }
 
+  @override
+  Future<Either<Failure, String>> createVideoNews({
+    required int categoryId,
+    required int stateId,
+    required String title,
+    required String subject,
+    required String videoPath,
+  }) {
+    return _guard(() {
+      return remoteDataSource.createVideoNews(
+        categoryId: categoryId,
+        stateId: stateId,
+        title: title,
+        subject: subject,
+        videoPath: videoPath,
+      );
+    });
+  }
+
   Future<Either<Failure, T>> _guard<T>(Future<T> Function() action) async {
     try {
       return Right(await action());

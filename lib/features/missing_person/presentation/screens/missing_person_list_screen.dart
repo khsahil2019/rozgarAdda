@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import '../../domain/entities/missing_person.dart';
+import '../bindings/missing_person_binding.dart';
 import '../controller/missing_person_controller.dart';
 import 'missing_person_detail_screen.dart';
 import 'post_missing_person_screen.dart';
@@ -19,7 +20,18 @@ class MissingPersonListScreen extends GetView<MissingPersonController> {
   const MissingPersonListScreen({super.key});
 
   @override
+  MissingPersonController get controller {
+    if (!Get.isRegistered<MissingPersonController>()) {
+      MissingPersonBinding().dependencies();
+    }
+    return Get.find<MissingPersonController>();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<MissingPersonController>()) {
+      MissingPersonBinding().dependencies();
+    }
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
