@@ -599,29 +599,22 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
         // Vertical List Section
         _filteredJobs.isEmpty
             ? SliverToBoxAdapter(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.search_off_rounded,
-                          size: 54,
-                          color: _Colors.grey.withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'No jobs match your search',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: _Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                child: EmptyStateWidget.noJobsFound(
+                  title: 'No Jobs Match Your Search',
+                  subtitle: 'Try clearing your search text or removing active filter chips to discover more jobs.',
+                  onResetFilters: () {
+                    setState(() {
+                      _searchController.clear();
+                      _searchQuery = '';
+                      _selectedCategoryIndex = 0;
+                      _filterStateId = null;
+                      _filterDistrictId = null;
+                      _filterLocalityId = null;
+                      _filterStateName = null;
+                      _filterDistrictName = null;
+                      _filterLocalityName = null;
+                    });
+                  },
                 ),
               )
             : SliverPadding(

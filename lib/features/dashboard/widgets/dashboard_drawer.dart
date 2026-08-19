@@ -3,9 +3,6 @@ import 'package:get/get.dart';
 import 'package:rojgar/features/app/app_controller.dart';
 import 'package:rojgar/features/buy_product/presentation/bindings/buy_product_binding.dart';
 import 'package:rojgar/features/buy_product/presentation/screens/product_category_list_screen.dart';
-import 'package:rojgar/features/chat/presentation/bindings/chat_binding.dart';
-import 'package:rojgar/features/chat/presentation/controller/chat_controller.dart';
-import 'package:rojgar/features/chat/presentation/screens/chat_user_list_screen.dart';
 import 'package:rojgar/features/jobs/presentation/bindings/jobs_binding.dart';
 import 'package:rojgar/features/jobs/presentation/screens/recent_jobs_screen.dart';
 import 'package:rojgar/features/jobs/presentation/screens/select_category_screen.dart';
@@ -18,7 +15,6 @@ import 'package:rojgar/features/profile/presentation/screens/my_products_screen.
 import 'package:rojgar/features/sell_product/presentation/screens/sell_product_category_screen.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/profile_screen.dart';
-import '../models/quick_link_model.dart';
 
 class DashboardDrawer extends StatefulWidget {
   final VoidCallback onClose;
@@ -145,25 +141,25 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                     // ── Menu Section 2: COMMUNITY & SERVICES ─────
                     _buildSectionHeader('COMMUNITY & SERVICES'),
                     const SizedBox(height: 8),
-                    _buildMenuItem(
-                      context,
-                      icon: Icons.chat_bubble_rounded,
-                      labelKey: 'messages',
-                      defaultLabel: 'Messages',
-                      iconBg: const Color(0xFFEEF2FF),
-                      iconColor: const Color(0xFF4F46E5),
-                      badge: 'CHAT',
-                      badgeBg: const Color(0xFF6366F1),
-                      isActive: _selectedIndex == 4,
-                      onTap: () {
-                        setState(() => _selectedIndex = 4);
-                        widget.onClose();
-                        if (!Get.isRegistered<ChatController>()) {
-                          ChatBinding().dependencies();
-                        }
-                        Get.to(() => const ChatUserListScreen());
-                      },
-                    ),
+                    // _buildMenuItem(
+                    //   context,
+                    //   icon: Icons.chat_bubble_rounded,
+                    //   labelKey: 'messages',
+                    //   defaultLabel: 'Messages',
+                    //   iconBg: const Color(0xFFEEF2FF),
+                    //   iconColor: const Color(0xFF4F46E5),
+                    //   badge: 'CHAT',
+                    //   badgeBg: const Color(0xFF6366F1),
+                    //   isActive: _selectedIndex == 4,
+                    //   onTap: () {
+                    //     setState(() => _selectedIndex = 4);
+                    //     widget.onClose();
+                    //     if (!Get.isRegistered<ChatController>()) {
+                    //       ChatBinding().dependencies();
+                    //     }
+                    //     Get.to(() => const ChatUserListScreen());
+                    //   },
+                    // ),
                     _buildMenuItem(
                       context,
                       icon: Icons.newspaper_rounded,

@@ -12,6 +12,7 @@ import 'package:rojgar/services/storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:rojgar/features/employer_dashboard/presentation/screens/employer_dashboard_screen.dart';
+import 'package:rojgar/core/utils/app_navigator_observer.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -95,6 +96,14 @@ class MyAppState extends State<MyApp> {
             GlobalCupertinoLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
           ],
+          navigatorObservers: [
+            AppNavigatorObserver(),
+          ],
+          routingCallback: (routing) {
+            if (routing != null && routing.current.isNotEmpty) {
+              debugPrint('🧭 [GETX ROUTE CHANGE] ➜ Current Screen/Route: ${routing.current}');
+            }
+          },
           home: child,
         );
       },

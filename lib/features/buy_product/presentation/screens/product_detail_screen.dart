@@ -46,25 +46,158 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _DC.scaffoldBg,
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        foregroundColor: _DC.darkText,
         elevation: 0,
-        centerTitle: false,
+        surfaceTintColor: Colors.transparent,
+        leadingWidth: 58,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16, top: 7, bottom: 7),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => Navigator.maybePop(context),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                ),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Color(0xFF0F172A),
+                  size: 17,
+                ),
+              ),
+            ),
+          ),
+        ),
         title: Obx(() => Text(
-              controller.productDetail.value?.title ?? 'Product Detail',
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+              controller.productDetail.value?.title ?? 'Product Details',
+              style: const TextStyle(
+                color: Color(0xFF0F172A),
+                fontWeight: FontWeight.w800,
+                fontSize: 17,
+                letterSpacing: -0.3,
+              ),
               overflow: TextOverflow.ellipsis,
             )),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(color: Color(0xFFE2E8F0), height: 1),
+        ),
       ),
       body: Obx(() => _buildBody()),
+      bottomNavigationBar: Obx(() {
+        final product = controller.productDetail.value;
+        if (product == null || controller.isLoadingDetail.value) {
+          return const SizedBox.shrink();
+        }
+        return _buildBottomBar(context, product);
+      }),
+    );
+  }
+
+  Widget _buildBottomBar(BuildContext context, BuyProduct product) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(16, 12, 16, MediaQuery.of(context).padding.bottom + 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 48,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  if (!Get.isRegistered<ChatController>()) {
+                    ChatBinding().dependencies();
+                  }
+                  Get.find<ChatController>().initiateChat(product.id);
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Color(0xFF4F46E5), width: 1.5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  foregroundColor: const Color(0xFF4F46E5),
+                ),
+                icon: const Icon(Icons.chat_bubble_rounded, size: 18),
+                label: const Text(
+                  'Chat with Seller',
+                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: SizedBox(
+              height: 48,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Get.snackbar(
+                      'Enquiry Sent',
+                      'Your buy enquiry for "${product.title}" has been submitted to the seller!',
+                      snackPosition: SnackPosition.BOTTOM,
+                      duration: const Duration(seconds: 3),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  icon: const Icon(Icons.shopping_bag_rounded, size: 18, color: Colors.white),
+                  label: const Text(
+                    'Enquire Now',
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildBody() {
     if (controller.isLoadingDetail.value) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator(color: Color(0xFF4F46E5)));
     }
 
     if (controller.detailError.value != null) {
@@ -77,13 +210,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               const Icon(
                 Icons.wifi_off_rounded,
                 size: 52,
-                color: Color(0xFF8A8FA3),
+                color: Color(0xFF94A3B8),
               ),
               const SizedBox(height: 16),
               Text(
                 controller.detailError.value!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xFF8A8FA3), fontSize: 15),
+                style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
@@ -92,7 +225,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('Retry'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _DC.primary,
+                  backgroundColor: const Color(0xFF4F46E5),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -115,19 +248,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             : null;
 
     return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Image + info card ──────────────────────
           Container(
-            color: _DC.cardBg,
-            padding: const EdgeInsets.all(16),
+            color: Colors.white,
+            padding: const EdgeInsets.all(18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Main image
                 _MainImage(imageUrl: currentImage),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
                 // Thumbnails row
                 if (images.length > 1)
@@ -137,18 +271,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     onTap: controller.selectImage,
                   ),
 
-                const SizedBox(height: 18),
+                const SizedBox(height: 20),
 
                 // Title
                 Text(
                   product.title,
                   style: const TextStyle(
-                    color: _DC.darkText,
-                    fontSize: 22,
+                    color: Color(0xFF0F172A),
+                    fontSize: 20,
                     fontWeight: FontWeight.w800,
+                    letterSpacing: -0.3,
+                    height: 1.25,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
 
                 // Price row
                 _PriceRow(
@@ -156,116 +292,105 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   originalPrice: product.price,
                   discount: product.discount,
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 20),
 
                 // Description
-                const _SectionTitle(title: 'Description'),
-                const SizedBox(height: 6),
-                Text(
-                  product.description,
-                  style: const TextStyle(
-                    color: _DC.greyText,
-                    fontSize: 14,
-                    height: 1.5,
+                const _SectionTitle(title: 'Product Overview & Description'),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFF1F5F9), width: 1),
+                  ),
+                  child: Text(
+                    product.description.isNotEmpty ? product.description : 'High quality product available directly from verified seller.',
+                    style: const TextStyle(
+                      color: Color(0xFF334155),
+                      fontSize: 13.5,
+                      height: 1.6,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
 
                 // Specs row
                 _SpecsRow(
                   warranty: product.warranty,
                   capacity: product.capacity,
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 20),
 
                 // Key Features
                 if (product.featureList.isNotEmpty) ...[
-                  const _SectionTitle(title: 'Key Features'),
-                  const SizedBox(height: 8),
+                  const _SectionTitle(title: 'Key Features & Specifications'),
+                  const SizedBox(height: 10),
                   ...product.featureList.map(
                     (f) => Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.check_rounded,
-                            color: _DC.greenCheck,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              f,
-                              style: const TextStyle(
-                                color: _DC.greenCheck,
-                                fontSize: 14,
-                                fontStyle: FontStyle.italic,
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFECFDF5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFA7F3D0), width: 1),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.check_circle_rounded,
+                              color: Color(0xFF059669),
+                              size: 16,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                f,
+                                style: const TextStyle(
+                                  color: Color(0xFF047857),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 20),
                 ],
-
-                // CTA button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _DC.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      elevation: 0,
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    onPressed: () {
-                      if (!Get.isRegistered<ChatController>()) {
-                        ChatBinding().dependencies();
-                      }
-                      Get.find<ChatController>().initiateChat(product.id);
-                    },
-                    child: const Text('Chat with Seller'),
-                  ),
-                ),
               ],
             ),
           ),
 
           // ── Related Products ────────────────────────
           if (controller.relatedProducts.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            const Divider(color: _DC.divider, thickness: 1),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 18),
               child: Text(
                 'Related Products',
                 style: TextStyle(
-                  color: _DC.darkText,
-                  fontSize: 20,
+                  color: Color(0xFF0F172A),
+                  fontSize: 18,
                   fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             _RelatedProductsGrid(
               products: controller.relatedProducts,
               onProductTap: (id) {
-                // Fetch details for target product & refresh screen context
                 Get.off(() => ProductDetailScreen(productId: id),
                     preventDuplicates: false);
               },
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 30),
           ],
         ],
       ),

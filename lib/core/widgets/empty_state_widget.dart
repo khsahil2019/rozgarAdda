@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Modern, visually engaging Empty State Screen widget.
+/// Modern, high-end Empty State Screen widget for No Jobs Found and other empty states.
 class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -10,6 +10,7 @@ class EmptyStateWidget extends StatelessWidget {
   final String? secondaryButtonText;
   final VoidCallback? onSecondaryPressed;
   final Color primaryColor;
+  final List<String>? suggestions;
 
   const EmptyStateWidget({
     super.key,
@@ -21,6 +22,7 @@ class EmptyStateWidget extends StatelessWidget {
     this.secondaryButtonText,
     this.onSecondaryPressed,
     this.primaryColor = const Color(0xFF4F46E5),
+    this.suggestions,
   });
 
   /// Factory constructor specifically tailored for "No Jobs Found".
@@ -29,16 +31,22 @@ class EmptyStateWidget extends StatelessWidget {
     String? subtitle,
     VoidCallback? onResetFilters,
     VoidCallback? onExploreCategories,
+    List<String>? suggestions,
   }) {
     return EmptyStateWidget(
       icon: Icons.search_off_rounded,
-      title: title ?? 'No Jobs Found Right Now',
+      title: title ?? 'No Jobs Available Right Now',
       subtitle: subtitle ??
-          'We couldn\'t find any openings matching your selected filters. Try resetting filters or exploring other categories.',
-      primaryButtonText: 'Reset Filters',
+          'We couldn\'t find any openings matching your selected filters or location. Try clearing filters or exploring other job categories.',
+      primaryButtonText: 'Reset All Filters',
       onPrimaryPressed: onResetFilters,
-      secondaryButtonText: onExploreCategories != null ? 'Explore Categories' : null,
+      secondaryButtonText: onExploreCategories != null ? 'Explore All Categories' : null,
       onSecondaryPressed: onExploreCategories,
+      suggestions: suggestions ?? const [
+        'Try removing specific location or district filters',
+        'Select a broader job role or category',
+        'Clear salary and experience requirements',
+      ],
     );
   }
 
@@ -46,55 +54,97 @@ class EmptyStateWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 36.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ── Glowing Icon Hub ──────────────────────────────────────
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: primaryColor.withValues(alpha: 0.08),
-                border: Border.all(
-                  color: primaryColor.withValues(alpha: 0.15),
-                  width: 1.5,
+            // ── Glowing Layered Illustration Circle ─────────────────────
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                // Outer ambient glow ring
+                Container(
+                  width: 110,
+                  height: 110,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primaryColor.withValues(alpha: 0.05),
+                    border: Border.all(
+                      color: primaryColor.withValues(alpha: 0.12),
+                      width: 1.5,
+                    ),
+                  ),
                 ),
-              ),
-              child: Center(
-                child: Container(
-                  width: 72,
-                  height: 72,
+                // Middle ring
+                Container(
+                  width: 86,
+                  height: 86,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: primaryColor.withValues(alpha: 0.1),
+                    border: Border.all(
+                      color: primaryColor.withValues(alpha: 0.2),
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+                // Inner gradient icon hub
+                Container(
+                  width: 64,
+                  height: 64,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
                       colors: [
-                        primaryColor.withValues(alpha: 0.18),
-                        primaryColor.withValues(alpha: 0.08),
+                        primaryColor,
+                        Color.lerp(primaryColor, const Color(0xFF818CF8), 0.5)!,
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: primaryColor.withValues(alpha: 0.15),
-                        blurRadius: 18,
-                        spreadRadius: 2,
+                        color: primaryColor.withValues(alpha: 0.35),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
                   child: Icon(
                     icon,
-                    size: 36,
-                    color: primaryColor,
+                    size: 32,
+                    color: Colors.white,
                   ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            // ── Badge Chip ──────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: primaryColor.withValues(alpha: 0.18),
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                '0 RESULTS FOUND',
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.8,
                 ),
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
 
             // ── Title & Subtitle ─────────────────────────────────────
             Text(
@@ -116,58 +166,126 @@ class EmptyStateWidget extends StatelessWidget {
               style: const TextStyle(
                 color: Color(0xFF64748B),
                 fontSize: 13,
-                fontWeight: FontWeight.w500,
-                height: 1.5,
+                fontWeight: FontWeight.w400,
+                height: 1.55,
               ),
             ),
 
-            const SizedBox(height: 28),
-
-            // ── Action Buttons ───────────────────────────────────────
-            if (primaryButtonText != null && onPrimaryPressed != null) ...[
+            // ── Suggestions Box ─────────────────────────────────────
+            if (suggestions != null && suggestions!.isNotEmpty) ...[
+              const SizedBox(height: 20),
               Container(
                 width: double.infinity,
-                constraints: const BoxConstraints(maxWidth: 260),
-                height: 46,
+                constraints: const BoxConstraints(maxWidth: 360),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      primaryColor,
-                      Color.lerp(primaryColor, Colors.white, 0.15)!,
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColor.withValues(alpha: 0.28),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.lightbulb_outline_rounded, size: 16, color: Color(0xFFD97706)),
+                        SizedBox(width: 6),
+                        Text(
+                          'Quick Tips to Find Jobs:',
+                          style: TextStyle(
+                            color: Color(0xFF0F172A),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    ...suggestions!.map(
+                      (tip) => Padding(
+                        padding: const EdgeInsets.only(bottom: 5),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '• ',
+                              style: TextStyle(
+                                color: Color(0xFF4F46E5),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                tip,
+                                style: const TextStyle(
+                                  color: Color(0xFF475569),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                child: ElevatedButton.icon(
-                  onPressed: onPrimaryPressed,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
+              ),
+            ],
+
+            const SizedBox(height: 24),
+
+            // ── Action Buttons ───────────────────────────────────────
+            if (primaryButtonText != null && onPrimaryPressed != null) ...[
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 280),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          primaryColor,
+                          Color.lerp(primaryColor, const Color(0xFF6366F1), 0.5)!,
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
                       borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primaryColor.withValues(alpha: 0.28),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                  ),
-                  icon: const Icon(
-                    Icons.tune_rounded,
-                    size: 18,
-                    color: Colors.white,
-                  ),
-                  label: Text(
-                    primaryButtonText!,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                    child: ElevatedButton.icon(
+                      onPressed: onPrimaryPressed,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      icon: const Icon(
+                        Icons.tune_rounded,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                      label: Text(
+                        primaryButtonText!,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -176,33 +294,35 @@ class EmptyStateWidget extends StatelessWidget {
 
             if (secondaryButtonText != null && onSecondaryPressed != null) ...[
               const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                constraints: const BoxConstraints(maxWidth: 260),
-                height: 44,
-                child: TextButton.icon(
-                  onPressed: onSecondaryPressed,
-                  style: TextButton.styleFrom(
-                    foregroundColor: primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 280),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 46,
+                  child: OutlinedButton.icon(
+                    onPressed: onSecondaryPressed,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: primaryColor,
                       side: BorderSide(
-                        color: primaryColor.withValues(alpha: 0.25),
-                        width: 1.2,
+                        color: primaryColor.withValues(alpha: 0.3),
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                  ),
-                  icon: Icon(
-                    Icons.explore_outlined,
-                    size: 18,
-                    color: primaryColor,
-                  ),
-                  label: Text(
-                    secondaryButtonText!,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                    icon: Icon(
+                      Icons.explore_outlined,
+                      size: 18,
                       color: primaryColor,
+                    ),
+                    label: Text(
+                      secondaryButtonText!,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: primaryColor,
+                      ),
                     ),
                   ),
                 ),

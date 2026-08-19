@@ -137,7 +137,9 @@ class _ExploreJobsScreenState extends State<ExploreJobsScreen> {
                       itemCount: filtered.length,
                       itemBuilder: (context, index) {
                         final role = filtered[index];
-                        return _buildRoleCard(context, role);
+                        return RepaintBoundary(
+                          child: _buildRoleCard(context, role),
+                        );
                       },
                     ),
                   ],

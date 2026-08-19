@@ -133,8 +133,7 @@ class QuickLinkCard extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.bottomLeft,
                       child: Text(
-                        AppLocalizations.of(context)
-                            .text(link.label.toLowerCase().replaceAll(' ', '_')),
+                        _getLocalizedLabel(context, link.label),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -159,5 +158,20 @@ class QuickLinkCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getLocalizedLabel(BuildContext context, String rawLabel) {
+    final key = rawLabel.toLowerCase().replaceAll(' ', '_');
+    final l10n = AppLocalizations.of(context);
+    if (key == 'recent_jobs') {
+      final res = l10n.text('recent_jobs_title');
+      if (res.isNotEmpty && res != 'recent_jobs_title') return res;
+      return 'Recent Jobs';
+    }
+    final translated = l10n.text(key);
+    if (translated.isNotEmpty && translated != key) {
+      return translated;
+    }
+    return rawLabel;
   }
 }

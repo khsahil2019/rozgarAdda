@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'fast_loader.dart';
 
+/// Lightweight, high-performance Network Image widget using Flutter's native memory cache.
+/// Bypasses SQLite database disk locks for ultra-fast main thread rendering.
 class NetworkImageService extends StatelessWidget {
   final String imageUrl;
   final double? width;
@@ -40,17 +41,18 @@ class NetworkImageService extends StatelessWidget {
         ? (height! * 2).toInt()
         : null;
 
-    final imageWidget = CachedNetworkImage(
-      imageUrl: imageUrl,
+    final imageWidget = Image.network(
+      imageUrl,
       width: width,
       height: height,
       fit: fit,
-      fadeInDuration: const Duration(milliseconds: 150),
-      fadeOutDuration: const Duration(milliseconds: 150),
-      memCacheWidth: cacheWidth,
-      memCacheHeight: cacheHeight,
-      placeholder: (context, url) => placeholder ?? _buildDefaultPlaceholder(),
-      errorWidget: (context, url, error) =>
+      cacheWidth: cacheWidth,
+      cacheHeight: cacheHeight,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return placeholder ?? _buildDefaultPlaceholder();
+      },
+      errorBuilder: (context, error, stackTrace) =>
           errorWidget ?? _buildDefaultErrorWidget(),
     );
 
@@ -86,4 +88,3 @@ class NetworkImageService extends StatelessWidget {
     );
   }
 }
-

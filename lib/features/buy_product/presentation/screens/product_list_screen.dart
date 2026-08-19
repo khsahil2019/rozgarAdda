@@ -5,18 +5,6 @@ import '../../domain/entities/buy_product_entities.dart';
 import 'product_detail_screen.dart';
 import '../../../../core/widgets/fast_loader.dart';
 
-// ─────────────────────────────────────────────
-// COLORS
-// ─────────────────────────────────────────────
-class _C {
-  static const Color primary = Color(0xFF1400FF);
-  static const Color scaffoldBg = Color(0xFFF5F6FA);
-  static const Color cardBg = Color(0xFFFFFFFF);
-  static const Color darkText = Color(0xFF1A1A2E);
-  static const Color greyText = Color(0xFF8A8FA3);
-  static const Color priceGreen = Color(0xFF1E9E5E);
-  static const Color discountRed = Color(0xFFDD0000);
-}
 
 // ─────────────────────────────────────────────
 // SCREEN
@@ -56,32 +44,66 @@ class _ProductListScreenState extends State<ProductListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _C.scaffoldBg,
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        foregroundColor: _C.darkText,
-        elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => Navigator.maybePop(context),
-        ),
-        title: Text(
-          widget.title ?? 'Products',
-          style: const TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        leadingWidth: 58,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16, top: 7, bottom: 7),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => Navigator.maybePop(context),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                ),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Color(0xFF0F172A),
+                  size: 17,
+                ),
+              ),
+            ),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.favorite_border_rounded),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_none_rounded),
-            onPressed: () {},
-          ),
-        ],
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.title ?? 'Buy Products',
+              style: const TextStyle(
+                color: Color(0xFF0F172A),
+                fontWeight: FontWeight.w800,
+                fontSize: 18,
+                letterSpacing: -0.3,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            Obx(() => Text(
+                  '${controller.products.length} Products Available',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF64748B),
+                  ),
+                )),
+          ],
+        ),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(color: Color(0xFFE2E8F0), height: 1),
+        ),
       ),
       body: Column(
         children: [
@@ -101,18 +123,19 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget _buildSearchBar() {
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
       child: Container(
         decoration: BoxDecoration(
-          color: _C.scaffoldBg,
-          borderRadius: BorderRadius.circular(8),
+          color: const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
         ),
         child: TextField(
           readOnly: true,
           decoration: InputDecoration(
-            hintText: 'Search in ${widget.title ?? "Products"}',
-            hintStyle: const TextStyle(color: _C.greyText, fontSize: 13),
-            prefixIcon: const Icon(Icons.search_rounded, color: _C.greyText, size: 20),
+            hintText: 'Search in ${widget.title ?? "Products"}...',
+            hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontWeight: FontWeight.w500),
+            prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF4F46E5), size: 20),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
           ),
@@ -131,7 +154,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
             child: SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4F46E5)),
             ),
           ),
         );
@@ -143,7 +166,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
       return Container(
         color: Colors.white,
-        height: 50,
+        height: 48,
         padding: const EdgeInsets.only(bottom: 10),
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
@@ -165,20 +188,21 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 label: Text(label),
                 selected: isSelected,
                 labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : _C.darkText,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF334155),
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   fontSize: 12,
                 ),
-                selectedColor: _C.primary,
-                backgroundColor: _C.scaffoldBg,
+                selectedColor: const Color(0xFFEEF2FF),
+                backgroundColor: const Color(0xFFF8FAFC),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(12),
                   side: BorderSide(
-                    color: isSelected ? _C.primary : const Color(0xFFECEEF5),
+                    color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
+                    width: isSelected ? 1.5 : 1,
                   ),
                 ),
                 showCheckmark: false,
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
                 onSelected: (selected) {
                   if (selected) {
                     controller.selectSubCategoryFilter(widget.categoryId, subId);
@@ -211,13 +235,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 const Icon(
                   Icons.wifi_off_rounded,
                   size: 52,
-                  color: _C.greyText,
+                  color: Color(0xFF94A3B8),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   controller.productsError.value!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: _C.greyText, fontSize: 15),
+                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
@@ -228,7 +252,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   icon: const Icon(Icons.refresh_rounded),
                   label: const Text('Retry'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _C.primary,
+                    backgroundColor: const Color(0xFF4F46E5),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -248,12 +272,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.inbox_rounded, size: 52, color: _C.greyText),
+                Icon(Icons.shopping_bag_outlined, size: 52, color: Color(0xFF94A3B8)),
                 SizedBox(height: 12),
                 Text(
-                  'No products available.',
+                  'No products available in this category.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: _C.greyText, fontSize: 15),
+                  style: TextStyle(color: Color(0xFF64748B), fontSize: 14, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -267,13 +291,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
           controller.selectedSubCategoryId.value,
         ),
         child: GridView.builder(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 20),
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
           itemCount: controller.products.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 0.70,
+            mainAxisSpacing: 14,
+            crossAxisSpacing: 14,
+            childAspectRatio: 0.68,
           ),
           itemBuilder: (context, i) =>
               _ProductCard(product: controller.products[i]),
@@ -284,40 +308,48 @@ class _ProductListScreenState extends State<ProductListScreen> {
 }
 
 // ─────────────────────────────────────────────
-// PRODUCT CARD (OLX Style)
+// PRODUCT CARD (High-end Marketplace Style)
 // ─────────────────────────────────────────────
-class _ProductCard extends StatelessWidget {
+class _ProductCard extends StatefulWidget {
   final BuyProduct product;
   const _ProductCard({required this.product});
+
+  @override
+  State<_ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<_ProductCard> {
+  bool _isLiked = false;
 
   String _formatPrice(double price) {
     return '₹${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}';
   }
 
   void _openDetail(BuildContext context) {
-    Get.to(() => ProductDetailScreen(productId: product.id));
+    Get.to(() => ProductDetailScreen(productId: widget.product.id));
   }
 
   @override
   Widget build(BuildContext context) {
+    final product = widget.product;
     final hasDiscount = product.discount > 0;
 
     return GestureDetector(
       onTap: () => _openDetail(context),
       child: Container(
         decoration: BoxDecoration(
-          color: _C.cardBg,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x08000000),
-              blurRadius: 10,
-              offset: Offset(0, 4),
+              color: const Color(0xFF0F172A).withValues(alpha: 0.04),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
             ),
           ],
           border: Border.all(
-            color: const Color(0xFFECEEF5),
-            width: 1,
+            color: const Color(0xFFE2E8F0),
+            width: 1.2,
           ),
         ),
         child: Column(
@@ -330,7 +362,7 @@ class _ProductCard extends StatelessWidget {
                   Positioned.fill(
                     child: ClipRRect(
                       borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(11),
+                        top: Radius.circular(17),
                       ),
                       child: product.metaImage.isNotEmpty
                           ? Image.network(
@@ -341,22 +373,24 @@ class _ProductCard extends StatelessWidget {
                           : _PlaceholderImage(),
                     ),
                   ),
-                  // FEATURED Badge (Like OLX screenshot)
+                  // FEATURED Badge
                   Positioned(
                     top: 8,
                     left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFCE00),
-                        borderRadius: BorderRadius.circular(4),
+                        color: const Color(0xFFFEF3C7),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFFCD34D), width: 1),
                       ),
                       child: const Text(
                         'FEATURED',
                         style: TextStyle(
-                          color: _C.darkText,
+                          color: Color(0xFFD97706),
                           fontSize: 9,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.3,
                         ),
                       ),
                     ),
@@ -365,22 +399,33 @@ class _ProductCard extends StatelessWidget {
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x1A000000),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.favorite_border_rounded,
-                        color: _C.darkText,
-                        size: 16,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() => _isLiked = !_isLiked);
+                        Get.snackbar(
+                          _isLiked ? 'Saved to Favorites' : 'Removed from Favorites',
+                          _isLiked ? '${product.title} saved to wishlist' : 'Removed from wishlist',
+                          snackPosition: SnackPosition.BOTTOM,
+                          duration: const Duration(seconds: 2),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 6,
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          _isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          color: _isLiked ? const Color(0xFFEF4444) : const Color(0xFF475569),
+                          size: 16,
+                        ),
                       ),
                     ),
                   ),
@@ -390,36 +435,40 @@ class _ProductCard extends StatelessWidget {
 
             // ── Content ───────────────────────────────
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Price row with discount
+                  // Price row with discount badge
                   Row(
                     children: [
                       Expanded(
                         child: Text(
                           _formatPrice(product.totalCost),
                           style: const TextStyle(
-                            color: _C.darkText,
+                            color: Color(0xFF0F172A),
                             fontSize: 16,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.3,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (hasDiscount)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: _C.discountRed.withAlpha(25),
-                            borderRadius: BorderRadius.circular(4),
+                            color: const Color(0xFFFEF2F2),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: const Color(0xFFFCA5A5), width: 1),
                           ),
                           child: Text(
                             '${product.discount.toStringAsFixed(0)}% OFF',
                             style: const TextStyle(
-                              color: _C.discountRed,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFDC2626),
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ),
@@ -433,12 +482,12 @@ class _ProductCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: Color(0xFF4B5563),
+                      color: Color(0xFF1E293B),
                       fontSize: 13,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
 
                   // Description snippet
                   Text(
@@ -446,30 +495,33 @@ class _ProductCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: _C.greyText,
+                      color: Color(0xFF64748B),
                       fontSize: 11,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
-                  const Divider(color: Color(0xFFECEEF5), height: 16, thickness: 1),
+                  const SizedBox(height: 8),
+                  const Divider(color: Color(0xFFF1F5F9), height: 1),
+                  const SizedBox(height: 6),
 
-                  // Location (OLX Style footer)
+                  // Location Footer
                   const Row(
                     children: [
                       Icon(
-                        Icons.location_on_outlined,
-                        color: _C.greyText,
-                        size: 12,
+                        Icons.location_on_rounded,
+                        color: Color(0xFFEF4444),
+                        size: 13,
                       ),
                       SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          'Chak Bhikhari, Ghazipur',
+                          'Verified Seller',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: _C.greyText,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF475569),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),

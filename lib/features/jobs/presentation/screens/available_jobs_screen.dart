@@ -484,7 +484,9 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                           final job = filteredJobs[jobIndex];
                           final categoryImg =
                               selectedCategory?.imageUrl ?? '';
-                          return _buildJobCard(job, categoryImg, l10n);
+                          return RepaintBoundary(
+                            child: _buildJobCard(job, categoryImg, l10n),
+                          );
                         },
                       ),
                     const SliverToBoxAdapter(
@@ -815,9 +817,10 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
           ? l10n.text('jobs_no_jobs_found')
           : 'No Jobs Available Right Now',
       subtitle:
-          'No openings match your currently selected filters. Try clearing filters or selecting another job role.',
+          'No job openings match your currently selected role or location filters. Try clearing your filters to explore all available opportunities.',
       onResetFilters: () {
         setState(() {
+          _selectedCategoryIndex = 0;
           _selectedJobTypeIndex = 0;
           _selectedSalaryIndex = 0;
           _selectedEducationIndex = 0;
@@ -831,6 +834,18 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
           _filterLocalityName = null;
         });
       },
+      onExploreCategories: _selectedCategoryIndex != 0
+          ? () {
+              setState(() {
+                _selectedCategoryIndex = 0;
+              });
+            }
+          : null,
+      suggestions: const [
+        'Select "All Job Roles" to view all active openings',
+        'Clear state, district, or city location filters',
+        'Reset salary range and work experience preferences',
+      ],
     );
   }
 
