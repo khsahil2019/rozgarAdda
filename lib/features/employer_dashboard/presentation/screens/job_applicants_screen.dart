@@ -6,6 +6,7 @@ import 'package:rojgar/localization/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:open_filex/open_filex.dart';
 import '../controllers/employer_dashboard_controller.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../domain/entities/job_application_entity.dart';
 
 class JobApplicantsScreen extends StatefulWidget {
@@ -1265,44 +1266,17 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   }
 
   Widget _buildEmptyState(BuildContext context, dynamic l10n) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: primaryBlue.withValues(alpha: 0.05),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.people_outline_rounded,
-                color: primaryBlue,
-                size: 38,
-              ),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              l10n.text('employer_dashboard_no_applicants'),
-              style: const TextStyle(
-                color: darkText,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'No candidates match the selected filters or search query.',
-              style: TextStyle(color: greyText, fontSize: 13),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.people_outline_rounded,
+      title: l10n.text('employer_dashboard_no_applicants').isNotEmpty
+          ? l10n.text('employer_dashboard_no_applicants')
+          : 'No Job Applicants Found',
+      subtitle: 'No candidate applications match your current filters or search query.',
+      primaryButtonText: 'Reset Filters',
+      onPrimaryPressed: () {
+        controller.applicantSearchQuery.value = '';
+        controller.applicantStatusFilter.value = 'all';
+      },
     );
   }
 }

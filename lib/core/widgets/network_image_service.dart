@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'fast_loader.dart';
 
 class NetworkImageService extends StatelessWidget {
   final String imageUrl;
@@ -32,17 +33,22 @@ class NetworkImageService extends StatelessWidget {
           : _buildDefaultErrorWidget();
     }
 
+    final int? cacheWidth = (width != null && width! > 0 && width! < 1200)
+        ? (width! * 2).toInt()
+        : null;
+    final int? cacheHeight = (height != null && height! > 0 && height! < 1200)
+        ? (height! * 2).toInt()
+        : null;
+
     final imageWidget = CachedNetworkImage(
       imageUrl: imageUrl,
       width: width,
       height: height,
       fit: fit,
-      memCacheWidth: (width != null && width! > 0 && width! < 1000)
-          ? (width! * 2).toInt()
-          : 400,
-      memCacheHeight: (height != null && height! > 0 && height! < 1000)
-          ? (height! * 2).toInt()
-          : 400,
+      fadeInDuration: const Duration(milliseconds: 150),
+      fadeOutDuration: const Duration(milliseconds: 150),
+      memCacheWidth: cacheWidth,
+      memCacheHeight: cacheHeight,
       placeholder: (context, url) => placeholder ?? _buildDefaultPlaceholder(),
       errorWidget: (context, url, error) =>
           errorWidget ?? _buildDefaultErrorWidget(),
@@ -59,15 +65,10 @@ class NetworkImageService extends StatelessWidget {
   }
 
   Widget _buildDefaultPlaceholder() {
-    return Center(
-      child: SizedBox(
-        width: 24,
-        height: 24,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: const Color(0xFF0F5FFF),
-        ),
-      ),
+    return FastImageLoader(
+      width: width,
+      height: height,
+      borderRadius: borderRadius,
     );
   }
 
@@ -85,3 +86,4 @@ class NetworkImageService extends StatelessWidget {
     );
   }
 }
+

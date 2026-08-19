@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../controller/profile_controller.dart';
+import 'package:rojgar/core/widgets/empty_state_widget.dart';
 
 class MyApplicationsScreen extends StatefulWidget {
   const MyApplicationsScreen({super.key});
@@ -241,37 +242,12 @@ class _EmptyView extends StatelessWidget {
   const _EmptyView();
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: const Color(0xFFEEEEFF),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Icon(Icons.work_outline_rounded,
-                color: Color(0xFF1400FF), size: 38),
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'No Applications Yet',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF17181C),
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Start applying to jobs and\nyour applications will appear here.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: Color(0xFF8A8FA3)),
-          ),
-        ],
-      ),
+    return EmptyStateWidget(
+      icon: Icons.business_center_rounded,
+      title: 'No Applications Yet',
+      subtitle: 'Start applying to job openings and your tracked applications will appear here.',
+      primaryButtonText: 'Browse Jobs',
+      onPrimaryPressed: () => Navigator.maybePop(context),
     );
   }
 }

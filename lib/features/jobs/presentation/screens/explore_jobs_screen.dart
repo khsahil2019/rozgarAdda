@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/widgets/network_image_service.dart';
+import '../../../../core/widgets/fast_loader.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../bindings/jobs_binding.dart';
 import '../controller/jobs_controller.dart';
 import '../../domain/entities/job_category.dart';
@@ -63,10 +65,9 @@ class _ExploreJobsScreenState extends State<ExploreJobsScreen> {
               child: Obx(() {
                 if (controller.isLoadingJobRoles.value &&
                     controller.jobRoles.isEmpty) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF4F46E5),
-                    ),
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: FastGridSkeleton(itemCount: 8),
                   );
                 }
 
@@ -514,45 +515,14 @@ class _ExploreJobsScreenState extends State<ExploreJobsScreen> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 70,
-              height: 70,
-              decoration: const BoxDecoration(
-                color: Color(0xFFEEF2FF),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.work_off_rounded,
-                size: 34,
-                color: Color(0xFF4F46E5),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'No job roles found',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF0F172A),
-              ),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Try searching for another job role',
-              style: TextStyle(
-                fontSize: 13,
-                color: Color(0xFF64748B),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.work_off_rounded,
+      title: 'No Job Roles Found',
+      subtitle: 'Try searching for a different job role or clear your search input.',
+      primaryButtonText: 'Clear Search',
+      onPrimaryPressed: () {
+        searchController.clear();
+      },
     );
   }
 

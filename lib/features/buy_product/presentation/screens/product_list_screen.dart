@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controller/buy_product_controller.dart';
 import '../../domain/entities/buy_product_entities.dart';
 import 'product_detail_screen.dart';
+import '../../../../core/widgets/fast_loader.dart';
 
 // ─────────────────────────────────────────────
 // COLORS
@@ -194,7 +195,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget _buildBody() {
     return Obx(() {
       if (controller.isLoadingProducts.value) {
-        return const Center(child: CircularProgressIndicator());
+        return const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: FastGridSkeleton(itemCount: 6),
+        );
       }
 
       if (controller.productsError.value != null) {

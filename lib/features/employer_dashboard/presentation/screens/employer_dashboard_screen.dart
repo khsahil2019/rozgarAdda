@@ -4,6 +4,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/splash_screen.dart';
 import '../controllers/employer_dashboard_controller.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../jobs/domain/entities/available_job_entity.dart';
 import 'post_job_form_screen.dart';
 import 'job_applicants_screen.dart';
@@ -551,47 +552,14 @@ class EmployerDashboardScreen extends GetView<EmployerDashboardController> {
 
   Widget _buildEmptyState(BuildContext context) {
     final l10n = context.l10n;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderGrey),
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: primaryBlue.withValues(alpha: 0.05),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.work_off_rounded,
-              color: primaryBlue,
-              size: 32,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            l10n.text('employer_dashboard_no_jobs'),
-            style: const TextStyle(
-              color: darkText,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Create a new job post to start receiving candidate applications.',
-            style: TextStyle(color: greyText, fontSize: 13),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+    return EmptyStateWidget(
+      icon: Icons.post_add_rounded,
+      title: l10n.text('employer_dashboard_no_jobs').isNotEmpty
+          ? l10n.text('employer_dashboard_no_jobs')
+          : 'No Job Openings Posted',
+      subtitle: 'Create a new job post to start receiving candidate applications.',
+      primaryButtonText: 'Post a New Job',
+      onPrimaryPressed: () => Get.to(() => const PostJobFormScreen()),
     );
   }
 

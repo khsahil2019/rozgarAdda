@@ -9,6 +9,8 @@ import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/features/jobs/presentation/widgets/job_card_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/widgets/network_image_service.dart';
+import '../../../../core/widgets/fast_loader.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../domain/entities/available_job_entity.dart';
 import '../../domain/entities/job_category.dart';
@@ -381,9 +383,7 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                     selectedCategory?.name ?? 'Category';
 
                 if (controller.isLoadingAvailableJobs.value) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: _C.primaryBlue),
-                  );
+                  return const FastListSkeleton(itemCount: 5, cardHeight: 180.0);
                 }
 
                 if (controller.availableJobsError.value != null) {
@@ -440,63 +440,55 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
                   return true;
                 }).toList();
 
-                return Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(
-                          parent: AlwaysScrollableScrollPhysics(),
-                        ),
-                        padding: const EdgeInsets.fromLTRB(0, 16, 0, 20),
+                return CustomScrollView(
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: EdgeInsetsGeometry.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: Column(
-                                children: [
-                                  _buildFilterRow(categories),
-                                  const SizedBox(height: 18),
-                                  // _buildLocationRow(),
-                                  // const SizedBox(height: 8),
-                                  _buildCategoryHint(selectedCategoryName),
-                                  const SizedBox(height: 18),
-                                ],
-                              ),
-                            ),
-                            if (filteredJobs.isEmpty)
-                              _buildEmptyState(l10n)
-                            else
-                              ListView.separated(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: filteredJobs.isEmpty
-                                    ? 0
-                                    : filteredJobs.length +
-                                        (filteredJobs.length - 1) ~/ 3,
-                                separatorBuilder: (_, __) =>
-                                    const SizedBox(height: 18),
-                                itemBuilder: (context, index) {
-                                  final isBanner = (index + 1) % 4 == 0;
-                                  if (isBanner) {
-                                    return Image.asset(
-                                      'assets/icons/warning.png',
-                                      width: double.infinity,
-                                      fit: BoxFit.fitWidth,
-                                    );
-                                  }
-                                  final jobIndex = index - (index ~/ 4);
-                                  final job = filteredJobs[jobIndex];
-                                  final categoryImg =
-                                      selectedCategory?.imageUrl ?? '';
-                                  return _buildJobCard(job, categoryImg, l10n);
-                                },
-                              ),
+                            _buildFilterRow(categories),
+                            const SizedBox(height: 16),
+                            _buildCategoryHint(selectedCategoryName),
                           ],
                         ),
                       ),
+                    ),
+                    if (filteredJobs.isEmpty)
+                      SliverToBoxAdapter(
+                        child: _buildEmptyState(l10n),
+                      )
+                    else
+                      SliverList.separated(
+                        itemCount: filteredJobs.length +
+                            (filteredJobs.length - 1) ~/ 3,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final isBanner = (index + 1) % 4 == 0;
+                          if (isBanner) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: Image.asset(
+                                'assets/icons/warning.png',
+                                width: double.infinity,
+                                fit: BoxFit.fitWidth,
+                              ),
+                            );
+                          }
+                          final jobIndex = index - (index ~/ 4);
+                          final job = filteredJobs[jobIndex];
+                          final categoryImg =
+                              selectedCategory?.imageUrl ?? '';
+                          return _buildJobCard(job, categoryImg, l10n);
+                        },
+                      ),
+                    const SliverToBoxAdapter(
+                      child: SizedBox(height: 24),
                     ),
                   ],
                 );
@@ -818,39 +810,27 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
   }
 
   Widget _buildEmptyState(AppLocalizations l10n) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF1F2F5),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.work_off_outlined,
-                color: _C.primaryBlue,
-                size: 36,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              l10n.text('jobs_no_jobs_found'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: _C.grey,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget.noJobsFound(
+      title: l10n.text('jobs_no_jobs_found').isNotEmpty
+          ? l10n.text('jobs_no_jobs_found')
+          : 'No Jobs Available Right Now',
+      subtitle:
+          'No openings match your currently selected filters. Try clearing filters or selecting another job role.',
+      onResetFilters: () {
+        setState(() {
+          _selectedJobTypeIndex = 0;
+          _selectedSalaryIndex = 0;
+          _selectedEducationIndex = 0;
+          _selectedExperienceIndex = 0;
+          _selectedFreshnessIndex = 0;
+          _filterStateId = null;
+          _filterDistrictId = null;
+          _filterLocalityId = null;
+          _filterStateName = null;
+          _filterDistrictName = null;
+          _filterLocalityName = null;
+        });
+      },
     );
   }
 

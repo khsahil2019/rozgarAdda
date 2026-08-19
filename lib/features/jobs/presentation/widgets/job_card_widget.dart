@@ -9,12 +9,15 @@ import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dar
 import 'package:share_plus/share_plus.dart';
 
 class _CardColors {
-  static const Color primaryBlue = Color(0xFF1400FF);
-  static const Color darkText = Color(0xFF17181C);
-  static const Color grey = Color(0xFF72757F);
-  static const Color borderGrey = Color(0xFFD7DADF);
-  static const Color chipBg = Color(0xFFF7F8FB);
-  static const Color green = Color(0xFF2E7D32);
+  static const Color primaryIndigo = Color(0xFF4F46E5);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color subText = Color(0xFF475569);
+  static const Color mutedText = Color(0xFF64748B);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+  static const Color bgTint = Color(0xFFF8FAFC);
+  static const Color emeraldBg = Color(0xFFECFDF5);
+  static const Color emeraldText = Color(0xFF059669);
+  static const Color indigoBg = Color(0xFFEEF2FF);
 }
 
 class JobCardWidget extends StatelessWidget {
@@ -41,22 +44,7 @@ class JobCardWidget extends StatelessWidget {
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return imageUrl!;
     }
-    switch (job.id) {
-      case 101:
-        return 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=150';
-      case 102:
-        return 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=150';
-      case 103:
-        return 'https://images.unsplash.com/photo-1534536281715-e28d76689b4d?w=150';
-      case 104:
-        return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150';
-      case 105:
-        return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=150';
-      case 106:
-        return 'https://images.unsplash.com/photo-1549923746-c502d488f3aa?w=150';
-      default:
-        return 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=150';
-    }
+    return '';
   }
 
   String _getLocalizedJobType(String type, String lang) {
@@ -144,29 +132,6 @@ class JobCardWidget extends StatelessWidget {
     return title;
   }
 
-  Widget _buildMetadataItem(IconData icon, String text) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Icon(icon, size: 16, color: Colors.grey),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-
   void _navigateToDetail(BuildContext context) {
     Navigator.push(
       context,
@@ -251,12 +216,41 @@ class JobCardWidget extends StatelessWidget {
     await Share.share('https://rozgaradda.com/job-details/${job.id}');
   }
 
+  Widget _buildMetaChip(IconData icon, String text, {Color? iconColor}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: _CardColors.bgTint,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: iconColor ?? _CardColors.primaryIndigo,
+          ),
+          const SizedBox(width: 5),
+          Text(
+            text,
+            style: const TextStyle(
+              color: _CardColors.mutedText,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final lang = l10n.locale.languageCode;
     final localizedTitle = _getLocalizedTitle(job.title, lang);
-    final localizedSubcategory = _getLocalizedTitle(job.title, lang);
     final localizedLocation = job.stateName;
     final localizedJobType = _getLocalizedJobType(job.jobType, lang);
     final localizedExperience = _getLocalizedExperience(
@@ -277,336 +271,415 @@ class JobCardWidget extends StatelessWidget {
 
     return RepaintBoundary(
       child: Container(
-        color: Colors.white,
-        margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          GestureDetector(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: _CardColors.borderGrey, width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withValues(alpha: 0.045),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          child: InkWell(
             onTap: onTap ?? () => _navigateToDetail(context),
-            behavior: HitTestBehavior.opaque,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: NetworkImageService(
-                        imageUrl: _getJobImageUrl(job),
-                        width: 56,
-                        height: 56,
-                        fit: BoxFit.cover,
-                        errorWidget: Container(
-                          width: 56,
-                          height: 56,
-                          color: _CardColors.chipBg,
-                          child: const Icon(
-                            Icons.work_outline_rounded,
-                            color: _CardColors.primaryBlue,
-                            size: 24,
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Top Header: Image, Title, Company & Vacancy ────────
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Thumbnail Image
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: _CardColors.indigoBg,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(0xFFC7D2FE),
+                            width: 1,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(11),
+                          child: NetworkImageService(
+                            imageUrl: _getJobImageUrl(job),
+                            fit: BoxFit.cover,
+                            errorWidget: Container(
+                              color: _CardColors.indigoBg,
+                              alignment: Alignment.center,
+                              child: const Icon(
+                                Icons.work_rounded,
+                                color: _CardColors.primaryIndigo,
+                                size: 24,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                      const SizedBox(width: 12),
+
+                      // Title & Company Subtitle
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    localizedTitle,
+                                    style: const TextStyle(
+                                      color: _CardColors.darkText,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: -0.3,
+                                      height: 1.25,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  color: _CardColors.primaryIndigo,
+                                  size: 14,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              job.addressLine1.isNotEmpty
+                                  ? job.addressLine1
+                                  : 'Verified Employer',
+                              style: const TextStyle(
+                                color: _CardColors.subText,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // ── Middle Section: Salary Badge & Vacancies ───────────
+                  Row(
+                    children: [
+                      // Salary Badge
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _CardColors.emeraldBg,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color(0xFFA7F3D0),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              const Icon(
+                                Icons.account_balance_wallet_rounded,
+                                color: _CardColors.emeraldText,
+                                size: 15,
+                              ),
+                              const SizedBox(width: 5),
                               Flexible(
                                 child: Text(
-                                  localizedTitle,
+                                  job.salaryDisplay,
                                   style: const TextStyle(
-                                    color: Color(0xFF007AFF),
-                                    fontSize: 16,
+                                    color: _CardColors.emeraldText,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w800,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              const SizedBox(width: 4),
-                              const Icon(
-                                Icons.arrow_forward,
-                                color: Color(0xFF007AFF),
-                                size: 14,
-                              ),
                             ],
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            job.addressLine1.isNotEmpty
-                                ? job.addressLine1
-                                : 'Company',
-                            style: const TextStyle(
-                              color: _CardColors.darkText,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            localizedSubcategory,
-                            style: const TextStyle(
-                              color: _CardColors.grey,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            job.salaryDisplay,
-                            style: const TextStyle(
-                              color: _CardColors.green,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                    // const SizedBox(width: 8),
-                    // GestureDetector(
-                    //   onTap: onFavoriteTap,
-                    //   child: const Icon(
-                    //     Icons.favorite_border_rounded,
-                    //     color: Colors.grey,
-                    //     size: 24,
-                    //   ),
-                    // ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
+                      const SizedBox(width: 8),
+
+                      // Vacancies Pill
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _CardColors.indigoBg,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: const Color(0xFFC7D2FE),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.groups_rounded,
+                              color: _CardColors.primaryIndigo,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${job.vacancy} ${job.vacancy == 1 ? "Open" : "Openings"}',
+                              style: const TextStyle(
+                                color: _CardColors.primaryIndigo,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF1F2F5),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '${job.vacancy} ${job.vacancy == 1 ? "Vacancy" : "Vacancies"}',
-                    style: const TextStyle(
-                      color: _CardColors.darkText,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Divider(color: Color(0xFFE7E9EE), height: 1),
-                const SizedBox(height: 12),
-                Table(
-                  columnWidths: const {
-                    0: FlexColumnWidth(1.1),
-                    1: FlexColumnWidth(0.9),
-                  },
-                  children: [
-                    TableRow(
-                      children: [
-                        _buildMetadataItem(
-                          Icons.location_on,
+
+                  const SizedBox(height: 8),
+
+                  // ── Metadata Info Chips Grid ───────────────────────────
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      if (localizedLocation.isNotEmpty)
+                        _buildMetaChip(
+                          Icons.location_on_rounded,
                           localizedLocation,
+                          iconColor: const Color(0xFFEF4444),
                         ),
-                        _buildMetadataItem(
-                          Icons.access_time_filled,
-                          localizedJobType,
+                      _buildMetaChip(
+                        Icons.work_history_rounded,
+                        localizedJobType,
+                        iconColor: const Color(0xFF3B82F6),
+                      ),
+                      _buildMetaChip(
+                        Icons.workspace_premium_rounded,
+                        localizedExperience,
+                        iconColor: const Color(0xFFF59E0B),
+                      ),
+                      if (localizedEducation.isNotEmpty)
+                        _buildMetaChip(
+                          Icons.school_rounded,
+                          localizedEducation,
+                          iconColor: const Color(0xFF8B5CF6),
                         ),
-                      ],
-                    ),
-                    const TableRow(
-                      children: [SizedBox(height: 8), SizedBox(height: 8)],
-                    ),
-                    TableRow(
-                      children: [
-                        _buildMetadataItem(Icons.work, localizedExperience),
-                        _buildMetadataItem(Icons.menu_book, localizedEducation),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              PopupMenuButton<String>(
-                icon: const Icon(
-                  Icons.more_vert_rounded,
-                  color: Colors.grey,
-                  size: 24,
-                ),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                onSelected: (value) {
-                  if (value == 'share') {
-                    if (onShareTap != null) {
-                      onShareTap!();
-                    } else {
-                      _shareJob();
-                    }
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'share',
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.share,
-                          size: 18,
-                          color: _CardColors.darkText,
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+                  const Divider(color: Color(0xFFF1F5F9), height: 1),
+                  const SizedBox(height: 10),
+
+                  // ── Action Buttons Bar ─────────────────────────────────
+                  Row(
+                    children: [
+                      // Share / More Button
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: onShareTap ?? _shareJob,
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: _CardColors.bgTint,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: _CardColors.borderGrey,
+                                width: 1,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.share_rounded,
+                              color: _CardColors.subText,
+                              size: 16,
+                            ),
+                          ),
                         ),
-                        SizedBox(width: 8),
-                        Text('Share Job'),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 8),
+
+                      // CTA Buttons (Apply, WhatsApp, Call)
+                      ...() {
+                        final List<Widget> activeButtons = [];
+                        if (showApply) {
+                          activeButtons.add(
+                            Expanded(
+                              child: Container(
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF4F46E5),
+                                      Color(0xFF6366F1),
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: ElevatedButton.icon(
+                                  onPressed:
+                                      onTap ?? () => _navigateToDetail(context),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  icon: const Icon(
+                                    Icons.arrow_forward_rounded,
+                                    size: 15,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    l10n.text('jobs_apply'),
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        if (showChat) {
+                          activeButtons.add(
+                            Expanded(
+                              child: SizedBox(
+                                height: 36,
+                                child: OutlinedButton.icon(
+                                  onPressed:
+                                      onWhatsAppTap ?? () => _openWhatsApp(),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                      color: Color(0xFF25D366),
+                                      width: 1.2,
+                                    ),
+                                    backgroundColor: const Color(0xFFF0FDF4),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    foregroundColor: const Color(0xFF166534),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  icon: SizedBox(
+                                    width: 15,
+                                    height: 15,
+                                    child: Image.asset(
+                                      'assets/icons/whatsapp.png',
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(
+                                        Icons.chat_bubble_rounded,
+                                        size: 14,
+                                        color: Color(0xFF25D366),
+                                      ),
+                                    ),
+                                  ),
+                                  label: const Text(
+                                    'WhatsApp',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF166534),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        if (showCall) {
+                          activeButtons.add(
+                            Expanded(
+                              child: Container(
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF4F46E5),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: ElevatedButton.icon(
+                                  onPressed: onCallTap ?? () => _makeCall(),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  icon: const Icon(
+                                    Icons.phone_rounded,
+                                    size: 15,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    lang == 'mr' ? 'कॉल करा' : 'Call Employer',
+                                    style: const TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        final List<Widget> rowChildren = [];
+                        for (int i = 0; i < activeButtons.length; i++) {
+                          rowChildren.add(activeButtons[i]);
+                          if (i < activeButtons.length - 1) {
+                            rowChildren.add(const SizedBox(width: 8));
+                          }
+                        }
+                        return rowChildren;
+                      }(),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(width: 8),
-              ...() {
-                final List<Widget> activeButtons = [];
-                if (showApply) {
-                  activeButtons.add(
-                    Expanded(
-                      child: SizedBox(
-                        height: 40,
-                        child: ElevatedButton.icon(
-                          onPressed: onTap ?? () => _navigateToDetail(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _CardColors.primaryBlue,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: EdgeInsets.zero,
-                          ),
-                          icon: const Icon(
-                            Icons.check_circle_outline_rounded,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                          label: Text(
-                            l10n.text('jobs_apply'),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }
-                if (showChat) {
-                  activeButtons.add(
-                    Expanded(
-                      child: SizedBox(
-                        height: 40,
-                        child: OutlinedButton.icon(
-                          onPressed: onWhatsAppTap ?? () => _openWhatsApp(),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(
-                              color: Color(0xFFD7DADF),
-                              width: 1.2,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            foregroundColor: _CardColors.darkText,
-                            padding: EdgeInsets.zero,
-                          ),
-                          icon: SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: Image.asset(
-                              'assets/icons/whatsapp.png',
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                    Icons.chat_bubble_outline_rounded,
-                                    size: 16,
-                                    color: Color(0xFF25D366),
-                                  ),
-                            ),
-                          ),
-                          label: const Text(
-                            'Chat',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: _CardColors.darkText,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }
-                if (showCall) {
-                  activeButtons.add(
-                    Expanded(
-                      child: SizedBox(
-                        height: 40,
-                        child: ElevatedButton.icon(
-                          onPressed: onCallTap ?? () => _makeCall(),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _CardColors.primaryBlue,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: EdgeInsets.zero,
-                          ),
-                          icon: const Icon(
-                            Icons.phone_rounded,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                          label: Text(
-                            lang == 'mr' ? 'कॉल' : 'Call',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }
-
-                final List<Widget> rowChildren = [];
-                for (int i = 0; i < activeButtons.length; i++) {
-                  rowChildren.add(activeButtons[i]);
-                  if (i < activeButtons.length - 1) {
-                    rowChildren.add(const SizedBox(width: 8));
-                  }
-                }
-                return rowChildren;
-              }(),
-            ],
+            ),
           ),
-        ],
+        ),
       ),
-    ),
     );
   }
 }
