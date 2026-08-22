@@ -113,6 +113,12 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
     super.initState();
     _fetchCategories();
     _fetchStates();
+
+    // Auto-fill phone if available from employer profile
+    if (controller.phone.value.isNotEmpty) {
+      _contactPhoneCtrl.text = controller.phone.value;
+      _contactWhatsappCtrl.text = controller.phone.value;
+    }
   }
 
   Future<void> _fetchCategories() async {
@@ -184,8 +190,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
     if (!mounted) return;
     setState(() => _isStatesLoading = true);
     try {
-      final res = await ApiService.get('https://rozgaradda.com/api/states');
-      if (res['statusCode'] == 200) {
+      final res = await ApiService.get(ApiRoutes.states);
+      if (res['data'] != null) {
         final List<dynamic> raw = res['data'] as List<dynamic>? ?? [];
         if (mounted) {
           setState(() {
@@ -217,7 +223,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
       final res = await ApiService.get(
         'https://rozgaradda.com/api/districts/$stateId',
       );
-      if (res['statusCode'] == 200) {
+      if (res['data'] != null) {
         final List<dynamic> raw = res['data'] as List<dynamic>? ?? [];
         if (mounted) {
           setState(() {
@@ -247,7 +253,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
       final res = await ApiService.get(
         'https://rozgaradda.com/api/localities/$districtId',
       );
-      if (res['statusCode'] == 200) {
+      if (res['data'] != null) {
         final List<dynamic> raw = res['data'] as List<dynamic>? ?? [];
         if (mounted) {
           setState(() {
@@ -915,6 +921,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
             ),
           ],
         ),
+        _buildStepInlineButtons(),
       ],
     );
   }
@@ -1184,6 +1191,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               ),
             ],
           ),
+        _buildStepInlineButtons(),
       ],
     );
   }
@@ -1302,6 +1310,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
             ),
           ],
         ),
+        _buildStepInlineButtons(),
       ],
     );
   }
@@ -1539,7 +1548,83 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
             ],
           ],
         ),
+        _buildStepInlineButtons(),
       ],
+    );
+  }
+
+  // ==========================================
+  // INLINE ACTION BUTTONS (INSIDE STEP CARD)
+  // ==========================================
+  Widget _buildStepInlineButtons() {
+    final isLastStep = _currentStep == _totalSteps - 1;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 20, bottom: 8),
+      child: Row(
+        children: [
+          if (_currentStep > 0) ...[
+            Expanded(
+              flex: 1,
+              child: OutlinedButton.icon(
+                onPressed: _handleBackNavigation,
+                icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                label: const Text('Back'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: darkText,
+                  side: const BorderSide(color: borderGrey, width: 1.2),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+          ],
+          Expanded(
+            flex: 2,
+            child: ElevatedButton.icon(
+              onPressed: _isSubmitting ? null : _nextStep,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isLastStep ? successGreen : primary,
+                foregroundColor: Colors.white,
+                elevation: 2,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              icon: _isSubmitting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Icon(
+                      isLastStep
+                          ? Icons.rocket_launch_rounded
+                          : Icons.arrow_forward_rounded,
+                      size: 18,
+                    ),
+              label: Text(
+                _isSubmitting
+                    ? 'Publishing...'
+                    : (isLastStep
+                        ? 'Publish Job Opening'
+                        : 'Continue to Step ${_currentStep + 2}'),
+                style: const TextStyle(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

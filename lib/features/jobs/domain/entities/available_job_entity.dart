@@ -99,15 +99,43 @@ class AvailableJob {
     this.enableChat = false,
   });
 
+  /// Helper to format currency numbers with Indian commas (e.g. 20000 -> 20,000, 100000 -> 1,00,000)
+  static String formatAmount(String? val) {
+    if (val == null || val.trim().isEmpty) return '';
+    final clean = val.replaceAll(',', '').replaceAll(' ', '').trim();
+    final numVal = num.tryParse(clean);
+    if (numVal != null) {
+      final isNegative = numVal < 0;
+      final absInt = numVal.abs().toInt();
+      final str = absInt.toString();
+      if (str.length <= 3) {
+        return '${isNegative ? "-" : ""}$str';
+      }
+      final lastThree = str.substring(str.length - 3);
+      final remaining = str.substring(0, str.length - 3);
+      final buffer = StringBuffer();
+      for (int i = 0; i < remaining.length; i++) {
+        if (i > 0 && (remaining.length - i) % 2 == 0) {
+          buffer.write(',');
+        }
+        buffer.write(remaining[i]);
+      }
+      return '${isNegative ? "-" : ""}${buffer.toString()},$lastThree';
+    }
+    return val;
+  }
+
   /// Human-readable salary display string
   String get salaryDisplay {
-    if (fixedSalary != null && fixedSalary!.isNotEmpty) {
-      return '₹$fixedSalary';
+    if (fixedSalary != null && fixedSalary!.trim().isNotEmpty) {
+      return '₹${formatAmount(fixedSalary)}';
     }
-    if (minSalary != null && maxSalary != null) {
-      return '₹$minSalary - ₹$maxSalary';
+    if (minSalary != null && maxSalary != null && minSalary!.trim().isNotEmpty && maxSalary!.trim().isNotEmpty) {
+      return '₹${formatAmount(minSalary)} - ₹${formatAmount(maxSalary)}';
     }
-    if (minSalary != null) return '₹$minSalary+';
+    if (minSalary != null && minSalary!.trim().isNotEmpty) {
+      return '₹${formatAmount(minSalary)}+';
+    }
     return 'Not disclosed';
   }
 

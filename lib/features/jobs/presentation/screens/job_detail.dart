@@ -87,7 +87,23 @@ class JobDetailScreen extends StatefulWidget {
 
 class _JobDetailScreenState extends State<JobDetailScreen> {
   AvailableJob get job => widget.job;
-  String? get imageUrl => widget.imageUrl;
+  String? get imageUrl {
+    if (widget.imageUrl != null && widget.imageUrl!.trim().isNotEmpty) {
+      return widget.imageUrl!.trim();
+    }
+    try {
+      if (Get.isRegistered<JobsController>()) {
+        final controller = Get.find<JobsController>();
+        final category = controller.categories.firstWhereOrNull(
+          (c) => c.id == widget.job.categoryId,
+        );
+        if (category != null && category.imageUrl.trim().isNotEmpty) {
+          return category.imageUrl.trim();
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
   late int _viewsCount;
 
   @override
@@ -334,8 +350,52 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     );
   }
 
+  String _getPostedTimeAgo(DateTime dt, String lang) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inDays <= 0) {
+      if (diff.inHours <= 0) {
+        if (diff.inMinutes <= 1) {
+          return lang == 'mr'
+              ? 'आत्ताच पोस्ट केले'
+              : (lang == 'hi' ? 'अभी पोस्ट किया' : 'Posted just now');
+        }
+        final mins = diff.inMinutes;
+        return lang == 'mr'
+            ? '$mins मिनिटांपूर्वी'
+            : (lang == 'hi' ? '$mins मिनट पहले' : 'Posted ${mins}m ago');
+      }
+      final hours = diff.inHours;
+      return lang == 'mr'
+          ? '$hours तासांपूर्वी'
+          : (lang == 'hi' ? '$hours घंटे पहले' : 'Posted ${hours}h ago');
+    } else if (diff.inDays == 1) {
+      return lang == 'mr'
+          ? 'काल पोस्ट केले'
+          : (lang == 'hi' ? 'कल पोस्ट किया' : 'Posted 1 day ago');
+    } else if (diff.inDays < 30) {
+      final days = diff.inDays;
+      return lang == 'mr'
+          ? '$days दिवसांपूर्वी'
+          : (lang == 'hi' ? '$days दिन पहले' : 'Posted $days days ago');
+    } else {
+      final months = (diff.inDays / 30).floor();
+      return lang == 'mr'
+          ? '$months महिन्यांपूर्वी'
+          : (lang == 'hi' ? '$months महीने पहले' : 'Posted $months mo ago');
+    }
+  }
+
+  String _formatJobDate(DateTime dt) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
+  }
+
   // ── Hero Job Info Card ──────────────────────────────────────────────────────
   Widget _buildHeroCard(BuildContext context) {
+    final lang = AppLocalizations.of(context).locale.languageCode;
     final parts = <String>[];
     if (job.addressLine1.isNotEmpty) parts.add(job.addressLine1);
     if (job.addressLine2.isNotEmpty) parts.add(job.addressLine2);
@@ -460,11 +520,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
           const SizedBox(height: 14),
 
-          // Tag Pills (Views, Vacancy, Job Type, Walk-in)
+          // Tag Pills (Posted time, Views, Vacancy, Job Type, Walk-in)
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
+              _buildTagPill(
+                icon: Icons.history_toggle_off_rounded,
+                text: _getPostedTimeAgo(job.createdAt, lang),
+                bgColor: const Color(0xFFF0FDF4),
+                textColor: const Color(0xFF16A34A),
+              ),
               _buildTagPill(
                 icon: Icons.visibility_rounded,
                 text: '$_viewsCount ${_viewsCount == 1 ? "View" : "Views"}',
@@ -805,6 +871,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             icon2: Icons.business_center_outlined,
             title2: 'Work Location',
             val2: job.workLocationLabel.isNotEmpty ? job.workLocationLabel : 'Office',
+          ),
+
+          const SizedBox(height: 14),
+
+          _buildGridSpecRow(
+            icon1: Icons.access_time_rounded,
+            title1: 'Job Posted',
+            val1: _getPostedTimeAgo(job.createdAt, AppLocalizations.of(context).locale.languageCode),
+            icon2: Icons.calendar_month_outlined,
+            title2: 'Posting Date',
+            val2: _formatJobDate(job.createdAt),
           ),
 
           if (job.skills.isNotEmpty) ...[

@@ -227,9 +227,9 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                       child: _buildContactTile(
                         icon: Icons.phone_in_talk_rounded,
                         title: 'Call Support',
-                        subtitle: 'Mon - Sat (9AM - 6PM)',
+                        subtitle: '+91 9565969555',
                         color: const Color(0xFF10B981),
-                        onTap: () => _launchUrl('tel:+918000000000'),
+                        onTap: () => _launchUrl('tel:+919565969555'),
                       ),
                     ),
                     const SizedBox(width: 12),

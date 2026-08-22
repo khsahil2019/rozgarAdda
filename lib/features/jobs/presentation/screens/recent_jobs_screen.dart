@@ -119,9 +119,11 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
 
   String _getJobImageUrl(AvailableJob job) {
     try {
-      final category = _jobsController.categories.firstWhereOrNull((c) => c.id == job.categoryId);
-      if (category != null && category.imageUrl.isNotEmpty) {
-        return category.imageUrl;
+      final category = _jobsController.categories.firstWhereOrNull(
+        (c) => c.id == job.categoryId,
+      );
+      if (category != null && category.imageUrl.trim().isNotEmpty) {
+        return category.imageUrl.trim();
       }
     } catch (_) {}
     return '';
@@ -134,6 +136,13 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       JobsBinding().dependencies();
     }
     _jobsController = Get.find<JobsController>();
+
+    if (_jobsController.categories.isEmpty) {
+      _jobsController.fetchCategories().then((_) {
+        if (mounted) setState(() {});
+      });
+    }
+
     _pageController = PageController(viewportFraction: 0.85);
     _pageController.addListener(() {
       if (_pageController.hasClients) {
@@ -189,6 +198,9 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
     });
 
     try {
+      if (_jobsController.categories.isEmpty) {
+        await _jobsController.fetchCategories();
+      }
       final repository = Get.find<JobsRepository>();
       final result = await repository.getLatestJobs(
         stateId: stateId,
@@ -1036,6 +1048,7 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   Widget _buildVerticalJobCard(AvailableJob job, AppLocalizations l10n) {
     return JobCardWidget(
       job: job,
+      imageUrl: _getJobImageUrl(job),
       onTap: () => _navigateToDetail(job),
       onWhatsAppTap: () => _openWhatsApp(
         job.whatsappNumber ?? job.contactPhone,
@@ -2057,7 +2070,12 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
   void _navigateToDetail(AvailableJob job) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => JobDetailScreen(job: job)),
+      MaterialPageRoute(
+        builder: (_) => JobDetailScreen(
+          job: job,
+          imageUrl: _getJobImageUrl(job),
+        ),
+      ),
     );
   }
 

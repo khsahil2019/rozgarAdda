@@ -55,7 +55,7 @@ class EmployerDashboardController extends GetxController {
       phone.value = prefs.getString('employer_phone') ?? '';
       contactPerson.value = prefs.getString('employer_contact_person') ?? '';
       address.value = prefs.getString('employer_address') ?? '';
-      final token = prefs.getString('employer_token');
+      final token = await _getAuthToken();
 
       List<AvailableJob> jobs = [];
 
@@ -95,15 +95,26 @@ class EmployerDashboardController extends GetxController {
               ApiRoutes.employerApplications(job.id),
               accessToken: token,
             );
-            if (res['success'] == true &&
-                res['applications'] != null &&
-                res['applications']['data'] != null) {
-              final List<dynamic> dataList = res['applications']['data'] ?? [];
+
+            List<dynamic>? dataList;
+            if (res['applications'] is List) {
+              dataList = res['applications'] as List<dynamic>;
+            } else if (res['applications'] is Map &&
+                res['applications']['data'] is List) {
+              dataList = res['applications']['data'] as List<dynamic>;
+            } else if (res['data'] is List) {
+              dataList = res['data'] as List<dynamic>;
+            } else if (res['data'] is Map && res['data']['data'] is List) {
+              dataList = res['data']['data'] as List<dynamic>;
+            } else if (res['candidates'] is List) {
+              dataList = res['candidates'] as List<dynamic>;
+            }
+
+            if (dataList != null) {
               apps = dataList.map<JobApplication>((item) {
                 final app = JobApplication.fromJson(
                   item as Map<String, dynamic>,
                 );
-                // Apply local status override if stored in memory
                 if (localApplicationStatuses.containsKey(app.id)) {
                   return JobApplication(
                     id: app.id,
@@ -125,24 +136,22 @@ class EmployerDashboardController extends GetxController {
                 }
                 return app;
               }).toList();
+            }
 
-              if (res['stats'] != null) {
-                final statsMap = Map<String, dynamic>.from(res['stats'] as Map);
-                jobStats[job.id] = statsMap.map(
-                  (k, v) => MapEntry(k, int.tryParse(v.toString()) ?? 0),
-                );
-              } else {
-                _calculateMockStats(job.id, apps, job.viewsCount);
-              }
-
-              if (res['job'] != null && res['job']['visitor_count'] != null) {
-                jobVisitorCounts[job.id] =
-                    int.tryParse(res['job']['visitor_count'].toString()) ?? 0;
-              } else {
-                jobVisitorCounts[job.id] = job.viewsCount;
-              }
+            if (res['stats'] != null && res['stats'] is Map) {
+              final statsMap = Map<String, dynamic>.from(res['stats'] as Map);
+              jobStats[job.id] = statsMap.map(
+                (k, v) => MapEntry(k, int.tryParse(v.toString()) ?? 0),
+              );
             } else {
               _calculateMockStats(job.id, apps, job.viewsCount);
+            }
+
+            if (res['job'] != null && res['job']['visitor_count'] != null) {
+              jobVisitorCounts[job.id] =
+                  int.tryParse(res['job']['visitor_count'].toString()) ?? 0;
+            } else {
+              jobVisitorCounts[job.id] = job.viewsCount;
             }
           } catch (e) {
             debugPrint('Error loading applications for job ${job.id}: $e');
@@ -155,6 +164,96 @@ class EmployerDashboardController extends GetxController {
       }
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  final RxMap<int, bool> isJobApplicationsLoading = <int, bool>{}.obs;
+
+  Future<String?> _getAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final empToken = prefs.getString('employer_token');
+    if (empToken != null && empToken.isNotEmpty) return empToken;
+    final accToken = prefs.getString('access_token');
+    if (accToken != null && accToken.isNotEmpty) return accToken;
+    final token = prefs.getString('token');
+    if (token != null && token.isNotEmpty) return token;
+    return null;
+  }
+
+  Future<void> fetchApplicationsForJob(int jobId) async {
+    isJobApplicationsLoading[jobId] = true;
+    try {
+      final token = await _getAuthToken();
+
+      List<JobApplication> apps = [];
+      if (token != null && token.isNotEmpty) {
+        try {
+          final res = await ApiService.get(
+            ApiRoutes.employerApplications(jobId),
+            accessToken: token,
+          );
+
+          List<dynamic>? dataList;
+          if (res['applications'] is List) {
+            dataList = res['applications'] as List<dynamic>;
+          } else if (res['applications'] is Map &&
+              res['applications']['data'] is List) {
+            dataList = res['applications']['data'] as List<dynamic>;
+          } else if (res['data'] is List) {
+            dataList = res['data'] as List<dynamic>;
+          } else if (res['data'] is Map && res['data']['data'] is List) {
+            dataList = res['data']['data'] as List<dynamic>;
+          } else if (res['candidates'] is List) {
+            dataList = res['candidates'] as List<dynamic>;
+          }
+
+          if (dataList != null) {
+            apps = dataList.map<JobApplication>((item) {
+              final app = JobApplication.fromJson(
+                item as Map<String, dynamic>,
+              );
+              if (localApplicationStatuses.containsKey(app.id)) {
+                return JobApplication(
+                  id: app.id,
+                  jobId: app.jobId,
+                  candidateName: app.candidateName,
+                  email: app.email,
+                  phone: app.phone,
+                  experienceYears: app.experienceYears,
+                  experienceMonths: app.experienceMonths,
+                  educationLevel: app.educationLevel,
+                  educationDetails: app.educationDetails,
+                  keySkills: app.keySkills,
+                  resumePath: app.resumePath,
+                  status: localApplicationStatuses[app.id]!,
+                  appliedAt: app.appliedAt,
+                  expectedSalary: app.expectedSalary,
+                  noticePeriod: app.noticePeriod,
+                );
+              }
+              return app;
+            }).toList();
+          }
+
+          if (res['stats'] != null && res['stats'] is Map) {
+            final statsMap = Map<String, dynamic>.from(res['stats'] as Map);
+            jobStats[jobId] = statsMap.map(
+              (k, v) => MapEntry(k, int.tryParse(v.toString()) ?? 0),
+            );
+          }
+
+          if (res['job'] != null && res['job']['visitor_count'] != null) {
+            jobVisitorCounts[jobId] =
+                int.tryParse(res['job']['visitor_count'].toString()) ?? 0;
+          }
+        } catch (e) {
+          debugPrint('Error fetching applications for job $jobId: $e');
+        }
+      }
+
+      jobApplications[jobId] = apps;
+    } finally {
+      isJobApplicationsLoading[jobId] = false;
     }
   }
 
@@ -704,19 +803,47 @@ class EmployerDashboardController extends GetxController {
 
   void _calculateMockStats(int jobId, List<JobApplication> apps, int views) {
     final total = apps.length;
-    final newCount = apps.where((a) => a.status == 'pending').length;
-    final reviewed = apps.where((a) => a.status == 'reviewed').length;
-    final shortlisted = apps
-        .where((a) => a.status == 'accepted' || a.status == 'shortlisted')
+    final newCount = apps.where((a) {
+      final s = a.status.toLowerCase();
+      return s == 'pending' ||
+          s == 'new' ||
+          s == 'applied' ||
+          s == 'under_review' ||
+          s == '0' ||
+          s.isEmpty;
+    }).length;
+    final reviewed = apps
+        .where((a) =>
+            a.status.toLowerCase() == 'reviewed' ||
+            a.status.toLowerCase() == 'viewed')
         .length;
-    final rejected = apps.where((a) => a.status == 'rejected').length;
+    final shortlisted = apps
+        .where((a) =>
+            a.status.toLowerCase() == 'accepted' ||
+            a.status.toLowerCase() == 'shortlisted' ||
+            a.status.toLowerCase() == 'shortlist' ||
+            a.status.toLowerCase() == '1')
+        .length;
+    final rejected = apps
+        .where((a) =>
+            a.status.toLowerCase() == 'rejected' ||
+            a.status.toLowerCase() == 'reject' ||
+            a.status.toLowerCase() == '2')
+        .length;
+    final hired = apps
+        .where((a) =>
+            a.status.toLowerCase() == 'hired' ||
+            a.status.toLowerCase() == 'selected')
+        .length;
+
     jobStats[jobId] = {
       'total': total,
       'new': newCount,
+      'pending': newCount,
       'reviewed': reviewed,
       'shortlisted': shortlisted,
       'rejected': rejected,
-      'hired': 0,
+      'hired': hired,
     };
     jobVisitorCounts[jobId] = views;
   }
@@ -814,15 +941,25 @@ class EmployerDashboardController extends GetxController {
       final appStatus = app.status.trim().toLowerCase();
 
       if (filter == 'pending' || filter == 'new') {
-        return appStatus == 'pending' || appStatus == 'new';
+        return appStatus == 'pending' ||
+            appStatus == 'new' ||
+            appStatus == '0' ||
+            appStatus == 'under_review' ||
+            appStatus == 'applied' ||
+            appStatus.isEmpty;
       } else if (filter == 'shortlisted' || filter == 'accepted') {
-        return appStatus == 'shortlisted' || appStatus == 'accepted';
+        return appStatus == 'shortlisted' ||
+            appStatus == 'accepted' ||
+            appStatus == 'shortlist' ||
+            appStatus == '1';
       } else if (filter == 'rejected') {
-        return appStatus == 'rejected';
+        return appStatus == 'rejected' ||
+            appStatus == 'reject' ||
+            appStatus == '2';
       } else if (filter == 'hired') {
-        return appStatus == 'hired';
+        return appStatus == 'hired' || appStatus == 'selected';
       } else if (filter == 'reviewed') {
-        return appStatus == 'reviewed';
+        return appStatus == 'reviewed' || appStatus == 'viewed';
       }
 
       return appStatus == filter;

@@ -41,9 +41,20 @@ class JobCardWidget extends StatelessWidget {
   });
 
   String _getJobImageUrl(AvailableJob job) {
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return imageUrl!;
+    if (imageUrl != null && imageUrl!.trim().isNotEmpty) {
+      return imageUrl!.trim();
     }
+    try {
+      if (Get.isRegistered<JobsController>()) {
+        final controller = Get.find<JobsController>();
+        final category = controller.categories.firstWhereOrNull(
+          (c) => c.id == job.categoryId,
+        );
+        if (category != null && category.imageUrl.trim().isNotEmpty) {
+          return category.imageUrl.trim();
+        }
+      }
+    } catch (_) {}
     return '';
   }
 

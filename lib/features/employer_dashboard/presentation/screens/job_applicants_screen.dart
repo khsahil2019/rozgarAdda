@@ -10,6 +10,7 @@ import '../../../../core/widgets/app_back_button.dart';
 import '../controllers/employer_dashboard_controller.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../domain/entities/job_application_entity.dart';
+import '../../../jobs/domain/entities/available_job_entity.dart';
 
 class JobApplicantsScreen extends StatefulWidget {
   final int jobId;
@@ -58,6 +59,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     _searchCtrl.addListener(() {
       controller.applicantSearchQuery.value = _searchCtrl.text;
     });
+    controller.fetchApplicationsForJob(widget.jobId);
   }
 
   @override
@@ -426,6 +428,32 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(width: 2),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _selectedApplicationIds.isNotEmpty ? statusGreen : primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        minimumSize: const Size(0, 32),
+                      ),
+                      onPressed: _selectedApplicationIds.isNotEmpty
+                          ? _exportSelectedCandidates
+                          : () {
+                              _selectAllFiltered();
+                              _exportSelectedCandidates();
+                            },
+                      icon: const Icon(Icons.file_download_outlined, size: 14),
+                      label: Text(
+                        _selectedApplicationIds.isNotEmpty
+                            ? 'Export (${_selectedApplicationIds.length})'
+                            : 'Export All',
+                        style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
                     IconButton(
                       tooltip: 'Exit Selection Mode',
                       icon: const Icon(Icons.close_rounded, color: darkText, size: 20),
@@ -508,27 +536,44 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
 
                   // 3. Candidate Applications List
                   Expanded(
-                    child: filteredApps.isEmpty
-                        ? _buildEmptyState()
-                        : ListView.builder(
-                            padding: EdgeInsets.fromLTRB(
-                              16,
-                              4,
-                              16,
-                              hasSelection ? 86 : 24,
-                            ),
-                            itemCount: filteredApps.length,
-                            itemBuilder: (ctx, index) {
-                              final app = filteredApps[index];
-                              return _buildCandidateCard(app);
-                            },
+                    child: (controller.isJobApplicationsLoading[widget.jobId] == true && allApps.isEmpty)
+                        ? const Center(
+                            child: CircularProgressIndicator(color: primary),
+                          )
+                        : RefreshIndicator(
+                            onRefresh: () => controller.fetchApplicationsForJob(widget.jobId),
+                            color: primary,
+                            child: filteredApps.isEmpty
+                                ? ListView(
+                                    physics: const AlwaysScrollableScrollPhysics(),
+                                    children: [
+                                      SizedBox(
+                                        height: MediaQuery.of(context).size.height * 0.45,
+                                        child: _buildEmptyState(),
+                                      ),
+                                    ],
+                                  )
+                                : ListView.builder(
+                                    physics: const AlwaysScrollableScrollPhysics(),
+                                    padding: EdgeInsets.fromLTRB(
+                                      16,
+                                      4,
+                                      16,
+                                      hasSelection ? 86 : 24,
+                                    ),
+                                    itemCount: filteredApps.length,
+                                    itemBuilder: (ctx, index) {
+                                      final app = filteredApps[index];
+                                      return _buildCandidateCard(app);
+                                    },
+                                  ),
                           ),
                   ),
                 ],
               ),
 
               // 4. Sticky Floating Multi-Select Export Bar
-              if (hasSelection)
+              if (_isSelectionMode.value || hasSelection)
                 Positioned(
                   bottom: 16,
                   left: 16,
@@ -551,7 +596,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                           decoration: BoxDecoration(
-                            color: primary,
+                            color: _selectedApplicationIds.isNotEmpty ? primary : Colors.white24,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -564,42 +609,53 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Text(
-                          'Candidate(s) Selected',
-                          style: TextStyle(
+                        Text(
+                          _selectedApplicationIds.isNotEmpty
+                              ? 'Selected'
+                              : 'Tap cards or Select All',
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
                             fontSize: 13,
                           ),
                         ),
                         const Spacer(),
-                        TextButton(
-                          onPressed: _deselectAll,
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white70,
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            minimumSize: const Size(0, 0),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        if (_selectedApplicationIds.isNotEmpty) ...[
+                          TextButton(
+                            onPressed: _deselectAll,
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white70,
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              minimumSize: const Size(0, 0),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text(
+                              'Clear',
+                              style: TextStyle(fontSize: 12),
+                            ),
                           ),
-                          child: const Text(
-                            'Clear',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
+                          const SizedBox(width: 6),
+                        ],
                         ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: primary,
+                            backgroundColor: _selectedApplicationIds.isNotEmpty ? statusGreen : primary,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          onPressed: _exportSelectedCandidates,
+                          onPressed: _selectedApplicationIds.isNotEmpty
+                              ? _exportSelectedCandidates
+                              : () {
+                                  _selectAllFiltered();
+                                  _exportSelectedCandidates();
+                                },
                           icon: const Icon(Icons.file_download_outlined, size: 15),
                           label: Text(
-                            'Export Excel (${_selectedApplicationIds.length})',
+                            _selectedApplicationIds.isNotEmpty
+                                ? 'Export Excel (${_selectedApplicationIds.length})'
+                                : 'Select & Export All',
                             style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               fontSize: 12.5,
@@ -627,23 +683,39 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     final totalCount = allApps.length;
     final pendingCount = allApps
         .where(
-          (a) =>
-              a.status.toLowerCase() == 'pending' ||
-              a.status.toLowerCase() == 'new',
+          (a) {
+            final s = a.status.toLowerCase();
+            return s == 'pending' ||
+                s == 'new' ||
+                s == 'applied' ||
+                s == 'under_review' ||
+                s == '0' ||
+                s.isEmpty;
+          },
         )
         .length;
     final shortlistedCount = allApps
         .where(
-          (a) =>
-              a.status.toLowerCase() == 'shortlisted' ||
-              a.status.toLowerCase() == 'accepted',
+          (a) {
+            final s = a.status.toLowerCase();
+            return s == 'shortlisted' ||
+                s == 'accepted' ||
+                s == 'shortlist' ||
+                s == '1';
+          },
         )
         .length;
     final hiredCount = allApps
-        .where((a) => a.status.toLowerCase() == 'hired')
+        .where((a) {
+          final s = a.status.toLowerCase();
+          return s == 'hired' || s == 'selected';
+        })
         .length;
     final rejectedCount = allApps
-        .where((a) => a.status.toLowerCase() == 'rejected')
+        .where((a) {
+          final s = a.status.toLowerCase();
+          return s == 'rejected' || s == 'reject' || s == '2';
+        })
         .length;
 
     return Container(
@@ -722,72 +794,70 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     required Color color,
     required IconData icon,
   }) {
-    return Obx(() {
-      final isSelected =
-          controller.applicantStatusFilter.value.toLowerCase() ==
-          filterKey.toLowerCase();
+    final isSelected =
+        controller.applicantStatusFilter.value.toLowerCase() ==
+        filterKey.toLowerCase();
 
-      return Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => controller.applicantStatusFilter.value = filterKey,
-          borderRadius: BorderRadius.circular(12),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-            decoration: BoxDecoration(
-              color: isSelected ? color : fieldBg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isSelected ? color : borderGrey,
-                width: isSelected ? 1.5 : 1.0,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => controller.applicantStatusFilter.value = filterKey,
+        borderRadius: BorderRadius.circular(12),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          decoration: BoxDecoration(
+            color: isSelected ? color : fieldBg,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? color : borderGrey,
+              width: isSelected ? 1.5 : 1.0,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.25),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? Colors.white : color,
+                size: 16,
               ),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.25),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  icon,
-                  color: isSelected ? Colors.white : color,
-                  size: 16,
+              const SizedBox(height: 3),
+              Text(
+                count,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : darkText,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w900,
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  count,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : darkText,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.2,
-                  ),
+              ),
+              const SizedBox(height: 1),
+              Text(
+                title,
+                style: TextStyle(
+                  color: isSelected
+                      ? Colors.white.withValues(alpha: 0.9)
+                      : greyText,
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w700,
                 ),
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: isSelected
-                        ? Colors.white.withValues(alpha: 0.9)
-                        : greyText,
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   // ==========================================
@@ -827,21 +897,19 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   color: primary,
                   size: 20,
                 ),
-                suffixIcon: Obx(
-                  () => controller.applicantSearchQuery.value.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(
-                            Icons.close_rounded,
-                            color: greyText,
-                            size: 18,
-                          ),
-                          onPressed: () {
-                            _searchCtrl.clear();
-                            controller.applicantSearchQuery.value = '';
-                          },
-                        )
-                      : const SizedBox.shrink(),
-                ),
+                suffixIcon: controller.applicantSearchQuery.value.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          color: greyText,
+                          size: 18,
+                        ),
+                        onPressed: () {
+                          _searchCtrl.clear();
+                          controller.applicantSearchQuery.value = '';
+                        },
+                      )
+                    : const SizedBox.shrink(),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 12,
@@ -856,19 +924,15 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Obx(() {
-                final currentFilter =
-                    controller.applicantStatusFilter.value.toUpperCase();
-                return Text(
-                  'STAGE: $currentFilter',
-                  style: const TextStyle(
-                    color: greyText,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.5,
-                  ),
-                );
-              }),
+              Text(
+                'STAGE: ${controller.applicantStatusFilter.value.toUpperCase()}',
+                style: const TextStyle(
+                  color: greyText,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                ),
+              ),
               Text(
                 '$matchingCount Candidates Found',
                 style: const TextStyle(
@@ -915,29 +979,28 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         ? app.candidateName.substring(0, 1).toUpperCase()
         : '?';
 
-    return Obx(() {
-      final isSelecting = _isSelectionMode.value;
-      final isSelected = _selectedApplicationIds.contains(app.id);
+    final isSelecting = _isSelectionMode.value;
+    final isSelected = _selectedApplicationIds.contains(app.id);
 
-      return Container(
-        margin: const EdgeInsets.only(bottom: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: isSelected ? primary : borderGrey,
-            width: isSelected ? 1.8 : 1.0,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected
-                  ? primary.withValues(alpha: 0.08)
-                  : const Color(0xFF0F172A).withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isSelected ? primary : borderGrey,
+          width: isSelected ? 1.8 : 1.0,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: isSelected
+                ? primary.withValues(alpha: 0.08)
+                : const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(18),
           child: Column(
@@ -1213,7 +1276,6 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           ),
         ),
       );
-    });
   }
 
   Widget _buildInfoTag({required IconData icon, required String label}) {
@@ -1468,7 +1530,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                     Icons.currency_rupee_rounded,
                     'Expected Salary',
                     app.expectedSalary.isNotEmpty
-                        ? '₹${app.expectedSalary} / month'
+                        ? '₹${AvailableJob.formatAmount(app.expectedSalary)} / month'
                         : 'Negotiable / Not specified',
                   ),
                   _buildDetailRow(
