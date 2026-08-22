@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:rojgar/core/widgets/app_back_button.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../domain/entities/missing_person.dart';
 
-class _MPDC {
-  static const Color bg = Color(0xFFF8FAFC);
-  static const Color navy = Color(0xFF0F172A);
-  static const Color redAccent = Color(0xFFEF4444);
-  static const Color grey = Color(0xFF64748B);
-  static const Color green = Color(0xFF10B981);
-  static const Color border = Color(0xFFE2E8F0);
-  static const Color gold = Color(0xFFD4A017);
+class _C {
+  static const Color primary = Color(0xFF1400FF);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color greyText = Color(0xFF64748B);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+  static const Color scaffoldBg = Color(0xFFF8FAFC);
+  static const Color cardBg = Colors.white;
+  static const Color dangerRed = Color(0xFFEF4444);
+  static const Color successGreen = Color(0xFF10B981);
 }
 
 class MissingPersonDetailScreen extends StatefulWidget {
@@ -32,10 +34,10 @@ class _MissingPersonDetailScreenState extends State<MissingPersonDetailScreen> {
     final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
     if (cleanNumber.isEmpty) {
       Get.snackbar(
-        'Call Error',
-        'No phone number available.',
+        'Contact Unavailable',
+        'No valid phone number is available for this case.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: _MPDC.redAccent.withValues(alpha: 0.9),
+        backgroundColor: _C.dangerRed,
         colorText: Colors.white,
       );
       return;
@@ -48,38 +50,49 @@ class _MissingPersonDetailScreenState extends State<MissingPersonDetailScreen> {
       } else {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       }
-    } catch (e) {
+    } catch (_) {
       Get.snackbar(
         'Call Error',
-        'Could not initiate phone call.',
+        'Could not initiate phone call to $cleanNumber.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: _MPDC.redAccent.withValues(alpha: 0.9),
+        backgroundColor: _C.dangerRed,
         colorText: Colors.white,
       );
     }
   }
 
-  Future<void> _launchBrowser(String urlString) async {
+  Future<void> _openFirDocument(String urlString) async {
+    if (urlString.isEmpty) return;
     final Uri url = Uri.parse(urlString);
     try {
-      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-        Get.snackbar(
-          'Error',
-          'Could not open link.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: _MPDC.redAccent.withValues(alpha: 0.9),
-          colorText: Colors.white,
-        );
-      }
-    } catch (e) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (_) {
       Get.snackbar(
         'Error',
-        'Invalid link format.',
+        'Could not open FIR document.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: _MPDC.redAccent.withValues(alpha: 0.9),
+        backgroundColor: _C.dangerRed,
         colorText: Colors.white,
       );
     }
+  }
+
+  void _shareCase() {
+    final person = widget.person;
+    final location = [person.locality, person.district, person.state].where((e) => e.isNotEmpty).join(', ');
+    final date = person.missingDatetime != null
+        ? DateFormat('dd MMM yyyy').format(person.missingDatetime!)
+        : 'Unknown';
+
+    final text = '🚨 *URGENT MISSING PERSON ALERT* 🚨\n\n'
+        '• *Name*: ${person.name}\n'
+        '• *Age*: ${person.age} Yrs (${person.gender})\n'
+        '• *Missing From*: $location\n'
+        '• *Missing Since*: $date\n'
+        '• *Contact Family*: ${person.complaintMobile.isNotEmpty ? person.complaintMobile : person.mobile}\n\n'
+        'Please share and inform authorities if you have any leads. Shared via Rozgar Adda App.';
+
+    Share.share(text, subject: 'Missing Person: ${person.name}');
   }
 
   @override
@@ -87,9 +100,8 @@ class _MissingPersonDetailScreenState extends State<MissingPersonDetailScreen> {
     final person = widget.person;
     final formattedDate = person.missingDatetime != null
         ? DateFormat('dd MMM yyyy, hh:mm a').format(person.missingDatetime!)
-        : 'Unknown';
+        : 'Date Unknown';
 
-    // List of images to display in carousel
     final List<String> imageUrls = [
       if (person.fullImage1Url.isNotEmpty) person.fullImage1Url,
       if (person.fullImage2Url.isNotEmpty) person.fullImage2Url,
@@ -102,15 +114,15 @@ class _MissingPersonDetailScreenState extends State<MissingPersonDetailScreen> {
         Get.back();
       },
       child: Scaffold(
-        backgroundColor: _MPDC.bg,
+        backgroundColor: _C.scaffoldBg,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
           scrolledUnderElevation: 0,
           title: const Text(
-            'Missing Person Profile',
+            'Missing Person Details',
             style: TextStyle(
-              color: _MPDC.navy,
+              color: _C.darkText,
               fontSize: 18,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.3,
@@ -123,149 +135,215 @@ class _MissingPersonDetailScreenState extends State<MissingPersonDetailScreen> {
               tooltip: 'Back',
             ),
           ),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(1),
-            child: Container(height: 1, color: _MPDC.border),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.share_rounded, color: _C.primary, size: 20),
+              tooltip: 'Share Alert',
+              onPressed: _shareCase,
+            ),
+            const SizedBox(width: 6),
+          ],
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(1),
+            child: Divider(height: 1, color: _C.borderGrey),
           ),
         ),
         body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image Carousel Header
+              // ── Top Image Carousel ─────────────────────────
               if (imageUrls.isNotEmpty)
                 _buildImageCarousel(imageUrls)
               else
-                _buildNoImagePlaceholder(),
+                _buildNoImageHeader(),
 
               Padding(
-                padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Status & Title
-                  _buildHeaderSection(person, formattedDate),
-                  const SizedBox(height: 16),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 90),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Hero Title Card with Emergency Badge ───────
+                    _buildHeroTitleCard(person, formattedDate),
+                    const SizedBox(height: 14),
 
-                  // Section 1: Physical Description
-                  _buildSectionTitle('Physical Description', Icons.accessibility_new_rounded),
-                  _buildDescriptionCard(person),
-                  const SizedBox(height: 16),
-
-                  // Section 2: Missing Circumstances
-                  _buildSectionTitle('Missing Details', Icons.info_outline_rounded),
-                  _buildMissingDetailsCard(person, formattedDate),
-                  const SizedBox(height: 16),
-
-                  // Section 3: Complainant & Relative Details
-                  _buildSectionTitle('Contact/Relative Details', Icons.contact_phone_outlined),
-                  _buildRelativeDetailsCard(person),
-                  const SizedBox(height: 16),
-
-                  // Section 4: FIR Details
-                  if (person.firNumber.isNotEmpty || person.fullFirCopyUrl.isNotEmpty) ...[
-                    _buildSectionTitle('Legal / FIR Information', Icons.gavel_rounded),
-                    _buildFirDetailsCard(person),
+                    // ── 1-Tap Emergency Contact Bar ───────────────
+                    _buildEmergencyActionButtons(person),
                     const SizedBox(height: 16),
-                  ],
 
-                  // Section 5: Police Station Details
-                  _buildSectionTitle('Investigating Authority', Icons.local_police_outlined),
-                  _buildPoliceDetailsCard(person),
-                  const SizedBox(height: 24),
-                ],
+                    // ── Physical Description Card ──────────────────
+                    _buildCardSection(
+                      icon: Icons.accessibility_new_rounded,
+                      iconColor: _C.primary,
+                      title: 'Physical Description',
+                      children: [
+                        _buildDetailRow('Age', '${person.age} Years'),
+                        _buildDetailRow('Gender', person.gender),
+                        if (person.relationInfo.isNotEmpty)
+                          _buildDetailRow('Guardian Info', person.relationInfo),
+                        if (person.heightFrom.isNotEmpty || person.heightTo.isNotEmpty)
+                          _buildDetailRow('Height Range', '${person.heightFrom} - ${person.heightTo}'),
+                        if (person.mentalStatus.isNotEmpty)
+                          _buildDetailRow('Mental Condition', person.mentalStatus),
+                        if (person.identityMark.isNotEmpty)
+                          _buildDetailRow('Identity Marks / Tattoos', person.identityMark),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // ── Incident & Last Seen Details ───────────────
+                    _buildCardSection(
+                      icon: Icons.location_on_rounded,
+                      iconColor: const Color(0xFF10B981),
+                      title: 'Last Seen & Incident Circumstances',
+                      children: [
+                        _buildDetailRow('Missing Date/Time', formattedDate),
+                        _buildDetailRow('State & District', '${person.district}, ${person.state}'),
+                        if (person.locality.isNotEmpty || person.village.isNotEmpty)
+                          _buildDetailRow('Locality / Village', '${person.locality} ${person.village}'.trim()),
+                        if (person.pincode.isNotEmpty)
+                          _buildDetailRow('Pincode', person.pincode),
+                        if (person.clothes.isNotEmpty)
+                          _buildDetailRow('Clothes Worn', person.clothes),
+                        if (person.reason.isNotEmpty)
+                          _buildDetailRow('Probable Reason', person.reason),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // ── Police & FIR Information ──────────────────
+                    _buildCardSection(
+                      icon: Icons.local_police_rounded,
+                      iconColor: const Color(0xFF0EA5E9),
+                      title: 'Police & FIR Records',
+                      children: [
+                        _buildDetailRow('FIR Number', person.firNumber.isNotEmpty ? person.firNumber : 'Not registered yet'),
+                        if (person.policeStationNo.isNotEmpty)
+                          _buildDetailRow('Station Contact', person.policeStationNo, isPhone: true),
+                        if (person.subInspector.isNotEmpty)
+                          _buildDetailRow('Assigned SI', person.subInspector),
+                        if (person.shoNo.isNotEmpty)
+                          _buildDetailRow('SHO Contact', person.shoNo, isPhone: true),
+                        if (person.fullFirCopyUrl.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: _C.primary,
+                              side: const BorderSide(color: _C.primary),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            onPressed: () => _openFirDocument(person.fullFirCopyUrl),
+                            icon: const Icon(Icons.description_outlined, size: 16),
+                            label: const Text('View Attached FIR Copy', style: TextStyle(fontWeight: FontWeight.w700)),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // ── Complainant / Family Information ──────────
+                    _buildCardSection(
+                      icon: Icons.contact_phone_rounded,
+                      iconColor: const Color(0xFF8B5CF6),
+                      title: 'Complainant & Family Contact',
+                      children: [
+                        _buildDetailRow('Reporter Name', person.complaintName),
+                        if (person.relationType.isNotEmpty)
+                          _buildDetailRow('Relation', person.relationType),
+                        _buildDetailRow('Contact Phone', person.complaintMobile, isPhone: true),
+                        if (person.relativeAddress.isNotEmpty)
+                          _buildDetailRow('Residential Address', person.relativeAddress),
+                        if (person.complaintReason.isNotEmpty)
+                          _buildDetailRow('Complaint Reason', person.complaintReason),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: _buildBottomActionBar(person),
       ),
     );
   }
 
-  // ── Image PageView Carousel ───────────────────────────────────────────────
-  Widget _buildImageCarousel(List<String> urls) {
-    return Stack(
-      children: [
-        SizedBox(
-          height: 280,
-          width: double.infinity,
-          child: PageView.builder(
+  Widget _buildImageCarousel(List<String> imageUrls) {
+    return Container(
+      color: Colors.black,
+      height: 280,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          PageView.builder(
             controller: _pageController,
-            itemCount: urls.length,
-            onPageChanged: (index) {
-              setState(() {
-                _currentImageIndex = index;
-              });
-            },
-            itemBuilder: (context, index) {
+            itemCount: imageUrls.length,
+            onPageChanged: (idx) => setState(() => _currentImageIndex = idx),
+            itemBuilder: (context, idx) {
               return Image.network(
-                urls[index],
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: const Color(0xFFE2E4EB),
-                  child: const Icon(Icons.broken_image_rounded, size: 64, color: _MPDC.grey),
-                ),
+                imageUrls[idx],
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => _buildNoImageHeader(),
               );
             },
           ),
-        ),
-        // Indicators
-        if (urls.length > 1)
-          Positioned(
-            bottom: 12,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                urls.length,
-                (index) => AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentImageIndex == index ? 18 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _currentImageIndex == index ? Colors.white : Colors.white60,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
+          if (imageUrls.length > 1)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(imageUrls.length, (idx) {
+                  final active = _currentImageIndex == idx;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: active ? 16 : 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: active ? Colors.white : Colors.white54,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  );
+                }),
               ),
             ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildNoImagePlaceholder() {
-    return Container(
-      height: 220,
-      width: double.infinity,
-      color: const Color(0xFFE2E4EB),
-      child: const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.person_rounded, size: 80, color: _MPDC.grey),
-          SizedBox(height: 8),
-          Text('No Image Available', style: TextStyle(color: _MPDC.grey, fontSize: 14)),
         ],
       ),
     );
   }
 
-  // ── Header Section ────────────────────────────────────────────────────────
-  Widget _buildHeaderSection(MissingPerson person, String formattedDate) {
+  Widget _buildNoImageHeader() {
+    return Container(
+      height: 200,
+      color: const Color(0xFFEFF6FF),
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.person_rounded, size: 64, color: _C.primary),
+            SizedBox(height: 8),
+            Text(
+              'No Photograph Available',
+              style: TextStyle(color: _C.greyText, fontSize: 13, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroTitleCard(MissingPerson person, String formattedDate) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: _C.cardBg,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _C.borderGrey),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -275,341 +353,188 @@ class _MissingPersonDetailScreenState extends State<MissingPersonDetailScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _MPDC.redAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(6),
+                  color: _C.dangerRed,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.warning_amber_rounded, size: 12, color: _MPDC.redAccent),
-                    SizedBox(width: 4),
-                    Text(
-                      'MISSING',
-                      style: TextStyle(
-                        color: _MPDC.redAccent,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ],
+                child: const Text(
+                  'MISSING PERSON ALERT',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
               const Spacer(),
               Text(
-                'Case status: ${person.status.toUpperCase()}',
-                style: TextStyle(
-                  color: person.status == 'approved' ? _MPDC.green : _MPDC.gold,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
+                'ID: #${person.id}',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _C.greyText),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             person.name,
             style: const TextStyle(
-              color: _MPDC.navy,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              color: _C.darkText,
+              letterSpacing: -0.4,
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              _buildBadge(person.gender, Icons.wc_rounded),
-              const SizedBox(width: 8),
-              _buildBadge('${person.age} Years Old', Icons.calendar_today_rounded),
-            ],
-          ),
-          const Divider(height: 24, thickness: 0.8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(Icons.location_on_rounded, size: 16, color: _MPDC.redAccent),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Last Known Location',
-                      style: TextStyle(color: _MPDC.grey, fontSize: 11, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      person.fullAddress,
-                      style: const TextStyle(color: _MPDC.navy, fontSize: 14, fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBadge(String label, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF0F1F6),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: _MPDC.navy),
-          const SizedBox(width: 6),
+          const SizedBox(height: 4),
           Text(
-            label,
-            style: const TextStyle(color: _MPDC.navy, fontSize: 12, fontWeight: FontWeight.bold),
+            'Missing since $formattedDate',
+            style: const TextStyle(fontSize: 12.5, color: _C.greyText, fontWeight: FontWeight.w500),
           ),
         ],
       ),
     );
   }
 
-  // ── Helper Titles ─────────────────────────────────────────────────────────
-  Widget _buildSectionTitle(String text, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: _MPDC.navy),
-          const SizedBox(width: 8),
-          Text(
-            text,
-            style: const TextStyle(
-              color: _MPDC.navy,
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildEmergencyActionButtons(MissingPerson person) {
+    final familyPhone = person.complaintMobile.isNotEmpty ? person.complaintMobile : person.mobile;
+    final policePhone = person.policeStationNo.isNotEmpty ? person.policeStationNo : person.shoNo;
 
-  // ── Physical Details Card ──────────────────────────────────────────────────
-  Widget _buildDescriptionCard(MissingPerson person) {
-    return _buildContainerCard(
-      child: Column(
-        children: [
-          _buildDetailRow('Height Range', '${person.heightFrom} to ${person.heightTo}'),
-          _buildDetailRow('Mental Status', person.mentalStatus),
-          _buildDetailRow('Clothes Worn', person.clothes),
-          _buildDetailRow('Distinguishing Marks', person.identityMark, isLast: true),
-        ],
-      ),
-    );
-  }
-
-  // ── Missing Details Card ───────────────────────────────────────────────────
-  Widget _buildMissingDetailsCard(MissingPerson person, String formattedDate) {
-    return _buildContainerCard(
-      child: Column(
-        children: [
-          _buildDetailRow('Missing Since', formattedDate),
-          _buildDetailRow('Reason / Circumstance', person.reason, isLast: true),
-        ],
-      ),
-    );
-  }
-
-  // ── Relative/Contact Details Card ──────────────────────────────────────────
-  Widget _buildRelativeDetailsCard(MissingPerson person) {
-    return _buildContainerCard(
-      child: Column(
-        children: [
-          _buildDetailRow('Reported By', person.complaintName),
-          _buildDetailRow('Relation', person.relationType),
-          _buildDetailRow('Relation Details', person.relationInfo),
-          _buildDetailRow('Relative Address', person.relativeAddress),
-          _buildDetailRow('Complainant Contact', person.complaintMobile),
-          _buildDetailRow('Reporter Identity Mark', person.complaintIdentityMark),
-          _buildDetailRow('Report Reason', person.complaintReason, isLast: true),
-        ],
-      ),
-    );
-  }
-
-  // ── FIR Legal Card ─────────────────────────────────────────────────────────
-  Widget _buildFirDetailsCard(MissingPerson person) {
-    return _buildContainerCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (person.firNumber.isNotEmpty)
-            _buildDetailRow('FIR Number', person.firNumber, isLast: person.fullFirCopyUrl.isEmpty),
-          if (person.fullFirCopyUrl.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            InkWell(
-              onTap: () => _launchBrowser(person.fullFirCopyUrl),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: _MPDC.navy.withValues(alpha: 0.04),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: _MPDC.navy.withValues(alpha: 0.15)),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.file_open_rounded, color: _MPDC.navy, size: 18),
-                    SizedBox(width: 8),
-                    Text(
-                      'View Registered FIR Copy',
-                      style: TextStyle(
-                        color: _MPDC.navy,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
+    return Row(
+      children: [
+        if (familyPhone.isNotEmpty)
+          Expanded(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _C.successGreen,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
+              onPressed: () => _makePhoneCall(familyPhone),
+              icon: const Icon(Icons.phone_rounded, size: 16),
+              label: const Text('Call Family', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
             ),
-          ],
-        ],
-      ),
+          ),
+        if (familyPhone.isNotEmpty && policePhone.isNotEmpty)
+          const SizedBox(width: 10),
+        if (policePhone.isNotEmpty)
+          Expanded(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _C.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              onPressed: () => _makePhoneCall(policePhone),
+              icon: const Icon(Icons.local_police_rounded, size: 16),
+              label: const Text('Call Police', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+            ),
+          ),
+      ],
     );
   }
 
-  // ── Police Details Card ────────────────────────────────────────────────────
-  Widget _buildPoliceDetailsCard(MissingPerson person) {
-    return _buildContainerCard(
-      child: Column(
-        children: [
-          _buildDetailRow('Assigned Sub-Inspector', person.subInspector.isEmpty ? 'Not Assigned' : person.subInspector),
-          _buildDetailRow('Police Station Phone', person.policeStationNo.isEmpty ? 'N/A' : person.policeStationNo),
-          _buildDetailRow('SHO Contact Number', person.shoNo.isEmpty ? 'N/A' : person.shoNo, isLast: true),
-        ],
-      ),
-    );
-  }
-
-  // ── Card container utilities ──────────────────────────────────────────────
-  Widget _buildContainerCard({required Widget child}) {
+  Widget _buildCardSection({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required List<Widget> children,
+  }) {
     return Container(
-      width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: _C.cardBg,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _C.borderGrey),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: child,
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value, {bool isLast = false}) {
-    final cleanValue = value.trim().isEmpty ? 'N/A' : value.trim();
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Expanded(
-                flex: 4,
-                child: Text(
-                  label,
-                  style: const TextStyle(
-                    color: _MPDC.grey,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                child: Icon(icon, color: iconColor, size: 18),
               ),
-              Expanded(
-                flex: 6,
-                child: Text(
-                  cleanValue,
-                  style: const TextStyle(
-                    color: _MPDC.navy,
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.bold,
-                  ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w800,
+                  color: _C.darkText,
                 ),
               ),
             ],
           ),
-        ),
-        if (!isLast) const Divider(height: 12, thickness: 0.5),
-      ],
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: _C.borderGrey),
+          const SizedBox(height: 10),
+          ...children,
+        ],
+      ),
     );
   }
 
-  // ── Bottom Call Actions Bar ───────────────────────────────────────────────
-  Widget _buildBottomActionBar(MissingPerson person) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
+  Widget _buildDetailRow(String label, String value, {bool isPhone = false}) {
+    if (value.trim().isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.5),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Complainant / Family contact button
-          Expanded(
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _MPDC.navy,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () => _makePhoneCall(
-                person.complaintMobile.isNotEmpty ? person.complaintMobile : person.mobile,
-              ),
-              icon: const Icon(Icons.call, size: 18),
-              label: const Text(
-                'Contact Family',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          SizedBox(
+            width: 130,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12.5,
+                color: _C.greyText,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          const SizedBox(width: 12),
-
-          // Police call button
           Expanded(
-            child: OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: _MPDC.redAccent,
-                side: const BorderSide(color: _MPDC.redAccent, width: 1.5),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () {
-                final policeNo = person.shoNo.isNotEmpty
-                    ? person.shoNo
-                    : (person.policeStationNo.isNotEmpty ? person.policeStationNo : '100');
-                _makePhoneCall(policeNo);
-              },
-              icon: const Icon(Icons.shield_outlined, size: 18),
-              label: const Text(
-                'Contact Police',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: _C.darkText,
+                    ),
+                  ),
+                ),
+                if (isPhone)
+                  GestureDetector(
+                    onTap: () => _makePhoneCall(value),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFECFDF5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.phone_rounded, color: Color(0xFF10B981), size: 14),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],

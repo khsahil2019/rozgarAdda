@@ -139,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.symmetric(horizontal: hPad),
                 child: GridView.builder(
                   shrinkWrap: true,
+                  padding: EdgeInsets.zero,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: kQuickLinks.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

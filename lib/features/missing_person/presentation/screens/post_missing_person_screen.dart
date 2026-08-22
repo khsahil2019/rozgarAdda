@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -5,12 +7,15 @@ import 'package:intl/intl.dart';
 import 'package:rojgar/core/widgets/app_back_button.dart';
 import '../controller/missing_person_controller.dart';
 
-class _PMPC {
-  static const Color bg = Color(0xFFF8FAFC);
-  static const Color navy = Color(0xFF0F172A);
-  static const Color accentBlue = Color(0xFF1400FF);
-  static const Color grey = Color(0xFF64748B);
-  static const Color borderColor = Color(0xFFE2E8F0);
+class _C {
+  static const Color primary = Color(0xFF1400FF);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color greyText = Color(0xFF64748B);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+  static const Color scaffoldBg = Color(0xFFF8FAFC);
+  static const Color cardBg = Colors.white;
+  static const Color fieldBg = Color(0xFFF8FAFC);
+  static const Color dangerRed = Color(0xFFEF4444);
 }
 
 class PostMissingPersonScreen extends GetView<MissingPersonController> {
@@ -25,19 +30,32 @@ class PostMissingPersonScreen extends GetView<MissingPersonController> {
         Get.back();
       },
       child: Scaffold(
-        backgroundColor: _PMPC.bg,
+        backgroundColor: _C.scaffoldBg,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
           scrolledUnderElevation: 0,
-          title: const Text(
-            'Missing Person Form',
-            style: TextStyle(
-              color: _PMPC.navy,
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.3,
-            ),
+          title: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Report Missing Person',
+                style: TextStyle(
+                  color: _C.darkText,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              Text(
+                'Community Alert & Verification',
+                style: TextStyle(
+                  color: _C.greyText,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
           centerTitle: false,
           leading: Center(
@@ -46,328 +64,482 @@ class PostMissingPersonScreen extends GetView<MissingPersonController> {
               tooltip: 'Back',
             ),
           ),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(1),
-            child: Container(height: 1, color: _PMPC.borderColor),
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(1),
+            child: Divider(height: 1, color: _C.borderGrey),
           ),
         ),
-      body: SafeArea(
-        child: Obx(() {
-          return Stack(
-            children: [
-              SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Section 1: Missing Person Details
-                    _buildSectionHeader('Missing Person Details'),
-                    _buildMissingPersonCard(context),
-                    const SizedBox(height: 20),
+        body: SafeArea(
+          child: Obx(() {
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Notice Banner ──────────────────────────────
+                      _buildNoticeBanner(),
+                      const SizedBox(height: 16),
 
-                    // Section 2: Photos Upload
-                    _buildSectionHeader('Photos Upload'),
-                    _buildPhotosUploadCard(context),
-                    const SizedBox(height: 20),
+                      // ── Section 1: Missing Person Details ───────────
+                      _buildSectionCard(
+                        icon: Icons.person_pin_rounded,
+                        iconColor: _C.primary,
+                        title: 'Missing Person Details',
+                        subtitle: 'Basic identity & primary contact',
+                        children: [
+                          _buildTextField(
+                            controller: controller.nameCtrl,
+                            label: 'Full Name *',
+                            hint: 'Enter missing person name',
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            controller: controller.relationInfoCtrl,
+                            label: 'Guardian Relation (S/O, W/O, D/O, C/O)',
+                            hint: 'e.g., S/O Ramesh Kumar',
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.ageCtrl,
+                                  label: 'Age (Years) *',
+                                  hint: 'e.g. 24',
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _buildDropdownField(
+                                  label: 'Gender *',
+                                  value: controller.postGender,
+                                  options: const ['Male', 'Female', 'Other'],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.mobileCtrl,
+                                  label: 'Contact Number *',
+                                  hint: '10-digit number',
+                                  keyboardType: TextInputType.phone,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.pincodeCtrl,
+                                  label: 'Pincode',
+                                  hint: '6-digit pincode',
+                                  keyboardType: TextInputType.number,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
 
-                    // Section 3: Complaint Person Details
-                    _buildSectionHeader('Complaint Person Details'),
-                    _buildComplaintPersonCard(context),
-                    const SizedBox(height: 20),
+                      // ── Section 2: Location & Address ───────────────
+                      _buildSectionCard(
+                        icon: Icons.location_on_rounded,
+                        iconColor: const Color(0xFF10B981),
+                        title: 'Location & Address',
+                        subtitle: 'Last known place & residence details',
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.stateCtrl,
+                                  label: 'State *',
+                                  hint: 'e.g., Maharashtra',
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.districtCtrl,
+                                  label: 'District *',
+                                  hint: 'e.g., Pune',
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.localityCtrl,
+                                  label: 'Locality / City',
+                                  hint: 'City or area',
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.villageCtrl,
+                                  label: 'Village / Mohalla',
+                                  hint: 'Village or sector',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
 
-                    // Section 4: FIR & Police Station Details
-                    _buildSectionHeader('Police FIR Details'),
-                    _buildPoliceDetailsCard(context),
-                    const SizedBox(height: 30),
+                      // ── Section 3: Physical Attributes & Incident ───
+                      _buildSectionCard(
+                        icon: Icons.info_outline_rounded,
+                        iconColor: const Color(0xFF6366F1),
+                        title: 'Incident & Physical Attributes',
+                        subtitle: 'Appearance and missing timeline',
+                        children: [
+                          _buildDateTimePickerField(context),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.heightFromCtrl,
+                                  label: 'Height From',
+                                  hint: 'e.g. 5\'2"',
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.heightToCtrl,
+                                  label: 'Height To',
+                                  hint: 'e.g. 5\'6"',
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            controller: controller.mentalStatusCtrl,
+                            label: 'Mental Condition',
+                            hint: 'e.g., Normal, Memory Loss, Speech Impaired',
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            controller: controller.probableReasonCtrl,
+                            label: 'Probable Reason of Missing',
+                            hint: 'Details regarding why/how they went missing...',
+                            maxLines: 2,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            controller: controller.clothesWornCtrl,
+                            label: 'Clothes & Accessories Worn',
+                            hint: 'Color and type of shirt, pants, footwear, etc.',
+                            maxLines: 2,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            controller: controller.identityMarkCtrl,
+                            label: 'Visible Identification Marks',
+                            hint: 'Birthmarks, scars, tattoos, distinctive marks...',
+                            maxLines: 2,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
 
-                    // Submit Button
-                    _buildSubmitButton(context),
-                    const SizedBox(height: 24),
-                  ],
-                ),
-              ),
-              if (controller.isSubmitting.value)
-                Container(
-                  color: Colors.black26,
-                  child: const Center(
-                    child: CircularProgressIndicator(color: _PMPC.accentBlue),
+                      // ── Section 4: Photo Uploads ───────────────────
+                      _buildSectionCard(
+                        icon: Icons.add_a_photo_rounded,
+                        iconColor: const Color(0xFFF59E0B),
+                        title: 'Recent Photographs *',
+                        subtitle: 'Upload clear front and profile photos',
+                        children: [
+                          _buildPhotoPickerCard(
+                            context: context,
+                            title: 'Front View Photo *',
+                            filePath: controller.postImage1Path.value,
+                            onPick: () => _showImageSourceModal(context, 1),
+                            onRemove: () => controller.postImage1Path.value = '',
+                          ),
+                          const SizedBox(height: 12),
+                          _buildPhotoPickerCard(
+                            context: context,
+                            title: 'Side / Alternate Photo',
+                            filePath: controller.postImage2Path.value,
+                            onPick: () => _showImageSourceModal(context, 2),
+                            onRemove: () => controller.postImage2Path.value = '',
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // ── Section 5: Police & FIR Details ────────────
+                      _buildSectionCard(
+                        icon: Icons.local_police_rounded,
+                        iconColor: const Color(0xFF0EA5E9),
+                        title: 'Police & FIR Details',
+                        subtitle: 'Registered complaint or station information',
+                        children: [
+                          _buildTextField(
+                            controller: controller.firNumberCtrl,
+                            label: 'FIR / Complaint Number',
+                            hint: 'Enter FIR registration number',
+                          ),
+                          const SizedBox(height: 12),
+                          _buildFirPickerCard(
+                            context: context,
+                            filePath: controller.postFirCopyPath.value,
+                            onPick: () => controller.pickFirCopy(),
+                            onRemove: () => controller.postFirCopyPath.value = '',
+                          ),
+                          const SizedBox(height: 14),
+                          const Divider(height: 1, color: _C.borderGrey),
+                          const SizedBox(height: 14),
+                          const Text(
+                            'Police Station Contacts',
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w800,
+                              color: _C.darkText,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildTextField(
+                            controller: controller.policeStationNoCtrl,
+                            label: 'Police Station Contact No.',
+                            hint: 'Phone number of local station',
+                            keyboardType: TextInputType.phone,
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.subInspectorCtrl,
+                                  label: 'Assigned SI Name',
+                                  hint: 'Sub-Inspector name',
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.shoNoCtrl,
+                                  label: 'SHO Contact No.',
+                                  hint: 'SHO phone number',
+                                  keyboardType: TextInputType.phone,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // ── Section 6: Complainant Details ─────────────
+                      _buildSectionCard(
+                        icon: Icons.contact_phone_rounded,
+                        iconColor: const Color(0xFF8B5CF6),
+                        title: 'Complainant / Reporter Info',
+                        subtitle: 'Person submitting this report',
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.complaintNameCtrl,
+                                  label: 'Reporter Name *',
+                                  hint: 'Your full name',
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _buildTextField(
+                                  controller: controller.complaintMobileCtrl,
+                                  label: 'Reporter Mobile *',
+                                  hint: 'Your phone number',
+                                  keyboardType: TextInputType.phone,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            controller: controller.relationTypeCtrl,
+                            label: 'Relation with Missing Person',
+                            hint: 'e.g. Father, Mother, Brother, Friend',
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            controller: controller.relativeAddressCtrl,
+                            label: 'Complainant Address',
+                            hint: 'Full residential address',
+                            maxLines: 2,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildTextField(
+                            controller: controller.complaintReasonCtrl,
+                            label: 'Reason of Lodging Report',
+                            hint: 'Any additional remarks or incident context...',
+                            maxLines: 2,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+
+                      // ── Submit Button ──────────────────────────────
+                      _buildSubmitButton(context),
+                      const SizedBox(height: 24),
+                    ],
                   ),
                 ),
-            ],
-          );
-        }),
-      ),
-      ),
-    );
-  }
 
-  // ── Section Title ─────────────────────────────────────────────────────────
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 10),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: _PMPC.navy,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
+                // Submitting Overlay
+                if (controller.isSubmitting.value)
+                  Container(
+                    color: Colors.black45,
+                    child: const Center(
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(24.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircularProgressIndicator(color: _C.primary),
+                              SizedBox(height: 16),
+                              Text(
+                                'Submitting Report...',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 14,
+                                  color: _C.darkText,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          }),
         ),
       ),
     );
   }
 
-  // ── Card container helper ──────────────────────────────────────────────────
-  Widget _buildFormContainer({required Widget child}) {
+  Widget _buildNoticeBanner() {
     return Container(
-      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFF6FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFBFDBFE)),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.privacy_tip_outlined, color: _C.primary, size: 20),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Please provide accurate information, recent photographs, and contact details to assist community search and rapid verification.',
+              style: TextStyle(
+                fontSize: 12.5,
+                color: Color(0xFF1E40AF),
+                height: 1.45,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionCard({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required List<Widget> children,
+  }) {
+    return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: _C.cardBg,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _C.borderGrey, width: 1.1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: child,
-    );
-  }
-
-  // ── Cards Components ───────────────────────────────────────────────────────
-  Widget _buildMissingPersonCard(BuildContext context) {
-    return _buildFormContainer(
-      child: Column(
-        children: [
-          _buildTextField(controller: controller.nameCtrl, label: 'Name', hint: 'Full Name'),
-          const SizedBox(height: 14),
-          _buildTextField(controller: controller.relationInfoCtrl, label: 'Relation (S/O, W/O, D/O, C/O)', hint: 'e.g., S/O Rajesh Kumar'),
-          const SizedBox(height: 14),
-
-          // State and District Row
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(controller: controller.stateCtrl, label: 'State', hint: 'State'),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildTextField(controller: controller.districtCtrl, label: 'District', hint: 'District'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // Locality and Village Row
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(controller: controller.localityCtrl, label: 'Locality / City', hint: 'Locality'),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildTextField(controller: controller.villageCtrl, label: 'Village / Mohalla', hint: 'Village'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // Mobile and Pincode Row
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(
-                  controller: controller.mobileCtrl,
-                  label: 'Mobile',
-                  hint: 'Mobile Number',
-                  keyboardType: TextInputType.phone,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildTextField(
-                  controller: controller.pincodeCtrl,
-                  label: 'Pincode',
-                  hint: '6-Digit Pincode',
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // Age and Gender Row
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(
-                  controller: controller.ageCtrl,
-                  label: 'Age',
-                  hint: 'Age in years',
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildDropdownField(
-                  label: 'Gender',
-                  value: controller.postGender,
-                  options: const ['Male', 'Female', 'Other'],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // Height Row
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(controller: controller.heightFromCtrl, label: 'Height From', hint: 'e.g., 5 feet'),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildTextField(controller: controller.heightToCtrl, label: 'Height To', hint: 'e.g., 5.5 feet'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          _buildTextField(controller: controller.mentalStatusCtrl, label: 'Mental Status', hint: 'e.g., Normal, Mentally Unsound'),
-          const SizedBox(height: 14),
-
-          // Missing Date/Time Picker
-          _buildDateTimePickerField(context),
-          const SizedBox(height: 14),
-
-          _buildTextField(controller: controller.probableReasonCtrl, label: 'Probable Reason', hint: 'Reason for going missing...', maxLines: 2),
-          const SizedBox(height: 14),
-          _buildTextField(controller: controller.clothesWornCtrl, label: 'Clothes Worn', hint: 'Details of clothing...', maxLines: 2),
-          const SizedBox(height: 14),
-          _buildTextField(controller: controller.identityMarkCtrl, label: 'Identity Mark', hint: 'Any visible birthmarks, tattoos...', maxLines: 2),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPhotosUploadCard(BuildContext context) {
-    return _buildFormContainer(
-      child: Column(
-        children: [
-          _buildFilePickerTile(
-            label: 'Image 1 (Front Photo)',
-            filePath: controller.postImage1Path.value,
-            onTap: () => _showImageSourceDialog(context, 1),
-          ),
-          const SizedBox(height: 14),
-          _buildFilePickerTile(
-            label: 'Image 2 (Side/Profile Photo)',
-            filePath: controller.postImage2Path.value,
-            onTap: () => _showImageSourceDialog(context, 2),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildComplaintPersonCard(BuildContext context) {
-    return _buildFormContainer(
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(controller: controller.complaintNameCtrl, label: 'Name', hint: 'Complainant Name'),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildTextField(
-                  controller: controller.complaintMobileCtrl,
-                  label: 'Mobile',
-                  hint: 'Mobile Number',
-                  keyboardType: TextInputType.phone,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          _buildTextField(controller: controller.relationTypeCtrl, label: 'Relation Type', hint: 'e.g., Father, Mother, Brother'),
-          const SizedBox(height: 14),
-          _buildTextField(controller: controller.relativeAddressCtrl, label: 'Address', hint: 'Complainant Address', maxLines: 2),
-          const SizedBox(height: 14),
-          _buildTextField(controller: controller.complaintReasonCtrl, label: 'Complaint Reason', hint: 'Why are you lodging the complaint...', maxLines: 2),
-          const SizedBox(height: 14),
-          _buildTextField(controller: controller.complaintIdentityMarkCtrl, label: 'Identity Mark (Complaint)', hint: 'Complainant Identity Mark', maxLines: 2),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPoliceDetailsCard(BuildContext context) {
-    return _buildFormContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTextField(controller: controller.firNumberCtrl, label: 'FIR Number', hint: 'FIR Number (if registered)'),
-          const SizedBox(height: 14),
-
-          // FIR Copy
-          _buildFilePickerTile(
-            label: 'FIR Copy Upload',
-            filePath: controller.postFirCopyPath.value,
-            onTap: () => controller.pickFirCopy(),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: iconColor, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: _C.darkText,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        color: _C.greyText,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 18),
-
-          const Divider(height: 1, color: _PMPC.borderColor),
-          const SizedBox(height: 16),
-          const Text(
-            'Police Station Details',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: _PMPC.navy),
-          ),
           const SizedBox(height: 14),
-
-          _buildTextField(controller: controller.policeStationNoCtrl, label: 'Police Station No', hint: 'Station Phone number'),
+          const Divider(height: 1, color: _C.borderGrey),
           const SizedBox(height: 14),
-          _buildTextField(controller: controller.subInspectorCtrl, label: 'Sub Inspector', hint: 'Assigned SI Name'),
-          const SizedBox(height: 14),
-          _buildTextField(controller: controller.shoNoCtrl, label: 'SHO No', hint: 'SHO Phone number'),
+          ...children,
         ],
       ),
     );
   }
-
-  Widget _buildSubmitButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _PMPC.navy,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 2,
-        ),
-        onPressed: () async {
-          final isSuccess = await controller.submitMissingPersonForm();
-          if (isSuccess && context.mounted) {
-            Navigator.maybePop(context);
-          }
-        },
-        child: const Text(
-          'Submit Request',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Custom Field Builders ──────────────────────────────────────────────────
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -381,31 +553,36 @@ class PostMissingPersonScreen extends GetView<MissingPersonController> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: _PMPC.navy),
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 12.5,
+            color: _C.darkText,
+          ),
         ),
         const SizedBox(height: 6),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           maxLines: maxLines,
-          style: const TextStyle(fontSize: 14, color: _PMPC.navy),
+          style: const TextStyle(fontSize: 14, color: _C.darkText, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
             hintText: hint,
-            fillColor: Colors.white,
+            hintStyle: const TextStyle(color: _C.greyText, fontSize: 13, fontWeight: FontWeight.w400),
+            fillColor: _C.fieldBg,
             filled: true,
             isDense: true,
             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: _PMPC.borderColor),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: _C.borderGrey),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: _PMPC.borderColor),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: _C.borderGrey),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: _PMPC.navy, width: 1.5),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: _C.primary, width: 1.5),
             ),
           ),
         ),
@@ -423,23 +600,27 @@ class PostMissingPersonScreen extends GetView<MissingPersonController> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: _PMPC.navy),
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 12.5,
+            color: _C.darkText,
+          ),
         ),
         const SizedBox(height: 6),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: _PMPC.borderColor),
+            color: _C.fieldBg,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: _C.borderGrey),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: value.value,
               isExpanded: true,
-              isDense: true,
-              icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _PMPC.grey, size: 22),
-              style: const TextStyle(color: _PMPC.navy, fontSize: 14),
+              isDense: false,
+              icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _C.greyText, size: 20),
+              style: const TextStyle(color: _C.darkText, fontSize: 13.5, fontWeight: FontWeight.w600),
               onChanged: (newValue) {
                 if (newValue != null) {
                   value.value = newValue;
@@ -457,40 +638,72 @@ class PostMissingPersonScreen extends GetView<MissingPersonController> {
 
   Widget _buildDateTimePickerField(BuildContext context) {
     final dateStr = controller.postMissingDatetime.value != null
-        ? DateFormat('dd-MM-yyyy, hh:mm a').format(controller.postMissingDatetime.value!)
-        : 'dd-mm-yyyy --:--';
+        ? DateFormat('dd-MMM-yyyy, hh:mm a').format(controller.postMissingDatetime.value!)
+        : 'Select Missing Date & Time *';
+
+    final hasValue = controller.postMissingDatetime.value != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Missing Date/Time',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: _PMPC.navy),
+          'Missing Date & Time *',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 12.5,
+            color: _C.darkText,
+          ),
         ),
         const SizedBox(height: 6),
-        InkWell(
-          onTap: () => controller.pickDateTime(context),
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: _PMPC.borderColor),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    dateStr,
-                    style: TextStyle(
-                      color: controller.postMissingDatetime.value != null ? _PMPC.navy : _PMPC.grey,
-                      fontSize: 14,
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => controller.pickDateTime(context),
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: _C.fieldBg,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: hasValue ? _C.primary.withValues(alpha: 0.3) : _C.borderGrey,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.calendar_month_rounded,
+                    color: hasValue ? _C.primary : _C.greyText,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      dateStr,
+                      style: TextStyle(
+                        color: hasValue ? _C.darkText : _C.greyText,
+                        fontSize: 13.5,
+                        fontWeight: hasValue ? FontWeight.w700 : FontWeight.w500,
+                      ),
                     ),
                   ),
-                ),
-                const Icon(Icons.calendar_month_outlined, color: _PMPC.grey, size: 20),
-              ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: _C.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'PICK',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: _C.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -498,90 +711,329 @@ class PostMissingPersonScreen extends GetView<MissingPersonController> {
     );
   }
 
-  Widget _buildFilePickerTile({
-    required String label,
+  Widget _buildPhotoPickerCard({
+    required BuildContext context,
+    required String title,
     required String filePath,
-    required VoidCallback onTap,
+    required VoidCallback onPick,
+    required VoidCallback onRemove,
   }) {
-    final fileName = filePath.isNotEmpty ? filePath.split('/').last : 'No file chosen';
+    final hasFile = filePath.isNotEmpty && File(filePath).existsSync();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: _PMPC.navy),
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 12.5,
+            color: _C.darkText,
+          ),
         ),
         const SizedBox(height: 6),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8F9FC),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: _PMPC.borderColor),
-          ),
-          child: Row(
-            children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF0F1F6),
-                  foregroundColor: _PMPC.navy,
-                  elevation: 0,
-                  minimumSize: const Size(0, 0),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                onPressed: onTap,
-                child: const Text(
-                  'Choose File',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Text(
-                  fileName,
-                  style: TextStyle(
-                    color: filePath.isNotEmpty ? _PMPC.navy : _PMPC.grey,
-                    fontSize: 13,
+        if (hasFile)
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: _C.fieldBg,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(
+                    File(filePath),
+                    width: 54,
+                    height: 54,
+                    fit: BoxFit.cover,
                   ),
-                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        filePath.split('/').last,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: _C.darkText,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        'Photo attached successfully',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: Color(0xFF10B981),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline_rounded, color: _C.dangerRed, size: 20),
+                  onPressed: onRemove,
+                  tooltip: 'Remove photo',
+                ),
+              ],
+            ),
+          )
+        else
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onPick,
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: _C.fieldBg,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: _C.borderGrey,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add_a_photo_outlined, color: _C.primary, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Upload Photo (Camera / Gallery)',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: _C.primary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
       ],
     );
   }
 
-  // ── Image Source Selector Dialog ──────────────────────────────────────────
-  void _showImageSourceDialog(BuildContext context, int imageIndex) {
-    showDialog(
+  Widget _buildFirPickerCard({
+    required BuildContext context,
+    required String filePath,
+    required VoidCallback onPick,
+    required VoidCallback onRemove,
+  }) {
+    final hasFile = filePath.isNotEmpty;
+    final fileName = hasFile ? filePath.split('/').last : '';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'FIR Document / Receipt Copy',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 12.5,
+            color: _C.darkText,
+          ),
+        ),
+        const SizedBox(height: 6),
+        if (hasFile)
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: _C.fieldBg,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.description_outlined, color: Color(0xFF10B981), size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        fileName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: _C.darkText,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        'Document attached',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: Color(0xFF10B981),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline_rounded, color: _C.dangerRed, size: 20),
+                  onPressed: onRemove,
+                  tooltip: 'Remove file',
+                ),
+              ],
+            ),
+          )
+        else
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onPick,
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: _C.fieldBg,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: _C.borderGrey),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.upload_file_rounded, color: _C.primary, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Attach FIR PDF / Image',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: _C.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildSubmitButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _C.primary,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 2,
+        ),
+        onPressed: () async {
+          final isSuccess = await controller.submitMissingPersonForm();
+          if (isSuccess && context.mounted) {
+            Navigator.maybePop(context);
+          }
+        },
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.send_rounded, color: Colors.white, size: 18),
+            SizedBox(width: 8),
+            Text(
+              'Submit Missing Person Report',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showImageSourceModal(BuildContext context, int imageIndex) {
+    showModalBottomSheet(
       context: context,
-      builder: (dialogCtx) {
-        return AlertDialog(
-          title: const Text('Select Image Source', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt_outlined, color: _PMPC.navy),
-                title: const Text('Camera'),
-                onTap: () {
-                  Navigator.pop(dialogCtx);
-                  controller.pickImage(imageIndex, ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library_outlined, color: _PMPC.navy),
-                title: const Text('Gallery'),
-                onTap: () {
-                  Navigator.pop(dialogCtx);
-                  controller.pickImage(imageIndex, ImageSource.gallery);
-                },
-              ),
-            ],
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (modalCtx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFCBD5E1),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Select Photo Source',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 17,
+                    color: _C.darkText,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: _C.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.camera_alt_rounded, color: _C.primary, size: 22),
+                  ),
+                  title: const Text('Take Photo with Camera', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                  onTap: () {
+                    Navigator.pop(modalCtx);
+                    controller.pickImage(imageIndex, ImageSource.camera);
+                  },
+                ),
+                const SizedBox(height: 4),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEFF6FF),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.photo_library_rounded, color: Color(0xFF2563EB), size: 22),
+                  ),
+                  title: const Text('Choose from Photo Gallery', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                  onTap: () {
+                    Navigator.pop(modalCtx);
+                    controller.pickImage(imageIndex, ImageSource.gallery);
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },

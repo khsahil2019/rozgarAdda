@@ -9,14 +9,15 @@ import '../controller/missing_person_controller.dart';
 import 'missing_person_detail_screen.dart';
 import 'post_missing_person_screen.dart';
 
-// Styling Colors (matching App Theme and unified design tokens)
-class _MPC {
-  static const Color bg = Color(0xFFF8FAFC);
+class _C {
   static const Color primary = Color(0xFF1400FF);
-  static const Color navy = Color(0xFF0F172A);
-  static const Color redAccent = Color(0xFFEF4444);
-  static const Color grey = Color(0xFF64748B);
-  static const Color border = Color(0xFFE2E8F0);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color greyText = Color(0xFF64748B);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+  static const Color scaffoldBg = Color(0xFFF8FAFC);
+  static const Color cardBg = Colors.white;
+  static const Color fieldBg = Color(0xFFF8FAFC);
+  static const Color dangerRed = Color(0xFFEF4444);
 }
 
 class MissingPersonListScreen extends GetView<MissingPersonController> {
@@ -44,8 +45,42 @@ class MissingPersonListScreen extends GetView<MissingPersonController> {
         Get.back();
       },
       child: Scaffold(
+        backgroundColor: _C.scaffoldBg,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: Center(
+            child: AppBackButton(
+              onPressed: () => Navigator.maybePop(context),
+              tooltip: 'Back',
+            ),
+          ),
+          title: Text(
+            l10n.text('missing_persons').isNotEmpty ? l10n.text('missing_persons') : 'Missing Persons',
+            style: const TextStyle(
+              color: _C.darkText,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.3,
+            ),
+          ),
+          centerTitle: false,
+          actions: [
+            IconButton(
+              tooltip: 'Refresh Feed',
+              icon: const Icon(Icons.refresh_rounded, color: _C.primary, size: 22),
+              onPressed: () => controller.fetchMissingPersons(),
+            ),
+            const SizedBox(width: 4),
+          ],
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(1),
+            child: Divider(height: 1, color: _C.borderGrey),
+          ),
+        ),
         floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: _MPC.primary,
+          backgroundColor: _C.primary,
           foregroundColor: Colors.white,
           elevation: 4,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -58,166 +93,116 @@ class MissingPersonListScreen extends GetView<MissingPersonController> {
             style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.white),
           ),
         ),
-        backgroundColor: _MPC.bg,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          leading: Center(
-            child: AppBackButton(
-              onPressed: () => Navigator.maybePop(context),
-              tooltip: 'Back',
-            ),
-          ),
-          title: Text(
-            l10n.text('missing_persons'),
-            style: const TextStyle(
-              color: _MPC.navy,
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.3,
-            ),
-          ),
-          centerTitle: false,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh_rounded, color: _MPC.navy, size: 22),
-              onPressed: () => controller.fetchMissingPersons(),
-            ),
-            const SizedBox(width: 4),
-          ],
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(1),
-            child: Container(height: 1, color: _MPC.border),
-          ),
-        ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Search and Filter Bar
-            _buildSearchAndFilters(context),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Search and Filter Hub
+              _buildSearchAndFilters(context),
+              const Divider(height: 1, color: _C.borderGrey),
 
-            // Main Content Area
-            Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return _buildLoadingState();
-                }
+              // Main Feed Area
+              Expanded(
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return _buildLoadingState();
+                  }
 
-                if (controller.errorMessage.isNotEmpty) {
-                  return _buildErrorState(l10n);
-                }
+                  if (controller.errorMessage.isNotEmpty) {
+                    return _buildErrorState();
+                  }
 
-                if (controller.filteredPersons.isEmpty) {
-                  return _buildEmptyState(l10n);
-                }
+                  final list = controller.filteredPersons;
 
-                return RefreshIndicator(
-                  onRefresh: () => controller.fetchMissingPersons(),
-                  color: _MPC.navy,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
+                  if (list.isEmpty) {
+                    return _buildEmptyState();
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () => controller.fetchMissingPersons(),
+                    color: _C.primary,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 90),
+                      itemCount: list.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final person = list[index];
+                        return _buildMissingPersonCard(context, person);
+                      },
                     ),
-                    itemCount: controller.filteredPersons.length,
-                    itemBuilder: (context, index) {
-                      final person = controller.filteredPersons[index];
-                      return _buildMissingPersonCard(context, person);
-                    },
-                  ),
-                );
-              }),
-            ),
-          ],
+                  );
+                }),
+              ),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
 
-  // ── Search & Filter Bars ──────────────────────────────────────────────────
   Widget _buildSearchAndFilters(BuildContext context) {
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Column(
         children: [
           // Search Input
           Container(
+            height: 46,
             decoration: BoxDecoration(
-              color: const Color(0xFFF0F1F6),
-              borderRadius: BorderRadius.circular(12),
+              color: _C.fieldBg,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: _C.borderGrey),
             ),
             child: TextField(
               onChanged: (val) => controller.searchQuery.value = val,
+              style: const TextStyle(color: _C.darkText, fontSize: 13.5, fontWeight: FontWeight.w600),
               decoration: InputDecoration(
-                hintText: 'Search by name, district, state...',
-                hintStyle: const TextStyle(color: _MPC.grey, fontSize: 14),
-                prefixIcon: const Icon(
-                  Icons.search_rounded,
-                  color: _MPC.grey,
-                  size: 20,
-                ),
+                hintText: 'Search by name, city, state, or ID...',
+                hintStyle: const TextStyle(color: _C.greyText, fontSize: 13),
+                prefixIcon: const Icon(Icons.search_rounded, color: _C.primary, size: 20),
                 suffixIcon: Obx(() {
                   if (controller.searchQuery.value.isNotEmpty) {
                     return IconButton(
-                      icon: const Icon(
-                        Icons.clear_rounded,
-                        color: _MPC.grey,
-                        size: 18,
-                      ),
-                      onPressed: () {
-                        controller.searchQuery.value = '';
-                      },
+                      icon: const Icon(Icons.clear_rounded, color: _C.greyText, size: 18),
+                      onPressed: () => controller.searchQuery.value = '',
                     );
                   }
                   return const SizedBox.shrink();
                 }),
                 border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
-          // Filters Row (Gender & State dropdown/sheets)
+          // Filters Row
           Row(
             children: [
-              // Gender Filter Chip
+              // Gender Filter
               Expanded(
                 child: Obx(() {
                   return _buildFilterDropdown(
-                    context: context,
                     label: 'Gender',
                     value: controller.selectedGender.value,
                     options: const ['All', 'Male', 'Female'],
                     onChanged: (val) {
-                      if (val != null) {
-                        controller.selectedGender.value = val;
-                      }
+                      if (val != null) controller.selectedGender.value = val;
                     },
                   );
                 }),
               ),
-              const SizedBox(width: 12),
-              // State Filter Chip
+              const SizedBox(width: 10),
+
+              // State Filter
               Expanded(
                 child: Obx(() {
                   return _buildFilterDropdown(
-                    context: context,
                     label: 'State',
                     value: controller.selectedState.value,
                     options: controller.availableStates,
                     onChanged: (val) {
-                      if (val != null) {
-                        controller.selectedState.value = val;
-                      }
+                      if (val != null) controller.selectedState.value = val;
                     },
                   );
                 }),
@@ -229,9 +214,7 @@ class MissingPersonListScreen extends GetView<MissingPersonController> {
     );
   }
 
-  // ── Filter Dropdown Selector ──────────────────────────────────────────────
   Widget _buildFilterDropdown({
-    required BuildContext context,
     required String label,
     required String value,
     required List<String> options,
@@ -241,274 +224,187 @@ class MissingPersonListScreen extends GetView<MissingPersonController> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       decoration: BoxDecoration(
-        color: isSelected
-            ? _MPC.navy.withValues(alpha: 0.05)
-            : const Color(0xFFF0F1F6),
-        borderRadius: BorderRadius.circular(8),
+        color: isSelected ? _C.primary.withValues(alpha: 0.08) : _C.fieldBg,
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isSelected ? _MPC.navy : Colors.transparent,
-          width: 1,
+          color: isSelected ? _C.primary : _C.borderGrey,
         ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          value: value,
+          value: options.contains(value) ? value : options.first,
           isExpanded: true,
-          icon: const Icon(
+          icon: Icon(
             Icons.keyboard_arrow_down_rounded,
-            color: _MPC.grey,
+            color: isSelected ? _C.primary : _C.greyText,
             size: 20,
           ),
           style: TextStyle(
-            color: isSelected ? _MPC.navy : _MPC.navy.withValues(alpha: 0.8),
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? _C.primary : _C.darkText,
+            fontSize: 12.5,
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
           ),
           hint: Text(label),
           onChanged: onChanged,
           items: options.map<DropdownMenuItem<String>>((String val) {
-            return DropdownMenuItem<String>(value: val, child: Text(val));
+            return DropdownMenuItem<String>(
+              value: val,
+              child: Text(val == 'All' ? '$label: All' : val),
+            );
           }).toList(),
         ),
       ),
     );
   }
 
-  // ── Missing Person Card Renderer ──────────────────────────────────────────
   Widget _buildMissingPersonCard(BuildContext context, MissingPerson person) {
     final formattedDate = person.missingDatetime != null
         ? DateFormat('dd MMM yyyy').format(person.missingDatetime!)
-        : 'Unknown';
+        : 'Date Unknown';
 
-    return Card(
-      color: Colors.white,
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MissingPersonDetailScreen(person: person),
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Photo Thumbnail
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: SizedBox(
-                  width: 96,
-                  height: 104,
-                  child: person.fullImage1Url.isNotEmpty
-                      ? Image.network(
-                          person.fullImage1Url,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return _buildImagePlaceholder();
-                          },
-                        )
-                      : _buildImagePlaceholder(),
-                ),
-              ),
-              const SizedBox(width: 14),
-
-              // Detail Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Badge status and Gender
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _MPC.redAccent.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'MISSING',
-                            style: TextStyle(
-                              color: _MPC.redAccent,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF0F1F6),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            person.gender,
-                            style: const TextStyle(
-                              color: _MPC.navy,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Name
-                    Text(
-                      person.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: _MPC.navy,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-
-                    // Age and date
-                    Row(
-                      children: [
-                        Text(
-                          'Age: ${person.age} yrs',
-                          style: const TextStyle(
-                            color: _MPC.navy,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          width: 4,
-                          height: 4,
-                          decoration: const BoxDecoration(
-                            color: _MPC.grey,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Since: $formattedDate',
-                            style: const TextStyle(
-                              color: _MPC.grey,
-                              fontSize: 12,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Location Info
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.location_on_rounded,
-                          size: 14,
-                          color: _MPC.redAccent,
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            '${person.district}, ${person.state}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: _MPC.grey,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildImagePlaceholder() {
     return Container(
-      color: const Color(0xFFE2E4EB),
-      child: const Icon(Icons.person_rounded, color: _MPC.grey, size: 40),
-    );
-  }
-
-  // ── Skeletons / Loading Screen ────────────────────────────────────────────
-  Widget _buildLoadingState() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: 4,
-      itemBuilder: (ctx, index) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+      decoration: BoxDecoration(
+        color: _C.cardBg,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _C.borderGrey),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MissingPersonDetailScreen(person: person),
+              ),
+            );
+          },
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 96,
-                  height: 104,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                // Thumbnail Photo with Emergency Badge
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: SizedBox(
+                        width: 96,
+                        height: 110,
+                        child: person.fullImage1Url.isNotEmpty
+                            ? Image.network(
+                                person.fullImage1Url,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
+                              )
+                            : _buildImagePlaceholder(),
+                      ),
+                    ),
+                    Positioned(
+                      top: 6,
+                      left: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: _C.dangerRed,
+                          borderRadius: BorderRadius.circular(6),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black26, blurRadius: 4),
+                          ],
+                        ),
+                        child: const Text(
+                          'MISSING',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
+
+                // Case Details Info
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 80,
-                        height: 12,
-                        color: Colors.grey.shade200,
+                      // Name & Gender/Age Chips
+                      Text(
+                        person.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w800,
+                          color: _C.darkText,
+                          letterSpacing: -0.2,
+                        ),
                       ),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: 140,
-                        height: 16,
-                        color: Colors.grey.shade200,
+                      const SizedBox(height: 4),
+
+                      // Age, Gender, and Relation
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          if (person.age > 0)
+                            _buildMiniChip('${person.age} Yrs'),
+                          if (person.gender.isNotEmpty)
+                            _buildMiniChip(person.gender),
+                          if (person.relationInfo.isNotEmpty)
+                            _buildMiniChip(person.relationInfo),
+                        ],
                       ),
-                      const SizedBox(height: 6),
-                      Container(
-                        width: 110,
-                        height: 12,
-                        color: Colors.grey.shade200,
+                      const SizedBox(height: 8),
+
+                      // Location Details
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on_outlined, size: 14, color: _C.primary),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              [person.district, person.state].where((e) => e.isNotEmpty).join(', '),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: _C.darkText,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        height: 12,
-                        color: Colors.grey.shade200,
+                      const SizedBox(height: 4),
+
+                      // Missing Date
+                      Row(
+                        children: [
+                          const Icon(Icons.access_time_rounded, size: 14, color: _C.greyText),
+                          const SizedBox(width: 3),
+                          Text(
+                            'Missing since $formattedDate',
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              color: _C.greyText,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -516,48 +412,68 @@ class MissingPersonListScreen extends GetView<MissingPersonController> {
               ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  // ── Error View ───────────────────────────────────────────────────────────
-  Widget _buildErrorState(AppLocalizations l10n) {
+  Widget _buildMiniChip(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: _C.borderGrey),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w700,
+          color: _C.darkText,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImagePlaceholder() {
+    return Container(
+      color: const Color(0xFFEFF6FF),
+      child: const Center(
+        child: Icon(Icons.person_rounded, size: 40, color: _C.primary),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: CircularProgressIndicator(color: _C.primary),
+    );
+  }
+
+  Widget _buildErrorState() {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.wifi_off_rounded, size: 64, color: _MPC.grey),
-            const SizedBox(height: 16),
-            const Text(
-              'Failed to load missing persons feed.',
-              style: TextStyle(
-                color: _MPC.navy,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
+            const Icon(Icons.error_outline_rounded, size: 48, color: _C.dangerRed),
+            const SizedBox(height: 12),
             Text(
               controller.errorMessage.value,
-              style: const TextStyle(color: _MPC.grey, fontSize: 13),
               textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, color: _C.darkText, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () => controller.fetchMissingPersons(),
-              icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+            const SizedBox(height: 16),
+            ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: _MPC.navy,
+                backgroundColor: _C.primary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
+              onPressed: () => controller.fetchMissingPersons(),
+              child: const Text('Try Again'),
             ),
           ],
         ),
@@ -565,45 +481,48 @@ class MissingPersonListScreen extends GetView<MissingPersonController> {
     );
   }
 
-  // ── Empty View ───────────────────────────────────────────────────────────
-  Widget _buildEmptyState(AppLocalizations l10n) {
+  Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.assignment_ind_outlined,
-              size: 72,
-              color: _MPC.grey,
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: _C.primary.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.person_search_rounded, size: 42, color: _C.primary),
             ),
             const SizedBox(height: 16),
             const Text(
-              'No Missing Persons Found',
+              'No Missing Person Records',
               style: TextStyle(
-                color: _MPC.navy,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: _C.darkText,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             const Text(
-              'Try adjusting search query or filters.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: _MPC.grey, fontSize: 14),
+              'No cases match your active search filters',
+              style: TextStyle(fontSize: 13, color: _C.greyText),
             ),
-            const SizedBox(height: 20),
-            TextButton(
-              onPressed: () => controller.resetFilters(),
-              child: const Text(
-                'Reset Filters',
-                style: TextStyle(
-                  color: _MPC.navy,
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.underline,
-                ),
+            const SizedBox(height: 16),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: _C.primary,
+                side: const BorderSide(color: _C.primary),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
+              onPressed: () {
+                controller.searchQuery.value = '';
+                controller.selectedGender.value = 'All';
+                controller.selectedState.value = 'All';
+              },
+              child: const Text('Reset All Filters', style: TextStyle(fontWeight: FontWeight.w700)),
             ),
           ],
         ),
