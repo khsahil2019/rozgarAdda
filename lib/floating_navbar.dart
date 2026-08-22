@@ -24,12 +24,14 @@ class _FloatingNavbarScreenState extends State<FloatingNavbarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       backgroundColor: const Color(0xFFF8FAFC),
       body: IndexedStack(
         index: _selectedIndex,
         children: _screens,
       ),
       bottomNavigationBar: SafeArea(
+        top: false,
         child: Container(
           margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
           height: 66,

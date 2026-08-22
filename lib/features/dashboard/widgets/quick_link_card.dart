@@ -18,7 +18,9 @@ class QuickLinkCard extends StatelessWidget {
     if (link.assetPath.isNotEmpty) {
       return Image.asset(
         link.assetPath,
-        fit: BoxFit.cover,
+        fit: BoxFit.fill,
+        width: double.infinity,
+        height: double.infinity,
         errorBuilder: (context, error, stackTrace) => _buildFallbackIcon(),
       );
     }
@@ -60,7 +62,7 @@ class QuickLinkCard extends StatelessWidget {
             kUseNetworkImages && link.imageUrl.isNotEmpty
                 ? Image.network(
                     link.imageUrl,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fill,
                     errorBuilder: (context, error, stackTrace) {
                       return _buildAssetOrFallback();
                     },

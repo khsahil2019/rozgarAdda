@@ -44,7 +44,7 @@ const List<QuickLink> kQuickLinks = [
     AC.blueBg,
     AC.blueIcon,
     'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=400&q=80',
-    assetPath: 'assets/img/find_job.jpeg',
+    assetPath: 'assets/img/find_job1.jpeg',
   ),
   QuickLink(
     'KYC Status',
@@ -52,7 +52,7 @@ const List<QuickLink> kQuickLinks = [
     AC.greenBg,
     AC.greenIcon,
     'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=400&q=80',
-    assetPath: 'assets/img/kyc_status.jpeg',
+    assetPath: 'assets/img/kyc_status1.jpeg',
   ),
   QuickLink(
     'Sell Products',
@@ -60,7 +60,7 @@ const List<QuickLink> kQuickLinks = [
     AC.greenBg,
     AC.greenIcon,
     'https://images.unsplash.com/photo-1573216755088-971e32839531?auto=format&fit=crop&w=400&q=80',
-    assetPath: 'assets/img/sell_product.jpeg',
+    assetPath: 'assets/img/sell_product1.jpeg',
   ),
   QuickLink(
     'News',
@@ -68,7 +68,7 @@ const List<QuickLink> kQuickLinks = [
     AC.orangeBg,
     AC.orangeIcon,
     'https://i.ibb.co/qFXNhgFD/Whats-App-Image-2026-06-06-at-12-45-46-AM.jpg',
-    assetPath: 'assets/img/news.jpeg',
+    assetPath: 'assets/img/news1.jpeg',
   ),
   QuickLink(
     'Missing Persons',
@@ -76,7 +76,7 @@ const List<QuickLink> kQuickLinks = [
     AC.pinkBg,
     AC.pinkIcon,
     'https://images.unsplash.com/photo-1737154590393-20c0b8c389ae?auto=format&fit=crop&w=400&q=80',
-    assetPath: 'assets/img/missing.jpeg',
+    assetPath: 'assets/img/missing1.jpeg',
   ),
   QuickLink(
     'Recent Jobs',
@@ -84,6 +84,6 @@ const List<QuickLink> kQuickLinks = [
     AC.cyanBg,
     Color.fromARGB(255, 174, 152, 255),
     'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80',
-    assetPath: 'assets/img/recent_job.jpeg',
+    assetPath: 'assets/img/recent_job1.jpeg',
   ),
 ];
