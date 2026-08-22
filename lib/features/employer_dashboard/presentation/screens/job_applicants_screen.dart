@@ -47,6 +47,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   final EmployerDashboardController controller = Get.find();
   final TextEditingController _searchCtrl = TextEditingController();
 
+  final RxSet<int> _selectedApplicationIds = <int>{}.obs;
+  final RxBool _isSelectionMode = false.obs;
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +64,30 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
   void dispose() {
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  void _toggleSelectMode() {
+    _isSelectionMode.value = !_isSelectionMode.value;
+    if (!_isSelectionMode.value) {
+      _selectedApplicationIds.clear();
+    }
+  }
+
+  void _toggleCandidateSelection(int id) {
+    if (_selectedApplicationIds.contains(id)) {
+      _selectedApplicationIds.remove(id);
+    } else {
+      _selectedApplicationIds.add(id);
+    }
+  }
+
+  void _selectAllFiltered() {
+    final filtered = controller.getFilteredApplicants(widget.jobId);
+    _selectedApplicationIds.addAll(filtered.map((a) => a.id));
+  }
+
+  void _deselectAll() {
+    _selectedApplicationIds.clear();
   }
 
   Future<void> _makeCall(String phone) async {
@@ -126,132 +153,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
       Get.back(); // Dismiss loading dialog
 
       if (filePath != null) {
-        Get.bottomSheet(
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Center(
-                  child: Container(
-                    width: 36,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: borderGrey,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: statusGreen.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_circle_rounded,
-                    color: statusGreen,
-                    size: 36,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Candidates Exported Successfully!',
-                  style: TextStyle(
-                    fontSize: 16.5,
-                    fontWeight: FontWeight.w900,
-                    color: darkText,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  filePath.split('/').last,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: greyText,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () async {
-                          Get.back();
-                          try {
-                            await Share.shareXFiles(
-                              [XFile(filePath)],
-                              text: 'Candidate list for ${widget.jobTitle}',
-                            );
-                          } catch (e) {
-                            Get.snackbar(
-                              'Share Error',
-                              e.toString(),
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                            );
-                          }
-                        },
-                        icon: const Icon(Icons.share_rounded, size: 18),
-                        label: const Text('Share File'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: primary,
-                          side: const BorderSide(color: primary),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          Get.back();
-                          try {
-                            final result = await OpenFilex.open(filePath);
-                            if (result.type != ResultType.done) {
-                              // If cannot open directly, offer share
-                              await Share.shareXFiles(
-                                [XFile(filePath)],
-                                text: 'Candidate list for ${widget.jobTitle}',
-                              );
-                            }
-                          } catch (e) {
-                            await Share.shareXFiles(
-                              [XFile(filePath)],
-                              text: 'Candidate list for ${widget.jobTitle}',
-                            );
-                          }
-                        },
-                        icon: const Icon(Icons.folder_open_rounded, size: 18),
-                        label: const Text('Open File'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-        );
+        final totalCount = controller.jobApplications[widget.jobId]?.length ?? 0;
+        _showExportSuccessModal(filePath, totalCount);
       }
     } catch (e) {
       Get.back();
@@ -263,6 +166,179 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         colorText: Colors.white,
       );
     }
+  }
+
+  Future<void> _exportSelectedCandidates() async {
+    if (_selectedApplicationIds.isEmpty) {
+      Get.snackbar(
+        'No Selection',
+        'Please select at least one candidate application to export.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    try {
+      Get.dialog(
+        const Center(
+          child: CircularProgressIndicator(color: primary),
+        ),
+        barrierDismissible: false,
+      );
+
+      final selectedIds = _selectedApplicationIds.toList();
+      final filePath = await controller.exportSelectedApplications(
+        selectedApplicationIds: selectedIds,
+        jobId: widget.jobId,
+      );
+      Get.back(); // Dismiss loading dialog
+
+      if (filePath != null) {
+        final count = selectedIds.length;
+        _selectedApplicationIds.clear();
+        _isSelectionMode.value = false;
+        _showExportSuccessModal(filePath, count);
+      }
+    } catch (e) {
+      Get.back();
+      Get.snackbar(
+        'Export Failed',
+        e is Failure ? e.message : e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  void _showExportSuccessModal(String filePath, int count) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: borderGrey,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: statusGreen.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.check_circle_rounded,
+                color: statusGreen,
+                size: 36,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '$count Candidate(s) Exported Successfully!',
+              style: const TextStyle(
+                fontSize: 16.5,
+                fontWeight: FontWeight.w900,
+                color: darkText,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              filePath.split('/').last,
+              style: const TextStyle(
+                fontSize: 12,
+                color: greyText,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      Get.back();
+                      try {
+                        await Share.shareXFiles(
+                          [XFile(filePath)],
+                          text: 'Candidate export list for ${widget.jobTitle}',
+                        );
+                      } catch (e) {
+                        Get.snackbar(
+                          'Share Error',
+                          e.toString(),
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.share_rounded, size: 18),
+                    label: const Text('Share File'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: primary,
+                      side: const BorderSide(color: primary),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      Get.back();
+                      try {
+                        final result = await OpenFilex.open(filePath);
+                        if (result.type != ResultType.done) {
+                          await Share.shareXFiles(
+                            [XFile(filePath)],
+                            text: 'Candidate export list for ${widget.jobTitle}',
+                          );
+                        }
+                      } catch (e) {
+                        await Share.shareXFiles(
+                          [XFile(filePath)],
+                          text: 'Candidate export list for ${widget.jobTitle}',
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.folder_open_rounded, size: 18),
+                    label: const Text('Open Excel/CSV'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
   }
 
   String _formatAppliedDate(DateTime dt) {
@@ -323,27 +399,89 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             ],
           ),
           actions: [
-            Container(
-              margin: const EdgeInsets.only(right: 14),
-              child: OutlinedButton.icon(
-                onPressed: _exportCandidates,
-                icon: const Icon(Icons.file_download_outlined, size: 16),
-                label: const Text(
-                  'Export',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
-                ),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: primary,
-                  side: BorderSide(color: primary.withValues(alpha: 0.2)),
-                  backgroundColor: primary.withValues(alpha: 0.04),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+            Obx(() {
+              final isSelecting = _isSelectionMode.value;
+              final filtered = controller.getFilteredApplicants(widget.jobId);
+              final isAllSelected = filtered.isNotEmpty &&
+                  _selectedApplicationIds.length >= filtered.length;
+
+              if (isSelecting) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        if (isAllSelected) {
+                          _deselectAll();
+                        } else {
+                          _selectAllFiltered();
+                        }
+                      },
+                      child: Text(
+                        isAllSelected ? 'Deselect All' : 'Select All',
+                        style: const TextStyle(
+                          color: primary,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Exit Selection Mode',
+                      icon: const Icon(Icons.close_rounded, color: darkText, size: 20),
+                      onPressed: _toggleSelectMode,
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: _toggleSelectMode,
+                    icon: const Icon(Icons.checklist_rounded, size: 15),
+                    label: const Text(
+                      'Select',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: primary,
+                      side: BorderSide(color: primary.withValues(alpha: 0.25)),
+                      backgroundColor: primary.withValues(alpha: 0.05),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      minimumSize: const Size(0, 34),
+                    ),
                   ),
-                  minimumSize: const Size(0, 34),
-                ),
-              ),
-            ),
+                  const SizedBox(width: 6),
+                  Container(
+                    margin: const EdgeInsets.only(right: 12),
+                    child: ElevatedButton.icon(
+                      onPressed: _exportCandidates,
+                      icon: const Icon(Icons.file_download_outlined, size: 15),
+                      label: const Text(
+                        'Export All',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        minimumSize: const Size(0, 34),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }),
           ],
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(1),
@@ -356,28 +494,122 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           final List<JobApplication> filteredApps =
               controller.getFilteredApplicants(widget.jobId);
           final stats = controller.jobStats[widget.jobId] ?? {};
+          final hasSelection = _selectedApplicationIds.isNotEmpty;
 
-          return Column(
+          return Stack(
             children: [
-              // 1. Grid Pipeline Filter Bar (No Slider - 100% on screen)
-              _buildGridPipelineBar(stats, allApps),
+              Column(
+                children: [
+                  // 1. Grid Pipeline Filter Bar (No Slider - 100% on screen)
+                  _buildGridPipelineBar(stats, allApps),
 
-              // 2. Search Box & Active Filter Indicator
-              _buildSearchBoxAndIndicator(filteredApps.length),
+                  // 2. Search Box & Active Filter Indicator
+                  _buildSearchBoxAndIndicator(filteredApps.length),
 
-              // 3. Candidate Applications List
-              Expanded(
-                child: filteredApps.isEmpty
-                    ? _buildEmptyState()
-                    : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
-                        itemCount: filteredApps.length,
-                        itemBuilder: (ctx, index) {
-                          final app = filteredApps[index];
-                          return _buildCandidateCard(app);
-                        },
-                      ),
+                  // 3. Candidate Applications List
+                  Expanded(
+                    child: filteredApps.isEmpty
+                        ? _buildEmptyState()
+                        : ListView.builder(
+                            padding: EdgeInsets.fromLTRB(
+                              16,
+                              4,
+                              16,
+                              hasSelection ? 86 : 24,
+                            ),
+                            itemCount: filteredApps.length,
+                            itemBuilder: (ctx, index) {
+                              final app = filteredApps[index];
+                              return _buildCandidateCard(app);
+                            },
+                          ),
+                  ),
+                ],
               ),
+
+              // 4. Sticky Floating Multi-Select Export Bar
+              if (hasSelection)
+                Positioned(
+                  bottom: 16,
+                  left: 16,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: darkText,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.25),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: primary,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${_selectedApplicationIds.length}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Candidate(s) Selected',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: _deselectAll,
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white70,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            minimumSize: const Size(0, 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Text(
+                            'Clear',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: _exportSelectedCandidates,
+                          icon: const Icon(Icons.file_download_outlined, size: 15),
+                          label: Text(
+                            'Export Excel (${_selectedApplicationIds.length})',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           );
         }),
@@ -683,261 +915,305 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         ? app.candidateName.substring(0, 1).toUpperCase()
         : '?';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: borderGrey),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return Obx(() {
+      final isSelecting = _isSelectionMode.value;
+      final isSelected = _selectedApplicationIds.contains(app.id);
+
+      return Container(
+        margin: const EdgeInsets.only(bottom: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isSelected ? primary : borderGrey,
+            width: isSelected ? 1.8 : 1.0,
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top Section
-            InkWell(
-              onTap: () => _showApplicantDetailsBottomSheet(context, app),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Avatar
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            primary.withValues(alpha: 0.12),
-                            primaryLight.withValues(alpha: 0.2),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? primary.withValues(alpha: 0.08)
+                  : const Color(0xFF0F172A).withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Section
+              InkWell(
+                onLongPress: () {
+                  if (!_isSelectionMode.value) {
+                    _isSelectionMode.value = true;
+                  }
+                  _toggleCandidateSelection(app.id);
+                },
+                onTap: () {
+                  if (_isSelectionMode.value) {
+                    _toggleCandidateSelection(app.id);
+                  } else {
+                    _showApplicantDetailsBottomSheet(context, app);
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Checkbox when multi-select active
+                      if (isSelecting)
+                        GestureDetector(
+                          onTap: () => _toggleCandidateSelection(app.id),
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 12, top: 12),
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              color: isSelected ? primary : Colors.transparent,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected ? primary : greyText,
+                                width: 1.8,
+                              ),
+                            ),
+                            child: isSelected
+                                ? const Icon(Icons.check, color: Colors.white, size: 14)
+                                : null,
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: primary.withValues(alpha: 0.2),
-                          width: 1.5,
+
+                      // Avatar
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              primary.withValues(alpha: 0.12),
+                              primaryLight.withValues(alpha: 0.2),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: primary.withValues(alpha: 0.2),
+                            width: 1.5,
+                          ),
                         ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          initial,
-                          style: const TextStyle(
-                            color: primary,
-                            fontSize: 19,
-                            fontWeight: FontWeight.w900,
+                        child: Center(
+                          child: Text(
+                            initial,
+                            style: const TextStyle(
+                              color: primary,
+                              fontSize: 19,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
+                      const SizedBox(width: 12),
 
-                    // Info Column
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  app.candidateName.isNotEmpty
-                                      ? app.candidateName
-                                      : 'Anonymous Candidate',
-                                  style: const TextStyle(
-                                    color: darkText,
-                                    fontSize: 15.5,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: -0.2,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: statusColor.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: statusColor.withValues(alpha: 0.25),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      statusIcon,
-                                      color: statusColor,
-                                      size: 12,
+                      // Info Column
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    app.candidateName.isNotEmpty
+                                        ? app.candidateName
+                                        : 'Anonymous Candidate',
+                                    style: const TextStyle(
+                                      color: darkText,
+                                      fontSize: 15.5,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: -0.2,
                                     ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      statusTitle,
-                                      style: TextStyle(
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: statusColor.withValues(alpha: 0.25),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        statusIcon,
                                         color: statusColor,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w900,
+                                        size: 12,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-
-                          // Experience & Education Chips
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 4,
-                            children: [
-                              _buildInfoTag(
-                                icon: Icons.work_outline_rounded,
-                                label:
-                                    '${app.experienceYears}y ${app.experienceMonths}m Exp',
-                              ),
-                              if (app.educationLevel.isNotEmpty)
-                                _buildInfoTag(
-                                  icon: Icons.school_outlined,
-                                  label: app.educationLevel,
-                                ),
-                              _buildInfoTag(
-                                icon: Icons.calendar_today_rounded,
-                                label: _formatAppliedDate(app.appliedAt),
-                              ),
-                            ],
-                          ),
-
-                          // Skills Row
-                          if (app.keySkills.isNotEmpty) ...[
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 5,
-                              runSpacing: 4,
-                              children: app.keySkills
-                                  .split(',')
-                                  .take(3)
-                                  .map((s) => s.trim())
-                                  .where((s) => s.isNotEmpty)
-                                  .map(
-                                    (skill) => Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 7,
-                                        vertical: 2.5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: fieldBg,
-                                        borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(color: borderGrey),
-                                      ),
-                                      child: Text(
-                                        skill,
-                                        style: const TextStyle(
-                                          color: mediumText,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        statusTitle,
+                                        style: TextStyle(
+                                          color: statusColor,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w900,
                                         ),
                                       ),
-                                    ),
-                                  )
-                                  .toList(),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
+                            const SizedBox(height: 6),
+
+                            // Experience & Education Chips
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 4,
+                              children: [
+                                _buildInfoTag(
+                                  icon: Icons.work_outline_rounded,
+                                  label:
+                                      '${app.experienceYears}y ${app.experienceMonths}m Exp',
+                                ),
+                                if (app.educationLevel.isNotEmpty)
+                                  _buildInfoTag(
+                                    icon: Icons.school_outlined,
+                                    label: app.educationLevel,
+                                  ),
+                                _buildInfoTag(
+                                  icon: Icons.calendar_today_rounded,
+                                  label: _formatAppliedDate(app.appliedAt),
+                                ),
+                              ],
+                            ),
+
+                            // Skills Row
+                            if (app.keySkills.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 5,
+                                runSpacing: 4,
+                                children: app.keySkills
+                                    .split(',')
+                                    .take(3)
+                                    .map((s) => s.trim())
+                                    .where((s) => s.isNotEmpty)
+                                    .map(
+                                      (skill) => Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 7,
+                                          vertical: 2.5,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: fieldBg,
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: borderGrey),
+                                        ),
+                                        child: Text(
+                                          skill,
+                                          style: const TextStyle(
+                                            color: mediumText,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Divider
+              Container(height: 1, color: borderGrey),
+
+              // Bottom Action Bar (Call, WhatsApp, Email, Update Status)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                color: const Color(0xFFFAFBFC),
+                child: Row(
+                  children: [
+                    // Call Action
+                    _buildActionButton(
+                      icon: Icons.phone_in_talk_rounded,
+                      label: 'Call',
+                      color: statusGreen,
+                      onTap: () => _makeCall(app.phone),
+                    ),
+                    const SizedBox(width: 8),
+
+                    // WhatsApp Action
+                    _buildActionButton(
+                      icon: Icons.chat_bubble_rounded,
+                      label: 'WhatsApp',
+                      color: const Color(0xFF25D366),
+                      onTap: () => _sendWhatsApp(
+                        app.phone,
+                        app.candidateName,
+                        widget.jobTitle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    // Mail Action
+                    _buildActionButton(
+                      icon: Icons.mail_rounded,
+                      label: 'Email',
+                      color: statusRed,
+                      onTap: () => _sendEmail(app.email, widget.jobTitle),
+                    ),
+
+                    const Spacer(),
+
+                    // Update Status Button
+                    ElevatedButton.icon(
+                      onPressed: () => _showStatusUpdateDialog(context, app),
+                      icon: const Icon(Icons.edit_note_rounded, size: 16),
+                      label: const Text('Status'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 7,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-
-            // Divider
-            Container(height: 1, color: borderGrey),
-
-            // Bottom Action Bar (Call, WhatsApp, Email, Update Status)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              color: const Color(0xFFFAFBFC),
-              child: Row(
-                children: [
-                  // Call Action
-                  _buildActionButton(
-                    icon: Icons.phone_in_talk_rounded,
-                    label: 'Call',
-                    color: statusGreen,
-                    onTap: () => _makeCall(app.phone),
-                  ),
-                  const SizedBox(width: 8),
-
-                  // WhatsApp Action
-                  _buildActionButton(
-                    icon: Icons.chat_bubble_rounded,
-                    label: 'WhatsApp',
-                    color: const Color(0xFF25D366),
-                    onTap: () => _sendWhatsApp(
-                      app.phone,
-                      app.candidateName,
-                      widget.jobTitle,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-
-                  // Mail Action
-                  _buildActionButton(
-                    icon: Icons.mail_rounded,
-                    label: 'Email',
-                    color: statusRed,
-                    onTap: () => _sendEmail(app.email, widget.jobTitle),
-                  ),
-
-                  const Spacer(),
-
-                  // Update Status Button
-                  ElevatedButton.icon(
-                    onPressed: () => _showStatusUpdateDialog(context, app),
-                    icon: const Icon(Icons.edit_note_rounded, size: 16),
-                    label: const Text('Status'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primary,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 7,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildInfoTag({required IconData icon, required String label}) {

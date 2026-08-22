@@ -27,6 +27,8 @@ class ApiRoutes {
       _buildUrl('emp/get-details/$applicationId');
   static String employerExportApplications(int jobId) =>
       _buildUrl('emp/jobs/$jobId/applications/export');
+  static String get exportCandidateApplications =>
+      _buildUrl('emp/applications/export');
   static String get forgotPassword => _buildUrl('candidate/forgot-password');
   static String get resetPassword => _buildUrl('candidate/reset-password');
   static String get verifyEmail => _buildUrl('candidate/verify-email');

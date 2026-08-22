@@ -579,6 +579,129 @@ class EmployerDashboardController extends GetxController {
     }
   }
 
+  Future<String?> exportSelectedApplications({
+    required List<int> selectedApplicationIds,
+    required int jobId,
+  }) async {
+    if (selectedApplicationIds.isEmpty) {
+      throw Failure('Please select at least one candidate application to export.');
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('employer_token') ?? prefs.getString('access_token');
+      final directory = await getApplicationDocumentsDirectory();
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final localCsvPath = '${directory.path}/selected_candidates_$timestamp.csv';
+
+      List<dynamic> exportedDataList = [];
+
+      // 1. Send POST request with selected IDs to API: /api/emp/applications/export
+      if (token != null && token.isNotEmpty) {
+        try {
+          final res = await ApiService.post(
+            ApiRoutes.exportCandidateApplications,
+            body: {'ids': selectedApplicationIds},
+            accessToken: token,
+          );
+
+          if (res['data'] is List) {
+            exportedDataList = res['data'] as List;
+          } else if (res['applications'] is List) {
+            exportedDataList = res['applications'] as List;
+          } else if (res['candidates'] is List) {
+            exportedDataList = res['candidates'] as List;
+          } else if (res['data'] is Map && res['data']['data'] is List) {
+            exportedDataList = res['data']['data'] as List;
+          }
+        } catch (e) {
+          debugPrint('Server export API error, generating local Excel export: $e');
+        }
+      }
+
+      // 2. Generate clean CSV / Excel file (UTF-8 BOM for full Microsoft Excel & Google Sheets support)
+      final csvBuffer = StringBuffer();
+      csvBuffer.write('\uFEFF');
+
+      // Column Headers
+      csvBuffer.writeln(
+        '"Application ID","Candidate Name","Mobile Phone","Email Address",'
+        '"Experience","Education Level","Education Details","Expected Salary",'
+        '"Notice Period","Key Skills","Status","Applied Date"',
+      );
+
+      String escape(String? text) {
+        if (text == null) return '""';
+        return '"${text.replaceAll('"', '""').trim()}"';
+      }
+
+      if (exportedDataList.isNotEmpty) {
+        for (final item in exportedDataList) {
+          if (item is Map) {
+            final id = item['id']?.toString() ?? '';
+            final name = item['name'] ?? item['candidate_name'] ?? item['full_name'] ?? '';
+            final phone = item['mobile'] ?? item['phone'] ?? item['contact_no'] ?? '';
+            final email = item['email'] ?? '';
+            final exp = '${item['experience_years'] ?? item['experience'] ?? '0'} yrs';
+            final edu = item['education'] ?? item['education_level'] ?? item['highest_qualification'] ?? '';
+            final eduDetails = item['education_details'] ?? item['qualification_details'] ?? '';
+            final salary = item['expected_salary']?.toString() ?? item['salary']?.toString() ?? 'N/A';
+            final notice = item['notice_period']?.toString() ?? 'Immediate';
+            final skills = item['skills'] ?? item['key_skills'] ?? '';
+            final status = item['status']?.toString().toUpperCase() ?? 'PENDING';
+            final date = item['created_at']?.toString().split('T').first ?? item['applied_at']?.toString().split('T').first ?? '';
+
+            csvBuffer.writeln([
+              escape(id),
+              escape(name.toString()),
+              escape(phone.toString()),
+              escape(email.toString()),
+              escape(exp),
+              escape(edu.toString()),
+              escape(eduDetails.toString()),
+              escape(salary),
+              escape(notice),
+              escape(skills.toString()),
+              escape(status),
+              escape(date),
+            ].join(','));
+          }
+        }
+      } else {
+        // Fallback: Generate from locally cached applications
+        final allApps = jobApplications[jobId] ?? [];
+        final selectedApps = allApps.where((a) => selectedApplicationIds.contains(a.id)).toList();
+
+        for (final a in selectedApps) {
+          csvBuffer.writeln([
+            escape(a.id.toString()),
+            escape(a.candidateName),
+            escape(a.phone),
+            escape(a.email),
+            escape('${a.experienceYears} yrs ${a.experienceMonths} mos'),
+            escape(a.educationLevel),
+            escape(a.educationDetails),
+            escape(a.expectedSalary.isNotEmpty ? a.expectedSalary : 'N/A'),
+            escape(a.noticePeriod.isNotEmpty ? a.noticePeriod : 'Immediate'),
+            escape(a.keySkills),
+            escape(a.status.toUpperCase()),
+            escape(a.appliedAt.toIso8601String().split('T').first),
+          ].join(','));
+        }
+      }
+
+      final file = File(localCsvPath);
+      await file.writeAsString(csvBuffer.toString(), encoding: utf8);
+
+      return localCsvPath;
+    } on Failure {
+      rethrow;
+    } catch (e) {
+      debugPrint('Error in exportSelectedApplications: $e');
+      throw Failure('Export failed: ${e.toString()}');
+    }
+  }
+
   void _calculateMockStats(int jobId, List<JobApplication> apps, int views) {
     final total = apps.length;
     final newCount = apps.where((a) => a.status == 'pending').length;
