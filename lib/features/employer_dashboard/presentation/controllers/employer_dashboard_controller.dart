@@ -128,7 +128,7 @@ class EmployerDashboardController extends GetxController {
                     educationDetails: app.educationDetails,
                     keySkills: app.keySkills,
                     resumePath: app.resumePath,
-                    status: localApplicationStatuses[app.id]!,
+                    status: localApplicationStatuses[app.id] ?? app.status,
                     appliedAt: app.appliedAt,
                     expectedSalary: app.expectedSalary,
                     noticePeriod: app.noticePeriod,
@@ -182,16 +182,22 @@ class EmployerDashboardController extends GetxController {
 
   Future<void> fetchApplicationsForJob(int jobId) async {
     isJobApplicationsLoading[jobId] = true;
+    print('═══════════════════════════════════════════════════════════════');
+    print('🚀 [API FETCH] Fetching Applications for Job ID: $jobId');
     try {
       final token = await _getAuthToken();
+      print('🔑 [API AUTH] Active Token: ${token != null ? "${token.substring(0, token.length > 15 ? 15 : token.length)}..." : "NULL"}');
 
       List<JobApplication> apps = [];
       if (token != null && token.isNotEmpty) {
         try {
+          final url = ApiRoutes.employerApplications(jobId);
+          print('🌐 [API URL] Calling GET: $url');
           final res = await ApiService.get(
-            ApiRoutes.employerApplications(jobId),
+            url,
             accessToken: token,
           );
+          print('📦 [API RESPONSE] Raw Data: $res');
 
           List<dynamic>? dataList;
           if (res['applications'] is List) {
@@ -208,10 +214,12 @@ class EmployerDashboardController extends GetxController {
           }
 
           if (dataList != null) {
+            print('🔍 [DATA FOUND] Found ${dataList.length} candidate entries in response');
             apps = dataList.map<JobApplication>((item) {
               final app = JobApplication.fromJson(
                 item as Map<String, dynamic>,
               );
+              print('   👤 Candidate: id=${app.id}, name="${app.candidateName}", phone="${app.phone}", status="${app.status}", appliedAt="${app.appliedAt}"');
               if (localApplicationStatuses.containsKey(app.id)) {
                 return JobApplication(
                   id: app.id,
@@ -225,7 +233,7 @@ class EmployerDashboardController extends GetxController {
                   educationDetails: app.educationDetails,
                   keySkills: app.keySkills,
                   resumePath: app.resumePath,
-                  status: localApplicationStatuses[app.id]!,
+                  status: localApplicationStatuses[app.id] ?? app.status,
                   appliedAt: app.appliedAt,
                   expectedSalary: app.expectedSalary,
                   noticePeriod: app.noticePeriod,
@@ -233,6 +241,8 @@ class EmployerDashboardController extends GetxController {
               }
               return app;
             }).toList();
+          } else {
+            print('⚠️ [NO LIST FOUND] Neither "applications", "data" nor "candidates" contained a list in response');
           }
 
           if (res['stats'] != null && res['stats'] is Map) {
@@ -240,18 +250,24 @@ class EmployerDashboardController extends GetxController {
             jobStats[jobId] = statsMap.map(
               (k, v) => MapEntry(k, int.tryParse(v.toString()) ?? 0),
             );
+          } else {
+            _calculateMockStats(jobId, apps, jobVisitorCounts[jobId] ?? 0);
           }
 
           if (res['job'] != null && res['job']['visitor_count'] != null) {
             jobVisitorCounts[jobId] =
                 int.tryParse(res['job']['visitor_count'].toString()) ?? 0;
           }
-        } catch (e) {
-          debugPrint('Error fetching applications for job $jobId: $e');
+        } catch (e, st) {
+          print('❌ [API ERROR] Error fetching applications for job $jobId: $e\n$st');
         }
+      } else {
+        print('⚠️ [AUTH WARNING] No token found in SharedPreferences');
       }
 
       jobApplications[jobId] = apps;
+      print('✅ [COMPLETE] Stored ${apps.length} applications in controller for Job ID $jobId');
+      print('═══════════════════════════════════════════════════════════════');
     } finally {
       isJobApplicationsLoading[jobId] = false;
     }
@@ -555,7 +571,7 @@ class EmployerDashboardController extends GetxController {
               educationDetails: app.educationDetails,
               keySkills: app.keySkills,
               resumePath: app.resumePath,
-              status: localApplicationStatuses[appId]!,
+              status: localApplicationStatuses[appId] ?? app.status,
               appliedAt: app.appliedAt,
               expectedSalary: app.expectedSalary,
               noticePeriod: app.noticePeriod,

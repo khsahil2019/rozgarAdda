@@ -56,9 +56,6 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     super.initState();
     controller.applicantSearchQuery.value = '';
     controller.applicantStatusFilter.value = 'all';
-    _searchCtrl.addListener(() {
-      controller.applicantSearchQuery.value = _searchCtrl.text;
-    });
     controller.fetchApplicationsForJob(widget.jobId);
   }
 
@@ -522,6 +519,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           ),
         ),
         body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 1. Grid Pipeline Filter Bar (No Slider - 100% on screen)
             Obx(() {
@@ -542,6 +540,8 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                 final List<JobApplication> filteredApps =
                     controller.getFilteredApplicants(widget.jobId);
                 final hasSelection = _selectedApplicationIds.isNotEmpty;
+
+                print('🖥️ [UI RENDER] Job ID ${widget.jobId}: allApps=${allApps.length}, filteredApps=${filteredApps.length}, activeFilter="${controller.applicantStatusFilter.value}", query="${controller.applicantSearchQuery.value}"');
 
                 if (controller.isJobApplicationsLoading[widget.jobId] == true && allApps.isEmpty) {
                   return const Center(
@@ -901,6 +901,9 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             ),
             child: TextField(
               controller: _searchCtrl,
+              onChanged: (val) {
+                controller.applicantSearchQuery.value = val;
+              },
               style: const TextStyle(
                 color: darkText,
                 fontSize: 14,
@@ -1276,26 +1279,12 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       const SizedBox(width: 12),
 
                       // Update Status Button
-                      ElevatedButton.icon(
-                        onPressed: () => _showStatusUpdateDialog(context, app),
-                        icon: const Icon(Icons.edit_note_rounded, size: 16),
-                        label: const Text('Status'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primary,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 7,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          textStyle: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
+                      _buildActionButton(
+                        icon: Icons.edit_note_rounded,
+                        label: 'Status',
+                        color: primary,
+                        isFilled: true,
+                        onTap: () => _showStatusUpdateDialog(context, app),
                       ),
                     ],
                   ),
@@ -1382,31 +1371,37 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     required String label,
     required Color color,
     required VoidCallback onTap,
+    bool isFilled = false,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withValues(alpha: 0.2)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 14),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 11.5,
-                fontWeight: FontWeight.w800,
-              ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: isFilled ? color : color.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isFilled ? color : color.withValues(alpha: 0.2),
             ),
-          ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: isFilled ? Colors.white : color, size: 14),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isFilled ? Colors.white : color,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

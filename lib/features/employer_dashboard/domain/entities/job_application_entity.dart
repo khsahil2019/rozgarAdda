@@ -60,6 +60,15 @@ class JobApplication {
             ? json['user'] as Map<String, dynamic>
             : null);
 
+    final rawSkills = json['key_skills'] ?? (json['skills'] ?? '');
+    String parsedSkills = '';
+    if (rawSkills is List) {
+      parsedSkills = rawSkills.map((e) => e.toString()).where((s) => s.isNotEmpty).join(', ');
+    } else {
+      parsedSkills = rawSkills.toString();
+      if (parsedSkills == '[]' || parsedSkills == '{}') parsedSkills = '';
+    }
+
     final rawStatus = (json['status'] ?? (json['application_status'] ?? 'pending')).toString();
 
     return JobApplication(
@@ -84,7 +93,7 @@ class JobApplication {
               (json['education'] ?? (json['qualification'] ?? '')))
           .toString(),
       educationDetails: (json['education_details'] ?? '').toString(),
-      keySkills: (json['key_skills'] ?? (json['skills'] ?? '')).toString(),
+      keySkills: parsedSkills,
       resumePath: (json['resume_path'] ?? (json['resume'] ?? '')).toString(),
       status: rawStatus.isEmpty ? 'pending' : rawStatus,
       appliedAt: DateTime.tryParse(
