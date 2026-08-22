@@ -6,7 +6,7 @@ import 'package:rojgar/features/buy_product/presentation/screens/product_categor
 import 'package:rojgar/features/jobs/presentation/bindings/jobs_binding.dart';
 import 'package:rojgar/features/jobs/presentation/screens/recent_jobs_screen.dart';
 import 'package:rojgar/features/jobs/presentation/screens/select_category_screen.dart';
-import 'package:rojgar/features/kyc/presentation/screens/edit_kyc_screen.dart' hide AC;
+import 'package:rojgar/features/kyc/presentation/screens/edit_kyc_screen.dart';
 import 'package:rojgar/features/missing_person/presentation/screens/missing_person_list_screen.dart';
 import 'package:rojgar/features/news/prsentation/screens/news_screen.dart';
 import 'package:rojgar/features/profile/presentation/screens/help_support_screen.dart';

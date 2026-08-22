@@ -30,6 +30,11 @@ class EmployerAuthRepositoryImpl implements EmployerAuthRepository {
         await prefs.setInt(_keySessionId, employer.id);
         await prefs.setString(_keySessionToken, employer.token);
         await prefs.setString('access_token', employer.token);
+        await prefs.setString('employer_company_name', employer.companyName);
+        await prefs.setString('employer_email', employer.email);
+        await prefs.setString('employer_phone', employer.phone);
+        await prefs.setString('employer_contact_person', employer.contactPerson);
+        await prefs.setString('employer_address', employer.address);
         
         // Clear candidate session to avoid conflict
         await prefs.remove('candidate_id');
@@ -86,6 +91,11 @@ class EmployerAuthRepositoryImpl implements EmployerAuthRepository {
         await prefs.setInt(_keySessionId, employer.id);
         await prefs.setString(_keySessionToken, employer.token);
         await prefs.setString('access_token', employer.token);
+        await prefs.setString('employer_company_name', employer.companyName);
+        await prefs.setString('employer_email', employer.email);
+        await prefs.setString('employer_phone', employer.phone);
+        await prefs.setString('employer_contact_person', employer.contactPerson);
+        await prefs.setString('employer_address', employer.address);
 
         // Clear candidate session to avoid conflict
         await prefs.remove('candidate_id');

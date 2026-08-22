@@ -3,18 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/widgets/app_back_button.dart';
 import '../../../../localization/app_localizations.dart';
 import '../controller/sell_product_controller.dart';
+import '../widgets/sell_product_step_indicator.dart';
 import 'sell_product_review_screen.dart';
 
 class _C {
   static const Color primaryBlue = Color(0xFF1400FF);
-  static const Color darkText = Color(0xFF1A1A2E);
-  static const Color greyText = Color(0xFF8A8FA3);
-  static const Color scaffoldBg = Color(0xFFF5F6FA);
-  static const Color fieldBg = Color(0xFFFFFFFF);
-  static const Color borderColor = Color(0xFFDDDDEE);
-  static const Color uploadBg = Color(0xFFF0F0FF);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color greyText = Color(0xFF64748B);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+  static const Color scaffoldBg = Color(0xFFF8FAFC);
+  static const Color fieldBg = Color(0xFFF8FAFC);
+  static const Color cardBg = Color(0xFFFFFFFF);
 }
 
 class SellProductFormScreen extends GetView<SellProductController> {
@@ -27,10 +29,10 @@ class SellProductFormScreen extends GetView<SellProductController> {
   }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(message, style: const TextStyle(fontWeight: FontWeight.w600)),
         backgroundColor: backgroundColor ?? _C.primaryBlue,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -38,521 +40,529 @@ class SellProductFormScreen extends GetView<SellProductController> {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
+    final l10n = AppLocalizations.of(context);
 
     // Clear form when opening
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.resetForm();
     });
 
-    return Scaffold(
-      backgroundColor: _C.scaffoldBg,
-      body: Column(
-        children: [
-          const _TopBar(),
-          const _StepIndicator(currentStep: 3),
-          Expanded(
-            child: Form(
-              key: formKey,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Category Banner
-                    Obx(() {
-                      final catIdx = controller.selectedCategoryIndex.value;
-                      final subCatIdx =
-                          controller.selectedSubCategoryIndex.value;
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Get.back();
+      },
+      child: Scaffold(
+        backgroundColor: _C.scaffoldBg,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: Center(
+            child: AppBackButton(
+              onPressed: () => Get.back(),
+              tooltip: 'Back',
+            ),
+          ),
+          title: Text(
+            l10n.text('sell_post_ad'),
+            style: const TextStyle(
+              color: _C.darkText,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.3,
+            ),
+          ),
+          centerTitle: false,
+          actions: [
+            IconButton(
+              tooltip: 'Cancel',
+              icon: const Icon(Icons.close_rounded, color: _C.greyText, size: 22),
+              onPressed: () => Navigator.maybePop(context),
+            ),
+            const SizedBox(width: 4),
+          ],
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(1),
+            child: Divider(height: 1, color: _C.borderGrey),
+          ),
+        ),
+        body: Column(
+          children: [
+            const SellProductStepIndicator(currentStep: 3),
+            Expanded(
+              child: Form(
+                key: formKey,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 110),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Category & Subcategory Summary
+                      Obx(() {
+                        final catIdx = controller.selectedCategoryIndex.value;
+                        final subCatIdx = controller.selectedSubCategoryIndex.value;
 
-                      if (catIdx == null || subCatIdx == null)
-                        return const SizedBox.shrink();
+                        if (catIdx == null || subCatIdx == null) {
+                          return const SizedBox.shrink();
+                        }
 
-                      final catName = controller.categories[catIdx].name;
-                      final subCatName =
-                          controller.subCategories[subCatIdx].name;
+                        final catName = controller.categories[catIdx].name;
+                        final subCatName = controller.subCategories[subCatIdx].name;
 
-                      return _CategoryBanner(
-                        categoryName: catName,
-                        subCategoryName: subCatName,
-                      );
-                    }),
-                    const SizedBox(height: 20),
-
-                    // Product Title
-                    _FieldLabel(context.l10n.text('sell_product_title')),
-                    _InputField(
-                      controller: controller.titleCtrl,
-                      hint: context.l10n.text('sell_title_hint'),
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? context.l10n.text('sell_required')
-                          : null,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Description
-                    _FieldLabel(context.l10n.text('sell_description')),
-                    _InputField(
-                      controller: controller.descCtrl,
-                      hint: context.l10n.text('sell_desc_hint'),
-                      maxLines: 5,
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? context.l10n.text('sell_required')
-                          : null,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Features
-                    _FieldLabel(context.l10n.text('sell_features')),
-                    _InputField(
-                      controller: controller.featuresCtrl,
-                      hint: context.l10n.text('sell_features_hint'),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Main Product Image
-                    _FieldLabel(context.l10n.text('sell_main_image')),
-                    Obx(() {
-                      final mainImg = controller.mainImage.value;
-                      return _ImagePickerTile(
-                        label: mainImg == null
-                            ? context.l10n.text('sell_no_file')
-                            : mainImg.name,
-                        onTap: controller.pickMainImage,
-                        previewFile: mainImg != null
-                            ? File(mainImg.path)
-                            : null,
-                        chooseFileText: context.l10n.text('sell_choose_file'),
-                      );
-                    }),
-                    const SizedBox(height: 16),
-
-                    // Gallery Images
-                    _FieldLabel(context.l10n.text('sell_gallery_images')),
-                    Obx(() {
-                      return _GalleryPickerTile(
-                        images: controller.galleryImages.toList(),
-                        onPickTap: controller.pickGalleryImages,
-                        onRemove: controller.removeGalleryImage,
-                        maxImagesText: context.l10n.text('sell_max_images'),
-                        chooseFileText: context.l10n.text('sell_choose_file'),
-                      );
-                    }),
-                    const SizedBox(height: 16),
-
-                    // Price & Discount row
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        return Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1400FF).withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: const Color(0xFF1400FF).withValues(alpha: 0.15),
+                            ),
+                          ),
+                          child: Row(
                             children: [
-                              _FieldLabel(context.l10n.text('sell_price')),
-                              _InputField(
-                                controller: controller.priceCtrl,
-                                hint: '0.00',
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                      decimal: true,
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF1400FF).withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(Icons.sell_outlined, color: _C.primaryBlue, size: 20),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '$catName  •  $subCatName',
+                                      style: const TextStyle(
+                                        color: _C.darkText,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w800,
+                                      ),
                                     ),
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                    RegExp(r'^\d+\.?\d{0,2}'),
-                                  ),
-                                ],
-                                onChanged: (_) => controller.priceCtrl.text =
-                                    controller.priceCtrl.text,
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      l10n.text('sell_change_by_back'),
+                                      style: const TextStyle(color: _C.greyText, fontSize: 12),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _FieldLabel(context.l10n.text('sell_discount')),
-                              _InputField(
-                                controller: controller.discountCtrl,
-                                hint: '0',
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
-                                onChanged: (_) => controller.discountCtrl.text =
-                                    controller.discountCtrl.text,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Total Cost
-                    _FieldLabel(context.l10n.text('sell_total_cost')),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _C.fieldBg,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: _C.borderColor, width: 1),
-                      ),
-                      child: Obx(() {
-                        final total = controller.totalCostObx.value;
-                        return Text(
-                          controller.priceCtrl.text.isEmpty
-                              ? 'Calculated total'
-                              : '₹ ${total.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            color: controller.priceCtrl.text.isEmpty
-                                ? _C.greyText
-                                : _C.darkText,
-                            fontSize: 14,
                           ),
                         );
                       }),
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    // Capacity & Warranty row
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _FieldLabel(context.l10n.text('sell_capacity')),
-                              _InputField(
-                                controller: controller.capacityCtrl,
-                                hint: 'e.g. 5 Seater',
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _FieldLabel(context.l10n.text('sell_warranty')),
-                              _InputField(
-                                controller: controller.warrantyCtrl,
-                                hint: 'e.g. 3 Years',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Active Product toggle
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F5E0),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: const Color(0xFFE8E8C0),
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
+                      // Card 1: Basic Information
+                      _buildSectionCard(
+                        title: 'Product Information',
+                        icon: Icons.info_outline_rounded,
                         children: [
-                          const Icon(
-                            Icons.visibility_rounded,
-                            color: _C.primaryBlue,
-                            size: 20,
+                          _FieldLabel(l10n.text('sell_product_title')),
+                          _InputField(
+                            controller: controller.titleCtrl,
+                            hint: l10n.text('sell_title_hint'),
+                            prefixIcon: Icons.title_rounded,
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? l10n.text('sell_required')
+                                : null,
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              context.l10n.text('sell_active_product'),
-                              style: const TextStyle(
-                                color: _C.darkText,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                          const SizedBox(height: 14),
+
+                          _FieldLabel(l10n.text('sell_description')),
+                          _InputField(
+                            controller: controller.descCtrl,
+                            hint: l10n.text('sell_desc_hint'),
+                            prefixIcon: Icons.notes_rounded,
+                            maxLines: 4,
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? l10n.text('sell_required')
+                                : null,
                           ),
+                          const SizedBox(height: 14),
+
+                          _FieldLabel(l10n.text('sell_features')),
+                          _InputField(
+                            controller: controller.featuresCtrl,
+                            hint: l10n.text('sell_features_hint'),
+                            prefixIcon: Icons.star_border_rounded,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Card 2: Photos & Media
+                      _buildSectionCard(
+                        title: 'Product Images',
+                        icon: Icons.photo_camera_outlined,
+                        children: [
+                          _FieldLabel(l10n.text('sell_main_image')),
                           Obx(() {
-                            return Switch(
-                              value: controller.isActive.value,
-                              onChanged: (v) => controller.isActive.value = v,
-                              activeThumbColor: Colors.white,
-                              activeTrackColor: _C.primaryBlue,
-                              inactiveThumbColor: Colors.white,
-                              inactiveTrackColor: const Color(0xFFCCCCCC),
+                            final mainImg = controller.mainImage.value;
+                            return _MainImagePickerTile(
+                              label: mainImg == null
+                                  ? l10n.text('sell_no_file')
+                                  : mainImg.name,
+                              onTap: controller.pickMainImage,
+                              previewFile: mainImg != null ? File(mainImg.path) : null,
+                              chooseFileText: l10n.text('sell_choose_file'),
+                            );
+                          }),
+                          const SizedBox(height: 16),
+
+                          _FieldLabel(l10n.text('sell_gallery_images')),
+                          Obx(() {
+                            return _GalleryPickerTile(
+                              images: controller.galleryImages.toList(),
+                              onPickTap: controller.pickGalleryImages,
+                              onRemove: controller.removeGalleryImage,
+                              maxImagesText: l10n.text('sell_max_images'),
+                              chooseFileText: l10n.text('sell_choose_file'),
                             );
                           }),
                         ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 16),
+
+                      // Card 3: Pricing & Inventory
+                      _buildSectionCard(
+                        title: 'Pricing & Details',
+                        icon: Icons.currency_rupee_rounded,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _FieldLabel(l10n.text('sell_price')),
+                                    _InputField(
+                                      controller: controller.priceCtrl,
+                                      hint: '0.00',
+                                      prefixText: '₹ ',
+                                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                                      ],
+                                      onChanged: (_) => controller.priceCtrl.text = controller.priceCtrl.text,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _FieldLabel(l10n.text('sell_discount')),
+                                    _InputField(
+                                      controller: controller.discountCtrl,
+                                      hint: '0',
+                                      suffixText: '%',
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                      onChanged: (_) => controller.discountCtrl.text = controller.discountCtrl.text,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Total Cost banner
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: _C.borderGrey),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.receipt_long_outlined, color: _C.greyText, size: 18),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${l10n.text('sell_total_cost')}: ',
+                                  style: const TextStyle(
+                                    color: _C.greyText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Obx(() {
+                                  final total = controller.totalCostObx.value;
+                                  return Text(
+                                    controller.priceCtrl.text.isEmpty
+                                        ? '₹ 0.00'
+                                        : '₹ ${total.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      color: _C.primaryBlue,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _FieldLabel(l10n.text('sell_capacity')),
+                                    _InputField(
+                                      controller: controller.capacityCtrl,
+                                      hint: 'e.g. 5 Seater',
+                                      prefixIcon: Icons.aspect_ratio_rounded,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _FieldLabel(l10n.text('sell_warranty')),
+                                    _InputField(
+                                      controller: controller.warrantyCtrl,
+                                      hint: 'e.g. 1 Year',
+                                      prefixIcon: Icons.verified_user_outlined,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Active Product Switch
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8FAFC),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: _C.borderGrey),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.visibility_outlined, color: _C.primaryBlue, size: 20),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        l10n.text('sell_active_product'),
+                                        style: const TextStyle(
+                                          color: _C.darkText,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      const Text(
+                                        'Show this listing publicly',
+                                        style: TextStyle(color: _C.greyText, fontSize: 11.5),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Obx(() {
+                                  return Switch(
+                                    value: controller.isActive.value,
+                                    onChanged: (v) => controller.isActive.value = v,
+                                    activeThumbColor: Colors.white,
+                                    activeTrackColor: _C.primaryBlue,
+                                    inactiveThumbColor: Colors.white,
+                                    inactiveTrackColor: const Color(0xFFCBD5E1),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-      bottomSheet: Obx(() {
-        return _BottomActions(
-          isSaving: controller.isSaving.value,
-          cancelText: context.l10n.text('cancel'),
-          saveProductText: context.l10n.text('sell_save_product'),
-          onCancel: () => Get.back(),
-          onSave: () async {
-            if (!formKey.currentState!.validate()) return;
-            if (controller.mainImage.value == null) {
-              _showSnackBar(
-                context,
-                context.l10n.text('sell_select_main_image'),
-                backgroundColor: Colors.red,
-              );
-              return;
-            }
-
-            final l10n = context.l10n;
-            final messenger = ScaffoldMessenger.of(context);
-            final success = await controller.saveProduct();
-            if (success) {
-              Get.off(() => const SellProductReviewScreen());
-            } else {
-              final errMsg =
-                  controller.savingError.value ??
-                  l10n.text('sell_error_saving');
-              messenger.showSnackBar(
-                SnackBar(
-                  content: Text(errMsg),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              );
-            }
-          },
-        );
-      }),
-    );
-  }
-}
-
-class _TopBar extends StatelessWidget {
-  const _TopBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: _C.primaryBlue,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 8,
-        bottom: 12,
-        left: 16,
-        right: 16,
-      ),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Get.back(),
-            child: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-          ),
-          Expanded(
-            child: Text(
-              context.l10n.text('sell_post_ad'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.2,
+          ],
+        ),
+        bottomSheet: Obx(() {
+          return Container(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              12,
+              16,
+              MediaQuery.of(context).padding.bottom + 14,
+            ),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                top: BorderSide(color: _C.borderGrey, width: 1),
               ),
             ),
-          ),
-          GestureDetector(
-            onTap: () => Navigator.maybePop(context),
-            child: const Icon(Icons.close, color: Colors.white, size: 24),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StepIndicator extends StatelessWidget {
-  final int currentStep;
-  const _StepIndicator({required this.currentStep});
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isReviewStep = currentStep >= 4;
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-      child: Row(
-        children: [
-          _StepCircle(
-            number: 1,
-            label: context.l10n.text('sell_category'),
-            state: _StepState.done,
-          ),
-          const _StepLine(active: true),
-          _StepCircle(number: 2, label: 'Sub-Cat', state: _StepState.done),
-          const _StepLine(active: true),
-          _StepCircle(
-            number: 3,
-            label: context.l10n.text('sell_details'),
-            state: isReviewStep ? _StepState.done : _StepState.active,
-          ),
-          _StepLine(active: isReviewStep),
-          _StepCircle(
-            number: 4,
-            label: context.l10n.text('sell_review'),
-            state: isReviewStep ? _StepState.active : _StepState.inactive,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-enum _StepState { done, active, inactive }
-
-class _StepCircle extends StatelessWidget {
-  final int number;
-  final String label;
-  final _StepState state;
-
-  const _StepCircle({
-    required this.number,
-    required this.label,
-    required this.state,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isDone = state == _StepState.done;
-    final bool isActive = state == _StepState.active;
-
-    return Column(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: (isDone || isActive)
-                ? _C.primaryBlue
-                : const Color(0xFFE8E8F0),
-          ),
-          alignment: Alignment.center,
-          child: isDone
-              ? const Icon(Icons.check_rounded, color: Colors.white, size: 16)
-              : Text(
-                  '$number',
-                  style: TextStyle(
-                    color: isActive ? Colors.white : _C.greyText,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
-                  ),
-                ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: (isDone || isActive) ? _C.primaryBlue : _C.greyText,
-            fontSize: 9,
-            fontWeight: (isDone || isActive)
-                ? FontWeight.w700
-                : FontWeight.w500,
-            letterSpacing: 0.4,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _StepLine extends StatelessWidget {
-  final bool active;
-  const _StepLine({required this.active});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        height: 1.5,
-        margin: const EdgeInsets.only(bottom: 18),
-        color: active ? _C.primaryBlue : const Color(0xFFDDDDEE),
-      ),
-    );
-  }
-}
-
-class _CategoryBanner extends StatelessWidget {
-  final String categoryName;
-  final String subCategoryName;
-
-  const _CategoryBanner({
-    required this.categoryName,
-    required this.subCategoryName,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: _C.uploadBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFCCCCFF), width: 1),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE0E0FF),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.directions_car_rounded,
-              color: _C.primaryBlue,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Text(
-                  'Category: $categoryName',
-                  style: const TextStyle(
-                    color: _C.darkText,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: _C.darkText,
+                      side: const BorderSide(color: _C.borderGrey, width: 1.2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      minimumSize: const Size.fromHeight(52),
+                    ),
+                    onPressed: () => Get.back(),
+                    child: Text(
+                      l10n.text('cancel'),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
                   ),
                 ),
-                Text(
-                  'Sub Category: $subCategoryName',
-                  style: const TextStyle(color: _C.greyText, fontSize: 12),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _C.primaryBlue,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      minimumSize: const Size.fromHeight(52),
+                    ),
+                    onPressed: controller.isSaving.value
+                        ? null
+                        : () async {
+                            if (!formKey.currentState!.validate()) return;
+                            if (controller.mainImage.value == null) {
+                              _showSnackBar(
+                                context,
+                                l10n.text('sell_select_main_image'),
+                                backgroundColor: const Color(0xFFEF4444),
+                              );
+                              return;
+                            }
+
+                            final messenger = ScaffoldMessenger.of(context);
+                            final success = await controller.saveProduct();
+                            if (success) {
+                              Get.off(() => const SellProductReviewScreen());
+                            } else {
+                              final errMsg = controller.savingError.value ?? l10n.text('sell_error_saving');
+                              messenger.showSnackBar(
+                                SnackBar(
+                                  content: Text(errMsg),
+                                  backgroundColor: const Color(0xFFEF4444),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                    child: controller.isSaving.value
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                l10n.text('sell_save_product'),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward_rounded, size: 18),
+                            ],
+                          ),
+                  ),
                 ),
               ],
             ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildSectionCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _C.cardBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _C.borderGrey),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1400FF).withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: _C.primaryBlue, size: 16),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: _C.darkText,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ...children,
         ],
       ),
     );
@@ -566,13 +576,13 @@ class _FieldLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         text,
         style: const TextStyle(
           color: _C.darkText,
           fontSize: 13,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -587,6 +597,9 @@ class _InputField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
+  final IconData? prefixIcon;
+  final String? prefixText;
+  final String? suffixText;
 
   const _InputField({
     required this.controller,
@@ -596,6 +609,9 @@ class _InputField extends StatelessWidget {
     this.inputFormatters,
     this.validator,
     this.onChanged,
+    this.prefixIcon,
+    this.prefixText,
+    this.suffixText,
   });
 
   @override
@@ -607,23 +623,31 @@ class _InputField extends StatelessWidget {
       inputFormatters: inputFormatters,
       validator: validator,
       onChanged: onChanged,
-      style: const TextStyle(color: _C.darkText, fontSize: 14),
+      style: const TextStyle(
+        color: _C.darkText,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: _C.greyText, fontSize: 14),
+        hintStyle: const TextStyle(color: _C.greyText, fontSize: 13.5, fontWeight: FontWeight.normal),
         filled: true,
         fillColor: _C.fieldBg,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
+        prefixIcon: prefixIcon != null
+            ? Icon(prefixIcon, color: _C.greyText, size: 18)
+            : null,
+        prefixText: prefixText,
+        prefixStyle: const TextStyle(color: _C.darkText, fontSize: 14, fontWeight: FontWeight.w800),
+        suffixText: suffixText,
+        suffixStyle: const TextStyle(color: _C.greyText, fontSize: 14, fontWeight: FontWeight.w700),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _C.borderColor, width: 1),
+          borderSide: const BorderSide(color: _C.borderGrey, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _C.borderColor, width: 1),
+          borderSide: const BorderSide(color: _C.borderGrey, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -631,24 +655,24 @@ class _InputField extends StatelessWidget {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red, width: 1),
+          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red, width: 1.5),
+          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1.5),
         ),
       ),
     );
   }
 }
 
-class _ImagePickerTile extends StatelessWidget {
+class _MainImagePickerTile extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   final File? previewFile;
   final String chooseFileText;
 
-  const _ImagePickerTile({
+  const _MainImagePickerTile({
     required this.label,
     required this.onTap,
     required this.chooseFileText,
@@ -660,33 +684,34 @@ class _ImagePickerTile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: _C.fieldBg,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: _C.borderColor, width: 1),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: Row(
-            children: [
-              const Icon(Icons.image_outlined, color: _C.greyText, size: 22),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  label,
-                  style: const TextStyle(color: _C.greyText, fontSize: 13),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              GestureDetector(
-                onTap: onTap,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              color: _C.fieldBg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: _C.borderGrey, width: 1),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                const Icon(Icons.add_photo_alternate_outlined, color: _C.primaryBlue, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      color: _C.darkText,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEEEEFF),
+                    color: const Color(0xFF1400FF).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -694,23 +719,47 @@ class _ImagePickerTile extends StatelessWidget {
                     style: const TextStyle(
                       color: _C.primaryBlue,
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         if (previewFile != null) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.file(
-              previewFile!,
-              height: 140,
-              width: double.infinity,
-              fit: BoxFit.cover,
+            borderRadius: BorderRadius.circular(12),
+            child: Stack(
+              children: [
+                Image.file(
+                  previewFile!,
+                  height: 160,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: _C.primaryBlue,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'MAIN PHOTO',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -739,42 +788,35 @@ class _GalleryPickerTile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: _C.fieldBg,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: _C.borderColor,
-              width: 1,
-              style: BorderStyle.solid,
+        GestureDetector(
+          onTap: onPickTap,
+          child: Container(
+            decoration: BoxDecoration(
+              color: _C.fieldBg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: _C.borderGrey, width: 1),
             ),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: Row(
-            children: [
-              const Icon(
-                Icons.photo_library_outlined,
-                color: _C.greyText,
-                size: 22,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  images.isEmpty
-                      ? maxImagesText
-                      : '${images.length} image${images.length > 1 ? 's' : ''} selected',
-                  style: const TextStyle(color: _C.greyText, fontSize: 13),
-                ),
-              ),
-              GestureDetector(
-                onTap: onPickTap,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                const Icon(Icons.collections_outlined, color: _C.primaryBlue, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    images.isEmpty
+                        ? maxImagesText
+                        : '${images.length} image${images.length > 1 ? 's' : ''} selected',
+                    style: const TextStyle(
+                      color: _C.darkText,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEEEEFF),
+                    color: const Color(0xFF1400FF).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -782,18 +824,18 @@ class _GalleryPickerTile extends StatelessWidget {
                     style: const TextStyle(
                       color: _C.primaryBlue,
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         if (images.isNotEmpty) ...[
           const SizedBox(height: 10),
           SizedBox(
-            height: 80,
+            height: 84,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: images.length,
@@ -801,30 +843,30 @@ class _GalleryPickerTile extends StatelessWidget {
               itemBuilder: (_, i) => Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                     child: Image.file(
                       File(images[i].path),
-                      width: 80,
-                      height: 80,
+                      width: 84,
+                      height: 84,
                       fit: BoxFit.cover,
                     ),
                   ),
                   Positioned(
-                    top: 2,
-                    right: 2,
+                    top: 4,
+                    right: 4,
                     child: GestureDetector(
                       onTap: () => onRemove(i),
                       child: Container(
-                        width: 20,
-                        height: 20,
+                        width: 22,
+                        height: 22,
                         decoration: const BoxDecoration(
-                          color: Colors.black54,
+                          color: Colors.black87,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.close,
+                          Icons.close_rounded,
                           color: Colors.white,
-                          size: 12,
+                          size: 14,
                         ),
                       ),
                     ),
@@ -835,99 +877,6 @@ class _GalleryPickerTile extends StatelessWidget {
           ),
         ],
       ],
-    );
-  }
-}
-
-class _BottomActions extends StatelessWidget {
-  final bool isSaving;
-  final String cancelText;
-  final String saveProductText;
-  final VoidCallback onCancel;
-  final VoidCallback onSave;
-
-  const _BottomActions({
-    required this.isSaving,
-    required this.cancelText,
-    required this.saveProductText,
-    required this.onCancel,
-    required this.onSave,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.fromLTRB(
-        16,
-        12,
-        16,
-        MediaQuery.of(context).padding.bottom + 20,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: onCancel,
-              child: Container(
-                height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: const Color(0xFFDDDDEE),
-                    width: 1.5,
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  cancelText.toUpperCase(),
-                  style: const TextStyle(
-                    color: _C.darkText,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            flex: 2,
-            child: GestureDetector(
-              onTap: isSaving ? null : onSave,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                height: 52,
-                decoration: BoxDecoration(
-                  color: _C.primaryBlue,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                alignment: Alignment.center,
-                child: isSaving
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2.5,
-                        ),
-                      )
-                    : Text(
-                        saveProductText.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:rojgar/core/widgets/app_back_button.dart';
 import '../controller/missing_person_controller.dart';
 
 class _PMPC {
-  static const Color bg = Color(0xFFF4F5F9);
-  static const Color navy = Color(0xFF1A1E3C);
-  static const Color accentBlue = Color(0xFF1E38FC);
-  static const Color grey = Color(0xFF8A8FA3);
-  static const Color borderColor = Color(0xFFE2E4EB);
+  static const Color bg = Color(0xFFF8FAFC);
+  static const Color navy = Color(0xFF0F172A);
+  static const Color accentBlue = Color(0xFF1400FF);
+  static const Color grey = Color(0xFF64748B);
+  static const Color borderColor = Color(0xFFE2E8F0);
 }
 
 class PostMissingPersonScreen extends GetView<MissingPersonController> {
@@ -17,25 +18,39 @@ class PostMissingPersonScreen extends GetView<MissingPersonController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _PMPC.bg,
-      appBar: AppBar(
-        backgroundColor: _PMPC.navy,
-        foregroundColor: Colors.white,
-        title: const Text(
-          'Missing Person Form',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Get.back();
+      },
+      child: Scaffold(
+        backgroundColor: _PMPC.bg,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          title: const Text(
+            'Missing Person Form',
+            style: TextStyle(
+              color: _PMPC.navy,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.3,
+            ),
+          ),
+          centerTitle: false,
+          leading: Center(
+            child: AppBackButton(
+              onPressed: () => Navigator.maybePop(context),
+              tooltip: 'Back',
+            ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(height: 1, color: _PMPC.borderColor),
           ),
         ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: Colors.white),
-          onPressed: () => Navigator.maybePop(context),
-        ),
-      ),
       body: SafeArea(
         child: Obx(() {
           return Stack(
@@ -81,6 +96,7 @@ class PostMissingPersonScreen extends GetView<MissingPersonController> {
             ],
           );
         }),
+      ),
       ),
     );
   }

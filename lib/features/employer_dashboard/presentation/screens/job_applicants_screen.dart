@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:open_share_plus/open.dart';
-import 'package:rojgar/localization/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../../../core/exceptions/exceptions.dart';
+import '../../../../core/widgets/app_back_button.dart';
 import '../controllers/employer_dashboard_controller.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../domain/entities/job_application_entity.dart';
@@ -24,374 +26,527 @@ class JobApplicantsScreen extends StatefulWidget {
 }
 
 class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
-  // Modern Theme Colors
-  static const Color primaryBlue = Color(0xFF1400FF);
-  static const Color darkText = Color(0xFF1E202C);
-  static const Color greyText = Color(0xFF7E8494);
-  static const Color lightBg = Color(0xFFF7F8FC);
-  static const Color borderGrey = Color(0xFFE8EAF2);
-  static const Color statusGreen = Color(0xFF00C853);
-  static const Color statusOrange = Color(0xFFFF9100);
-  static const Color statusRed = Color(0xFFFF1744);
+  // Premium Enterprise ATS Color Palette
+  static const Color primary = Color(0xFF1400FF);
+  static const Color primaryLight = Color(0xFF4F46E5);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color mediumText = Color(0xFF334155);
+  static const Color greyText = Color(0xFF64748B);
+  static const Color lightGreyText = Color(0xFF94A3B8);
+  static const Color lightBg = Color(0xFFF8FAFC);
+  static const Color fieldBg = Color(0xFFF8FAFC);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+
+  // Status Colors
+  static const Color statusGreen = Color(0xFF10B981);
+  static const Color statusOrange = Color(0xFFF59E0B);
+  static const Color statusRed = Color(0xFFEF4444);
+  static const Color statusTeal = Color(0xFF0D9488);
+  static const Color statusBlue = Color(0xFF0284C7);
 
   final EmployerDashboardController controller = Get.find();
+  final TextEditingController _searchCtrl = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Reset filters when entering screen
     controller.applicantSearchQuery.value = '';
     controller.applicantStatusFilter.value = 'all';
+    _searchCtrl.addListener(() {
+      controller.applicantSearchQuery.value = _searchCtrl.text;
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
   }
 
   Future<void> _makeCall(String phone) async {
-    final url = Uri.parse('tel:$phone');
+    final cleanPhone = phone.replaceAll(RegExp(r'\s+'), '');
+    final url = Uri.parse('tel:$cleanPhone');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
+    } else {
+      Get.snackbar(
+        'Call Failed',
+        'Could not launch dialer for $phone',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 
   Future<void> _sendEmail(String email, String title) async {
-    final url = Uri.parse('mailto:$email?subject=Application%20for%20$title');
+    final url = Uri.parse(
+      'mailto:$email?subject=Application for $title on Rozgar Adda',
+    );
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
+    } else {
+      Get.snackbar(
+        'Mail Failed',
+        'Could not open mail client for $email',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 
   Future<void> _sendWhatsApp(String phone, String name, String title) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'\s+'), '');
     final message =
-        "Hello $name, this is regarding your application for the '$title' job on Rozgar Adda.";
-    Open.whatsApp(whatsAppNumber: phone, text: message);
+        "Hello $name, this is regarding your application for '$title' on Rozgar Adda. When are you available for an interview?";
+    try {
+      Open.whatsApp(whatsAppNumber: cleanPhone, text: message);
+    } catch (e) {
+      Get.snackbar(
+        'WhatsApp Unavailable',
+        'Could not open WhatsApp on this device.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
+  Future<void> _exportCandidates() async {
+    try {
+      Get.dialog(
+        const Center(
+          child: CircularProgressIndicator(color: primary),
+        ),
+        barrierDismissible: false,
+      );
 
-    return Scaffold(
-      backgroundColor: lightBg,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Job Applicants',
-              style: TextStyle(
-                color: darkText,
-                fontWeight: FontWeight.w900,
-                fontSize: 18,
-                letterSpacing: -0.4,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              widget.jobTitle,
-              style: const TextStyle(
-                color: greyText,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: darkText),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        actions: [
+      final filePath = await controller.exportApplications(widget.jobId);
+      Get.back(); // Dismiss loading dialog
+
+      if (filePath != null) {
+        Get.bottomSheet(
           Container(
-            margin: const EdgeInsets.only(right: 12),
-            decoration: BoxDecoration(
-              color: primaryBlue.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(12),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
-            child: IconButton(
-              icon: Text(
-                "Export Excel",
-                style: TextStyle(color: primaryBlue, fontSize: 12.sp),
-              ),
-              tooltip: 'Export Applicants',
-              onPressed: () async {
-                try {
-                  Get.dialog(
-                    const Center(
-                      child: CircularProgressIndicator(color: primaryBlue),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: borderGrey,
+                      borderRadius: BorderRadius.circular(2),
                     ),
-                    barrierDismissible: false,
-                  );
-
-                  final filePath = await controller.exportApplications(
-                    widget.jobId,
-                  );
-
-                  Get.back(); // close the loading dialog
-
-                  if (filePath != null) {
-                    Get.snackbar(
-                      'Success',
-                      'Applications exported successfully.',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
-                      duration: const Duration(seconds: 5),
-                      mainButton: TextButton(
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: statusGreen.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle_rounded,
+                    color: statusGreen,
+                    size: 36,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Candidates Exported Successfully!',
+                  style: TextStyle(
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w900,
+                    color: darkText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  filePath.split('/').last,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: greyText,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
                         onPressed: () async {
+                          Get.back();
                           try {
-                            final result = await OpenFilex.open(filePath);
-                            if (result.type != ResultType.done) {
-                              Get.snackbar(
-                                'Error',
-                                'Could not open file: ${result.message}',
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: Colors.red,
-                                colorText: Colors.white,
-                              );
-                            }
+                            await Share.shareXFiles(
+                              [XFile(filePath)],
+                              text: 'Candidate list for ${widget.jobTitle}',
+                            );
                           } catch (e) {
                             Get.snackbar(
-                              'Error',
-                              'Could not open file: $e',
+                              'Share Error',
+                              e.toString(),
                               snackPosition: SnackPosition.BOTTOM,
                               backgroundColor: Colors.red,
                               colorText: Colors.white,
                             );
                           }
                         },
-                        child: const Text(
-                          'OPEN',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                        icon: const Icon(Icons.share_rounded, size: 18),
+                        label: const Text('Share File'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: primary,
+                          side: const BorderSide(color: primary),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                       ),
-                    );
-                  }
-                } catch (e) {
-                  Get.back(); // close the loading dialog
-                  Get.snackbar(
-                    'Export Failed',
-                    e.toString(),
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Colors.red,
-                    colorText: Colors.white,
-                  );
-                }
-              },
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          Get.back();
+                          try {
+                            final result = await OpenFilex.open(filePath);
+                            if (result.type != ResultType.done) {
+                              // If cannot open directly, offer share
+                              await Share.shareXFiles(
+                                [XFile(filePath)],
+                                text: 'Candidate list for ${widget.jobTitle}',
+                              );
+                            }
+                          } catch (e) {
+                            await Share.shareXFiles(
+                              [XFile(filePath)],
+                              text: 'Candidate list for ${widget.jobTitle}',
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.folder_open_rounded, size: 18),
+                        label: const Text('Open File'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: borderGrey),
-        ),
-      ),
-      body: Obx(() {
-        final List<JobApplication> apps = controller.getFilteredApplicants(
-          widget.jobId,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
         );
-        final stats = controller.jobStats[widget.jobId] ?? {};
-        final views = controller.jobVisitorCounts[widget.jobId] ?? 0;
-
-        return Column(
-          children: [
-            // Performance stats summary widgets
-            _buildStatsDashboard(context, stats, views),
-
-            // Search bar
-            _buildSearchBar(context),
-
-            // Applicant counts row
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Obx(() {
-                    final currentFilter = controller.applicantStatusFilter.value
-                        .toUpperCase();
-                    return Text(
-                      'SHOWING: $currentFilter',
-                      style: const TextStyle(
-                        color: greyText,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
-                      ),
-                    );
-                  }),
-                  Text(
-                    '${apps.length} Candidates',
-                    style: const TextStyle(
-                      color: primaryBlue,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // List of candidates
-            Expanded(
-              child: apps.isEmpty
-                  ? _buildEmptyState(context, l10n)
-                  : ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-                      itemCount: apps.length,
-                      itemBuilder: (ctx, index) {
-                        final app = apps[index];
-                        return _buildApplicantCard(context, app);
-                      },
-                    ),
-            ),
-          ],
-        );
-      }),
-    );
+      }
+    } catch (e) {
+      Get.back();
+      Get.snackbar(
+        'Export Failed',
+        e is Failure ? e.message : e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
-  // Interactive Stats Dashboard
-  Widget _buildStatsDashboard(
-    BuildContext context,
-    Map<String, int> stats,
-    int views,
-  ) {
-    final newCount = stats['new'] ?? stats['pending'] ?? 0;
-    final shortlisted = stats['shortlisted'] ?? stats['accepted'] ?? 0;
-    final rejected = stats['rejected'] ?? 0;
+  String _formatAppliedDate(DateTime dt) {
+    final now = DateTime.now();
+    final diff = now.difference(dt);
+    if (diff.inMinutes < 60) {
+      return diff.inMinutes <= 1 ? 'Just now' : '${diff.inMinutes}m ago';
+    } else if (diff.inHours < 24) {
+      return '${diff.inHours}h ago';
+    } else if (diff.inDays < 7) {
+      return '${diff.inDays}d ago';
+    }
+    return DateFormat('dd MMM').format(dt);
+  }
 
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: borderGrey),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Job Stats Summary',
-            style: TextStyle(
-              color: darkText,
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.2,
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Get.back();
+      },
+      child: Scaffold(
+        backgroundColor: lightBg,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: Center(
+            child: AppBackButton(
+              onPressed: () => Get.back(),
+              tooltip: 'Back to Dashboard',
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _buildStatMiniCard(
-                  title: 'Views',
-                  value: views.toString(),
-                  icon: Icons.bar_chart_rounded,
-                  color: primaryBlue,
-                  filterVal: 'all',
+              const Text(
+                'Job Applicants',
+                style: TextStyle(
+                  color: darkText,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                  letterSpacing: -0.4,
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildStatMiniCard(
-                  title: 'New',
-                  value: newCount.toString(),
-                  icon: Icons.fiber_new_rounded,
-                  color: statusOrange,
-                  filterVal: 'pending',
+              Text(
+                widget.jobTitle,
+                style: const TextStyle(
+                  color: greyText,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildStatMiniCard(
-                  title: 'Selected',
-                  value: shortlisted.toString(),
-                  icon: Icons.check_circle_rounded,
-                  color: statusGreen,
-                  filterVal: 'accepted',
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildStatMiniCard(
-                  title: 'Rejected',
-                  value: rejected.toString(),
-                  icon: Icons.cancel_rounded,
-                  color: statusRed,
-                  filterVal: 'rejected',
-                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
+          actions: [
+            Container(
+              margin: const EdgeInsets.only(right: 14),
+              child: OutlinedButton.icon(
+                onPressed: _exportCandidates,
+                icon: const Icon(Icons.file_download_outlined, size: 16),
+                label: const Text(
+                  'Export',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: primary,
+                  side: BorderSide(color: primary.withValues(alpha: 0.2)),
+                  backgroundColor: primary.withValues(alpha: 0.04),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  minimumSize: const Size(0, 34),
+                ),
+              ),
+            ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(height: 1, color: borderGrey),
+          ),
+        ),
+        body: Obx(() {
+          final List<JobApplication> allApps =
+              controller.jobApplications[widget.jobId] ?? [];
+          final List<JobApplication> filteredApps =
+              controller.getFilteredApplicants(widget.jobId);
+          final stats = controller.jobStats[widget.jobId] ?? {};
+
+          return Column(
+            children: [
+              // 1. Grid Pipeline Filter Bar (No Slider - 100% on screen)
+              _buildGridPipelineBar(stats, allApps),
+
+              // 2. Search Box & Active Filter Indicator
+              _buildSearchBoxAndIndicator(filteredApps.length),
+
+              // 3. Candidate Applications List
+              Expanded(
+                child: filteredApps.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                        itemCount: filteredApps.length,
+                        itemBuilder: (ctx, index) {
+                          final app = filteredApps[index];
+                          return _buildCandidateCard(app);
+                        },
+                      ),
+              ),
+            ],
+          );
+        }),
+      ),
+    );
+  }
+
+  // ==========================================
+  // 1. GRID PIPELINE FILTER BAR (NO SLIDER)
+  // ==========================================
+  Widget _buildGridPipelineBar(
+    Map<String, int> stats,
+    List<JobApplication> allApps,
+  ) {
+    final totalCount = allApps.length;
+    final pendingCount = allApps
+        .where(
+          (a) =>
+              a.status.toLowerCase() == 'pending' ||
+              a.status.toLowerCase() == 'new',
+        )
+        .length;
+    final shortlistedCount = allApps
+        .where(
+          (a) =>
+              a.status.toLowerCase() == 'shortlisted' ||
+              a.status.toLowerCase() == 'accepted',
+        )
+        .length;
+    final hiredCount = allApps
+        .where((a) => a.status.toLowerCase() == 'hired')
+        .length;
+    final rejectedCount = allApps
+        .where((a) => a.status.toLowerCase() == 'rejected')
+        .length;
+
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      child: Row(
+        children: [
+          // 1. All Candidates
+          Expanded(
+            child: _buildGridStageCard(
+              title: 'All',
+              count: '$totalCount',
+              filterKey: 'all',
+              color: primary,
+              icon: Icons.people_alt_rounded,
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // 2. Pending / New
+          Expanded(
+            child: _buildGridStageCard(
+              title: 'Pending',
+              count: '$pendingCount',
+              filterKey: 'pending',
+              color: statusOrange,
+              icon: Icons.hourglass_top_rounded,
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // 3. Shortlisted
+          Expanded(
+            child: _buildGridStageCard(
+              title: 'Shortlist',
+              count: '$shortlistedCount',
+              filterKey: 'shortlisted',
+              color: statusGreen,
+              icon: Icons.star_rounded,
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // 4. Hired
+          Expanded(
+            child: _buildGridStageCard(
+              title: 'Hired',
+              count: '$hiredCount',
+              filterKey: 'hired',
+              color: statusTeal,
+              icon: Icons.check_circle_rounded,
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // 5. Rejected
+          Expanded(
+            child: _buildGridStageCard(
+              title: 'Rejected',
+              count: '$rejectedCount',
+              filterKey: 'rejected',
+              color: statusRed,
+              icon: Icons.cancel_rounded,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatMiniCard({
+  Widget _buildGridStageCard({
     required String title,
-    required String value,
-    required IconData icon,
+    required String count,
+    required String filterKey,
     required Color color,
-    required String filterVal,
+    required IconData icon,
   }) {
     return Obx(() {
-      final isSelected = controller.applicantStatusFilter.value == filterVal;
+      final isSelected =
+          controller.applicantStatusFilter.value.toLowerCase() ==
+          filterKey.toLowerCase();
+
       return Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            controller.applicantStatusFilter.value = filterVal;
-          },
-          borderRadius: BorderRadius.circular(14),
+          onTap: () => controller.applicantStatusFilter.value = filterKey,
+          borderRadius: BorderRadius.circular(12),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            duration: const Duration(milliseconds: 150),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
             decoration: BoxDecoration(
-              color: isSelected
-                  ? color.withValues(alpha: 0.12)
-                  : color.withValues(alpha: 0.04),
-              borderRadius: BorderRadius.circular(14),
+              color: isSelected ? color : fieldBg,
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected ? color : color.withValues(alpha: 0.1),
+                color: isSelected ? color : borderGrey,
                 width: isSelected ? 1.5 : 1.0,
               ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.25),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
             ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, color: color, size: 20),
-                const SizedBox(height: 6),
+                Icon(
+                  icon,
+                  color: isSelected ? Colors.white : color,
+                  size: 16,
+                ),
+                const SizedBox(height: 3),
                 Text(
-                  value,
+                  count,
                   style: TextStyle(
-                    color: darkText,
-                    fontSize: 16,
+                    color: isSelected ? Colors.white : darkText,
+                    fontSize: 14,
                     fontWeight: FontWeight.w900,
+                    letterSpacing: -0.2,
                   ),
                 ),
-                const SizedBox(height: 2),
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: greyText,
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
+                  style: TextStyle(
+                    color: isSelected
+                        ? Colors.white.withValues(alpha: 0.9)
+                        : greyText,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w700,
                   ),
-                  textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -403,48 +558,130 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     });
   }
 
-  // Modern Search Bar UI
-  Widget _buildSearchBar(BuildContext context) {
+  // ==========================================
+  // 2. SEARCH BOX & STAGE INDICATOR
+  // ==========================================
+  Widget _buildSearchBoxAndIndicator(int matchingCount) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderGrey),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      child: Column(
+        children: [
+          // Search Input
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: borderGrey),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: TextField(
+              controller: _searchCtrl,
+              style: const TextStyle(
+                color: darkText,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Search candidate, skills, education...',
+                hintStyle: const TextStyle(color: lightGreyText, fontSize: 13),
+                prefixIcon: const Icon(
+                  Icons.search_rounded,
+                  color: primary,
+                  size: 20,
+                ),
+                suffixIcon: Obx(
+                  () => controller.applicantSearchQuery.value.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(
+                            Icons.close_rounded,
+                            color: greyText,
+                            size: 18,
+                          ),
+                          onPressed: () {
+                            _searchCtrl.clear();
+                            controller.applicantSearchQuery.value = '';
+                          },
+                        )
+                      : const SizedBox.shrink(),
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 14,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // Count & Status Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Obx(() {
+                final currentFilter =
+                    controller.applicantStatusFilter.value.toUpperCase();
+                return Text(
+                  'STAGE: $currentFilter',
+                  style: const TextStyle(
+                    color: greyText,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
+                );
+              }),
+              Text(
+                '$matchingCount Candidates Found',
+                style: const TextStyle(
+                  color: primary,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
           ),
         ],
-      ),
-      child: TextField(
-        onChanged: (val) => controller.applicantSearchQuery.value = val,
-        style: const TextStyle(color: darkText, fontSize: 15),
-        decoration: const InputDecoration(
-          hintText: 'Search by candidate name or key skill...',
-          hintStyle: TextStyle(color: greyText, fontSize: 14),
-          prefixIcon: Icon(Icons.search_rounded, color: primaryBlue, size: 20),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        ),
       ),
     );
   }
 
-  // Modern Applicant Card UI
-  Widget _buildApplicantCard(BuildContext context, JobApplication app) {
+  // ==========================================
+  // 3. CANDIDATE CARD UI
+  // ==========================================
+  Widget _buildCandidateCard(JobApplication app) {
     Color statusColor = statusOrange;
-    if (app.status == 'accepted' || app.status == 'shortlisted') {
+    String statusTitle = 'PENDING';
+    IconData statusIcon = Icons.hourglass_top_rounded;
+
+    final normStatus = app.status.toLowerCase();
+    if (normStatus == 'accepted' || normStatus == 'shortlisted') {
       statusColor = statusGreen;
-    } else if (app.status == 'rejected') {
+      statusTitle = 'SHORTLISTED';
+      statusIcon = Icons.star_rounded;
+    } else if (normStatus == 'hired') {
+      statusColor = statusTeal;
+      statusTitle = 'HIRED';
+      statusIcon = Icons.check_circle_rounded;
+    } else if (normStatus == 'rejected') {
       statusColor = statusRed;
-    } else if (app.status == 'reviewed') {
-      statusColor = primaryBlue;
-    } else if (app.status == 'hired') {
-      statusColor = Colors.teal;
+      statusTitle = 'REJECTED';
+      statusIcon = Icons.cancel_rounded;
+    } else if (normStatus == 'reviewed') {
+      statusColor = statusBlue;
+      statusTitle = 'REVIEWED';
+      statusIcon = Icons.visibility_rounded;
     }
+
+    final initial = app.candidateName.isNotEmpty
+        ? app.candidateName.substring(0, 1).toUpperCase()
+        : '?';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -454,363 +691,319 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         border: Border.all(color: borderGrey),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
+            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
-        child: Material(
-          color: Colors.transparent,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InkWell(
-                onTap: () => _showApplicantDetailsBottomSheet(context, app),
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Circular Profile Avatar with Initials
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: primaryBlue.withValues(alpha: 0.05),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: primaryBlue.withValues(alpha: 0.1),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            app.candidateName.isEmpty
-                                ? '?'
-                                : app.candidateName
-                                      .substring(0, 1)
-                                      .toUpperCase(),
-                            style: const TextStyle(
-                              color: primaryBlue,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      // Details Section
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    app.candidateName,
-                                    style: const TextStyle(
-                                      color: darkText,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: -0.3,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 3,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: statusColor.withValues(alpha: 0.08),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        statusColor == statusGreen
-                                            ? Icons.check_circle_rounded
-                                            : (statusColor == statusRed
-                                                  ? Icons.cancel_rounded
-                                                  : Icons.info_rounded),
-                                        color: statusColor,
-                                        size: 13.sp,
-                                      ),
-                                      const SizedBox(width: 3),
-                                      Text(
-                                        'STATUS: ${app.status.toUpperCase()}',
-                                        style: TextStyle(
-                                          color: statusColor,
-                                          fontSize: 10.sp,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            // Experience Row
-                            Text(
-                              'Exp: ${app.experienceYears} Yrs ${app.experienceMonths} Mos',
-                              style: const TextStyle(
-                                color: greyText,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            // Education Row
-                            Text(
-                              'Edu: ${app.educationLevel} (${app.educationDetails})',
-                              style: const TextStyle(
-                                color: greyText,
-                                fontSize: 12,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-
-                            // Skill chips
-                            if (app.keySkills.isNotEmpty) ...[
-                              const SizedBox(height: 10),
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 4,
-                                children: app.keySkills.split(',').take(3).map((
-                                  skill,
-                                ) {
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: lightBg,
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: borderGrey),
-                                    ),
-                                    child: Text(
-                                      skill.trim(),
-                                      style: const TextStyle(
-                                        color: darkText,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Divider
-              Container(height: 1, color: borderGrey),
-
-              // Bottom Tray with Contact Actions & Decisions
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                color: const Color(0xFFFAFBFC),
-                child: Column(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top Section
+            InkWell(
+              onTap: () => _showApplicantDetailsBottomSheet(context, app),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Communication Shortcuts
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          // Call Button with Phone Number
-                          GestureDetector(
-                            onTap: () => _makeCall(app.phone),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withValues(alpha: 0.06),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Colors.green.withValues(alpha: 0.15),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.phone_in_talk_rounded,
-                                    size: 20.sp,
-                                    color: Colors.green,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    app.phone,
-                                    style: TextStyle(
-                                      color: Colors.green.shade800,
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-
-                          // WhatsApp Button with "Chat" Label
-                          GestureDetector(
-                            onTap: () => _sendWhatsApp(
-                              app.phone,
-                              app.candidateName,
-                              widget.jobTitle,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(
-                                  0xFF25D366,
-                                ).withValues(alpha: 0.06),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: const Color(
-                                    0xFF25D366,
-                                  ).withValues(alpha: 0.15),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Image.asset(
-                                    "assets/icons/whatsapp.png",
-                                    width: 20.sp,
-                                    height: 20.sp,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'Chat',
-                                    style: TextStyle(
-                                      color: const Color(0xFF075E54),
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-
-                          // Email Button with "Open Mail" Label
-                          GestureDetector(
-                            onTap: () => _sendEmail(app.email, widget.jobTitle),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.redAccent.withValues(alpha: 0.06),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Colors.redAccent.withValues(
-                                    alpha: 0.15,
-                                  ),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.mail_rounded,
-                                    size: 20.sp,
-                                    color: Colors.redAccent,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'Open Mail',
-                                    style: TextStyle(
-                                      color: Colors.red.shade800,
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
+                    // Avatar
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            primary.withValues(alpha: 0.12),
+                            primaryLight.withValues(alpha: 0.2),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: primary.withValues(alpha: 0.2),
+                          width: 1.5,
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // Status and Update Button in the next line
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        // Current Status Indicator
-
-                        // Update Button
-                        ElevatedButton.icon(
-                          onPressed: () =>
-                              _showStatusUpdateDialog(context, app),
-                          icon: Icon(
-                            Icons.edit_note_rounded,
-                            size: 18.sp,
-                            color: Colors.white,
-                          ),
-                          label: const Text(
-                            'Update Status',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryBlue,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            minimumSize: const Size(0, 0),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 8,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                      child: Center(
+                        child: Text(
+                          initial,
+                          style: const TextStyle(
+                            color: primary,
+                            fontSize: 19,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
-                      ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
+                    // Info Column
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  app.candidateName.isNotEmpty
+                                      ? app.candidateName
+                                      : 'Anonymous Candidate',
+                                  style: const TextStyle(
+                                    color: darkText,
+                                    fontSize: 15.5,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: -0.2,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: statusColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: statusColor.withValues(alpha: 0.25),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      statusIcon,
+                                      color: statusColor,
+                                      size: 12,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      statusTitle,
+                                      style: TextStyle(
+                                        color: statusColor,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+
+                          // Experience & Education Chips
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 4,
+                            children: [
+                              _buildInfoTag(
+                                icon: Icons.work_outline_rounded,
+                                label:
+                                    '${app.experienceYears}y ${app.experienceMonths}m Exp',
+                              ),
+                              if (app.educationLevel.isNotEmpty)
+                                _buildInfoTag(
+                                  icon: Icons.school_outlined,
+                                  label: app.educationLevel,
+                                ),
+                              _buildInfoTag(
+                                icon: Icons.calendar_today_rounded,
+                                label: _formatAppliedDate(app.appliedAt),
+                              ),
+                            ],
+                          ),
+
+                          // Skills Row
+                          if (app.keySkills.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 5,
+                              runSpacing: 4,
+                              children: app.keySkills
+                                  .split(',')
+                                  .take(3)
+                                  .map((s) => s.trim())
+                                  .where((s) => s.isNotEmpty)
+                                  .map(
+                                    (skill) => Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 7,
+                                        vertical: 2.5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: fieldBg,
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(color: borderGrey),
+                                      ),
+                                      child: Text(
+                                        skill,
+                                        style: const TextStyle(
+                                          color: mediumText,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+
+            // Divider
+            Container(height: 1, color: borderGrey),
+
+            // Bottom Action Bar (Call, WhatsApp, Email, Update Status)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              color: const Color(0xFFFAFBFC),
+              child: Row(
+                children: [
+                  // Call Action
+                  _buildActionButton(
+                    icon: Icons.phone_in_talk_rounded,
+                    label: 'Call',
+                    color: statusGreen,
+                    onTap: () => _makeCall(app.phone),
+                  ),
+                  const SizedBox(width: 8),
+
+                  // WhatsApp Action
+                  _buildActionButton(
+                    icon: Icons.chat_bubble_rounded,
+                    label: 'WhatsApp',
+                    color: const Color(0xFF25D366),
+                    onTap: () => _sendWhatsApp(
+                      app.phone,
+                      app.candidateName,
+                      widget.jobTitle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  // Mail Action
+                  _buildActionButton(
+                    icon: Icons.mail_rounded,
+                    label: 'Email',
+                    color: statusRed,
+                    onTap: () => _sendEmail(app.email, widget.jobTitle),
+                  ),
+
+                  const Spacer(),
+
+                  // Update Status Button
+                  ElevatedButton.icon(
+                    onPressed: () => _showStatusUpdateDialog(context, app),
+                    icon: const Icon(Icons.edit_note_rounded, size: 16),
+                    label: const Text('Status'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 7,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  // Modern Details Bottom Sheet
+  Widget _buildInfoTag({required IconData icon, required String label}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: fieldBg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: borderGrey),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: greyText),
+          const SizedBox(width: 3),
+          Text(
+            label,
+            style: const TextStyle(
+              color: greyText,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 14),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==========================================
+  // 4. APPLICANT FULL DETAILS BOTTOM SHEET
+  // ==========================================
   void _showApplicantDetailsBottomSheet(
     BuildContext context,
     JobApplication initialApp,
@@ -821,7 +1014,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         child: FutureBuilder<JobApplication?>(
           future: controller.getApplicationDetails(initialApp.id),
           builder: (context, snapshot) {
@@ -829,7 +1022,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
               return const SizedBox(
                 height: 320,
                 child: Center(
-                  child: CircularProgressIndicator(color: primaryBlue),
+                  child: CircularProgressIndicator(color: primary),
                 ),
               );
             }
@@ -840,46 +1033,144 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Pull handler bar
+                  // Handle
                   Center(
                     child: Container(
-                      width: 40,
+                      width: 36,
                       height: 4,
-                      margin: const EdgeInsets.only(bottom: 20),
+                      margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: borderGrey,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
 
-                  // Header
+                  // Header with candidate avatar & name
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: Text(
-                          app.candidateName,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            color: darkText,
-                            letterSpacing: -0.5,
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [primary, primaryLight],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Center(
+                          child: Text(
+                            app.candidateName.isNotEmpty
+                                ? app.candidateName.substring(0, 1).toUpperCase()
+                                : '?',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
                         ),
                       ),
-                      _buildStatusTag(app.status),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              app.candidateName,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                color: darkText,
+                                letterSpacing: -0.3,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Applied for: ${widget.jobTitle}',
+                              style: const TextStyle(
+                                color: greyText,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
 
                   const SizedBox(height: 16),
-                  Container(height: 1, color: borderGrey),
-                  const SizedBox(height: 20),
+                  const Divider(color: borderGrey, height: 1),
+                  const SizedBox(height: 16),
 
-                  // Detailed items with nice modern rows
+                  // Direct Contact Actions Bar
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _makeCall(app.phone),
+                          icon: const Icon(Icons.phone_in_talk_rounded, size: 16),
+                          label: const Text('Call'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: statusGreen,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _sendWhatsApp(
+                            app.phone,
+                            app.candidateName,
+                            widget.jobTitle,
+                          ),
+                          icon: const Icon(Icons.chat_bubble_rounded, size: 16),
+                          label: const Text('WhatsApp'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF25D366),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _sendEmail(app.email, widget.jobTitle),
+                          icon: const Icon(Icons.mail_rounded, size: 16),
+                          label: const Text('Email'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: statusRed,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // Information Cards
                   _buildDetailRow(
                     Icons.phone_android_rounded,
-                    'Mobile Number',
+                    'Phone Number',
                     app.phone,
                   ),
                   _buildDetailRow(
@@ -889,12 +1180,12 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   ),
                   _buildDetailRow(
                     Icons.school_rounded,
-                    'Education details',
+                    'Education',
                     '${app.educationLevel} (${app.educationDetails})',
                   ),
                   _buildDetailRow(
-                    Icons.history_rounded,
-                    'Work Experience',
+                    Icons.work_rounded,
+                    'Total Experience',
                     '${app.experienceYears} Years ${app.experienceMonths} Months',
                   ),
                   _buildDetailRow(
@@ -902,50 +1193,57 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                     'Expected Salary',
                     app.expectedSalary.isNotEmpty
                         ? '₹${app.expectedSalary} / month'
-                        : 'Not specified',
+                        : 'Negotiable / Not specified',
                   ),
                   _buildDetailRow(
-                    Icons.access_time_filled_rounded,
+                    Icons.timer_rounded,
                     'Notice Period',
-                    app.noticePeriod,
+                    app.noticePeriod.isNotEmpty
+                        ? app.noticePeriod
+                        : 'Immediate Joiner',
                   ),
                   _buildDetailRow(
-                    Icons.psychology_rounded,
-                    'Key Skills & Technologies',
+                    Icons.star_rounded,
+                    'Skills & Competencies',
                     app.keySkills,
                   ),
+
                   if (app.resumePath.isNotEmpty)
                     _buildDetailRow(
                       Icons.description_rounded,
-                      'Resume Document',
+                      'Uploaded Resume',
                       app.resumePath.split('/').last,
                     ),
 
                   const SizedBox(height: 16),
+
+                  // Status Action Button
                   SizedBox(
                     width: double.infinity,
+                    height: 46,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        Get.back(); // close applicant details sheet
+                        Get.back();
                         _showStatusUpdateDialog(context, app);
                       },
-                      icon: const Icon(
-                        Icons.edit_note_rounded,
-                        color: Colors.white,
+                      icon: const Icon(Icons.edit_note_rounded),
+                      label: const Text(
+                        'Change Application Status',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                      label: const Text('Update Status'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryBlue,
+                        backgroundColor: primary,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        elevation: 0,
+                        elevation: 1,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
                 ],
               ),
             );
@@ -953,266 +1251,25 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         ),
       ),
       isScrollControlled: true,
-    );
-  }
-
-  Widget _buildStatusTag(String status) {
-    Color color = statusOrange;
-    if (status == 'accepted' || status == 'shortlisted') color = statusGreen;
-    if (status == 'rejected') color = statusRed;
-    if (status == 'reviewed') color = primaryBlue;
-    if (status == 'hired') color = Colors.teal;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        status.toUpperCase(),
-        style: TextStyle(
-          color: color,
-          fontSize: 11,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 0.5,
-        ),
-      ),
-    );
-  }
-
-  void _showStatusUpdateDialog(BuildContext context, JobApplication app) {
-    final selectedStatus = app.status.obs;
-    final commentsController = TextEditingController();
-
-    // Set initial status selection (if it's one of the valid enums, otherwise default to reviewed or shortlisted)
-    if ([
-      'shortlisted',
-      'reviewed',
-      'rejected',
-      'hired',
-    ].contains(app.status.toLowerCase())) {
-      selectedStatus.value = app.status.toLowerCase();
-    } else {
-      selectedStatus.value = 'reviewed';
-    }
-
-    Get.bottomSheet(
-      Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        padding: EdgeInsets.only(
-          left: 24,
-          right: 24,
-          top: 24,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Update Application Status',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: darkText,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded, color: greyText),
-                    onPressed: () => Get.back(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Select Status',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: darkText,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Obx(
-                () => Column(
-                  children: [
-                    _buildStatusOption(
-                      title: 'Shortlisted',
-                      statusVal: 'shortlisted',
-                      selectedVal: selectedStatus.value,
-                      color: statusGreen,
-                      onTap: () => selectedStatus.value = 'shortlisted',
-                    ),
-                    _buildStatusOption(
-                      title: 'Reviewed',
-                      statusVal: 'reviewed',
-                      selectedVal: selectedStatus.value,
-                      color: primaryBlue,
-                      onTap: () => selectedStatus.value = 'reviewed',
-                    ),
-                    _buildStatusOption(
-                      title: 'Rejected',
-                      statusVal: 'rejected',
-                      selectedVal: selectedStatus.value,
-                      color: statusRed,
-                      onTap: () => selectedStatus.value = 'rejected',
-                    ),
-                    _buildStatusOption(
-                      title: 'Hired',
-                      statusVal: 'hired',
-                      selectedVal: selectedStatus.value,
-                      color: Colors.teal,
-                      onTap: () => selectedStatus.value = 'hired',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Comments (Optional)',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: darkText,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: commentsController,
-                maxLines: 3,
-                style: const TextStyle(color: darkText, fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'Enter comments here...',
-                  hintStyle: const TextStyle(color: greyText, fontSize: 13),
-                  filled: true,
-                  fillColor: lightBg,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.all(12),
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    Get.back();
-                    await controller.updateApplicationStatus(
-                      widget.jobId,
-                      app.id,
-                      selectedStatus.value,
-                      comments: commentsController.text.trim(),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryBlue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Update Status',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      isScrollControlled: true,
-    );
-  }
-
-  Widget _buildStatusOption({
-    required String title,
-    required String statusVal,
-    required String selectedVal,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    final isSelected = statusVal == selectedVal;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.05) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? color : borderGrey,
-            width: isSelected ? 1.5 : 1.0,
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 18,
-              height: 18,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? color : greyText,
-                  width: 2,
-                ),
-              ),
-              child: isSelected
-                  ? Center(
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: color,
-                        ),
-                      ),
-                    )
-                  : null,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                color: darkText,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
+      backgroundColor: Colors.transparent,
     );
   }
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
-              color: primaryBlue.withValues(alpha: 0.05),
+              color: primary.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, size: 20, color: primaryBlue),
+            child: Icon(icon, size: 16, color: primary),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1220,18 +1277,18 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                 Text(
                   label,
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 11.5,
                     color: greyText,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 2),
                 Text(
                   value.isEmpty ? 'Not specified' : value,
                   style: const TextStyle(
-                    fontSize: 15,
+                    fontSize: 13.5,
                     color: darkText,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -1242,15 +1299,274 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context, dynamic l10n) {
+  // ==========================================
+  // 5. STATUS UPDATE BOTTOM SHEET
+  // ==========================================
+  void _showStatusUpdateDialog(BuildContext context, JobApplication app) {
+    final selectedStatus = app.status.toLowerCase().obs;
+    final commentsCtrl = TextEditingController();
+
+    Get.bottomSheet(
+      Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 14,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: borderGrey,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+
+              Row(
+                children: [
+                  const Text(
+                    'Update Candidate Status',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: darkText,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: greyText),
+                    onPressed: () => Get.back(),
+                    constraints: const BoxConstraints(),
+                    padding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              const Text(
+                'Select New Pipeline Stage:',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: mediumText,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              Obx(
+                () => Column(
+                  children: [
+                    _buildStatusOption(
+                      title: 'Shortlisted for Interview',
+                      subtitle: 'Candidate meets criteria and moves forward',
+                      statusVal: 'shortlisted',
+                      selectedVal: selectedStatus.value,
+                      color: statusGreen,
+                      icon: Icons.star_rounded,
+                      onTap: () => selectedStatus.value = 'shortlisted',
+                    ),
+                    _buildStatusOption(
+                      title: 'Hired & Selected',
+                      subtitle: 'Candidate accepted job offer',
+                      statusVal: 'hired',
+                      selectedVal: selectedStatus.value,
+                      color: statusTeal,
+                      icon: Icons.check_circle_rounded,
+                      onTap: () => selectedStatus.value = 'hired',
+                    ),
+                    _buildStatusOption(
+                      title: 'Under Review',
+                      subtitle: 'Profile currently being evaluated',
+                      statusVal: 'reviewed',
+                      selectedVal: selectedStatus.value,
+                      color: statusBlue,
+                      icon: Icons.visibility_rounded,
+                      onTap: () => selectedStatus.value = 'reviewed',
+                    ),
+                    _buildStatusOption(
+                      title: 'Rejected',
+                      subtitle: 'Candidate not suitable for this position',
+                      statusVal: 'rejected',
+                      selectedVal: selectedStatus.value,
+                      color: statusRed,
+                      icon: Icons.cancel_rounded,
+                      onTap: () => selectedStatus.value = 'rejected',
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 14),
+              const Text(
+                'Internal Notes / Comments (Optional):',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: mediumText,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                decoration: BoxDecoration(
+                  color: fieldBg,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: borderGrey),
+                ),
+                child: TextField(
+                  controller: commentsCtrl,
+                  maxLines: 2,
+                  style: const TextStyle(color: darkText, fontSize: 13.5),
+                  decoration: const InputDecoration(
+                    hintText: 'e.g. Cleared 1st technical round, good communication',
+                    hintStyle: TextStyle(color: lightGreyText, fontSize: 12.5),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    Get.back();
+                    await controller.updateApplicationStatus(
+                      widget.jobId,
+                      app.id,
+                      selectedStatus.value,
+                      comments: commentsCtrl.text.trim(),
+                    );
+                    Get.snackbar(
+                      'Status Updated',
+                      'Candidate status set to ${selectedStatus.value.toUpperCase()}',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: statusGreen,
+                      colorText: Colors.white,
+                      margin: const EdgeInsets.all(16),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 1,
+                  ),
+                  child: const Text(
+                    'Confirm Status Update',
+                    style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
+  }
+
+  Widget _buildStatusOption({
+    required String title,
+    required String subtitle,
+    required String statusVal,
+    required String selectedVal,
+    required Color color,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    final isSelected = statusVal == selectedVal;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withValues(alpha: 0.06) : fieldBg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? color : borderGrey,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? color.withValues(alpha: 0.15)
+                    : Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? color : borderGrey,
+                ),
+              ),
+              child: Icon(icon, color: color, size: 16),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      color: isSelected ? color : darkText,
+                      fontWeight:
+                          isSelected ? FontWeight.w800 : FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: greyText,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle_rounded, color: color, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==========================================
+  // 6. EMPTY STATE
+  // ==========================================
+  Widget _buildEmptyState() {
     return EmptyStateWidget(
       icon: Icons.people_outline_rounded,
-      title: l10n.text('employer_dashboard_no_applicants').isNotEmpty
-          ? l10n.text('employer_dashboard_no_applicants')
-          : 'No Job Applicants Found',
-      subtitle: 'No candidate applications match your current filters or search query.',
+      title: 'No Candidates Found',
+      subtitle:
+          'No candidate applications match your selected stage or search keywords.',
       primaryButtonText: 'Reset Filters',
       onPrimaryPressed: () {
+        _searchCtrl.clear();
         controller.applicantSearchQuery.value = '';
         controller.applicantStatusFilter.value = 'all';
       },

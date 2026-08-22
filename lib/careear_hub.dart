@@ -4,24 +4,24 @@ import 'package:rojgar/localization/app_localizations.dart';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────
 class _HubColors {
-  static const Color background = Color(0xFFF2F2F7);
+  static const Color background = Color(0xFFF8FAFC);
   static const Color white = Colors.white;
-  static const Color primaryBlue = Color(0xFF1A1AE6);
-  static const Color jobTitleBlue = Color(0xFF1A1AE6);
-  static const Color darkText = Color(0xFF111122);
-  static const Color greyText = Color(0xFF888899);
-  static const Color lightGreyText = Color(0xFFAAABBB);
-  static const Color searchBg = Color(0xFFEEEEF4);
-  static const Color tagBg = Color(0xFFEEEEF8);
-  static const Color tagText = Color(0xFF3333CC);
-  static const Color salaryTagBg = Color(0xFFEEEEF4);
-  static const Color salaryTagText = Color(0xFF444455);
-  static const Color cardShadow = Color(0x10000000);
-  static const Color borderGrey = Color(0xFFDDDDE8);
-  static const Color inactiveTabText = Color(0xFF444455);
-  static const Color bookmarkActive = Color(0xFF1A1AE6);
-  static const Color bookmarkInactive = Color(0xFF9999AA);
-  static const Color appBarText = Color(0xFF111122);
+  static const Color primaryBlue = Color(0xFF1400FF);
+  static const Color jobTitleBlue = Color(0xFF0F172A);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color greyText = Color(0xFF64748B);
+  static const Color lightGreyText = Color(0xFF94A3B8);
+  static const Color searchBg = Color(0xFFF8FAFC);
+  static const Color tagBg = Color(0xFFF1F5F9);
+  static const Color tagText = Color(0xFF1400FF);
+  static const Color salaryTagBg = Color(0xFFF1F5F9);
+  static const Color salaryTagText = Color(0xFF334155);
+  static const Color cardShadow = Color(0x060F172A);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+  static const Color inactiveTabText = Color(0xFF64748B);
+  static const Color bookmarkActive = Color(0xFF1400FF);
+  static const Color bookmarkInactive = Color(0xFF94A3B8);
+  static const Color appBarText = Color(0xFF0F172A);
 }
 
 class JobListing {

@@ -2,31 +2,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/widgets/app_back_button.dart';
 import '../../../../dashboard_screen.dart';
 import '../../../../localization/app_localizations.dart';
 import '../bindings/kyc_binding.dart';
 import '../controller/kyc_controller.dart';
 import '../controller/uploaded_kyc_file.dart';
-
-// ─────────────────────────────────────────────
-// COLOR CONSTANTS
-// ─────────────────────────────────────────────
-class AC {
-  static const Color primaryBlue = Color(0xFF1400FF);
-  static const Color darkText = Color(0xFF111111);
-  static const Color greyText = Color(0xFF8A8FA3);
-  static const Color lightGrey = Color(0xFFEEEEEE);
-  static const Color fieldBg = Color(0xFFFFFFFF);
-  static const Color borderColor = Color(0xFFDDDDEE);
-  static const Color scaffoldBg = Color(0xFFF5F6FA);
-  static const Color yellow = Color(0xFFFFCC00);
-  static const Color pendingBg = Color(0xFFFFF8DC);
-  static const Color iconBg = Color(0xFFE8EAFF);
-  static const Color cardBg = Color(0xFFFFFFFF);
-  static const Color sectionBlue = Color(0xFF1400FF);
-  static const Color successGreen = Color(0xFF1E9E5E);
-  static const Color successBg = Color(0xFFD6F5E8);
-}
 
 // ─────────────────────────────────────────────
 // UPLOAD DOCUMENT TYPE
@@ -39,6 +20,23 @@ enum UploadType { image, file }
 class EditKycScreen extends GetView<KycController> {
   const EditKycScreen({super.key});
 
+  // Enterprise Brand Design System Colors
+  static const Color primary = Color(0xFF1400FF);
+  static const Color primaryLight = Color(0xFF4F46E5);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color mediumText = Color(0xFF334155);
+  static const Color greyText = Color(0xFF64748B);
+  static const Color lightGreyText = Color(0xFF94A3B8);
+  static const Color lightBg = Color(0xFFF8FAFC);
+  static const Color fieldBg = Color(0xFFF8FAFC);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+
+  // Status Colors
+  static const Color successGreen = Color(0xFF10B981);
+  static const Color warningOrange = Color(0xFFF59E0B);
+  static const Color dangerRed = Color(0xFFEF4444);
+  static const Color infoBlue = Color(0xFF0284C7);
+
   @override
   KycController get controller {
     if (!Get.isRegistered<KycController>()) {
@@ -47,7 +45,11 @@ class EditKycScreen extends GetView<KycController> {
     return Get.find<KycController>();
   }
 
-  void _showSnackbar(BuildContext context, String message, {bool isSuccess = false}) {
+  void _showSnackbar(
+    BuildContext context,
+    String message, {
+    bool isSuccess = false,
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -61,7 +63,7 @@ class EditKycScreen extends GetView<KycController> {
             Expanded(child: Text(message, softWrap: true)),
           ],
         ),
-        backgroundColor: isSuccess ? AC.successGreen : Colors.red,
+        backgroundColor: isSuccess ? successGreen : dangerRed,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
@@ -76,30 +78,32 @@ class EditKycScreen extends GetView<KycController> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => Container(
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+        decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AC.lightGrey,
-                borderRadius: BorderRadius.circular(4),
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: borderGrey,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
-            const SizedBox(height: 16),
             Text(
               context.l10n.text('kyc_image_source_title'),
               style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: AC.darkText,
+                fontSize: 16.5,
+                fontWeight: FontWeight.w900,
+                color: darkText,
+                letterSpacing: -0.3,
               ),
             ),
             const SizedBox(height: 16),
@@ -107,15 +111,15 @@ class EditKycScreen extends GetView<KycController> {
               context: context,
               icon: Icons.camera_alt_rounded,
               label: context.l10n.text('kyc_source_camera'),
-              color: AC.primaryBlue,
+              color: primary,
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
-            const Divider(height: 1, indent: 16, endIndent: 16),
+            const Divider(height: 1, color: borderGrey),
             _sourceOption(
               context: context,
               icon: Icons.photo_library_rounded,
               label: context.l10n.text('kyc_source_gallery'),
-              color: AC.primaryBlue,
+              color: primary,
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
             const SizedBox(height: 8),
@@ -123,10 +127,9 @@ class EditKycScreen extends GetView<KycController> {
               context: context,
               icon: Icons.close_rounded,
               label: context.l10n.text('cancel'),
-              color: Colors.red,
+              color: dangerRed,
               onTap: () => Navigator.pop(context, null),
             ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -142,20 +145,20 @@ class EditKycScreen extends GetView<KycController> {
   }) {
     return ListTile(
       leading: Container(
-        width: 44,
-        height: 44,
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: color, size: 22),
+        child: Icon(icon, color: color, size: 20),
       ),
       title: Text(
         label,
         style: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-          color: color == Colors.red ? Colors.red : AC.darkText,
+          fontSize: 14.5,
+          fontWeight: FontWeight.w700,
+          color: color == dangerRed ? dangerRed : darkText,
         ),
       ),
       onTap: onTap,
@@ -168,53 +171,69 @@ class EditKycScreen extends GetView<KycController> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (_) {
         final searchRx = ''.obs;
         return Container(
-          height: size.height * 0.7,
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+          height: size.height * 0.72,
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
           child: Column(
             children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AC.lightGrey,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                context.l10n.text('registration_select_state'),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AC.darkText,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                decoration: BoxDecoration(
-                  color: AC.scaffoldBg,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AC.borderColor, width: 1),
-                ),
-                child: TextField(
-                  onChanged: (val) => searchRx.value = val,
-                  style: const TextStyle(color: AC.darkText, fontSize: 14),
-                  decoration: InputDecoration(
-                    hintText: context.l10n.text('select_state_search_hint'),
-                    hintStyle: const TextStyle(color: AC.greyText, fontSize: 14),
-                    prefixIcon: const Icon(Icons.search, color: AC.greyText),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: borderGrey,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Text(
+                    context.l10n.text('registration_select_state'),
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: darkText,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: greyText),
+                    onPressed: () => Navigator.pop(context),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Container(
+                decoration: BoxDecoration(
+                  color: fieldBg,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: borderGrey),
+                ),
+                child: TextField(
+                  onChanged: (val) => searchRx.value = val,
+                  style: const TextStyle(color: darkText, fontSize: 14, fontWeight: FontWeight.w600),
+                  decoration: InputDecoration(
+                    hintText: context.l10n.text('select_state_search_hint'),
+                    hintStyle: const TextStyle(color: lightGreyText, fontSize: 13.5),
+                    prefixIcon: const Icon(Icons.search_rounded, color: primary, size: 20),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               Expanded(
                 child: Obx(() {
                   final filtered = controller.states
@@ -223,27 +242,29 @@ class EditKycScreen extends GetView<KycController> {
                           .contains(searchRx.value.toLowerCase().trim()))
                       .toList();
                   if (filtered.isEmpty) {
-                    return Center(
+                    return const Center(
                       child: Text(
                         'No states found',
-                        style: TextStyle(color: AC.greyText, fontSize: 14),
+                        style: TextStyle(color: greyText, fontSize: 13.5, fontWeight: FontWeight.w600),
                       ),
                     );
                   }
                   return ListView.separated(
                     itemCount: filtered.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1, color: AC.lightGrey),
+                    separatorBuilder: (_, __) => const Divider(height: 1, color: borderGrey),
                     itemBuilder: (context, idx) {
                       final state = filtered[idx];
                       return ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                         title: Text(
                           state.name,
                           style: const TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AC.darkText,
+                            fontWeight: FontWeight.w700,
+                            color: darkText,
                           ),
                         ),
+                        trailing: const Icon(Icons.chevron_right_rounded, color: greyText, size: 18),
                         onTap: () {
                           controller.onStateSelected(state);
                           Navigator.pop(context);
@@ -270,53 +291,69 @@ class EditKycScreen extends GetView<KycController> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (_) {
         final searchRx = ''.obs;
         return Container(
-          height: size.height * 0.7,
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+          height: size.height * 0.72,
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
           child: Column(
             children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AC.lightGrey,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                context.l10n.text('kyc_field_district'),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AC.darkText,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                decoration: BoxDecoration(
-                  color: AC.scaffoldBg,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AC.borderColor, width: 1),
-                ),
-                child: TextField(
-                  onChanged: (val) => searchRx.value = val,
-                  style: const TextStyle(color: AC.darkText, fontSize: 14),
-                  decoration: const InputDecoration(
-                    hintText: 'Search district...',
-                    hintStyle: TextStyle(color: AC.greyText, fontSize: 14),
-                    prefixIcon: Icon(Icons.search, color: AC.greyText),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 12),
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: borderGrey,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Text(
+                    context.l10n.text('kyc_field_district'),
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: darkText,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: greyText),
+                    onPressed: () => Navigator.pop(context),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Container(
+                decoration: BoxDecoration(
+                  color: fieldBg,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: borderGrey),
+                ),
+                child: TextField(
+                  onChanged: (val) => searchRx.value = val,
+                  style: const TextStyle(color: darkText, fontSize: 14, fontWeight: FontWeight.w600),
+                  decoration: const InputDecoration(
+                    hintText: 'Search district...',
+                    hintStyle: TextStyle(color: lightGreyText, fontSize: 13.5),
+                    prefixIcon: Icon(Icons.search_rounded, color: primary, size: 20),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               Expanded(
                 child: Obx(() {
                   final filtered = controller.districts
@@ -325,27 +362,29 @@ class EditKycScreen extends GetView<KycController> {
                           .contains(searchRx.value.toLowerCase().trim()))
                       .toList();
                   if (filtered.isEmpty) {
-                    return Center(
+                    return const Center(
                       child: Text(
                         'No districts found',
-                        style: TextStyle(color: AC.greyText, fontSize: 14),
+                        style: TextStyle(color: greyText, fontSize: 13.5, fontWeight: FontWeight.w600),
                       ),
                     );
                   }
                   return ListView.separated(
                     itemCount: filtered.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1, color: AC.lightGrey),
+                    separatorBuilder: (_, __) => const Divider(height: 1, color: borderGrey),
                     itemBuilder: (context, idx) {
                       final dist = filtered[idx];
                       return ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                         title: Text(
                           dist.name,
                           style: const TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AC.darkText,
+                            fontWeight: FontWeight.w700,
+                            color: darkText,
                           ),
                         ),
+                        trailing: const Icon(Icons.chevron_right_rounded, color: greyText, size: 18),
                         onTap: () {
                           controller.onDistrictSelected(dist);
                           Navigator.pop(context);
@@ -382,396 +421,437 @@ class EditKycScreen extends GetView<KycController> {
     if (!Get.isRegistered<KycController>()) {
       KycBinding().dependencies();
     }
-    final size = MediaQuery.of(context).size;
-    final hPad = size.width * 0.05;
 
-    return Scaffold(
-      backgroundColor: AC.scaffoldBg,
-      body: Obx(() {
-        final hasError = controller.errorMsg.value != null && controller.nameCtrl.text.isEmpty;
-        final hasLoader = controller.isLoading.value && controller.nameCtrl.text.isEmpty;
-
-        if (hasLoader) {
-          return const Center(
-            child: CircularProgressIndicator(color: AC.primaryBlue),
-          );
-        }
-
-        if (hasError) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline_rounded, color: Colors.red, size: 48),
-                  const SizedBox(height: 16),
-                  Text(
-                    context.l10n.text(controller.errorMsg.value ?? 'kyc_snack_error'),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.red, fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      final id = controller.candidateId.value;
-                      if (id != null) controller.fetchKycData(id);
-                    },
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Retry'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AC.primaryBlue,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                ],
-              ),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Get.back();
+      },
+      child: Scaffold(
+        backgroundColor: lightBg,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: Center(
+            child: AppBackButton(
+              onPressed: () => Get.back(),
+              tooltip: 'Back',
             ),
-          );
-        }
+          ),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                context.l10n.text('kyc_title'),
+                style: const TextStyle(
+                  color: darkText,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                  letterSpacing: -0.4,
+                ),
+              ),
+              Obx(() => Text(
+                    controller.candidateId.value == null
+                        ? context.l10n.text('kyc_subtitle')
+                        : '${context.l10n.text('kyc_subtitle_id')}${controller.candidateId.value}',
+                    style: const TextStyle(
+                      color: greyText,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  )),
+            ],
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(height: 1, color: borderGrey),
+          ),
+        ),
+        body: Obx(() {
+          final hasError = controller.errorMsg.value != null && controller.nameCtrl.text.isEmpty;
+          final hasLoader = controller.isLoading.value && controller.nameCtrl.text.isEmpty;
 
-        return Column(
-          children: [
-            // ── Blue AppBar ─────────────────────
-            _buildAppBar(context),
+          if (hasLoader) {
+            return const Center(
+              child: CircularProgressIndicator(color: primary),
+            );
+          }
 
-            // ── Scrollable Body ─────────────────
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: hPad),
+          if (hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 18),
-
-                    // Status chip
-                    _statusChip(context),
-
-                    const SizedBox(height: 22),
-
-                    // ── Personal Information ──────
-                    _sectionHeader(context.l10n.text('kyc_section_personal')),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: dangerRed.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.error_outline_rounded, color: dangerRed, size: 44),
+                    ),
                     const SizedBox(height: 16),
-
-                    _fieldLabel(context.l10n.text('kyc_field_full_name')),
-                    const SizedBox(height: 6),
-                    _inputField(controller: controller.nameCtrl),
-
-                    const SizedBox(height: 14),
-
-                    _fieldLabel(context.l10n.text('kyc_field_phone')),
-                    const SizedBox(height: 6),
-                    _inputField(
-                      controller: controller.phoneCtrl,
-                      keyboard: TextInputType.phone,
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    _fieldLabel(context.l10n.text('kyc_field_email')),
-                    const SizedBox(height: 6),
-                    _inputField(
-                      controller: controller.emailCtrl,
-                      hint: 'email@example.com',
-                      keyboard: TextInputType.emailAddress,
-                    ),
-
-                    const SizedBox(height: 26),
-
-                    // ── Address Information ───────
-                    _sectionHeader(context.l10n.text('kyc_section_address')),
-                    const SizedBox(height: 16),
-
-                    // State + District
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _fieldLabel(context.l10n.text('kyc_field_state')),
-                              const SizedBox(height: 6),
-                              GestureDetector(
-                                onTap: () => _showStateSelectionBottomSheet(context),
-                                child: AbsorbPointer(
-                                  child: _inputField(
-                                    controller: controller.stateCtrl,
-                                    hint: context.l10n.text('kyc_field_state'),
-                                    suffixIcon: const Icon(Icons.arrow_drop_down, color: AC.greyText),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _fieldLabel(context.l10n.text('kyc_field_district')),
-                              const SizedBox(height: 6),
-                              GestureDetector(
-                                onTap: () => _showDistrictSelectionBottomSheet(context),
-                                child: AbsorbPointer(
-                                  child: _inputField(
-                                    controller: controller.districtCtrl,
-                                    hint: context.l10n.text('kyc_field_district'),
-                                    suffixIcon: const Icon(Icons.arrow_drop_down, color: AC.greyText),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    // Locality + Pincode
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _fieldLabel(context.l10n.text('kyc_field_locality')),
-                              const SizedBox(height: 6),
-                              _inputField(
-                                controller: controller.localityCtrl,
-                                hint: context.l10n.text('kyc_field_locality'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _fieldLabel(context.l10n.text('kyc_field_pincode')),
-                              const SizedBox(height: 6),
-                              _inputField(
-                                controller: controller.pincodeCtrl,
-                                keyboard: TextInputType.number,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    _fieldLabel(context.l10n.text('kyc_field_address')),
-                    const SizedBox(height: 6),
-                    _multilineField(
-                      controller: controller.addressCtrl,
-                      hint: context.l10n.text('kyc_address_hint'),
-                    ),
-
-                    const SizedBox(height: 28),
-
-                    // ── Documents Upload ──────────
-                    _sectionHeader(context.l10n.text('kyc_section_documents')),
-                    const SizedBox(height: 6),
                     Text(
-                      context.l10n.text('kyc_docs_hint'),
-                      style: const TextStyle(color: AC.greyText, fontSize: 12),
+                      context.l10n.text(controller.errorMsg.value ?? 'kyc_snack_error'),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: darkText, fontSize: 15, fontWeight: FontWeight.w800),
                     ),
-                    const SizedBox(height: 16),
-
-                    // Identity Proof
-                    _UploadCard(
-                      slotId: 'identity',
-                      icon: Icons.badge_outlined,
-                      title: context.l10n.text('kyc_identity_title'),
-                      subtitle: context.l10n.text('kyc_identity_subtitle'),
-                      uploadType: UploadType.file,
-                      uploaded: controller.uploads['identity'],
-                      onUpload: () => controller.pickFile('identity'),
-                      onPickImage: () async {
-                        final source = await _showImageSourceSheet(context);
-                        if (source == null) return;
-                        await controller.pickImage('identity', source);
-                        if (context.mounted) {
-                          _showSnackbar(context, context.l10n.text('kyc_snack_doc_uploaded'), isSuccess: true);
-                        }
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        final id = controller.candidateId.value;
+                        if (id != null) controller.fetchKycData(id);
                       },
-                      onRemove: () {
-                        controller.removeUpload('identity');
-                        _showSnackbar(context, context.l10n.text('kyc_snack_file_removed'));
-                      },
+                      icon: const Icon(Icons.refresh_rounded, size: 18),
+                      label: const Text('Retry'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
                     ),
-
-                    const SizedBox(height: 12),
-
-                    // Resume / CV
-                    _UploadCard(
-                      slotId: 'resume',
-                      icon: Icons.description_outlined,
-                      title: context.l10n.text('kyc_resume_title'),
-                      subtitle: context.l10n.text('kyc_resume_subtitle'),
-                      uploadType: UploadType.file,
-                      uploaded: controller.uploads['resume'],
-                      onUpload: () => controller.pickFile('resume'),
-                      onPickImage: () {}, // no image upload option for resume
-                      onRemove: () {
-                        controller.removeUpload('resume');
-                        _showSnackbar(context, context.l10n.text('kyc_snack_file_removed'));
-                      },
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // Profile Photo
-                    _UploadCard(
-                      slotId: 'photo',
-                      icon: Icons.person_outline_rounded,
-                      title: context.l10n.text('kyc_photo_title'),
-                      subtitle: context.l10n.text('kyc_photo_subtitle'),
-                      uploadType: UploadType.image,
-                      uploaded: controller.uploads['photo'],
-                      onUpload: () => controller.pickFile('photo'),
-                      onPickImage: () async {
-                        final source = await _showImageSourceSheet(context);
-                        if (source == null) return;
-                        await controller.pickImage('photo', source);
-                        if (context.mounted) {
-                          _showSnackbar(context, context.l10n.text('kyc_snack_photo_uploaded'), isSuccess: true);
-                        }
-                      },
-                      onRemove: () {
-                        controller.removeUpload('photo');
-                        _showSnackbar(context, context.l10n.text('kyc_snack_file_removed'));
-                      },
-                    ),
-
-                    const SizedBox(height: 28),
                   ],
                 ),
               ),
-            ),
+            );
+          }
 
-            // ── Update KYC Button ───────────────
-            _buildBottomButton(hPad, context),
-          ],
-        );
-      }),
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 1. Status Banner
+                      _buildStatusBanner(context),
+                      const SizedBox(height: 16),
+
+                      // 2. Personal Information Card
+                      _buildFormCard(
+                        title: context.l10n.text('kyc_section_personal'),
+                        icon: Icons.person_outline_rounded,
+                        children: [
+                          _fieldLabel(context.l10n.text('kyc_field_full_name')),
+                          const SizedBox(height: 6),
+                          _inputField(controller: controller.nameCtrl, hint: 'e.g. Rahul Sharma'),
+                          const SizedBox(height: 14),
+
+                          _fieldLabel(context.l10n.text('kyc_field_phone')),
+                          const SizedBox(height: 6),
+                          _inputField(
+                            controller: controller.phoneCtrl,
+                            keyboard: TextInputType.phone,
+                            hint: 'e.g. 9876543210',
+                          ),
+                          const SizedBox(height: 14),
+
+                          _fieldLabel(context.l10n.text('kyc_field_email')),
+                          const SizedBox(height: 6),
+                          _inputField(
+                            controller: controller.emailCtrl,
+                            hint: 'e.g. rahul@example.com',
+                            keyboard: TextInputType.emailAddress,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 3. Address Information Card
+                      _buildFormCard(
+                        title: context.l10n.text('kyc_section_address'),
+                        icon: Icons.location_on_outlined,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _fieldLabel(context.l10n.text('kyc_field_state')),
+                                    const SizedBox(height: 6),
+                                    GestureDetector(
+                                      onTap: () => _showStateSelectionBottomSheet(context),
+                                      child: AbsorbPointer(
+                                        child: _inputField(
+                                          controller: controller.stateCtrl,
+                                          hint: context.l10n.text('kyc_field_state'),
+                                          suffixIcon: const Icon(Icons.arrow_drop_down_rounded, color: primary),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _fieldLabel(context.l10n.text('kyc_field_district')),
+                                    const SizedBox(height: 6),
+                                    GestureDetector(
+                                      onTap: () => _showDistrictSelectionBottomSheet(context),
+                                      child: AbsorbPointer(
+                                        child: _inputField(
+                                          controller: controller.districtCtrl,
+                                          hint: context.l10n.text('kyc_field_district'),
+                                          suffixIcon: const Icon(Icons.arrow_drop_down_rounded, color: primary),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _fieldLabel(context.l10n.text('kyc_field_locality')),
+                                    const SizedBox(height: 6),
+                                    _inputField(
+                                      controller: controller.localityCtrl,
+                                      hint: context.l10n.text('kyc_field_locality'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _fieldLabel(context.l10n.text('kyc_field_pincode')),
+                                    const SizedBox(height: 6),
+                                    _inputField(
+                                      controller: controller.pincodeCtrl,
+                                      keyboard: TextInputType.number,
+                                      hint: 'e.g. 110001',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+
+                          _fieldLabel(context.l10n.text('kyc_field_address')),
+                          const SizedBox(height: 6),
+                          _multilineField(
+                            controller: controller.addressCtrl,
+                            hint: context.l10n.text('kyc_address_hint'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 4. Documents Upload Card
+                      _buildFormCard(
+                        title: context.l10n.text('kyc_section_documents'),
+                        icon: Icons.upload_file_rounded,
+                        children: [
+                          Text(
+                            context.l10n.text('kyc_docs_hint'),
+                            style: const TextStyle(color: greyText, fontSize: 12.5, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Identity Proof
+                          _UploadCard(
+                            slotId: 'identity',
+                            icon: Icons.badge_outlined,
+                            title: context.l10n.text('kyc_identity_title'),
+                            subtitle: context.l10n.text('kyc_identity_subtitle'),
+                            uploadType: UploadType.file,
+                            uploaded: controller.uploads['identity'],
+                            onUpload: () => controller.pickFile('identity'),
+                            onPickImage: () async {
+                              final source = await _showImageSourceSheet(context);
+                              if (source == null) return;
+                              await controller.pickImage('identity', source);
+                              if (context.mounted) {
+                                _showSnackbar(context, context.l10n.text('kyc_snack_doc_uploaded'), isSuccess: true);
+                              }
+                            },
+                            onRemove: () {
+                              controller.removeUpload('identity');
+                              _showSnackbar(context, context.l10n.text('kyc_snack_file_removed'));
+                            },
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Resume / CV
+                          _UploadCard(
+                            slotId: 'resume',
+                            icon: Icons.description_outlined,
+                            title: context.l10n.text('kyc_resume_title'),
+                            subtitle: context.l10n.text('kyc_resume_subtitle'),
+                            uploadType: UploadType.file,
+                            uploaded: controller.uploads['resume'],
+                            onUpload: () => controller.pickFile('resume'),
+                            onPickImage: () {},
+                            onRemove: () {
+                              controller.removeUpload('resume');
+                              _showSnackbar(context, context.l10n.text('kyc_snack_file_removed'));
+                            },
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Profile Photo
+                          _UploadCard(
+                            slotId: 'photo',
+                            icon: Icons.account_circle_outlined,
+                            title: context.l10n.text('kyc_photo_title'),
+                            subtitle: context.l10n.text('kyc_photo_subtitle'),
+                            uploadType: UploadType.image,
+                            uploaded: controller.uploads['photo'],
+                            onUpload: () => controller.pickFile('photo'),
+                            onPickImage: () async {
+                              final source = await _showImageSourceSheet(context);
+                              if (source == null) return;
+                              await controller.pickImage('photo', source);
+                              if (context.mounted) {
+                                _showSnackbar(context, context.l10n.text('kyc_snack_photo_uploaded'), isSuccess: true);
+                              }
+                            },
+                            onRemove: () {
+                              controller.removeUpload('photo');
+                              _showSnackbar(context, context.l10n.text('kyc_snack_file_removed'));
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 5. Sticky Bottom Submit Button
+              _buildBottomActionBar(context),
+            ],
+          );
+        }),
+      ),
     );
   }
 
-  // ── Blue AppBar ──────────────────────────────
-  Widget _buildAppBar(BuildContext context) {
+  // ── Status Banner ────────────────────────────
+  Widget _buildStatusBanner(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: AC.primaryBlue,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 14,
-        left: 16,
-        right: 16,
-        bottom: 18,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: warningOrange.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: warningOrange.withValues(alpha: 0.25), width: 1.2),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: warningOrange.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.hourglass_top_rounded,
+              color: warningOrange,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.l10n.text('kyc_status_pending'),
+                  style: const TextStyle(
+                    color: darkText,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                const Text(
+                  'Submit your details & documents to get verified.',
+                  style: TextStyle(
+                    color: greyText,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Reusable Form Card Container ─────────────
+  Widget _buildFormCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderGrey),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.maybePop(context),
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.white,
-                  size: 24,
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                child: Icon(icon, color: primary, size: 18),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Text(
-                context.l10n.text('kyc_title'),
+                title,
                 style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
+                  color: darkText,
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.2,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            controller.candidateId.value == null
-                ? context.l10n.text('kyc_subtitle')
-                : '${context.l10n.text('kyc_subtitle_id')}${controller.candidateId.value}',
-            style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13),
-          ),
+          const SizedBox(height: 16),
+          ...children,
         ],
       ),
-    );
-  }
-
-  // ── Status chip ──────────────────────────────
-  Widget _statusChip(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: AC.pendingBg,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFFFDD88), width: 1.2),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 20,
-            height: 20,
-            decoration: const BoxDecoration(
-              color: AC.yellow,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.access_time_rounded,
-              color: Colors.white,
-              size: 13,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            context.l10n.text('kyc_status_pending'),
-            style: const TextStyle(
-              color: Color(0xFF886600),
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static Widget _sectionHeader(String title) {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 22,
-          decoration: BoxDecoration(
-            color: AC.sectionBlue,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          title,
-          style: const TextStyle(
-            color: AC.sectionBlue,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
     );
   }
 
@@ -779,9 +859,9 @@ class EditKycScreen extends GetView<KycController> {
     return Text(
       label,
       style: const TextStyle(
-        color: AC.darkText,
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
+        color: mediumText,
+        fontSize: 12.5,
+        fontWeight: FontWeight.w700,
       ),
     );
   }
@@ -794,22 +874,22 @@ class EditKycScreen extends GetView<KycController> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AC.fieldBg,
+        color: fieldBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AC.borderColor, width: 1.2),
+        border: Border.all(color: borderGrey, width: 1.0),
       ),
       child: TextField(
         controller: controller,
         keyboardType: keyboard,
-        style: const TextStyle(color: AC.darkText, fontSize: 14),
+        style: const TextStyle(color: darkText, fontSize: 14, fontWeight: FontWeight.w600),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: AC.greyText, fontSize: 14),
+          hintStyle: const TextStyle(color: lightGreyText, fontSize: 13.5),
           border: InputBorder.none,
           suffixIcon: suffixIcon,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 14,
-            vertical: 14,
+            vertical: 12,
           ),
         ),
       ),
@@ -822,75 +902,68 @@ class EditKycScreen extends GetView<KycController> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: AC.fieldBg,
+        color: fieldBg,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AC.borderColor, width: 1.2),
+        border: Border.all(color: borderGrey, width: 1.0),
       ),
       child: TextField(
         controller: controller,
-        maxLines: 4,
-        style: const TextStyle(color: AC.darkText, fontSize: 14),
+        maxLines: 3,
+        style: const TextStyle(color: darkText, fontSize: 14, fontWeight: FontWeight.w600),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: AC.greyText, fontSize: 14),
+          hintStyle: const TextStyle(color: lightGreyText, fontSize: 13.5),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 14,
-            vertical: 14,
+            vertical: 12,
           ),
         ),
       ),
     );
   }
 
-  // ── Bottom button ────────────────────────────
-  Widget _buildBottomButton(double hPad, BuildContext context) {
+  // ── Bottom Action Bar ────────────────────────
+  Widget _buildBottomActionBar(BuildContext context) {
     return Container(
-      color: AC.scaffoldBg,
       padding: EdgeInsets.fromLTRB(
-        hPad,
+        16,
         12,
-        hPad,
-        MediaQuery.of(context).padding.bottom + 16,
+        16,
+        MediaQuery.of(context).padding.bottom + 14,
       ),
-      child: GestureDetector(
-        onTap: controller.isLoading.value ? null : () => _onSubmitKyc(context),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: double.infinity,
-          height: 56,
-          decoration: BoxDecoration(
-            color: controller.isLoading.value
-                ? AC.primaryBlue.withValues(alpha: 0.65)
-                : AC.primaryBlue,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: AC.primaryBlue.withValues(alpha: 0.35),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: borderGrey)),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: ElevatedButton(
+          onPressed: controller.isLoading.value ? null : () => _onSubmitKyc(context),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primary,
+            foregroundColor: Colors.white,
+            elevation: 1,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
-          child: Center(
-            child: controller.isLoading.value
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2.5,
-                    ),
-                  )
-                : Text(
-                    context.l10n.text('kyc_update_button'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                    ),
+          child: controller.isLoading.value
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2.5,
                   ),
-          ),
+                )
+              : Text(
+                  context.l10n.text('kyc_update_button'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
         ),
       ),
     );
@@ -928,43 +1001,37 @@ class _UploadCard extends StatelessWidget {
     final bool hasFile = uploaded != null;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 250),
       decoration: BoxDecoration(
-        color: AC.cardBg,
-        borderRadius: BorderRadius.circular(16),
+        color: EditKycScreen.fieldBg,
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: hasFile
-              ? AC.successGreen.withValues(alpha: 0.5)
-              : AC.borderColor,
-          width: 1.5,
+              ? EditKycScreen.successGreen.withValues(alpha: 0.5)
+              : EditKycScreen.borderGrey,
+          width: 1.2,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         children: [
-          // ── Header row ───────────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
                 // Icon
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 42,
+                  height: 42,
                   decoration: BoxDecoration(
-                    color: hasFile ? AC.successBg : AC.iconBg,
+                    color: hasFile
+                        ? EditKycScreen.successGreen.withValues(alpha: 0.1)
+                        : EditKycScreen.primary.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     hasFile ? Icons.check_circle_rounded : icon,
-                    color: hasFile ? AC.successGreen : AC.primaryBlue,
-                    size: 22,
+                    color: hasFile ? EditKycScreen.successGreen : EditKycScreen.primary,
+                    size: 20,
                   ),
                 ),
 
@@ -978,22 +1045,20 @@ class _UploadCard extends StatelessWidget {
                       Text(
                         title,
                         style: const TextStyle(
-                          color: AC.darkText,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+                          color: EditKycScreen.darkText,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 2),
                       Text(
                         hasFile ? uploaded!.name : subtitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: hasFile ? AC.successGreen : AC.greyText,
-                          fontSize: 12,
-                          fontWeight: hasFile
-                              ? FontWeight.w600
-                              : FontWeight.w400,
+                          color: hasFile ? EditKycScreen.successGreen : EditKycScreen.greyText,
+                          fontSize: 11.5,
+                          fontWeight: hasFile ? FontWeight.w700 : FontWeight.w500,
                         ),
                       ),
                       if (hasFile && uploaded!.sizeLabel.isNotEmpty) ...[
@@ -1001,8 +1066,8 @@ class _UploadCard extends StatelessWidget {
                         Text(
                           uploaded!.sizeLabel,
                           style: const TextStyle(
-                            color: AC.greyText,
-                            fontSize: 11,
+                            color: EditKycScreen.greyText,
+                            fontSize: 10.5,
                           ),
                         ),
                       ],
@@ -1020,21 +1085,14 @@ class _UploadCard extends StatelessWidget {
                     onPickImage: onPickImage,
                   )
                 else
-                  GestureDetector(
-                    onTap: onRemove,
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFEBEB),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.delete_outline_rounded,
-                        color: Colors.red,
-                        size: 18,
-                      ),
+                  IconButton(
+                    onPressed: onRemove,
+                    icon: const Icon(
+                      Icons.delete_outline_rounded,
+                      color: EditKycScreen.dangerRed,
+                      size: 20,
                     ),
+                    tooltip: 'Remove',
                   ),
               ],
             ),
@@ -1042,24 +1100,24 @@ class _UploadCard extends StatelessWidget {
 
           // ── Preview (if image uploaded) ────────
           if (hasFile && uploaded!.isImage && uploaded!.path.isNotEmpty) ...[
-            const Divider(height: 1),
+            const Divider(height: 1, color: EditKycScreen.borderGrey),
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.file(
                   File(uploaded!.path),
-                  height: 140,
+                  height: 120,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    height: 80,
-                    color: AC.lightGrey,
+                    height: 70,
+                    color: EditKycScreen.borderGrey,
                     child: const Center(
                       child: Icon(
                         Icons.broken_image_outlined,
-                        color: AC.greyText,
-                        size: 32,
+                        color: EditKycScreen.greyText,
+                        size: 28,
                       ),
                     ),
                   ),
@@ -1070,47 +1128,47 @@ class _UploadCard extends StatelessWidget {
 
           // ── PDF / Doc preview badge ────────────
           if (hasFile && !uploaded!.isImage) ...[
-            const Divider(height: 1),
+            const Divider(height: 1, color: EditKycScreen.borderGrey),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
+                      horizontal: 8,
+                      vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFEBEB),
-                      borderRadius: BorderRadius.circular(8),
+                      color: EditKycScreen.dangerRed.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(
                           Icons.picture_as_pdf_rounded,
-                          color: Colors.red,
-                          size: 15,
+                          color: EditKycScreen.dangerRed,
+                          size: 13,
                         ),
-                        const SizedBox(width: 5),
+                        const SizedBox(width: 4),
                         Text(
                           uploaded!.name.split('.').last.toUpperCase(),
                           style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
+                            color: EditKycScreen.dangerRed,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       uploaded!.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: AC.darkText, fontSize: 12),
+                      style: const TextStyle(color: EditKycScreen.darkText, fontSize: 11.5, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
@@ -1154,21 +1212,22 @@ class _ActionButtons extends StatelessWidget {
       children: [
         _iconBtn(icon: Icons.camera_alt_rounded, onTap: onPickImage),
         const SizedBox(width: 6),
-        GestureDetector(
+        InkWell(
           onTap: onUpload,
+          borderRadius: BorderRadius.circular(8),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: AC.primaryBlue,
+              color: EditKycScreen.primary,
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Text(
               'UPLOAD',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
+                letterSpacing: 0.3,
               ),
             ),
           ),
@@ -1178,16 +1237,17 @@ class _ActionButtons extends StatelessWidget {
   }
 
   Widget _iconBtn({required IconData icon, required VoidCallback onTap}) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
       child: Container(
-        width: 36,
-        height: 36,
+        width: 34,
+        height: 34,
         decoration: BoxDecoration(
-          color: AC.iconBg,
+          color: EditKycScreen.primary.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(icon, color: AC.primaryBlue, size: 19),
+        child: Icon(icon, color: EditKycScreen.primary, size: 17),
       ),
     );
   }

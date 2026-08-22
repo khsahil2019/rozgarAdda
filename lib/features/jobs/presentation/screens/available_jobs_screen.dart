@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:rojgar/features/auth/data/data_source/model/dropdown_item.dart';
+import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:open_share_plus/open.dart';
 import 'package:share_plus/share_plus.dart';
-// import 'package:open_whatsapp/open_whatsapp.dart';
-import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/features/jobs/presentation/widgets/job_card_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/widgets/network_image_service.dart';
@@ -16,8 +14,6 @@ import '../../domain/entities/available_job_entity.dart';
 import '../../domain/entities/job_category.dart';
 import '../../domain/entities/job_role_entity.dart';
 import '../controller/jobs_controller.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import '../bindings/jobs_binding.dart';
 
 enum _FilterSection {
@@ -33,17 +29,16 @@ enum _FilterSection {
 
 class _C {
   static const Color primaryBlue = Color(0xFF1400FF);
-  static const Color darkText = Color(0xFF17181C);
-  static const Color grey = Color(0xFF72757F);
-  static const Color lightGrey = Color(0xFF9AA0AA);
-  static const Color borderGrey = Color(0xFFD7DADF);
-  static const Color scaffoldBg = Color(0xFFF4F5F8);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color grey = Color(0xFF64748B);
+  static const Color lightGrey = Color(0xFF94A3B8);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+  static const Color scaffoldBg = Color(0xFFF8FAFC);
   static const Color cardBg = Color(0xFFFFFFFF);
-  static const Color chipBg = Color(0xFFF7F8FB);
-  static const Color chipText = Color(0xFF1E2228);
-  static const Color chipAccent = Color(0xFFEAF2FF);
-  static const Color yellow = Color(0xFFFFC400);
-  static const Color red = Color(0xFFE84E5F);
+  static const Color chipBg = Color(0xFFF1F5F9);
+  static const Color chipText = Color(0xFF0F172A);
+  static const Color chipAccent = Color(0xFFEEF2FF);
+  static const Color red = Color(0xFFEF4444);
 }
 
 class AvailableJobsScreen extends StatefulWidget {
@@ -508,34 +503,14 @@ class _AvailableJobsScreenState extends State<AvailableJobsScreen> {
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(
-          bottom: BorderSide(color: Color(0xFFF1F5F9), width: 1),
+          bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
         ),
       ),
       child: Row(
         children: [
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => Navigator.maybePop(context),
-              borderRadius: BorderRadius.circular(14),
-              child: Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: const Color(0xFFE2E8F0),
-                    width: 1,
-                  ),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Color(0xFF0F172A),
-                  size: 18,
-                ),
-              ),
-            ),
+          AppBackButton(
+            onPressed: () => Navigator.maybePop(context),
+            tooltip: 'Back',
           ),
           const SizedBox(width: 14),
           Expanded(

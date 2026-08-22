@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import 'package:intl/intl.dart';
+import 'package:rojgar/core/widgets/app_back_button.dart';
 import '../../domain/entities/news_item.dart';
 
 class LocalVideoPlayerScreen extends StatefulWidget {
@@ -14,6 +15,11 @@ class LocalVideoPlayerScreen extends StatefulWidget {
 }
 
 class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
+  static const Color primary = Color(0xFF1400FF);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color lightBg = Color(0xFFF8FAFC);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
   bool _hasError = false;
@@ -38,15 +44,15 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
         aspectRatio: _videoPlayerController.value.aspectRatio,
         showControls: true,
         materialProgressColors: ChewieProgressColors(
-          playedColor: const Color(0xFFD4A017),
-          handleColor: const Color(0xFFD4A017),
+          playedColor: primary,
+          handleColor: primary,
           bufferedColor: Colors.white24,
           backgroundColor: Colors.white10,
         ),
         placeholder: Container(
           color: Colors.black,
           child: const Center(
-            child: CircularProgressIndicator(color: Color(0xFFD4A017)),
+            child: CircularProgressIndicator(color: primary),
           ),
         ),
         errorBuilder: (context, errorMessage) {
@@ -88,27 +94,29 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
     ).format(widget.news.createdAt);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FC),
+      backgroundColor: lightBg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1E3C),
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
         elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.maybePop(context),
-          child: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 20,
-            color: Colors.white,
+        scrolledUnderElevation: 0,
+        leading: Center(
+          child: AppBackButton(
+            onPressed: () => Navigator.maybePop(context),
+            tooltip: 'Back',
           ),
         ),
         title: const Text(
-          'Video Player',
+          'Video News',
           style: TextStyle(
             fontSize: 18,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.3,
-            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.3,
+            color: darkText,
           ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(height: 1, color: borderGrey),
         ),
       ),
       body: Column(
@@ -149,7 +157,7 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
                   ? Chewie(controller: _chewieController!)
                   : const Center(
                       child: CircularProgressIndicator(
-                        color: Color(0xFFD4A017),
+                        color: primary,
                       ),
                     ),
             ),
@@ -171,15 +179,15 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1E3C).withValues(alpha: 0.1),
+                          color: primary.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text(
                           'VIDEO',
                           style: TextStyle(
-                            color: Color(0xFF1A1E3C),
+                            color: primary,
                             fontSize: 11,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w800,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -188,13 +196,13 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
                       const Icon(
                         Icons.access_time_rounded,
                         size: 14,
-                        color: Color(0xFF8A8FA3),
+                        color: Color(0xFF64748B),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         formattedDate,
                         style: const TextStyle(
-                          color: Color(0xFF8A8FA3),
+                          color: Color(0xFF64748B),
                           fontSize: 12,
                         ),
                       ),
@@ -206,34 +214,36 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
                   Text(
                     widget.news.title,
                     style: const TextStyle(
-                      color: Color(0xFF1A1E3C),
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
+                      color: darkText,
+                      fontSize: 21,
+                      fontWeight: FontWeight.w900,
                       height: 1.35,
+                      letterSpacing: -0.3,
                     ),
                   ),
+                  const SizedBox(height: 16),
                   const Divider(
-                    height: 32,
-                    thickness: 1.2,
-                    color: Color(0xFFE0E0EE),
+                    height: 1,
+                    color: borderGrey,
                   ),
+                  const SizedBox(height: 16),
 
                   // Video Description (subject)
                   if (widget.news.description.isNotEmpty) ...[
                     const Text(
                       'Description',
                       style: TextStyle(
-                        color: Color(0xFF1A1E3C),
+                        color: darkText,
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       widget.news.description,
                       style: const TextStyle(
-                        color: Color(0xFF2C3248),
-                        fontSize: 14,
+                        color: Color(0xFF334155),
+                        fontSize: 14.5,
                         height: 1.6,
                         fontWeight: FontWeight.w400,
                       ),

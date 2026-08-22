@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import '../bindings/jobs_binding.dart';
 import '../controller/job_application_controller.dart';
@@ -7,26 +8,26 @@ import '../controller/job_application_controller.dart';
 // ─── Color Constants ───────────────────────────────────────────────────────────
 class AppColors {
   static const Color white = Colors.white;
-  static const Color background = Color(0xFFFFFFFF);
-  static const Color primaryBlue = Color(0xFF1A1AE6);
-  static const Color darkBlue = Color(0xFF1010CC);
-  static const Color stepLabel = Color(0xFF2222DD);
-  static const Color darkText = Color(0xFF111122);
-  static const Color greyText = Color(0xFF888899);
-  static const Color inputBorder = Color(0xFFDDDDE8);
-  static const Color inputBg = Color(0xFFFAFAFC);
-  static const Color inputHint = Color(0xFFBBBBCC);
-  static const Color progressBg = Color(0xFFEEEEF5);
-  static const Color progressFill = Color(0xFF2222DD);
-  static const Color sectionIcon = Color(0xFF2222DD);
-  static const Color uploadBorder = Color(0xFF9999DD);
-  static const Color uploadBg = Color(0xFFF8F8FE);
-  static const Color uploadIconBg = Color(0xFFDDDDF8);
-  static const Color checkBorder = Color(0xFFCCCCDD);
-  static const Color linkBlue = Color(0xFF2222DD);
-  static const Color footerText = Color(0xFFAAAAAB);
-  static const Color agreeBg = Color(0xFFF4F4FA);
-  static const Color cardShadow = Color(0x08000000);
+  static const Color background = Color(0xFFF8FAFC);
+  static const Color primaryBlue = Color(0xFF1400FF);
+  static const Color darkBlue = Color(0xFF0C00B8);
+  static const Color stepLabel = Color(0xFF1400FF);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color greyText = Color(0xFF64748B);
+  static const Color inputBorder = Color(0xFFE2E8F0);
+  static const Color inputBg = Color(0xFFF8FAFC);
+  static const Color inputHint = Color(0xFF94A3B8);
+  static const Color progressBg = Color(0xFFE2E8F0);
+  static const Color progressFill = Color(0xFF1400FF);
+  static const Color sectionIcon = Color(0xFF1400FF);
+  static const Color uploadBorder = Color(0xFFC7D2FE);
+  static const Color uploadBg = Color(0xFFF8FAFC);
+  static const Color uploadIconBg = Color(0xFFEEF2FF);
+  static const Color checkBorder = Color(0xFFCBD5E1);
+  static const Color linkBlue = Color(0xFF1400FF);
+  static const Color footerText = Color(0xFF94A3B8);
+  static const Color agreeBg = Color(0xFFF8FAFC);
+  static const Color cardShadow = Color(0x060F172A);
 }
 
 void main() => runApp(const JobApplicationApp());
@@ -198,15 +199,9 @@ class JobApplicationScreen extends GetView<JobApplicationController> {
       padding: EdgeInsets.fromLTRB(16, topPad + 12, 16, 14),
       child: Row(
         children: [
-          IconButton(
+          AppBackButton(
             onPressed: () => Navigator.maybePop(context),
-            icon: const Icon(
-              Icons.arrow_back_rounded,
-              size: 22,
-              color: AppColors.darkText,
-            ),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            tooltip: 'Back',
           ),
           const SizedBox(width: 12),
           Expanded(

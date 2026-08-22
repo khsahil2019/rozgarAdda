@@ -3,13 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import '../controller/create_news_controller.dart';
 
 class _CNC {
   static const Color bg = Color(0xFFF8FAFC);
   static const Color navy = Color(0xFF0F172A);
-  static const Color accent = Color(0xFF4F46E5);
+  static const Color accent = Color(0xFF1400FF);
   static const Color grey = Color(0xFF64748B);
   static const Color border = Color(0xFFE2E8F0);
 }
@@ -20,128 +21,126 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Scaffold(
-      backgroundColor: _CNC.bg,
-      appBar: AppBar(
-        backgroundColor: _CNC.accent,
-        foregroundColor: Colors.white,
-        centerTitle: true,
-        elevation: 0,
-        title: Text(
-          l10n.text('news_form_title'),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12),
-          child: Center(
-            child: GestureDetector(
-              onTap: () => Navigator.maybePop(context),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_rounded,
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Get.back();
+      },
+      child: Scaffold(
+        backgroundColor: _CNC.bg,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: Center(
+            child: AppBackButton(
+              onPressed: () => Navigator.maybePop(context),
+              tooltip: 'Back',
             ),
           ),
+          title: Text(
+            l10n.text('news_form_title'),
+            style: const TextStyle(
+              color: _CNC.navy,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.3,
+            ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(height: 1, color: _CNC.border),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: Obx(() {
-          if (controller.isLoadingOptions.value) {
-            return const Center(
-              child: CircularProgressIndicator(color: _CNC.accent),
-            );
-          }
+        body: SafeArea(
+          child: Obx(() {
+            if (controller.isLoadingOptions.value) {
+              return const Center(
+                child: CircularProgressIndicator(color: _CNC.accent),
+              );
+            }
 
-          final isVideo = controller.isPostTypeVideo.value;
+            final isVideo = controller.isPostTypeVideo.value;
 
-          return Stack(
-            children: [
-              SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (controller.errorMessage.isNotEmpty) ...[
-                      _buildErrorBanner(controller.errorMessage.value),
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (controller.errorMessage.isNotEmpty) ...[
+                        _buildErrorBanner(controller.errorMessage.value),
+                        const SizedBox(height: 16),
+                      ],
+
+                      // ── Post Type Toggle Bar (Text News vs Video News) ──
+                      _buildPostTypeToggle(),
+
                       const SizedBox(height: 16),
-                    ],
 
-                    // ── Post Type Toggle Bar (Text News vs Video News) ──
-                    _buildPostTypeToggle(),
-
-                    const SizedBox(height: 16),
-
-                    _buildCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildCategoryField(context, l10n),
-                          const SizedBox(height: 14),
-                          _buildStateField(context, l10n),
-                          const SizedBox(height: 14),
-                          _buildTextField(
-                            textController: controller.titleCtrl,
-                            label: l10n.text('news_form_headline'),
-                            hint: l10n.text('news_form_headline_hint'),
-                          ),
-                          const SizedBox(height: 14),
-                          if (isVideo) ...[
+                      _buildCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _buildCategoryField(context, l10n),
+                            const SizedBox(height: 14),
+                            _buildStateField(context, l10n),
+                            const SizedBox(height: 14),
                             _buildTextField(
-                              textController: controller.subjectCtrl,
-                              label: 'News Subject',
-                              hint: 'Enter video news subject...',
+                              textController: controller.titleCtrl,
+                              label: l10n.text('news_form_headline'),
+                              hint: l10n.text('news_form_headline_hint'),
                             ),
                             const SizedBox(height: 14),
+                            if (isVideo) ...[
+                              _buildTextField(
+                                textController: controller.subjectCtrl,
+                                label: 'News Subject',
+                                hint: 'Enter video news subject...',
+                              ),
+                              const SizedBox(height: 14),
+                            ],
+                            _buildTextField(
+                              textController: controller.descriptionCtrl,
+                              label: isVideo
+                                  ? 'Video Description'
+                                  : l10n.text('news_form_description'),
+                              hint: isVideo
+                                  ? 'Enter news description / summary...'
+                                  : l10n.text('news_form_description_hint'),
+                              maxLines: isVideo ? 3 : 5,
+                            ),
                           ],
-                          _buildTextField(
-                            textController: controller.descriptionCtrl,
-                            label: isVideo ? 'Video Description' : l10n.text('news_form_description'),
-                            hint: isVideo
-                                ? 'Enter news description / summary...'
-                                : l10n.text('news_form_description_hint'),
-                            maxLines: isVideo ? 3 : 5,
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 18),
-                    _buildCard(
-                      child: isVideo
-                          ? _buildVideoPicker(context, l10n)
-                          : _buildImagePicker(context, l10n),
-                    ),
-                    const SizedBox(height: 24),
-                    _buildSubmitButton(context, l10n),
-                    const SizedBox(height: 24),
-                  ],
-                ),
-              ),
-              if (controller.isSubmitting.value)
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.black38,
-                    child: const Center(
-                      child: CircularProgressIndicator(color: _CNC.accent),
-                    ),
+                      const SizedBox(height: 18),
+                      _buildCard(
+                        child: isVideo
+                            ? _buildVideoPicker(context, l10n)
+                            : _buildImagePicker(context, l10n),
+                      ),
+                      const SizedBox(height: 24),
+                      _buildSubmitButton(context, l10n),
+                      const SizedBox(height: 24),
+                    ],
                   ),
                 ),
-            ],
-          );
-        }),
+                if (controller.isSubmitting.value)
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.black38,
+                      child: const Center(
+                        child: CircularProgressIndicator(color: _CNC.accent),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          }),
+        ),
       ),
     );
   }
@@ -246,7 +245,11 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
       ),
       child: Text(
         message,
-        style: const TextStyle(color: Color(0xFFEF4444), fontSize: 13, fontWeight: FontWeight.w600),
+        style: const TextStyle(
+          color: Color(0xFFEF4444),
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -257,8 +260,8 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _CNC.border, width: 1.2),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _CNC.border),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -294,7 +297,11 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
               Icons.keyboard_arrow_down_rounded,
               color: _CNC.grey,
             ),
-            style: const TextStyle(color: _CNC.navy, fontSize: 14, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: _CNC.navy,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
             onChanged: (value) => controller.selectedCategoryId.value = value,
             items: categories
                 .map(
@@ -333,7 +340,11 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
               Icons.keyboard_arrow_down_rounded,
               color: _CNC.grey,
             ),
-            style: const TextStyle(color: _CNC.navy, fontSize: 14, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: _CNC.navy,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
             onChanged: (value) => controller.selectedStateId.value = value,
             items: states
                 .map(
@@ -357,7 +368,7 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
           label,
           style: const TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: 13,
+            fontSize: 12.5,
             color: _CNC.navy,
           ),
         ),
@@ -366,7 +377,7 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: _CNC.border),
           ),
           child: child,
@@ -388,7 +399,7 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
           label,
           style: const TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: 13,
+            fontSize: 12.5,
             color: _CNC.navy,
           ),
         ),
@@ -397,7 +408,11 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
           controller: textController,
           maxLines: maxLines,
           textCapitalization: TextCapitalization.sentences,
-          style: const TextStyle(fontSize: 14, color: _CNC.navy, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            fontSize: 14,
+            color: _CNC.navy,
+            fontWeight: FontWeight.w600,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: _CNC.grey, fontSize: 13),
@@ -409,15 +424,15 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
               vertical: 12,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: _CNC.border),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: _CNC.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: _CNC.accent, width: 1.5),
             ),
           ),
@@ -436,7 +451,7 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
             l10n.text('news_form_image'),
             style: const TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: 13,
+              fontSize: 12.5,
               color: _CNC.navy,
             ),
           ),
@@ -455,7 +470,7 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
             children: [
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEEF2FF),
+                  backgroundColor: _CNC.accent.withValues(alpha: 0.08),
                   foregroundColor: _CNC.accent,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(
@@ -516,7 +531,7 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
             'News Video File',
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: 13,
+              fontSize: 12.5,
               color: _CNC.navy,
             ),
           ),
@@ -525,9 +540,9 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFEEF2FF),
+                color: _CNC.accent.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFC7D2FE)),
+                border: Border.all(color: _CNC.accent.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
@@ -536,7 +551,11 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
                   Expanded(
                     child: Text(
                       path.split(Platform.pathSeparator).last,
-                      style: const TextStyle(color: _CNC.navy, fontSize: 13, fontWeight: FontWeight.w700),
+                      style: const TextStyle(
+                        color: _CNC.navy,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -553,7 +572,7 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
             children: [
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEEF2FF),
+                  backgroundColor: _CNC.accent.withValues(alpha: 0.08),
                   foregroundColor: _CNC.accent,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(
@@ -577,7 +596,9 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  path.isEmpty ? 'No video selected' : path.split(Platform.pathSeparator).last,
+                  path.isEmpty
+                      ? 'No video selected'
+                      : path.split(Platform.pathSeparator).last,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: path.isEmpty ? _CNC.grey : _CNC.navy,
@@ -594,39 +615,21 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
   }
 
   Widget _buildSubmitButton(BuildContext context, AppLocalizations l10n) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: _CNC.accent.withValues(alpha: 0.3),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: ElevatedButton(
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
+          backgroundColor: _CNC.accent,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 1,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
         onPressed: () => _submit(context, l10n),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.send_rounded, color: Colors.white, size: 18),
-            const SizedBox(width: 8),
-            Text(
-              l10n.text('news_form_submit'),
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-            ),
-          ],
+        icon: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
+        label: Text(
+          l10n.text('news_form_submit'),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
         ),
       ),
     );

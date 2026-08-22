@@ -91,8 +91,8 @@ class _FloatingNavbarScreenState extends State<FloatingNavbarScreen> {
     }
 
     final isSelected = _selectedIndex == index;
-    const activeColor = Color(0xFF4F46E5);
-    const activeBgColor = Color(0xFFEEF2FF);
+    const activeColor = Color(0xFF1400FF);
+    final activeBgColor = const Color(0xFF1400FF).withValues(alpha: 0.08);
     const inactiveColor = Color(0xFF94A3B8);
 
     return GestureDetector(

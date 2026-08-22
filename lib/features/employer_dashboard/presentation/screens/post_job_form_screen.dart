@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/exceptions/exceptions.dart';
 import '../../../../core/network/api_routes.dart';
 import '../../../../core/network/api_services.dart';
+import '../../../../core/widgets/app_back_button.dart';
 import '../../../jobs/domain/entities/available_job_entity.dart';
 import '../controllers/employer_dashboard_controller.dart';
 import '../../../auth/data/data_source/model/dropdown_item.dart';
@@ -650,10 +651,11 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
           backgroundColor: Colors.white,
           elevation: 0,
           scrolledUnderElevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded, color: darkText),
-            onPressed: _handleBackNavigation,
-            tooltip: _currentStep > 0 ? 'Previous Step' : 'Back',
+          leading: Center(
+            child: AppBackButton(
+              onPressed: _handleBackNavigation,
+              tooltip: _currentStep > 0 ? 'Previous Step' : 'Back',
+            ),
           ),
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

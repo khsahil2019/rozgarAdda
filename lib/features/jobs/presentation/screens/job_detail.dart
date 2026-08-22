@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
 import 'applyjob_form.dart';
@@ -12,13 +13,13 @@ import 'package:share_plus/share_plus.dart';
 class AppColors {
   static const Color white = Colors.white;
   static const Color background = Color(0xFFF8FAFC);
-  static const Color primaryBlue = Color(0xFF4F46E5);
+  static const Color primaryBlue = Color(0xFF1400FF);
   static const Color darkText = Color(0xFF0F172A);
   static const Color greyText = Color(0xFF64748B);
   static const Color lightLabel = Color(0xFF94A3B8);
   static const Color highlightCardBg = Color(0xFFEEF2FF);
   static const Color tagBg = Color(0xFFF1F5F9);
-  static const Color tagText = Color(0xFF4F46E5);
+  static const Color tagText = Color(0xFF1400FF);
   static const Color yellow = Color(0xFFF59E0B);
   static const Color green = Color(0xFF10B981);
   static const Color borderLight = Color(0xFFE2E8F0);
@@ -169,29 +170,9 @@ class JobDetailScreen extends StatelessWidget {
       child: Row(
         children: [
           // Squircle Back Button
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => Navigator.pop(context),
-              borderRadius: BorderRadius.circular(14),
-              child: Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: const Color(0xFFE2E8F0),
-                    width: 1,
-                  ),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Color(0xFF0F172A),
-                  size: 18,
-                ),
-              ),
-            ),
+          AppBackButton(
+            onPressed: () => Navigator.pop(context),
+            tooltip: 'Back',
           ),
           const SizedBox(width: 12),
 

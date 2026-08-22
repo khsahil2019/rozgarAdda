@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:rojgar/features/auth/data/data_source/model/dropdown_item.dart';
 import 'package:open_share_plus/open.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/core/widgets/fast_loader.dart';
 import 'package:rojgar/core/widgets/empty_state_widget.dart';
@@ -30,19 +30,13 @@ enum _FilterSection {
 
 class _Colors {
   static const Color primaryBlue = Color(0xFF1400FF);
-  static const Color darkText = Color(0xFF17181C);
-  static const Color grey = Color(0xFF72757F);
-  static const Color lightGrey = Color(0xFF9AA0AA);
-  static const Color borderGrey = Color(0xFFD7DADF);
-  static const Color scaffoldBg = Color(0xFFF4F5F8);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color grey = Color(0xFF64748B);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+  static const Color scaffoldBg = Color(0xFFF8FAFC);
   static const Color cardBg = Color(0xFFFFFFFF);
-  static const Color chipBg = Color(0xFFF7F8FB);
-  static const Color chipText = Color(0xFF1E2228);
-  static const Color chipAccent = Color(0xFFEAF2FF);
-  static const Color green = Color(0xFF2E7D32);
-  static const Color yellow = Color(0xFFFFC107);
-  static const Color yellowFilter = Color(0xFFFFC400);
-  static const Color red = Color(0xFFE84E5F);
+  static const Color chipBg = Color(0xFFF1F5F9);
+  static const Color yellow = Color(0xFFF59E0B);
 }
 
 class RecentJobsScreen extends StatefulWidget {
@@ -381,29 +375,10 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        leadingWidth: 58,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16, top: 7, bottom: 7),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => Navigator.pop(context),
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Color(0xFF0F172A),
-                  size: 17,
-                ),
-              ),
-            ),
+        leading: Center(
+          child: AppBackButton(
+            onPressed: () => Navigator.pop(context),
+            tooltip: 'Back',
           ),
         ),
         title: Column(

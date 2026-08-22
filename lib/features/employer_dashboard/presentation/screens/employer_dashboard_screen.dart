@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:rojgar/splash_screen.dart';
+import '../../../../core/exceptions/exceptions.dart';
 import '../controllers/employer_dashboard_controller.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../jobs/domain/entities/available_job_entity.dart';
@@ -341,7 +343,7 @@ class EmployerDashboardScreen extends GetView<EmployerDashboardController> {
               border: Border.all(color: primary.withValues(alpha: 0.2), width: 1.5),
             ),
             child: const Center(
-              child: Icon(Icons.storefront_rounded, color: primary, size: 20),
+              child: Icon(Icons.business_rounded, color: primary, size: 20),
             ),
           ),
           const SizedBox(width: 12),
@@ -374,9 +376,11 @@ class EmployerDashboardScreen extends GetView<EmployerDashboardController> {
                     Flexible(
                       child: Obx(
                         () => Text(
-                          controller.employerId.value != 0
-                              ? 'Employer #${controller.employerId.value}'
-                              : 'Hiring Manager',
+                          controller.companyName.value.isNotEmpty
+                              ? controller.companyName.value
+                              : (controller.employerId.value != 0
+                                  ? 'Employer #${controller.employerId.value}'
+                                  : 'Hiring Manager'),
                           style: const TextStyle(
                             color: darkText,
                             fontSize: 14.5,
@@ -449,8 +453,8 @@ class EmployerDashboardScreen extends GetView<EmployerDashboardController> {
                       'Post Job',
                       style: TextStyle(
                         color: primary,
-                        fontSize: 11.5,
                         fontWeight: FontWeight.w800,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -1899,53 +1903,137 @@ class EmployerDashboardScreen extends GetView<EmployerDashboardController> {
       Get.back(); // close loading dialog
 
       if (filePath != null) {
-        Get.snackbar(
-          'Export Successful',
-          'Candidate list has been exported to Excel.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: successGreen,
-          colorText: Colors.white,
-          margin: const EdgeInsets.all(16),
-          borderRadius: 14,
-          duration: const Duration(seconds: 5),
-          mainButton: TextButton(
-            onPressed: () async {
-              try {
-                final result = await OpenFilex.open(filePath);
-                if (result.type != ResultType.done) {
-                  Get.snackbar(
-                    'Error',
-                    'Could not open file: ${result.message}',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Colors.red,
-                    colorText: Colors.white,
-                  );
-                }
-              } catch (e) {
-                Get.snackbar(
-                  'Error',
-                  'Could not open file: $e',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                );
-              }
-            },
-            child: const Text(
-              'OPEN',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w900,
-              ),
+        Get.bottomSheet(
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: borderGrey,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: successGreen.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle_rounded,
+                    color: successGreen,
+                    size: 36,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Candidates Exported Successfully!',
+                  style: TextStyle(
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w900,
+                    color: darkText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  filePath.split('/').last,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: greyText,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          Get.back();
+                          try {
+                            await Share.shareXFiles(
+                              [XFile(filePath)],
+                              text: 'Candidate list for Job #$jobId',
+                            );
+                          } catch (e) {
+                            Get.snackbar(
+                              'Share Error',
+                              e.toString(),
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.share_rounded, size: 18),
+                        label: const Text('Share File'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: primary,
+                          side: const BorderSide(color: primary),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          Get.back();
+                          try {
+                            final result = await OpenFilex.open(filePath);
+                            if (result.type != ResultType.done) {
+                              await Share.shareXFiles(
+                                [XFile(filePath)],
+                                text: 'Candidate list for Job #$jobId',
+                              );
+                            }
+                          } catch (e) {
+                            await Share.shareXFiles(
+                              [XFile(filePath)],
+                              text: 'Candidate list for Job #$jobId',
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.folder_open_rounded, size: 18),
+                        label: const Text('Open File'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
         );
       }
     } catch (e) {
       Get.back(); // close loading dialog
       Get.snackbar(
         'Export Failed',
-        e.toString(),
+        e is Failure ? e.message : e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,

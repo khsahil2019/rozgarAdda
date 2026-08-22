@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +21,12 @@ class EmployerDashboardController extends GetxController {
     : _repository = repository;
 
   final RxInt employerId = 0.obs;
+  final RxString companyName = ''.obs;
+  final RxString email = ''.obs;
+  final RxString phone = ''.obs;
+  final RxString contactPerson = ''.obs;
+  final RxString address = ''.obs;
+  final RxString accountStatus = 'Active & Verified'.obs;
   final RxList<AvailableJob> postedJobs = <AvailableJob>[].obs;
   final RxMap<int, List<JobApplication>> jobApplications =
       <int, List<JobApplication>>{}.obs;
@@ -42,6 +50,11 @@ class EmployerDashboardController extends GetxController {
       final empId =
           prefs.getInt('employer_id') ?? 2001; // Fallback to seeded employer
       employerId.value = empId;
+      companyName.value = prefs.getString('employer_company_name') ?? '';
+      email.value = prefs.getString('employer_email') ?? '';
+      phone.value = prefs.getString('employer_phone') ?? '';
+      contactPerson.value = prefs.getString('employer_contact_person') ?? '';
+      address.value = prefs.getString('employer_address') ?? '';
       final token = prefs.getString('employer_token');
 
       List<AvailableJob> jobs = [];
@@ -465,33 +478,101 @@ class EmployerDashboardController extends GetxController {
 
   Future<String?> exportApplications(int jobId) async {
     try {
+      final directory = await getTemporaryDirectory();
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('employer_token');
 
-      if (token == null || token.isEmpty) {
-        throw Failure('Authentication token not found.');
+      // 1. Try server download if token exists
+      if (token != null && token.isNotEmpty) {
+        try {
+          final url = ApiRoutes.employerExportApplications(jobId);
+          final filePath = '${directory.path}/applicants_job_$jobId.xlsx';
+
+          final dio = Dio();
+          final response = await dio.download(
+            url,
+            filePath,
+            options: Options(
+              headers: {'Authorization': 'Bearer $token', 'Accept': '*/*'},
+              validateStatus: (status) => status != null && status < 400,
+            ),
+          );
+
+          if (response.statusCode == 200) {
+            final file = File(filePath);
+            if (await file.exists() && await file.length() > 0) {
+              return filePath;
+            }
+          }
+        } catch (e) {
+          debugPrint('Server export failed, falling back to local generator: $e');
+        }
       }
 
-      final url = ApiRoutes.employerExportApplications(jobId);
-      final directory = await getTemporaryDirectory();
-      final filePath = '${directory.path}/applicants_job_$jobId.xlsx';
+      // 2. Guaranteed Local CSV Generation Fallback
+      List<JobApplication> apps = jobApplications[jobId] ?? [];
+      if (apps.isEmpty && token != null && token.isNotEmpty) {
+        try {
+          final res = await ApiService.get(
+            ApiRoutes.employerApplications(jobId),
+            accessToken: token,
+          );
+          if (res['success'] == true &&
+              res['applications'] != null &&
+              res['applications']['data'] != null) {
+            final List<dynamic> dataList = res['applications']['data'] ?? [];
+            apps = dataList
+                .map<JobApplication>(
+                  (item) => JobApplication.fromJson(item as Map<String, dynamic>),
+                )
+                .toList();
+          }
+        } catch (_) {}
+      }
 
-      final dio = Dio();
-      final response = await dio.download(
-        url,
-        filePath,
-        options: Options(
-          headers: {'Authorization': 'Bearer $token', 'Accept': '*/*'},
-        ),
+      if (apps.isEmpty) {
+        throw Failure('No candidates available to export for this job.');
+      }
+
+      final csvBuffer = StringBuffer();
+      // Write UTF-8 BOM so Excel/Numbers opens non-ASCII and symbols properly
+      csvBuffer.write('\uFEFF');
+
+      // Headers
+      csvBuffer.writeln(
+        '"Application ID","Candidate Name","Mobile Phone","Email",'
+        '"Experience (Yrs)","Experience (Mos)","Education Level","Education Details",'
+        '"Expected Salary (₹)","Notice Period","Key Skills","Status","Applied Date"',
       );
 
-      if (response.statusCode == 200) {
-        return filePath;
-      } else {
-        throw Failure(
-          'Failed to download export file. Status: ${response.statusCode}',
-        );
+      // Data rows
+      for (final a in apps) {
+        String escape(String text) => '"${text.replaceAll('"', '""')}"';
+
+        csvBuffer.writeln([
+          escape(a.id.toString()),
+          escape(a.candidateName),
+          escape(a.phone),
+          escape(a.email),
+          escape(a.experienceYears),
+          escape(a.experienceMonths),
+          escape(a.educationLevel),
+          escape(a.educationDetails),
+          escape(a.expectedSalary.isNotEmpty ? a.expectedSalary : 'N/A'),
+          escape(a.noticePeriod.isNotEmpty ? a.noticePeriod : 'Immediate'),
+          escape(a.keySkills),
+          escape(a.status.toUpperCase()),
+          escape(a.appliedAt.toIso8601String().split('T').first),
+        ].join(','));
       }
+
+      final localCsvPath = '${directory.path}/applicants_job_$jobId.csv';
+      final localFile = File(localCsvPath);
+      await localFile.writeAsString(csvBuffer.toString(), encoding: utf8);
+
+      return localCsvPath;
+    } on Failure {
+      rethrow;
     } catch (e) {
       debugPrint('Error exporting applications: $e');
       throw Failure('Export failed: ${e.toString()}');
@@ -587,32 +668,60 @@ class EmployerDashboardController extends GetxController {
 
   List<JobApplication> getFilteredApplicants(int jobId) {
     final List<JobApplication> apps = jobApplications[jobId] ?? [];
-    if (applicantSearchQuery.isEmpty && applicantStatusFilter.value == 'all') {
+    final filter = applicantStatusFilter.value.trim().toLowerCase();
+    final query = applicantSearchQuery.value.trim().toLowerCase();
+
+    if (query.isEmpty && (filter.isEmpty || filter == 'all')) {
       return apps;
     }
+
     return apps.where((app) {
-      final matchesSearch =
-          applicantSearchQuery.isEmpty ||
-          app.candidateName.toLowerCase().contains(
-            applicantSearchQuery.value.toLowerCase(),
-          ) ||
-          app.keySkills.toLowerCase().contains(
-            applicantSearchQuery.value.toLowerCase(),
-          ) ||
-          app.educationDetails.toLowerCase().contains(
-            applicantSearchQuery.value.toLowerCase(),
-          );
+      final matchesSearch = query.isEmpty ||
+          app.candidateName.toLowerCase().contains(query) ||
+          app.phone.toLowerCase().contains(query) ||
+          app.email.toLowerCase().contains(query) ||
+          app.keySkills.toLowerCase().contains(query) ||
+          app.educationLevel.toLowerCase().contains(query) ||
+          app.educationDetails.toLowerCase().contains(query);
 
-      final matchesStatus =
-          applicantStatusFilter.value == 'all' ||
-          app.status.toLowerCase() ==
-              applicantStatusFilter.value.toLowerCase() ||
-          (applicantStatusFilter.value == 'accepted' &&
-              app.status.toLowerCase() ==
-                  'shortlisted'); // handle accepted/shortlisted mapping
+      if (!matchesSearch) return false;
 
-      return matchesSearch && matchesStatus;
+      if (filter.isEmpty || filter == 'all') return true;
+
+      final appStatus = app.status.trim().toLowerCase();
+
+      if (filter == 'pending' || filter == 'new') {
+        return appStatus == 'pending' || appStatus == 'new';
+      } else if (filter == 'shortlisted' || filter == 'accepted') {
+        return appStatus == 'shortlisted' || appStatus == 'accepted';
+      } else if (filter == 'rejected') {
+        return appStatus == 'rejected';
+      } else if (filter == 'hired') {
+        return appStatus == 'hired';
+      } else if (filter == 'reviewed') {
+        return appStatus == 'reviewed';
+      }
+
+      return appStatus == filter;
     }).toList();
+  }
+
+  Future<void> updateProfile({
+    required String newCompanyName,
+    required String newContactPerson,
+    required String newPhone,
+    required String newAddress,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('employer_company_name', newCompanyName.trim());
+    await prefs.setString('employer_contact_person', newContactPerson.trim());
+    await prefs.setString('employer_phone', newPhone.trim());
+    await prefs.setString('employer_address', newAddress.trim());
+
+    companyName.value = newCompanyName.trim();
+    contactPerson.value = newContactPerson.trim();
+    phone.value = newPhone.trim();
+    address.value = newAddress.trim();
   }
 }
 

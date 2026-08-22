@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/widgets/app_back_button.dart';
 import '../../../../localization/app_localizations.dart';
 import '../controller/sell_product_controller.dart';
+import '../widgets/sell_product_step_indicator.dart';
 import 'sell_product_form_screen.dart';
 
 class _C {
   static const Color primaryBlue = Color(0xFF1400FF);
-  static const Color yellow = Color(0xFFFFCC00);
-  static const Color darkText = Color(0xFF1A1A2E);
-  static const Color greyText = Color(0xFF8A8FA3);
-  static const Color scaffoldBg = Color(0xFFF5F6FA);
+  static const Color darkText = Color(0xFF0F172A);
+  static const Color greyText = Color(0xFF64748B);
+  static const Color borderGrey = Color(0xFFE2E8F0);
+  static const Color scaffoldBg = Color(0xFFF8FAFC);
   static const Color cardBg = Color(0xFFFFFFFF);
 }
 
@@ -18,425 +20,371 @@ class SellProductSubCategoryScreen extends GetView<SellProductController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _C.scaffoldBg,
-      body: Column(
-        children: [
-          const _TopBar(),
-          const _StepIndicator(),
-          Expanded(
-            child: Obx(() {
-              if (controller.selectedCategoryIndex.value == null) {
-                return Center(
-                  child: Text(
-                    context.l10n.text('sell_error_categories'),
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                );
-              }
+    final l10n = AppLocalizations.of(context);
 
-              final category = controller
-                  .categories[controller.selectedCategoryIndex.value!];
-
-              if (controller.isLoadingSubCategories.value) {
-                return const Center(
-                  child: CircularProgressIndicator(color: _C.primaryBlue),
-                );
-              }
-
-              if (controller.subCategoriesError.value != null) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          context.l10n.text('sell_error_subcategories'),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _C.primaryBlue,
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: () =>
-                              controller.fetchSubCategories(category.id),
-                          icon: const Icon(Icons.refresh),
-                          label: Text(context.l10n.text('sell_retry')),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              return SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // BACK
-                    GestureDetector(
-                      onTap: () => Get.back(),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.chevron_left_rounded,
-                              color: _C.primaryBlue,
-                              size: 22,
-                            ),
-                            const SizedBox(width: 2),
-                            Text(
-                              context.l10n.text('sell_back'),
-                              style: const TextStyle(
-                                color: _C.primaryBlue,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // Title
-                    Text(
-                      context.l10n.text('sell_select_subcategory'),
-                      style: const TextStyle(
-                        color: _C.darkText,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Selected category banner
-                    _SelectedCategoryBanner(
-                      categoryName: category.name,
-                      onChangeTap: () => Get.back(),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Grid or empty info
-                    if (controller.subCategories.isNotEmpty)
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: controller.subCategories.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                              childAspectRatio: 0.85,
-                            ),
-                        itemBuilder: (context, i) {
-                          final subCat = controller.subCategories[i];
-                          return Obx(() {
-                            final isSelected =
-                                controller.selectedSubCategoryIndex.value == i;
-
-                            return GestureDetector(
-                              onTap: () => controller.selectSubCategory(i),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 180),
-                                decoration: BoxDecoration(
-                                  color: _C.cardBg,
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? _C.primaryBlue
-                                        : Colors.transparent,
-                                    width: 2,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.06,
-                                      ),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Expanded(
-                                      child: Stack(
-                                        fit: StackFit.expand,
-                                        children: [
-                                          Image.network(
-                                            subCat.imageUrl,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) =>
-                                                Container(
-                                                  color: const Color(
-                                                    0xFFEEEEF8,
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.image_rounded,
-                                                    color: Color(0xFFAAAAAA),
-                                                    size: 40,
-                                                  ),
-                                                ),
-                                            loadingBuilder: (_, child, progress) {
-                                              if (progress == null)
-                                                return child;
-                                              return Container(
-                                                color: const Color(0xFFEEEEF8),
-                                                child: const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                        strokeWidth: 2,
-                                                        color: _C.primaryBlue,
-                                                      ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 10,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              subCat.name,
-                                              style: TextStyle(
-                                                color: _C.darkText,
-                                                fontSize: 14,
-                                                fontWeight: isSelected
-                                                    ? FontWeight.w700
-                                                    : FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                          Icon(
-                                            Icons.chevron_right_rounded,
-                                            color: isSelected
-                                                ? _C.primaryBlue
-                                                : _C.greyText,
-                                            size: 20,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          });
-                        },
-                      ),
-
-                    if (controller.subCategories.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Text(
-                          context.l10n.text('sell_no_subcategories'),
-                          style: const TextStyle(
-                            color: _C.greyText,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-
-                    const SizedBox(height: 24),
-
-                    // Hint
-                    Center(
-                      child: Text(
-                        context.l10n.text('sell_subcategory_hint'),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: _C.greyText,
-                          fontSize: 12,
-                          height: 1.6,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ),
-        ],
-      ),
-      bottomSheet: Obx(() {
-        final hasSelection = controller.selectedSubCategoryIndex.value != null;
-        return _NextButton(
-          enabled: hasSelection,
-          onTap: hasSelection
-              ? () => Get.to(() => const SellProductFormScreen())
-              : null,
-        );
-      }),
-    );
-  }
-}
-
-class _TopBar extends StatelessWidget {
-  const _TopBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: _C.primaryBlue,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 8,
-        bottom: 12,
-        left: 16,
-        right: 16,
-      ),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Get.back(),
-            child: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-          ),
-          Expanded(
-            child: Text(
-              context.l10n.text('sell_post_ad'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.2,
-              ),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Get.back();
+      },
+      child: Scaffold(
+        backgroundColor: _C.scaffoldBg,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: Center(
+            child: AppBackButton(
+              onPressed: () => Get.back(),
+              tooltip: 'Back',
             ),
           ),
-          GestureDetector(
-            onTap: () => Navigator.maybePop(context),
-            child: const Icon(Icons.close, color: Colors.white, size: 24),
+          title: Text(
+            l10n.text('sell_post_ad'),
+            style: const TextStyle(
+              color: _C.darkText,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.3,
+            ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StepIndicator extends StatelessWidget {
-  const _StepIndicator();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      child: Row(
-        children: [
-          _StepCircle(
-            number: 1,
-            label: context.l10n.text('sell_category'),
-            state: _StepState.done,
+          centerTitle: false,
+          actions: [
+            IconButton(
+              tooltip: 'Cancel',
+              icon: const Icon(Icons.close_rounded, color: _C.greyText, size: 22),
+              onPressed: () => Navigator.maybePop(context),
+            ),
+            const SizedBox(width: 4),
+          ],
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(1),
+            child: Divider(height: 1, color: _C.borderGrey),
           ),
-          const _StepLine(active: true),
-          _StepCircle(
-            number: 2,
-            label: context.l10n.text('sell_sub_category'),
-            state: _StepState.active,
-          ),
-          const _StepLine(active: false),
-          _StepCircle(
-            number: 3,
-            label: context.l10n.text('sell_details'),
-            state: _StepState.inactive,
-          ),
-        ],
-      ),
-    );
-  }
-}
+        ),
+        body: Column(
+          children: [
+            const SellProductStepIndicator(currentStep: 2),
+            Expanded(
+              child: Obx(() {
+                if (controller.selectedCategoryIndex.value == null) {
+                  return Center(
+                    child: Text(
+                      l10n.text('sell_error_categories'),
+                      style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w700),
+                    ),
+                  );
+                }
 
-enum _StepState { done, active, inactive }
+                final category = controller.categories[controller.selectedCategoryIndex.value!];
 
-class _StepCircle extends StatelessWidget {
-  final int number;
-  final String label;
-  final _StepState state;
+                if (controller.isLoadingSubCategories.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: _C.primaryBlue),
+                  );
+                }
 
-  const _StepCircle({
-    required this.number,
-    required this.label,
-    required this.state,
-  });
+                if (controller.subCategoriesError.value != null) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.error_outline_rounded,
+                              color: Color(0xFFEF4444),
+                              size: 36,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            l10n.text('sell_error_subcategories'),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: _C.darkText,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _C.primaryBlue,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            ),
+                            onPressed: () => controller.fetchSubCategories(category.id),
+                            icon: const Icon(Icons.refresh_rounded, size: 18),
+                            label: Text(
+                              l10n.text('sell_retry'),
+                              style: const TextStyle(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
 
-  @override
-  Widget build(BuildContext context) {
-    final bool isDone = state == _StepState.done;
-    final bool isActive = state == _StepState.active;
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Selected category banner card
+                      _SelectedCategoryBanner(
+                        categoryName: category.name,
+                        onChangeTap: () => Get.back(),
+                      ),
+                      const SizedBox(height: 20),
 
-    return Column(
-      children: [
-        Container(
-          width: 34,
-          height: 34,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: (isDone || isActive)
-                ? _C.primaryBlue
-                : const Color(0xFFE8E8F0),
-          ),
-          alignment: Alignment.center,
-          child: isDone
-              ? const Icon(Icons.check_rounded, color: Colors.white, size: 18)
-              : Text(
-                  '$number',
-                  style: TextStyle(
-                    color: isActive ? Colors.white : _C.greyText,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
+                      // Section Title
+                      Text(
+                        l10n.text('sell_select_subcategory'),
+                        style: const TextStyle(
+                          color: _C.darkText,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.text('sell_subcategory_hint').replaceAll('\\n', ' '),
+                        style: const TextStyle(
+                          color: _C.greyText,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Grid of subcategories
+                      if (controller.subCategories.isNotEmpty)
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: controller.subCategories.length,
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.95,
+                          ),
+                          itemBuilder: (context, i) {
+                            final subCat = controller.subCategories[i];
+                            return Obx(() {
+                              final isSelected = controller.selectedSubCategoryIndex.value == i;
+
+                              return GestureDetector(
+                                onTap: () {
+                                  controller.selectSubCategory(i);
+                                  Future.delayed(const Duration(milliseconds: 180), () {
+                                    if (context.mounted) {
+                                      Get.to(() => const SellProductFormScreen());
+                                    }
+                                  });
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? const Color(0xFF1400FF).withValues(alpha: 0.04)
+                                        : _C.cardBg,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: isSelected ? _C.primaryBlue : _C.borderGrey,
+                                      width: isSelected ? 2 : 1,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFF0F172A).withValues(alpha: isSelected ? 0.06 : 0.02),
+                                        blurRadius: isSelected ? 12 : 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      Expanded(
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            Image.network(
+                                              subCat.imageUrl,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) => Container(
+                                                color: const Color(0xFFF1F5F9),
+                                                child: const Icon(
+                                                  Icons.image_outlined,
+                                                  color: Color(0xFF94A3B8),
+                                                  size: 36,
+                                                ),
+                                              ),
+                                              loadingBuilder: (_, child, progress) {
+                                                if (progress == null) return child;
+                                                return Container(
+                                                  color: const Color(0xFFF1F5F9),
+                                                  child: const Center(
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: _C.primaryBlue,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            if (isSelected)
+                                              Positioned(
+                                                top: 8,
+                                                right: 8,
+                                                child: Container(
+                                                  width: 24,
+                                                  height: 24,
+                                                  decoration: const BoxDecoration(
+                                                    color: _C.primaryBlue,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.check_rounded,
+                                                    color: Colors.white,
+                                                    size: 15,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 10,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: isSelected ? const Color(0xFFEEF2FF) : Colors.white,
+                                          border: Border(
+                                            top: BorderSide(
+                                              color: isSelected
+                                                  ? _C.primaryBlue.withValues(alpha: 0.2)
+                                                  : _C.borderGrey,
+                                              width: 1,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          subCat.name,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: isSelected ? _C.primaryBlue : _C.darkText,
+                                            fontSize: 13.5,
+                                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                            letterSpacing: -0.2,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            });
+                          },
+                        ),
+
+                      if (controller.subCategories.isEmpty)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: _C.borderGrey),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(Icons.category_outlined, size: 42, color: _C.greyText.withValues(alpha: 0.5)),
+                              const SizedBox(height: 12),
+                              Text(
+                                l10n.text('sell_no_subcategories'),
+                                style: const TextStyle(
+                                  color: _C.greyText,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ],
+        ),
+        bottomSheet: Obx(() {
+          final hasSelection = controller.selectedSubCategoryIndex.value != null;
+          return Container(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              12,
+              16,
+              MediaQuery.of(context).padding.bottom + 14,
+            ),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                top: BorderSide(color: _C.borderGrey, width: 1),
+              ),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: hasSelection ? _C.primaryBlue : const Color(0xFFCBD5E1),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: (isDone || isActive) ? _C.primaryBlue : _C.greyText,
-            fontSize: 9,
-            fontWeight: (isDone || isActive)
-                ? FontWeight.w700
-                : FontWeight.w500,
-            letterSpacing: 0.5,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _StepLine extends StatelessWidget {
-  final bool active;
-  const _StepLine({required this.active});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        height: 1.5,
-        margin: const EdgeInsets.only(bottom: 18),
-        color: active ? _C.primaryBlue : const Color(0xFFDDDDEE),
+                onPressed: hasSelection
+                    ? () => Get.to(() => const SellProductFormScreen())
+                    : null,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.text('sell_next'),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.arrow_forward_rounded, size: 18),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }),
       ),
     );
   }
@@ -453,113 +401,82 @@ class _SelectedCategoryBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: _C.cardBg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFDDDDEE), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: const Color(0xFF1400FF).withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFF1400FF).withValues(alpha: 0.15),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1400FF).withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.folder_outlined, color: Color(0xFF1400FF), size: 20),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${context.l10n.text('sell_selected_category')}$categoryName',
+                  l10n.text('sell_category'),
                   style: const TextStyle(
-                    color: _C.primaryBlue,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF64748B),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 2),
                 Text(
-                  context.l10n.text('sell_change_by_back'),
-                  style: const TextStyle(color: _C.greyText, fontSize: 12),
+                  categoryName,
+                  style: const TextStyle(
+                    color: Color(0xFF0F172A),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.2,
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 10),
           GestureDetector(
             onTap: onChangeTap,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: _C.darkText,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    context.l10n.text('sell_change'),
+                    l10n.text('sell_change'),
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.8,
+                      color: Color(0xFF1400FF),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Icon(Icons.edit_rounded, color: Colors.white, size: 13),
+                  const Icon(Icons.edit_rounded, color: Color(0xFF1400FF), size: 13),
                 ],
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _NextButton extends StatelessWidget {
-  final bool enabled;
-  final VoidCallback? onTap;
-
-  const _NextButton({required this.enabled, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.fromLTRB(
-        16,
-        12,
-        16,
-        MediaQuery.of(context).padding.bottom + 20,
-      ),
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          height: 52,
-          decoration: BoxDecoration(
-            color: enabled
-                ? _C.primaryBlue
-                : const Color.fromARGB(255, 169, 161, 252),
-            borderRadius: BorderRadius.circular(30),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            context.l10n.text('sell_next'),
-            style: const TextStyle(
-              color: _C.darkText,
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.5,
-            ),
-          ),
-        ),
       ),
     );
   }

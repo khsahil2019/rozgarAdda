@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import '../../domain/entities/missing_person.dart';
 import '../bindings/missing_person_binding.dart';
@@ -8,12 +9,14 @@ import '../controller/missing_person_controller.dart';
 import 'missing_person_detail_screen.dart';
 import 'post_missing_person_screen.dart';
 
-// Styling Colors (matching App Theme and News screen styles)
+// Styling Colors (matching App Theme and unified design tokens)
 class _MPC {
-  static const Color bg = Color(0xFFF4F5F9);
-  static const Color navy = Color(0xFF1A1E3C);
-  static const Color redAccent = Color(0xFFE53935);
-  static const Color grey = Color(0xFF8A8FA3);
+  static const Color bg = Color(0xFFF8FAFC);
+  static const Color primary = Color(0xFF1400FF);
+  static const Color navy = Color(0xFF0F172A);
+  static const Color redAccent = Color(0xFFEF4444);
+  static const Color grey = Color(0xFF64748B);
+  static const Color border = Color(0xFFE2E8F0);
 }
 
 class MissingPersonListScreen extends GetView<MissingPersonController> {
@@ -34,41 +37,60 @@ class MissingPersonListScreen extends GetView<MissingPersonController> {
     }
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Get.to(() => const PostMissingPersonScreen());
-        },
-        child: const Icon(Icons.person_add_alt, color: Colors.white),
-      ),
-      backgroundColor: _MPC.bg,
-      appBar: AppBar(
-        backgroundColor: _MPC.navy,
-        foregroundColor: Colors.white,
-        title: Text(
-          l10n.text('missing_persons'),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Get.back();
+      },
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: _MPC.primary,
+          foregroundColor: Colors.white,
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          onPressed: () {
+            Get.to(() => const PostMissingPersonScreen());
+          },
+          icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white, size: 20),
+          label: const Text(
+            'Report Missing',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.white),
           ),
         ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 20,
-            color: Colors.white,
+        backgroundColor: _MPC.bg,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: Center(
+            child: AppBackButton(
+              onPressed: () => Navigator.maybePop(context),
+              tooltip: 'Back',
+            ),
           ),
-          onPressed: () => Navigator.maybePop(context),
+          title: Text(
+            l10n.text('missing_persons'),
+            style: const TextStyle(
+              color: _MPC.navy,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.3,
+            ),
+          ),
+          centerTitle: false,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh_rounded, color: _MPC.navy, size: 22),
+              onPressed: () => controller.fetchMissingPersons(),
+            ),
+            const SizedBox(width: 4),
+          ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(height: 1, color: _MPC.border),
+          ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            onPressed: () => controller.fetchMissingPersons(),
-          ),
-        ],
-      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -109,6 +131,7 @@ class MissingPersonListScreen extends GetView<MissingPersonController> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../domain/entities/missing_person.dart';
 
 class _MPDC {
-  static const Color bg = Color(0xFFF4F5F9);
-  static const Color navy = Color(0xFF1A1E3C);
+  static const Color bg = Color(0xFFF8FAFC);
+  static const Color navy = Color(0xFF0F172A);
+  static const Color redAccent = Color(0xFFEF4444);
+  static const Color grey = Color(0xFF64748B);
+  static const Color green = Color(0xFF10B981);
+  static const Color border = Color(0xFFE2E8F0);
   static const Color gold = Color(0xFFD4A017);
-  static const Color redAccent = Color(0xFFE53935);
-  static const Color grey = Color(0xFF8A8FA3);
-  static const Color green = Color(0xFF2E7D32);
 }
 
 class MissingPersonDetailScreen extends StatefulWidget {
@@ -49,7 +51,7 @@ class _MissingPersonDetailScreenState extends State<MissingPersonDetailScreen> {
     } catch (e) {
       Get.snackbar(
         'Call Error',
-        'Could not place a call to $phoneNumber',
+        'Could not initiate phone call.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: _MPDC.redAccent.withValues(alpha: 0.9),
         colorText: Colors.white,
@@ -93,37 +95,51 @@ class _MissingPersonDetailScreenState extends State<MissingPersonDetailScreen> {
       if (person.fullImage2Url.isNotEmpty) person.fullImage2Url,
     ];
 
-    return Scaffold(
-      backgroundColor: _MPDC.bg,
-      appBar: AppBar(
-        backgroundColor: _MPDC.navy,
-        foregroundColor: Colors.white,
-        title: const Text(
-          'Missing Person Profile',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Get.back();
+      },
+      child: Scaffold(
+        backgroundColor: _MPDC.bg,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          title: const Text(
+            'Missing Person Profile',
+            style: TextStyle(
+              color: _MPDC.navy,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.3,
+            ),
+          ),
+          centerTitle: false,
+          leading: Center(
+            child: AppBackButton(
+              onPressed: () => Navigator.maybePop(context),
+              tooltip: 'Back',
+            ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(height: 1, color: _MPDC.border),
           ),
         ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => Navigator.maybePop(context),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image Carousel Header
-            if (imageUrls.isNotEmpty)
-              _buildImageCarousel(imageUrls)
-            else
-              _buildNoImagePlaceholder(),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image Carousel Header
+              if (imageUrls.isNotEmpty)
+                _buildImageCarousel(imageUrls)
+              else
+                _buildNoImagePlaceholder(),
 
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -164,6 +180,7 @@ class _MissingPersonDetailScreenState extends State<MissingPersonDetailScreen> {
         ),
       ),
       bottomNavigationBar: _buildBottomActionBar(person),
+      ),
     );
   }
 
