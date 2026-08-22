@@ -517,22 +517,46 @@ class EmployerDashboardController extends GetxController {
     jobVisitorCounts[jobId] = views;
   }
 
+  // Computed metrics for dashboard
+  int get activeJobsCount =>
+      postedJobs.where((j) => j.status.toLowerCase() == 'active').length;
+
+  int get pendingJobsCount =>
+      postedJobs.where((j) => j.status.toLowerCase() == 'pending').length;
+
+  int get totalShortlistedCount {
+    int count = 0;
+    jobApplications.forEach((_, list) {
+      count += list
+          .where((a) => a.status == 'accepted' || a.status == 'shortlisted')
+          .length;
+    });
+    return count;
+  }
+
+  int get totalPendingReviewCount {
+    int count = 0;
+    jobApplications.forEach((_, list) {
+      count += list.where((a) => a.status == 'pending').length;
+    });
+    return count;
+  }
+
   // Search & Filter observables for dashboard
   final RxString searchQuery = ''.obs;
   final RxString statusFilter = 'all'.obs; // 'all', 'active', 'pending'
+  final RxString sortBy = 'newest'.obs; // 'newest', 'applicants', 'views'
 
   List<AvailableJob> get filteredJobs {
-    if (searchQuery.isEmpty && statusFilter.value == 'all') {
-      return postedJobs;
-    }
-    return postedJobs.where((job) {
+    List<AvailableJob> list = postedJobs.where((job) {
+      final query = searchQuery.value.trim().toLowerCase();
       final matchesSearch =
-          searchQuery.isEmpty ||
-          job.title.toLowerCase().contains(searchQuery.value.toLowerCase()) ||
-          job.addressLine1.toLowerCase().contains(
-            searchQuery.value.toLowerCase(),
-          ) ||
-          job.stateName.toLowerCase().contains(searchQuery.value.toLowerCase());
+          query.isEmpty ||
+          job.title.toLowerCase().contains(query) ||
+          job.addressLine1.toLowerCase().contains(query) ||
+          job.stateName.toLowerCase().contains(query) ||
+          job.jobType.toLowerCase().contains(query) ||
+          job.skills.any((s) => s.toLowerCase().contains(query));
 
       final matchesStatus =
           statusFilter.value == 'all' ||
@@ -540,6 +564,20 @@ class EmployerDashboardController extends GetxController {
 
       return matchesSearch && matchesStatus;
     }).toList();
+
+    if (sortBy.value == 'applicants') {
+      list.sort((a, b) {
+        final aApps = jobApplications[a.id]?.length ?? 0;
+        final bApps = jobApplications[b.id]?.length ?? 0;
+        return bApps.compareTo(aApps);
+      });
+    } else if (sortBy.value == 'views') {
+      list.sort((a, b) => b.viewsCount.compareTo(a.viewsCount));
+    } else {
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+
+    return list;
   }
 
   // Search & Filter observables for applicants
@@ -577,3 +615,4 @@ class EmployerDashboardController extends GetxController {
     }).toList();
   }
 }
+

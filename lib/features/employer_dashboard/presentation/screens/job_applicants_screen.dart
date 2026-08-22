@@ -77,13 +77,13 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.text('employer_dashboard_applicants_title'),
-              style: const TextStyle(
+            const Text(
+              'Job Applicants',
+              style: TextStyle(
                 color: darkText,
                 fontWeight: FontWeight.w900,
-                fontSize: 20,
-                letterSpacing: -0.5,
+                fontSize: 18,
+                letterSpacing: -0.4,
               ),
             ),
             const SizedBox(height: 2),
@@ -101,7 +101,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: darkText),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).maybePop(),
         ),
         actions: [
           Container(
@@ -806,29 +806,6 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildContactButton({
-    required Widget icon,
-    required Color color,
-    required VoidCallback onPressed,
-    required String tooltip,
-  }) {
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.15), width: 1),
-      ),
-      child: IconButton(
-        onPressed: onPressed,
-        icon: icon,
-        padding: EdgeInsets.zero,
-        tooltip: tooltip,
       ),
     );
   }
