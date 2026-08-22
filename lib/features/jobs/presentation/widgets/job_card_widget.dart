@@ -259,15 +259,9 @@ class JobCardWidget extends StatelessWidget {
     );
     final localizedEducation = _getLocalizedEducation(job.educationLevel, lang);
 
-    final bool showCall =
-        job.enableCall &&
-        job.contactPhone != null &&
-        job.contactPhone!.isNotEmpty;
-    final bool showChat =
-        job.enableChat &&
-        ((job.whatsappNumber != null && job.whatsappNumber!.isNotEmpty) ||
-            (job.contactPhone != null && job.contactPhone!.isNotEmpty));
-    final bool showApply = job.applyOnly || (!showCall && !showChat);
+    final bool showCall = job.showCallButton;
+    final bool showChat = job.showChatButton;
+    final bool showApply = job.showApplyButton;
 
     return RepaintBoundary(
       child: Container(

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:rojgar/core/network/api_routes.dart';
+import 'package:rojgar/core/network/api_services.dart';
 import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
+import 'package:rojgar/services/storage_service.dart';
 import 'applyjob_form.dart';
 import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dart';
 import 'package:rojgar/localization/app_localizations.dart';
@@ -26,7 +30,7 @@ class AppColors {
   static const Color dividerColor = Color(0xFFF1F5F9);
 }
 
-class JobDetailScreen extends StatelessWidget {
+class JobDetailScreen extends StatefulWidget {
   final AvailableJob job;
   final String? imageUrl;
 
@@ -75,6 +79,57 @@ class JobDetailScreen extends StatelessWidget {
       createdAt: DateTime.now(),
     );
     return JobDetailScreen(job: dummy);
+  }
+
+  @override
+  State<JobDetailScreen> createState() => _JobDetailScreenState();
+}
+
+class _JobDetailScreenState extends State<JobDetailScreen> {
+  AvailableJob get job => widget.job;
+  String? get imageUrl => widget.imageUrl;
+  late int _viewsCount;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewsCount = widget.job.viewsCount;
+    _recordJobView();
+  }
+
+  Future<void> _recordJobView() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getInt(StorageService.keyCandidateId) ??
+          prefs.getInt('user_id') ??
+          prefs.getInt('employer_id') ??
+          0;
+      final token = prefs.getString(StorageService.keyAccessToken) ??
+          prefs.getString('employer_token');
+
+      final res = await ApiService.post(
+        ApiRoutes.createJobView,
+        body: {
+          'job_id': job.id,
+          'user_id': userId,
+        },
+        accessToken: token,
+      );
+
+      if (mounted) {
+        setState(() {
+          if (res['views_count'] != null) {
+            _viewsCount = int.tryParse(res['views_count'].toString()) ?? (_viewsCount + 1);
+          } else if (res['data'] is Map && res['data']['views_count'] != null) {
+            _viewsCount = int.tryParse(res['data']['views_count'].toString()) ?? (_viewsCount + 1);
+          } else {
+            _viewsCount += 1;
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Error recording job view for job_id ${job.id}: $e');
+    }
   }
 
   @override
@@ -213,6 +268,30 @@ class JobDetailScreen extends StatelessWidget {
                       Icons.verified_rounded,
                       color: Color(0xFF10B981),
                       size: 13,
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      width: 3,
+                      height: 3,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF94A3B8),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(
+                      Icons.visibility_outlined,
+                      size: 12.5,
+                      color: Color(0xFF64748B),
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      '$_viewsCount views',
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        color: Color(0xFF64748B),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -381,11 +460,17 @@ class JobDetailScreen extends StatelessWidget {
 
           const SizedBox(height: 14),
 
-          // Tag Pills (Vacancy, Job Type, Walk-in)
+          // Tag Pills (Views, Vacancy, Job Type, Walk-in)
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
+              _buildTagPill(
+                icon: Icons.visibility_rounded,
+                text: '$_viewsCount ${_viewsCount == 1 ? "View" : "Views"}',
+                bgColor: const Color(0xFFEFF6FF),
+                textColor: const Color(0xFF1D4ED8),
+              ),
               _buildTagPill(
                 icon: Icons.people_outline_rounded,
                 text: '${job.vacancy} ${job.vacancy == 1 ? "Vacancy" : "Vacancies"}',
@@ -1201,8 +1286,142 @@ class JobDetailScreen extends StatelessWidget {
         ? job.whatsappNumber!.trim()
         : phone;
 
-    final bool showCall = phone != null || job.enableCall;
-    final bool showWhatsApp = whatsapp != null || job.enableChat;
+    final bool showCall = job.showCallButton;
+    final bool showWhatsApp = job.showChatButton;
+    final bool showApply = job.showApplyButton;
+
+    final List<Widget> actionButtons = [];
+
+    if (showCall) {
+      actionButtons.add(
+        Expanded(
+          flex: (showWhatsApp || showApply) ? 1 : 2,
+          child: SizedBox(
+            height: 48,
+            child: OutlinedButton.icon(
+              onPressed: () => _makeCall(phone ?? job.contactPhone, job.id),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFF4F46E5), width: 1.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                foregroundColor: const Color(0xFF4F46E5),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+              ),
+              icon: const Icon(Icons.phone_rounded, size: 16),
+              label: const Text(
+                'Call HR',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
+                maxLines: 1,
+                softWrap: false,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (showWhatsApp) {
+      if (actionButtons.isNotEmpty) {
+        actionButtons.add(const SizedBox(width: 8));
+      }
+      actionButtons.add(
+        Expanded(
+          flex: (showCall || showApply) ? 1 : 2,
+          child: SizedBox(
+            height: 48,
+            child: OutlinedButton.icon(
+              onPressed: () => _openWhatsApp(whatsapp ?? phone, job.title, job.id),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFF25D366), width: 1.5),
+                backgroundColor: const Color(0xFFF0FDF4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                foregroundColor: const Color(0xFF166534),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+              ),
+              icon: const Icon(Icons.chat_bubble_rounded, size: 15, color: Color(0xFF25D366)),
+              label: const Text(
+                'WhatsApp',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF166534),
+                ),
+                maxLines: 1,
+                softWrap: false,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (showApply) {
+      if (actionButtons.isNotEmpty) {
+        actionButtons.add(const SizedBox(width: 8));
+      }
+      actionButtons.add(
+        Expanded(
+          flex: (showCall && showWhatsApp) ? 1 : ((showCall || showWhatsApp) ? 1 : 2),
+          child: SizedBox(
+            height: 48,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => JobApplicationScreen(
+                        jobId: job.id,
+                        jobTitle: job.title,
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                icon: const Icon(Icons.send_rounded, size: 16, color: Colors.white),
+                label: const Text(
+                  'Apply Now',
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                  maxLines: 1,
+                  softWrap: false,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Container(
       padding: EdgeInsets.fromLTRB(14, 12, 14, bottomPad + 12),
@@ -1217,126 +1436,7 @@ class JobDetailScreen extends StatelessWidget {
         ],
       ),
       child: Row(
-        children: [
-          if (showCall) ...[
-            Expanded(
-              flex: 3,
-              child: SizedBox(
-                height: 48,
-                child: OutlinedButton.icon(
-                  onPressed: () => _makeCall(phone ?? job.contactPhone, job.id),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF4F46E5), width: 1.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    foregroundColor: const Color(0xFF4F46E5),
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                  ),
-                  icon: const Icon(Icons.phone_rounded, size: 16),
-                  label: const Text(
-                    'Call HR',
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w800,
-                    ),
-                    maxLines: 1,
-                    softWrap: false,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-          ],
-
-          if (showWhatsApp) ...[
-            Expanded(
-              flex: 3,
-              child: SizedBox(
-                height: 48,
-                child: OutlinedButton.icon(
-                  onPressed: () => _openWhatsApp(whatsapp ?? phone, job.title, job.id),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF25D366), width: 1.5),
-                    backgroundColor: const Color(0xFFF0FDF4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    foregroundColor: const Color(0xFF166534),
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                  ),
-                  icon: const Icon(Icons.chat_bubble_rounded, size: 15, color: Color(0xFF25D366)),
-                  label: const Text(
-                    'WhatsApp',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF166534),
-                    ),
-                    maxLines: 1,
-                    softWrap: false,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-          ],
-
-          Expanded(
-            flex: 4,
-            child: SizedBox(
-              height: 48,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => JobApplicationScreen(
-                          jobId: job.id,
-                          jobTitle: job.title,
-                        ),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    padding: EdgeInsets.zero,
-                  ),
-                  icon: const Icon(Icons.send_rounded, size: 16, color: Colors.white),
-                  label: const Text(
-                    'Apply Now',
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                    maxLines: 1,
-                    softWrap: false,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+        children: actionButtons,
       ),
     );
   }

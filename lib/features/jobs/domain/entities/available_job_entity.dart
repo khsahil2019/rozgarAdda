@@ -152,4 +152,40 @@ class AvailableJob {
         return '$experienceLevel years';
     }
   }
+
+  /// Whether employer enabled Direct Phone Call button
+  bool get showCallButton {
+    if (!enableCall &&
+        !contactPreference.toLowerCase().contains('call') &&
+        !contactPreference.toLowerCase().contains('phone')) {
+      return false;
+    }
+    return (contactPhone != null && contactPhone!.trim().isNotEmpty);
+  }
+
+  /// Whether employer enabled WhatsApp / Chat button
+  bool get showChatButton {
+    if (!enableChat &&
+        !contactPreference.toLowerCase().contains('chat') &&
+        !contactPreference.toLowerCase().contains('whatsapp')) {
+      return false;
+    }
+    final num = whatsappNumber ?? contactPhone;
+    return (num != null && num.trim().isNotEmpty);
+  }
+
+  /// Whether employer enabled Direct App Application button
+  bool get showApplyButton {
+    final pref = contactPreference.toLowerCase();
+    // If employer strictly selected only Call and/or Chat without Apply
+    if (pref.contains('call_only') ||
+        pref.contains('chat_only') ||
+        (pref.contains('call') && pref.contains('chat') && !pref.contains('apply'))) {
+      return false;
+    }
+    if (!applyOnly && (showCallButton || showChatButton) && !pref.contains('apply')) {
+      return false;
+    }
+    return true;
+  }
 }

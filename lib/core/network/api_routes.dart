@@ -65,6 +65,7 @@ class ApiRoutes {
   static String callAndChatApply(int jobId) =>
       _buildUrl('call-and-chat-apply/$jobId');
   static String get latestJobs => _buildUrl('latest-jobs');
+  static String get createJobView => _buildUrl('create-job-view');
 
   // Chat
   static String get startChat => _buildUrl('chat/start');

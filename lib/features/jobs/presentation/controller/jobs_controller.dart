@@ -1,6 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rojgar/core/exceptions/exceptions.dart';
+import 'package:rojgar/core/network/api_routes.dart';
+import 'package:rojgar/core/network/api_services.dart';
+import 'package:rojgar/services/storage_service.dart';
 import '../../../auth/data/data_source/model/dropdown_item.dart';
 import '../../domain/entities/available_job_entity.dart';
 import '../../domain/entities/job_category.dart';
@@ -181,5 +186,28 @@ class JobsController extends GetxController {
     required String phone
   }) async {
     return await repository.logCallAndChatApply(jobId: jobId, type: type, phone: phone);
+  }
+
+  Future<void> recordJobView(int jobId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getInt(StorageService.keyCandidateId) ??
+          prefs.getInt('user_id') ??
+          prefs.getInt('employer_id') ??
+          0;
+      final token = prefs.getString(StorageService.keyAccessToken) ??
+          prefs.getString('employer_token');
+
+      await ApiService.post(
+        ApiRoutes.createJobView,
+        body: {
+          'job_id': jobId,
+          'user_id': userId,
+        },
+        accessToken: token,
+      );
+    } catch (e) {
+      debugPrint('Error recording job view for job_id $jobId: $e');
+    }
   }
 }

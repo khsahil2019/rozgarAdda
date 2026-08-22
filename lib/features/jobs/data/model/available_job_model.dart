@@ -219,16 +219,27 @@ class AvailableJobModel {
                   : (json['field_localite_id'] != null
                       ? _parseInt(json['field_localite_id'])
                       : null)),
-      whatsappNumber: json['contact_whatsapp']?.toString(),
-      applyOnly: _parseBool(json['apply_only'] ?? true),
-      enableCall:
-          json['enable_call'] != null
-              ? _parseBool(json['enable_call'])
-              : (json['contact_number'] ?? '').toString().isNotEmpty,
-      enableChat:
-          json['enable_chat'] != null
-              ? _parseBool(json['enable_chat'])
-              : (json['contact_whatsapp'] ?? '').toString().isNotEmpty,
+      whatsappNumber: json['contact_whatsapp']?.toString() ??
+          json['whatsapp_number']?.toString(),
+      applyOnly: json['apply_only'] != null
+          ? _parseBool(json['apply_only'])
+          : ((json['contact_preference'] ?? '').toString().toLowerCase().contains('apply') ||
+              (!_parseBool(json['enable_call']) && !_parseBool(json['enable_chat']))),
+      enableCall: json['enable_call'] != null
+          ? _parseBool(json['enable_call'])
+          : ((json['contact_preference'] ?? '').toString().toLowerCase().contains('call') ||
+              (json['contact_phone'] ?? json['contact_number'] ?? '')
+                  .toString()
+                  .trim()
+                  .isNotEmpty),
+      enableChat: json['enable_chat'] != null
+          ? _parseBool(json['enable_chat'])
+          : ((json['contact_preference'] ?? '').toString().toLowerCase().contains('chat') ||
+              (json['contact_preference'] ?? '').toString().toLowerCase().contains('whatsapp') ||
+              (json['contact_whatsapp'] ?? json['whatsapp_number'] ?? '')
+                  .toString()
+                  .trim()
+                  .isNotEmpty),
     );
   }
 
