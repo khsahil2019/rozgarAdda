@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:rojgar/localization/app_localizations.dart';
+import '../bindings/news_binding.dart';
 import '../controller/create_news_controller.dart';
 
 class _CNC {
@@ -19,13 +20,24 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
   const CreateNewsScreen({super.key});
 
   @override
+  CreateNewsController get controller {
+    if (!Get.isRegistered<CreateNewsController>()) {
+      CreateNewsBinding().dependencies();
+    }
+    return Get.find<CreateNewsController>();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (!Get.isRegistered<CreateNewsController>()) {
+      CreateNewsBinding().dependencies();
+    }
     final l10n = AppLocalizations.of(context);
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-        Get.back();
+        Navigator.of(context).maybePop();
       },
       child: Scaffold(
         backgroundColor: _CNC.bg,
@@ -35,7 +47,13 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
           scrolledUnderElevation: 0,
           leading: Center(
             child: AppBackButton(
-              onPressed: () => Navigator.maybePop(context),
+              onPressed: () {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                } else {
+                  Get.back();
+                }
+              },
               tooltip: 'Back',
             ),
           ),

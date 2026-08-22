@@ -12,7 +12,7 @@ class ChatRoomScreen extends StatefulWidget {
 }
 
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
-  static const Color _navy = Color(0xFF001A99);
+  static const Color _navy = Color(0xFF1400FF);
   static const Color _yellow = Color(0xFFFFD700);
   static const Color _chatBg = Color(0xFFF5F5F7);
 
@@ -457,7 +457,7 @@ class _IncomingBubble extends StatelessWidget {
                   Container(
                     width: 4,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF2563EB),
+                      color: Color(0xFF1400FF),
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(14),
                         bottomLeft: Radius.circular(4),

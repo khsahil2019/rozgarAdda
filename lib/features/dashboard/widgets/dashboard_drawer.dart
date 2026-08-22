@@ -79,8 +79,8 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                       icon: Icons.grid_view_rounded,
                       labelKey: 'nav_home',
                       defaultLabel: 'Home Dashboard',
-                      iconBg: const Color(0xFFEFF6FF),
-                      iconColor: const Color(0xFF2563EB),
+                      iconBg: const Color(0xFFEEF2FF),
+                      iconColor: const Color(0xFF1400FF),
                       isActive: _selectedIndex == 0,
                       onTap: () {
                         setState(() => _selectedIndex = 0);

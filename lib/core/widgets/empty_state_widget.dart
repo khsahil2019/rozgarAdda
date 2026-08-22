@@ -21,7 +21,7 @@ class EmptyStateWidget extends StatelessWidget {
     this.onPrimaryPressed,
     this.secondaryButtonText,
     this.onSecondaryPressed,
-    this.primaryColor = const Color(0xFF4F46E5),
+    this.primaryColor = const Color(0xFF1400FF),
     this.suggestions,
   });
 
@@ -210,7 +210,7 @@ class EmptyStateWidget extends StatelessWidget {
                             const Text(
                               '• ',
                               style: TextStyle(
-                                color: Color(0xFF4F46E5),
+                                color: Color(0xFF1400FF),
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
                               ),

@@ -414,7 +414,7 @@ class EmployerDashboardController extends GetxController {
           }
         },
         loadingWidget: const Center(
-          child: CircularProgressIndicator(color: Colors.blue),
+          child: CircularProgressIndicator(color: Color(0xFF1400FF)),
         ),
       );
     } catch (err) {

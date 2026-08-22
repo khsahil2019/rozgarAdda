@@ -20,6 +20,14 @@ class NewsBinding extends Bindings {
 class CreateNewsBinding extends Bindings {
   @override
   void dependencies() {
+    if (!Get.isRegistered<NewsRemoteDataSource>()) {
+      Get.lazyPut<NewsRemoteDataSource>(() => NewsRemoteDataSourceImpl());
+    }
+    if (!Get.isRegistered<NewsRepository>()) {
+      Get.lazyPut<NewsRepository>(
+        () => NewsRepositoryImpl(remoteDataSource: Get.find()),
+      );
+    }
     Get.lazyPut(() => CreateNewsController(repository: Get.find()));
   }
 }

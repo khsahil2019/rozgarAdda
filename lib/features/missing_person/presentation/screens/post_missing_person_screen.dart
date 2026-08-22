@@ -1021,10 +1021,10 @@ class PostMissingPersonScreen extends GetView<MissingPersonController> {
                   leading: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: const BoxDecoration(
-                      color: Color(0xFFEFF6FF),
+                      color: Color(0xFFEEF2FF),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.photo_library_rounded, color: Color(0xFF2563EB), size: 22),
+                    child: const Icon(Icons.photo_library_rounded, color: Color(0xFF1400FF), size: 22),
                   ),
                   title: const Text('Choose from Photo Gallery', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
                   onTap: () {

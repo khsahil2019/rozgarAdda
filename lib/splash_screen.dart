@@ -152,14 +152,14 @@ class _SplashScreenState extends State<SplashScreen> {
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                                  colors: [Color(0xFF1400FF), Color(0xFF3B82F6)],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                 ),
                                 borderRadius: BorderRadius.circular(24),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
+                                    color: const Color(0xFF1400FF).withValues(alpha: 0.3),
                                     blurRadius: 16,
                                     offset: const Offset(0, 6),
                                   ),
@@ -226,7 +226,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                 TextSpan(
                                   text: ' $titlePart2',
                                   style: const TextStyle(
-                                    color: Color(0xFF4F46E5),
+                                    color: Color(0xFF1400FF),
                                     fontSize: 28,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: -0.5,
@@ -246,14 +246,14 @@ class _SplashScreenState extends State<SplashScreen> {
                             color: const Color(0xFFEEF2FF),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: const Color(0xFFC7D2FE).withValues(alpha: 0.8),
+                              color: const Color(0xFF1400FF).withValues(alpha: 0.2),
                               width: 1,
                             ),
                           ),
                           child: Text(
                             l10n.text('splash_tagline'),
                             style: const TextStyle(
-                              color: Color(0xFF3730A3),
+                              color: Color(0xFF1400FF),
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
@@ -280,7 +280,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           subtitle: 'Enter Candidate Dashboard & Job Search',
                           icon: Icons.dashboard_rounded,
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
+                            colors: [Color(0xFF1400FF), Color(0xFF3B82F6)],
                           ),
                           onTap: () => _navigateWithAuthCheck(
                             context: context,
@@ -302,7 +302,7 @@ class _SplashScreenState extends State<SplashScreen> {
                                 title: l10n.text('splash_menu_login'),
                                 subtitle: 'Candidate Login',
                                 iconBg: const Color(0xFFEEF2FF),
-                                iconColor: const Color(0xFF4F46E5),
+                                iconColor: const Color(0xFF1400FF),
                                 onTap: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -479,7 +479,7 @@ class _SplashScreenState extends State<SplashScreen> {
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
+                color: const Color(0xFF1400FF).withValues(alpha: 0.3),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
