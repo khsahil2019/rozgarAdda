@@ -546,18 +546,28 @@ class EmployerDashboardController extends GetxController {
 
   Future<JobApplication?> getApplicationDetails(int appId) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('employer_token');
+      final token = await _getAuthToken();
 
       if (token != null && token.isNotEmpty) {
-        final res = await ApiService.get(
-          ApiRoutes.employerApplicationDetails(appId),
-          accessToken: token,
-        );
-        if (res['success'] == true && res['application'] != null) {
-          final app = JobApplication.fromJson(
-            res['application'] as Map<String, dynamic>,
+        Map<String, dynamic>? res;
+        try {
+          res = await ApiService.post(
+            ApiRoutes.employerApplicationDetails(appId),
+            body: {'application_id': appId},
+            accessToken: token,
           );
+        } catch (_) {
+          try {
+            res = await ApiService.get(
+              ApiRoutes.employerApplicationDetails(appId),
+              accessToken: token,
+            );
+          } catch (_) {}
+        }
+
+        if (res != null && (res['success'] == true || res['application'] != null || res['data'] != null)) {
+          final dataMap = (res['application'] is Map ? res['application'] : (res['data'] is Map ? res['data'] : res)) as Map<String, dynamic>;
+          final app = JobApplication.fromJson(dataMap);
           if (localApplicationStatuses.containsKey(appId)) {
             return JobApplication(
               id: app.id,
