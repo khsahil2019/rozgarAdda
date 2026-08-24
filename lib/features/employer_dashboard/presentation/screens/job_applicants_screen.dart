@@ -370,32 +370,50 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      Get.back();
-                      try {
-                        final result = await OpenFilex.open(filePath);
-                        if (result.type != ResultType.done) {
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [primary, primaryLight],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primary.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        Get.back();
+                        try {
+                          final result = await OpenFilex.open(filePath);
+                          if (result.type != ResultType.done) {
+                            await Share.shareXFiles(
+                              [XFile(filePath)],
+                              text: 'Candidate export list for ${widget.jobTitle}',
+                            );
+                          }
+                        } catch (e) {
                           await Share.shareXFiles(
                             [XFile(filePath)],
                             text: 'Candidate export list for ${widget.jobTitle}',
                           );
                         }
-                      } catch (e) {
-                        await Share.shareXFiles(
-                          [XFile(filePath)],
-                          text: 'Candidate export list for ${widget.jobTitle}',
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.folder_open_rounded, size: 18),
-                    label: const Text('Open Excel/CSV'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      },
+                      icon: const Icon(Icons.folder_open_rounded, size: 18),
+                      label: const Text('Open Excel/CSV'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),
@@ -707,7 +725,7 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                       gradient: LinearGradient(
                         colors: _selectedApplicationIds.isNotEmpty
                             ? [const Color(0xFF10B981), const Color(0xFF059669)]
-                            : [primary, const Color(0xFF0F00C7)],
+                            : [primary, primaryLight],
                       ),
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [
@@ -1754,9 +1772,24 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                   const SizedBox(height: 16),
 
                   // Status Action Button
-                  SizedBox(
+                  Container(
                     width: double.infinity,
-                    height: 46,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [primary, primaryLight],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primary.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Get.back();
@@ -1771,12 +1804,13 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primary,
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        elevation: 1,
+                        elevation: 0,
                       ),
                     ),
                   ),
@@ -1975,9 +2009,24 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
               ),
               const SizedBox(height: 20),
 
-              SizedBox(
+              Container(
                 width: double.infinity,
                 height: 48,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [primary, primaryLight],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
                 child: ElevatedButton(
                   onPressed: () async {
                     Get.back();
@@ -1997,12 +2046,13 @@ class _JobApplicantsScreenState extends State<JobApplicantsScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primary,
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 1,
+                    elevation: 0,
                   ),
                   child: const Text(
                     'Confirm Status Update',

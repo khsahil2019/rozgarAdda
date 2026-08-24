@@ -10,7 +10,8 @@ import 'employer_login_screen.dart';
 class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
   const EmployerRegistrationScreen({super.key});
 
-  static const Color primaryPurple = Color(0xFF7C3AED);
+  static const Color primaryBlue = Color(0xFF1400FF);
+  static const Color primaryLight = Color(0xFF4F46E5);
   static const Color darkText = Color(0xFF0F172A);
   static const Color greyText = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
@@ -47,7 +48,7 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
             ElevatedButton(
               onPressed: () => Navigator.of(ctx).pop(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryPurple,
+                backgroundColor: primaryBlue,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: Text(context.l10n.text('ok'), style: const TextStyle(color: Colors.white)),
@@ -102,7 +103,7 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
     return Scaffold(
       backgroundColor: scaffoldBg,
       appBar: AppBar(
-        backgroundColor: primaryPurple,
+        backgroundColor: primaryBlue,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: Padding(
@@ -267,11 +268,11 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(7),
                                   color: controller.acceptedTerms.value
-                                      ? primaryPurple
+                                      ? primaryBlue
                                       : Colors.transparent,
                                   border: Border.all(
                                     color: controller.acceptedTerms.value
-                                        ? primaryPurple
+                                        ? primaryBlue
                                         : const Color(0xFFCBD5E1),
                                     width: 1.8,
                                   ),
@@ -349,7 +350,7 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
                             TextSpan(
                               text: l10n.text('registration_login'),
                               style: const TextStyle(
-                                color: primaryPurple,
+                                color: primaryBlue,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -406,7 +407,7 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-          prefixIcon: Icon(prefixIcon, color: primaryPurple, size: 20),
+          prefixIcon: Icon(prefixIcon, color: primaryBlue, size: 20),
           suffixIcon: showSuffix
               ? IconButton(
                   onPressed: onSuffixTap,
@@ -442,14 +443,14 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
         borderRadius: BorderRadius.circular(26),
         gradient: isEnabled
             ? const LinearGradient(
-                colors: [Color(0xFF7C3AED), Color(0xFF9333EA)],
+                colors: [primaryBlue, primaryLight],
               )
             : null,
         color: isEnabled ? null : const Color(0xFFCBD5E1),
         boxShadow: isEnabled
             ? [
                 BoxShadow(
-                  color: primaryPurple.withValues(alpha: 0.35),
+                  color: primaryBlue.withValues(alpha: 0.35),
                   blurRadius: 14,
                   offset: const Offset(0, 6),
                 ),
@@ -512,12 +513,12 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: primaryPurple.withValues(alpha: 0.12),
+              color: primaryBlue.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.cloud_upload_outlined,
-              color: primaryPurple,
+              color: primaryBlue,
               size: 22,
             ),
           ),
@@ -571,7 +572,7 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
                     child: const Text(
                       'Choose Another File',
                       style: TextStyle(
-                        color: primaryPurple,
+                        color: primaryBlue,
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                       ),
@@ -584,7 +585,7 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
             return OutlinedButton(
               onPressed: controller.pickIdentityProof,
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: primaryPurple, width: 1.5),
+                side: const BorderSide(color: primaryBlue, width: 1.5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -596,7 +597,7 @@ class EmployerRegistrationScreen extends GetView<EmployerRegisterController> {
               child: const Text(
                 'Choose File',
                 style: TextStyle(
-                  color: primaryPurple,
+                  color: primaryBlue,
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                 ),

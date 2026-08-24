@@ -1450,12 +1450,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             child: Container(
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
+                  colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
                 ),
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                    color: const Color(0xFF1400FF).withValues(alpha: 0.25),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),

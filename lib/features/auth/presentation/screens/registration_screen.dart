@@ -199,7 +199,7 @@ class RegistrationFormScreen extends GetView<RegisterController> {
                         child: Container(
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
+                              colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
                             ),
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -1388,11 +1388,8 @@ class RegistrationFormScreen extends GetView<RegisterController> {
           borderRadius: BorderRadius.circular(30),
           gradient: LinearGradient(
             colors: controller.isRegistrationEnabled
-                ? [colors.brandColor, const Color(0xFF6644FF), colors.warning]
+                ? [colors.brandColor, const Color(0xFF4F46E5)]
                 : const [Color(0xFFB8BCCD), Color(0xFFB8BCCD)],
-            stops: controller.isRegistrationEnabled
-                ? const [0.0, 0.6, 1.0]
-                : const [0.0, 1.0],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),

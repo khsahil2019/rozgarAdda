@@ -14,7 +14,8 @@ import 'employer_registration_screen.dart';
 class EmployerLoginScreen extends GetView<EmployerLoginController> {
   const EmployerLoginScreen({super.key});
 
-  static const Color primaryPurple = Color(0xFF7C3AED);
+  static const Color primaryBlue = Color(0xFF1400FF);
+  static const Color primaryLight = Color(0xFF4F46E5);
   static const Color darkText = Color(0xFF0F172A);
   static const Color greyText = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
@@ -51,7 +52,7 @@ class EmployerLoginScreen extends GetView<EmployerLoginController> {
             ElevatedButton(
               onPressed: () => Navigator.of(ctx).pop(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryPurple,
+                backgroundColor: primaryBlue,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: Text(context.l10n.text('ok'), style: const TextStyle(color: Colors.white)),
@@ -181,7 +182,7 @@ class EmployerLoginScreen extends GetView<EmployerLoginController> {
                           child: const Text(
                             'Employer Portal',
                             style: TextStyle(
-                              color: primaryPurple,
+                              color: primaryBlue,
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
@@ -202,14 +203,14 @@ class EmployerLoginScreen extends GetView<EmployerLoginController> {
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF7C3AED), Color(0xFF9333EA)],
+                                colors: [primaryBlue, primaryLight],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(22),
                               boxShadow: [
                                 BoxShadow(
-                                  color: primaryPurple.withValues(alpha: 0.3),
+                                  color: primaryBlue.withValues(alpha: 0.3),
                                   blurRadius: 16,
                                   offset: const Offset(0, 6),
                                 ),
@@ -326,11 +327,11 @@ class EmployerLoginScreen extends GetView<EmployerLoginController> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(7),
                                       color: controller.acceptedTerms.value
-                                          ? primaryPurple
+                                          ? primaryBlue
                                           : Colors.transparent,
                                       border: Border.all(
                                         color: controller.acceptedTerms.value
-                                            ? primaryPurple
+                                            ? primaryBlue
                                             : const Color(0xFFCBD5E1),
                                         width: 1.8,
                                       ),
@@ -404,7 +405,7 @@ class EmployerLoginScreen extends GetView<EmployerLoginController> {
                               Text(
                                 "Candidate Login",
                                 style: TextStyle(
-                                  color: primaryPurple,
+                                  color: primaryBlue,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w800,
                                 ),
@@ -440,7 +441,7 @@ class EmployerLoginScreen extends GetView<EmployerLoginController> {
                               TextSpan(
                                 text: l10n.text('login_register'),
                                 style: const TextStyle(
-                                  color: primaryPurple,
+                                  color: primaryBlue,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w800,
                                 ),
@@ -483,7 +484,7 @@ class EmployerLoginScreen extends GetView<EmployerLoginController> {
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-          prefixIcon: Icon(prefixIcon, color: primaryPurple, size: 20),
+          prefixIcon: Icon(prefixIcon, color: primaryBlue, size: 20),
           suffixIcon: showSuffix
               ? IconButton(
                   onPressed: onSuffixTap,
@@ -519,14 +520,14 @@ class EmployerLoginScreen extends GetView<EmployerLoginController> {
         borderRadius: BorderRadius.circular(26),
         gradient: isEnabled
             ? const LinearGradient(
-                colors: [Color(0xFF7C3AED), Color(0xFF9333EA)],
+                colors: [primaryBlue, primaryLight],
               )
             : null,
         color: isEnabled ? null : const Color(0xFFCBD5E1),
         boxShadow: isEnabled
             ? [
                 BoxShadow(
-                  color: primaryPurple.withValues(alpha: 0.35),
+                  color: primaryBlue.withValues(alpha: 0.35),
                   blurRadius: 14,
                   offset: const Offset(0, 6),
                 ),

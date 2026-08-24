@@ -8,6 +8,7 @@ import '../widgets/sell_product_step_indicator.dart';
 
 class _C {
   static const Color primaryBlue = Color(0xFF1400FF);
+  static const Color primaryLight = Color(0xFF4F46E5);
   static const Color darkText = Color(0xFF0F172A);
   static const Color mediumText = Color(0xFF334155);
   static const Color greyText = Color(0xFF64748B);
@@ -205,12 +206,28 @@ class SellProductReviewScreen extends StatelessWidget {
                     const SizedBox(height: 32),
 
                     // Primary Action: View My Products
-                    SizedBox(
+                    Container(
                       width: double.infinity,
                       height: 52,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [_C.primaryBlue, _C.primaryLight],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _C.primaryBlue.withValues(alpha: 0.3),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _C.primaryBlue,
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(

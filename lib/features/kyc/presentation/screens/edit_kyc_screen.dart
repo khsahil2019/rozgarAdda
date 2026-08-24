@@ -936,15 +936,36 @@ class EditKycScreen extends GetView<KycController> {
         color: Colors.white,
         border: Border(top: BorderSide(color: borderGrey)),
       ),
-      child: SizedBox(
+      child: Container(
         width: double.infinity,
         height: 50,
+        decoration: BoxDecoration(
+          gradient: controller.isLoading.value
+              ? null
+              : const LinearGradient(
+                  colors: [primary, primaryLight],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+          color: controller.isLoading.value ? const Color(0xFFCBD5E1) : null,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: controller.isLoading.value
+              ? null
+              : [
+                  BoxShadow(
+                    color: primary.withValues(alpha: 0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+        ),
         child: ElevatedButton(
           onPressed: controller.isLoading.value ? null : () => _onSubmitKyc(context),
           style: ElevatedButton.styleFrom(
-            backgroundColor: primary,
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
             foregroundColor: Colors.white,
-            elevation: 1,
+            elevation: 0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
           child: controller.isLoading.value

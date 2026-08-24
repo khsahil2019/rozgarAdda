@@ -12,6 +12,7 @@ class _CNC {
   static const Color bg = Color(0xFFF8FAFC);
   static const Color navy = Color(0xFF0F172A);
   static const Color accent = Color(0xFF1400FF);
+  static const Color accentLight = Color(0xFF4F46E5);
   static const Color grey = Color(0xFF64748B);
   static const Color border = Color(0xFFE2E8F0);
 }
@@ -633,14 +634,30 @@ class CreateNewsScreen extends GetView<CreateNewsController> {
   }
 
   Widget _buildSubmitButton(BuildContext context, AppLocalizations l10n) {
-    return SizedBox(
+    return Container(
       width: double.infinity,
       height: 50,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [_CNC.accent, _CNC.accentLight],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: _CNC.accent.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _CNC.accent,
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
           foregroundColor: Colors.white,
-          elevation: 1,
+          elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
         onPressed: () => _submit(context, l10n),

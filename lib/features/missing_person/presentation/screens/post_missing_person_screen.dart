@@ -9,6 +9,7 @@ import '../controller/missing_person_controller.dart';
 
 class _C {
   static const Color primary = Color(0xFF1400FF);
+  static const Color primaryLight = Color(0xFF4F46E5);
   static const Color darkText = Color(0xFF0F172A);
   static const Color greyText = Color(0xFF64748B);
   static const Color borderGrey = Color(0xFFE2E8F0);
@@ -934,15 +935,31 @@ class PostMissingPersonScreen extends GetView<MissingPersonController> {
   }
 
   Widget _buildSubmitButton(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [_C.primary, _C.primaryLight],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: _C.primary.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _C.primary,
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          elevation: 2,
+          elevation: 0,
         ),
         onPressed: () async {
           final isSuccess = await controller.submitMissingPersonForm();

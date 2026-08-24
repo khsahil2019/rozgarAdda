@@ -98,13 +98,13 @@ class ChatUserListScreen extends GetView<ChatController> {
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
           gradient: LinearGradient(
-            colors: [Color(0xFF003BFF), Color(0xFF001A8F)],
+            colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           boxShadow: [
             BoxShadow(
-              color: Color(0x55003BFF),
+              color: Color(0x551400FF),
               blurRadius: 12,
               offset: Offset(0, 4),
             ),
@@ -239,7 +239,7 @@ class _TabPill extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         gradient: selected
             ? const LinearGradient(
-                colors: [Color(0xFF003BFF), Color(0xFF001C99)],
+                colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )
@@ -248,7 +248,7 @@ class _TabPill extends StatelessWidget {
         boxShadow: selected
             ? const [
                 BoxShadow(
-                  color: Color(0x40003BFF),
+                  color: Color(0x401400FF),
                   blurRadius: 10,
                   offset: Offset(0, 4),
                 ),

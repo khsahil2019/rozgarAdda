@@ -281,14 +281,35 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 // Submit Button
                 Obx(() {
                   final isSubmitting = _ctrl.isChangingPassword.value;
-                  return SizedBox(
+                  return Container(
                     height: 52,
+                    decoration: BoxDecoration(
+                      gradient: isSubmitting
+                          ? null
+                          : const LinearGradient(
+                              colors: [_CC.primary, _CC.primaryLight],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                      color: isSubmitting ? const Color(0xFFCBD5E1) : null,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: isSubmitting
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: _CC.primary.withValues(alpha: 0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                    ),
                     child: ElevatedButton.icon(
                       onPressed: isSubmitting ? null : _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _CC.primary,
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
                         foregroundColor: Colors.white,
-                        elevation: 2,
+                        elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
                       icon: isSubmitting

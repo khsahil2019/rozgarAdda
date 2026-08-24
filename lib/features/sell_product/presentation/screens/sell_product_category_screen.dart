@@ -9,6 +9,7 @@ import 'sell_product_subcategory_screen.dart';
 
 class _C {
   static const Color primaryBlue = Color(0xFF1400FF);
+  static const Color primaryLight = Color(0xFF4F46E5);
   static const Color darkText = Color(0xFF0F172A);
   static const Color greyText = Color(0xFF64748B);
   static const Color borderGrey = Color(0xFFE2E8F0);
@@ -311,12 +312,33 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                 top: BorderSide(color: _C.borderGrey, width: 1),
               ),
             ),
-            child: SizedBox(
+            child: Container(
               width: double.infinity,
               height: 52,
+              decoration: BoxDecoration(
+                gradient: hasSelection
+                    ? const LinearGradient(
+                        colors: [_C.primaryBlue, _C.primaryLight],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : null,
+                color: hasSelection ? null : const Color(0xFFCBD5E1),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: hasSelection
+                    ? [
+                        BoxShadow(
+                          color: _C.primaryBlue.withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null,
+              ),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: hasSelection ? _C.primaryBlue : const Color(0xFFCBD5E1),
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(

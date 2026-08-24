@@ -1304,7 +1304,7 @@ class _NewsCategoryDrawer extends StatelessWidget {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF1400FF), Color(0xFF3B82F6)],
+                colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -1693,7 +1693,7 @@ class _NewsCategoryDrawer extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF1400FF), Color(0xFF3B82F6)],
+                            colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
                           ),
                           borderRadius: BorderRadius.circular(14),
                           boxShadow: [

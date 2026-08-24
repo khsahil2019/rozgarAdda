@@ -10,6 +10,7 @@ import '../controller/profile_controller.dart';
 
 class _C {
   static const Color primary = Color(0xFF1400FF);
+  static const Color primaryLight = Color(0xFF4F46E5);
   static const Color darkText = Color(0xFF0F172A);
   static const Color greyText = Color(0xFF64748B);
   static const Color borderGrey = Color(0xFFE2E8F0);
@@ -526,14 +527,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           ),
           child: Obx(
-            () => SizedBox(
+            () => Container(
               width: double.infinity,
               height: 52,
+              decoration: BoxDecoration(
+                gradient: _ctrl.isUpdatingProfile.value
+                    ? null
+                    : const LinearGradient(
+                        colors: [_C.primary, _C.primaryLight],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                color: _ctrl.isUpdatingProfile.value ? const Color(0xFFCBD5E1) : null,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: _ctrl.isUpdatingProfile.value
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: _C.primary.withValues(alpha: 0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+              ),
               child: ElevatedButton(
                 onPressed: _ctrl.isUpdatingProfile.value ? null : _submit,
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
-                  backgroundColor: _C.primary,
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),

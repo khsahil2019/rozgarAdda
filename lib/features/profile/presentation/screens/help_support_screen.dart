@@ -8,6 +8,7 @@ import '../controller/profile_controller.dart';
 
 class _C {
   static const Color primary = Color(0xFF1400FF);
+  static const Color primaryLight = Color(0xFF4F46E5);
   static const Color darkText = Color(0xFF0F172A);
   static const Color mediumText = Color(0xFF334155);
   static const Color greyText = Color(0xFF64748B);
@@ -157,7 +158,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [_C.primary, Color(0xFF3B82F6)],
+                      colors: [_C.primary, Color(0xFF4F46E5)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -516,14 +517,35 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
             ),
           ),
           child: Obx(
-            () => SizedBox(
+            () => Container(
               width: double.infinity,
               height: 52,
+              decoration: BoxDecoration(
+                gradient: _ctrl.isSubmittingInquiry.value
+                    ? null
+                    : const LinearGradient(
+                        colors: [_C.primary, _C.primaryLight],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                color: _ctrl.isSubmittingInquiry.value ? const Color(0xFFCBD5E1) : null,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: _ctrl.isSubmittingInquiry.value
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: _C.primary.withValues(alpha: 0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+              ),
               child: ElevatedButton(
                 onPressed: _ctrl.isSubmittingInquiry.value ? null : _submit,
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
-                  backgroundColor: _C.primary,
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),

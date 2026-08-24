@@ -443,7 +443,7 @@ class ProfileScreen extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF1400FF), Color(0xFF3B82F6), Color(0xFF1E40AF)],
+          colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

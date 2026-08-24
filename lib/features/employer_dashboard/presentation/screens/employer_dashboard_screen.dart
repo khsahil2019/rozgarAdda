@@ -479,7 +479,7 @@ class EmployerDashboardScreen extends GetView<EmployerDashboardController> {
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF0E00BF), Color(0xFF1400FF), Color(0xFF4F46E5)],
+              colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -1559,49 +1559,66 @@ class EmployerDashboardScreen extends GetView<EmployerDashboardController> {
                     children: [
                       // View Applicants Button (Primary)
                       Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Get.to(
-                              () => JobApplicantsScreen(
-                                jobId: job.id,
-                                jobTitle: job.title,
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primary,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [primary, primaryLight],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.people_outline_rounded,
-                                size: 16,
-                              ),
-                              SizedBox(width: 6),
-                              Flexible(
-                                child: Text(
-                                  'View Applicants',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 12.5,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              SizedBox(width: 3),
-                              Icon(
-                                Icons.chevron_right_rounded,
-                                size: 17,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: primary.withValues(alpha: 0.25),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
                               ),
                             ],
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Get.to(
+                                () => JobApplicantsScreen(
+                                  jobId: job.id,
+                                  jobTitle: job.title,
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.people_outline_rounded,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  'View Applicants',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                SizedBox(width: 3),
+                                Icon(
+                                  Icons.chevron_right_rounded,
+                                  size: 17,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -1990,32 +2007,50 @@ class EmployerDashboardScreen extends GetView<EmployerDashboardController> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          Get.back();
-                          try {
-                            final result = await OpenFilex.open(filePath);
-                            if (result.type != ResultType.done) {
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [primary, primaryLight],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: primary.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            Get.back();
+                            try {
+                              final result = await OpenFilex.open(filePath);
+                              if (result.type != ResultType.done) {
+                                await Share.shareXFiles(
+                                  [XFile(filePath)],
+                                  text: 'Candidate list for Job #$jobId',
+                                );
+                              }
+                            } catch (e) {
                               await Share.shareXFiles(
                                 [XFile(filePath)],
                                 text: 'Candidate list for Job #$jobId',
                               );
                             }
-                          } catch (e) {
-                            await Share.shareXFiles(
-                              [XFile(filePath)],
-                              text: 'Candidate list for Job #$jobId',
-                            );
-                          }
-                        },
-                        icon: const Icon(Icons.folder_open_rounded, size: 18),
-                        label: const Text('Open File'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          },
+                          icon: const Icon(Icons.folder_open_rounded, size: 18),
+                          label: const Text('Open File'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
                       ),

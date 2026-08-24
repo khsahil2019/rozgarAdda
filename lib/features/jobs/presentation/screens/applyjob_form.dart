@@ -537,7 +537,7 @@ class JobApplicationScreen extends GetView<JobApplicationController> {
         height: 58,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF1A1AE6), Color(0xFF3333FF)],
+            colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),

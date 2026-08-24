@@ -152,7 +152,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFF1400FF), Color(0xFF3B82F6)],
+                                  colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                 ),
@@ -280,7 +280,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           subtitle: 'Enter Candidate Dashboard & Job Search',
                           icon: Icons.dashboard_rounded,
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF1400FF), Color(0xFF3B82F6)],
+                            colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
                           ),
                           onTap: () => _navigateWithAuthCheck(
                             context: context,

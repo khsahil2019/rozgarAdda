@@ -381,14 +381,14 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF4F46E5), Color(0xFF7C3AED), Color(0xFF6366F1)],
+            colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
+              color: const Color(0xFF1400FF).withValues(alpha: 0.3),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -583,11 +583,11 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: isActive
-                  ? const Color(0xFF7C3AED).withValues(alpha: 0.09)
+                  ? const Color(0xFF1400FF).withValues(alpha: 0.08)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(16),
               border: isActive
-                  ? Border.all(color: const Color(0xFF7C3AED).withValues(alpha: 0.2), width: 1)
+                  ? Border.all(color: const Color(0xFF1400FF).withValues(alpha: 0.2), width: 1)
                   : null,
             ),
             child: Row(
@@ -596,12 +596,12 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: isActive ? const Color(0xFF7C3AED) : iconBg,
+                    color: isActive ? const Color(0xFF1400FF) : iconBg,
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: isActive
                         ? [
                             BoxShadow(
-                              color: const Color(0xFF7C3AED).withValues(alpha: 0.3),
+                              color: const Color(0xFF1400FF).withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 3),
                             ),
@@ -619,7 +619,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                   child: Text(
                     displayLabel,
                     style: TextStyle(
-                      color: isActive ? const Color(0xFF7C3AED) : const Color(0xFF1E293B),
+                      color: isActive ? const Color(0xFF1400FF) : const Color(0xFF1E293B),
                       fontSize: 15,
                       fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
                       letterSpacing: -0.2,
@@ -630,13 +630,13 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: (badgeBg ?? const Color(0xFF7C3AED)).withValues(alpha: 0.12),
+                      color: (badgeBg ?? const Color(0xFF1400FF)).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       badge,
                       style: TextStyle(
-                        color: badgeBg ?? const Color(0xFF7C3AED),
+                        color: badgeBg ?? const Color(0xFF1400FF),
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.5,
@@ -648,7 +648,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                     width: 7,
                     height: 7,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF7C3AED),
+                      color: Color(0xFF1400FF),
                       shape: BoxShape.circle,
                     ),
                   ),

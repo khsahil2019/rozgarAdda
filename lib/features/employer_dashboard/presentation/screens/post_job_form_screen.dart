@@ -22,6 +22,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
 
   // Premium Modern Color Palette
   static const Color primary = Color(0xFF1400FF);
+  static const Color primaryLight = Color(0xFF4F46E5);
   static const Color darkText = Color(0xFF0F172A);
   static const Color mediumText = Color(0xFF334155);
   static const Color greyText = Color(0xFF64748B);
@@ -1666,16 +1667,33 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               const SizedBox(width: 12),
             ],
 
-            // Next / Publish Button
             Expanded(
-              child: SizedBox(
+              child: Container(
                 height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isLastStep
+                        ? const [Color(0xFF10B981), Color(0xFF059669)]
+                        : const [primary, primaryLight],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: (isLastStep ? successGreen : primary).withValues(alpha: 0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: ElevatedButton(
                   onPressed: _isSubmitting ? null : _nextStep,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isLastStep ? successGreen : primary,
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
                     foregroundColor: Colors.white,
-                    elevation: 2,
+                    elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: _isSubmitting
@@ -1703,7 +1721,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                             const SizedBox(width: 8),
                             Icon(
                               isLastStep
-                                  ? Icons.rocket_launch_rounded
+                                  ? Icons.check_circle_rounded
                                   : Icons.arrow_forward_rounded,
                               size: 18,
                             ),

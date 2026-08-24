@@ -11,7 +11,8 @@ import 'package:rojgar/splash_screen.dart';
 class LoginScreen extends GetView<LoginController> {
   const LoginScreen({super.key});
 
-  static const Color primaryIndigo = Color(0xFF4F46E5);
+  static const Color primaryBlue = Color(0xFF1400FF);
+  static const Color primaryLight = Color(0xFF4F46E5);
   static const Color darkText = Color(0xFF0F172A);
   static const Color greyText = Color(0xFF64748B);
   static const Color borderColor = Color(0xFFE2E8F0);
@@ -78,7 +79,7 @@ class LoginScreen extends GetView<LoginController> {
             ElevatedButton(
               onPressed: () => Navigator.of(ctx).pop(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryIndigo,
+                backgroundColor: primaryBlue,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: Text(l10n.text('ok'), style: const TextStyle(color: Colors.white)),
@@ -177,7 +178,7 @@ class LoginScreen extends GetView<LoginController> {
                           child: const Text(
                             'Candidate Sign In',
                             style: TextStyle(
-                              color: primaryIndigo,
+                              color: primaryBlue,
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
@@ -198,14 +199,14 @@ class LoginScreen extends GetView<LoginController> {
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                                colors: [primaryBlue, primaryLight],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(22),
                               boxShadow: [
                                 BoxShadow(
-                                  color: primaryIndigo.withValues(alpha: 0.3),
+                                  color: primaryBlue.withValues(alpha: 0.3),
                                   blurRadius: 16,
                                   offset: const Offset(0, 6),
                                 ),
@@ -303,7 +304,7 @@ class LoginScreen extends GetView<LoginController> {
                                 child: Text(
                                   l10n.text('login_forgot'),
                                   style: const TextStyle(
-                                    color: primaryIndigo,
+                                    color: primaryBlue,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -338,11 +339,11 @@ class LoginScreen extends GetView<LoginController> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(7),
                                       color: controller.acceptedTerms.value
-                                          ? primaryIndigo
+                                          ? primaryBlue
                                           : Colors.transparent,
                                       border: Border.all(
                                         color: controller.acceptedTerms.value
-                                            ? primaryIndigo
+                                            ? primaryBlue
                                             : const Color(0xFFCBD5E1),
                                         width: 1.8,
                                       ),
@@ -421,7 +422,7 @@ class LoginScreen extends GetView<LoginController> {
                                 TextSpan(
                                   text: l10n.text('login_register'),
                                   style: const TextStyle(
-                                    color: primaryIndigo,
+                                    color: primaryBlue,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -465,7 +466,7 @@ class LoginScreen extends GetView<LoginController> {
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-          prefixIcon: Icon(prefixIcon, color: primaryIndigo, size: 20),
+          prefixIcon: Icon(prefixIcon, color: primaryBlue, size: 20),
           suffixIcon: showSuffix
               ? IconButton(
                   onPressed: onSuffixTap,
@@ -501,14 +502,14 @@ class LoginScreen extends GetView<LoginController> {
         borderRadius: BorderRadius.circular(26),
         gradient: isEnabled
             ? const LinearGradient(
-                colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
+                colors: [primaryBlue, primaryLight],
               )
             : null,
         color: isEnabled ? null : const Color(0xFFCBD5E1),
         boxShadow: isEnabled
             ? [
                 BoxShadow(
-                  color: primaryIndigo.withValues(alpha: 0.35),
+                  color: primaryBlue.withValues(alpha: 0.35),
                   blurRadius: 14,
                   offset: const Offset(0, 6),
                 ),
