@@ -14,8 +14,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rojgar/features/employer_dashboard/presentation/screens/employer_dashboard_screen.dart';
 import 'package:rojgar/core/utils/app_navigator_observer.dart';
 
+import 'dart:ui';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('⚠️ [Flutter Error] ${details.exceptionAsString()}');
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('⚠️ [Platform Error] $error');
+    return true;
+  };
+
   final prefs = await SharedPreferences.getInstance();
   final storageService = Get.put(StorageService(prefs), permanent: true);
 
@@ -89,6 +101,7 @@ class MyAppState extends State<MyApp> {
           
           initialBinding: InitialBinding(),
           locale: _locale,
+          fallbackLocale: const Locale('en'),
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: [
             AppLocalizations.delegate,

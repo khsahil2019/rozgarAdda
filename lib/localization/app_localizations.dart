@@ -37,8 +37,7 @@ class AppLocalizations {
       context,
       AppLocalizations,
     );
-    assert(result != null, 'No AppLocalizations found in context');
-    return result!;
+    return result ?? AppLocalizations(const Locale('en'));
   }
 
   // {{GENERATED_LOCALIZED_VALUES_START}}

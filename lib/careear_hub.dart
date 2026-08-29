@@ -4,6 +4,8 @@ import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 
+import 'package:rojgar/core/widgets/network_image_service.dart';
+
 class _C {
   static const Color primary = Color(0xFF1400FF);
   static const Color darkText = Color(0xFF0F172A);
@@ -26,7 +28,15 @@ class JobListingItem {
   final String experience;
   final String category;
   final String postedAgo;
+  final String? imageUrl;
   bool bookmarked;
+
+  String get validImageUrl {
+    if (imageUrl != null && imageUrl!.trim().isNotEmpty) {
+      return imageUrl!.trim();
+    }
+    return 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200&auto=format&fit=crop&q=80';
+  }
 
   JobListingItem({
     required this.id,
@@ -39,6 +49,7 @@ class JobListingItem {
     required this.experience,
     required this.category,
     required this.postedAgo,
+    this.imageUrl,
     this.bookmarked = false,
   });
 }
@@ -70,6 +81,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
       logoColor: const Color(0xFF1400FF),
       title: 'Senior Flutter Developer',
       company: 'TechMatrix Solutions',
+      imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200&auto=format&fit=crop&q=80',
       location: 'Bangalore / Remote',
       jobType: 'Full-Time',
       salary: '₹ 80,000 - ₹ 1,20,000 / mo',
@@ -83,6 +95,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
       logoColor: const Color(0xFF10B981),
       title: 'Digital Marketing Specialist',
       company: 'GrowthPulse Agency',
+      imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=200&auto=format&fit=crop&q=80',
       location: 'Mumbai, MH',
       jobType: 'Full-Time',
       salary: '₹ 45,000 - ₹ 65,000 / mo',
@@ -96,6 +109,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
       logoColor: const Color(0xFFF59E0B),
       title: 'UI/UX Product Designer',
       company: 'Creative Labs India',
+      imageUrl: 'https://images.unsplash.com/photo-1581291518655-9523c932694b?w=200&auto=format&fit=crop&q=80',
       location: 'Remote',
       jobType: 'Remote',
       salary: '₹ 60,000 - ₹ 90,000 / mo',
@@ -109,6 +123,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
       logoColor: const Color(0xFF6366F1),
       title: 'Operations & Branch Manager',
       company: 'Apex Logistics Hub',
+      imageUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=200&auto=format&fit=crop&q=80',
       location: 'Pune, MH',
       jobType: 'Full-Time',
       salary: '₹ 50,000 - ₹ 75,000 / mo',
@@ -122,6 +137,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
       logoColor: const Color(0xFF0EA5E9),
       title: 'Backend Python Architect',
       company: 'CloudNext Systems',
+      imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=200&auto=format&fit=crop&q=80',
       location: 'Hyderabad, TS',
       jobType: 'Remote',
       salary: '₹ 1,10,000 - ₹ 1,60,000 / mo',
@@ -135,6 +151,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
       logoColor: const Color(0xFFEC4899),
       title: 'Business Development Executive',
       company: 'Rozgar Enterprise Solutions',
+      imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=200&auto=format&fit=crop&q=80',
       location: 'Delhi NCR',
       jobType: 'Full-Time',
       salary: '₹ 35,000 - ₹ 55,000 / mo',
@@ -426,23 +443,45 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Company / Job Image Thumbnail
                     Container(
-                      width: 48,
-                      height: 48,
+                      width: 52,
+                      height: 52,
                       decoration: BoxDecoration(
-                        color: job.logoColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12),
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: job.logoColor.withValues(alpha: 0.25),
+                          color: _C.borderGrey,
+                          width: 1.2,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      child: Center(
-                        child: Text(
-                          job.company.substring(0, 2).toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w900,
-                            color: job.logoColor,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(13),
+                        child: NetworkImageService(
+                          imageUrl: job.validImageUrl,
+                          width: 52,
+                          height: 52,
+                          fit: BoxFit.cover,
+                          errorWidget: Container(
+                            color: const Color(0xFFEEF2FF),
+                            padding: const EdgeInsets.all(8),
+                            alignment: Alignment.center,
+                            child: Image.asset(
+                              'assets/icons/logo.png',
+                              fit: BoxFit.contain,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.business_rounded,
+                                color: job.logoColor,
+                                size: 26,
+                              ),
+                            ),
                           ),
                         ),
                       ),

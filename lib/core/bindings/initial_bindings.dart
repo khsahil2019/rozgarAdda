@@ -19,14 +19,8 @@ import '../../features/profile/presentation/bindings/profile_binding.dart';
 class InitialBinding extends Bindings {
   @override
   void dependencies() {
-    // Always alive — global controllers
-    Get.put(AppController(), permanent: true);
-
     // Reuse AuthBinding to register auth dependencies lazily
     AuthBinding().dependencies();
-
-    // Promote AuthController to permanent
-    Get.put<AuthController>(Get.find<AuthController>(), permanent: true);
 
     // Register news dependencies
     NewsBinding().dependencies();
@@ -58,6 +52,12 @@ class InitialBinding extends Bindings {
 
     // Register profile dependencies
     ProfileBinding().dependencies();
+
+    // Always alive — global controllers
+    Get.put(AppController(), permanent: true);
+
+    // Promote AuthController to permanent
+    Get.put<AuthController>(Get.find<AuthController>(), permanent: true);
   }
 }
 
