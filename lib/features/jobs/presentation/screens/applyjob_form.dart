@@ -558,7 +558,7 @@ class JobApplicationScreen extends GetView<JobApplicationController> {
                 ? null
                 : () => controller.submitApplication(jobId, () {
                       Navigator.maybePop(context);
-                    }),
+                    }, jobTitle: jobTitle),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

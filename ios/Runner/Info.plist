@@ -47,5 +47,20 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>FacebookAppID</key>
+	<string>1608368847684113</string>
+	<key>FacebookClientToken</key>
+	<string>1608368847684113</string>
+	<key>FacebookDisplayName</key>
+	<string>Rozgar Adda</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb1608368847684113</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

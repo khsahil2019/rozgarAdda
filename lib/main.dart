@@ -12,12 +12,16 @@ import 'package:rojgar/services/storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:rojgar/features/employer_dashboard/presentation/screens/employer_dashboard_screen.dart';
+import 'package:rojgar/core/services/meta_analytics_service.dart';
 import 'package:rojgar/core/utils/app_navigator_observer.dart';
 
 import 'dart:ui';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Meta (Facebook) App Events SDK
+  await MetaAnalyticsService.instance.init();
 
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
@@ -34,6 +38,12 @@ Future<void> main() async {
   final savedCode = storageService.getLanguageCode() ?? 'en';
   final bool isCandidateLoggedIn = storageService.getCandidateId() != null;
   final bool isEmployerLoggedIn = prefs.getInt('employer_id') != null;
+
+  if (isCandidateLoggedIn && storageService.getCandidateId() != null) {
+    MetaAnalyticsService.instance.setUserId(storageService.getCandidateId().toString());
+  } else if (isEmployerLoggedIn && prefs.getInt('employer_id') != null) {
+    MetaAnalyticsService.instance.setUserId(prefs.getInt('employer_id').toString());
+  }
 
   runApp(MyApp(
     initialLocale: Locale(savedCode),

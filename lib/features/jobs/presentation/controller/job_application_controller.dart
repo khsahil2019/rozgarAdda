@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rojgar/core/services/meta_analytics_service.dart';
 import '../../domain/repository/jobs_repository.dart';
 
 class JobApplicationController extends GetxController {
@@ -91,7 +92,7 @@ class JobApplicationController extends GetxController {
     resumeFile.value = file;
   }
 
-  Future<void> submitApplication(int jobId, VoidCallback onSuccess) async {
+  Future<void> submitApplication(int jobId, VoidCallback onSuccess, {String? jobTitle}) async {
     if (!formKey.currentState!.validate()) return;
     if (resumeFile.value?.path == null) {
       Get.snackbar(
@@ -145,6 +146,13 @@ class JobApplicationController extends GetxController {
           );
         },
         (success) {
+          try {
+            MetaAnalyticsService.instance.logSubmitApplication(
+              jobId: jobId,
+              jobTitle: jobTitle ?? 'Job #$jobId',
+              salary: expectedSalaryCtrl.text.trim(),
+            );
+          } catch (_) {}
           Get.snackbar(
             'Success',
             'Application submitted successfully.',

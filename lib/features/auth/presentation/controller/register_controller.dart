@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:rojgar/features/app/app_controller.dart';
 import 'package:rojgar/features/auth/data/data_source/model/auth_response.dart';
 import 'package:rojgar/features/auth/data/data_source/model/dropdown_item.dart';
+import 'package:rojgar/core/services/meta_analytics_service.dart';
 import 'package:rojgar/features/auth/domain/repository/auth_repository.dart';
 
 class RegisterController extends GetxController {
@@ -332,6 +333,14 @@ class RegisterController extends GetxController {
 
       return either.fold((failure) => throw failure, (result) {
         AppController.to.login(result);
+        try {
+          MetaAnalyticsService.instance.logCompleteRegistration(
+            registrationMethod: 'candidate_form_otp',
+          );
+          if (result.user.id > 0) {
+            MetaAnalyticsService.instance.setUserId(result.user.id.toString());
+          }
+        } catch (_) {}
         return result;
       });
     } finally {

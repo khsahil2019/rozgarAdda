@@ -17,6 +17,7 @@ import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dar
 import 'package:rojgar/features/jobs/presentation/bindings/jobs_binding.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/features/jobs/presentation/widgets/job_card_widget.dart';
+import 'package:rojgar/core/services/meta_analytics_service.dart';
 
 enum _FilterSection {
   category,
@@ -157,6 +158,12 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
         _searchQuery = _searchController.text;
         _filterJobs();
       });
+      if (_searchController.text.trim().length >= 3) {
+        MetaAnalyticsService.instance.logSearch(
+          query: _searchController.text.trim(),
+          contentType: 'jobs',
+        );
+      }
     });
 
     _loadRecentJobs();

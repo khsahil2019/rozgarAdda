@@ -6,6 +6,7 @@ import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
 import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
 import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dart';
+import 'package:rojgar/core/services/meta_analytics_service.dart';
 import 'package:share_plus/share_plus.dart';
 
 class _CardColors {
@@ -171,6 +172,11 @@ class JobCardWidget extends StatelessWidget {
           phone: phone,
         );
       }
+      MetaAnalyticsService.instance.logContact(
+        type: 'call',
+        jobId: job.id,
+        title: job.title,
+      );
     } catch (e) {
       debugPrint('Error logging call application: $e');
     }
@@ -204,6 +210,11 @@ class JobCardWidget extends StatelessWidget {
           phone: phone,
         );
       }
+      MetaAnalyticsService.instance.logContact(
+        type: 'whatsapp',
+        jobId: job.id,
+        title: job.title,
+      );
     } catch (e) {
       debugPrint('Error logging chat application: $e');
     }

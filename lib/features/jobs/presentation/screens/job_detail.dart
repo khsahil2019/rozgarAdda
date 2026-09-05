@@ -11,6 +11,7 @@ import 'package:rojgar/services/storage_service.dart';
 import 'applyjob_form.dart';
 import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dart';
 import 'package:rojgar/localization/app_localizations.dart';
+import 'package:rojgar/core/services/meta_analytics_service.dart';
 import 'package:share_plus/share_plus.dart';
 
 // ─── Color Constants ───────────────────────────────────────────────────────────
@@ -111,6 +112,13 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     super.initState();
     _viewsCount = widget.job.viewsCount;
     _recordJobView();
+    try {
+      MetaAnalyticsService.instance.logViewContent(
+        id: widget.job.id.toString(),
+        type: 'job',
+        title: widget.job.title,
+      );
+    } catch (_) {}
   }
 
   Future<void> _recordJobView() async {

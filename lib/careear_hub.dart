@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/core/widgets/app_back_button.dart';
-import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
-import 'package:rojgar/localization/app_localizations.dart';
-
+import 'package:rojgar/core/widgets/fast_loader.dart';
 import 'package:rojgar/core/widgets/network_image_service.dart';
+import 'package:rojgar/features/jobs/domain/entities/available_job_entity.dart';
+import 'package:rojgar/features/jobs/domain/repository/jobs_repository.dart';
+import 'package:rojgar/features/jobs/presentation/bindings/jobs_binding.dart';
+import 'package:rojgar/features/jobs/presentation/controller/jobs_controller.dart';
+import 'package:rojgar/features/jobs/presentation/screens/job_detail.dart';
+import 'package:rojgar/core/services/meta_analytics_service.dart';
+import 'package:rojgar/localization/app_localizations.dart';
 
 class _C {
   static const Color primary = Color(0xFF1400FF);
@@ -17,43 +22,6 @@ class _C {
   static const Color fieldBg = Color(0xFFF8FAFC);
 }
 
-class JobListingItem {
-  final int id;
-  final Color logoColor;
-  final String title;
-  final String company;
-  final String location;
-  final String jobType;
-  final String salary;
-  final String experience;
-  final String category;
-  final String postedAgo;
-  final String? imageUrl;
-  bool bookmarked;
-
-  String get validImageUrl {
-    if (imageUrl != null && imageUrl!.trim().isNotEmpty) {
-      return imageUrl!.trim();
-    }
-    return 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200&auto=format&fit=crop&q=80';
-  }
-
-  JobListingItem({
-    required this.id,
-    required this.logoColor,
-    required this.title,
-    required this.company,
-    required this.location,
-    required this.jobType,
-    required this.salary,
-    required this.experience,
-    required this.category,
-    required this.postedAgo,
-    this.imageUrl,
-    this.bookmarked = false,
-  });
-}
-
 class CareerHubScreen extends StatefulWidget {
   const CareerHubScreen({super.key});
 
@@ -63,104 +31,26 @@ class CareerHubScreen extends StatefulWidget {
 
 class _CareerHubScreenState extends State<CareerHubScreen> {
   final TextEditingController _searchCtrl = TextEditingController();
+  late final JobsController _jobsController;
+
+  bool _isLoading = true;
+  String? _errorMessage;
+  List<AvailableJob> _allJobs = [];
+  final Set<int> _bookmarkedJobIds = <int>{};
+
   int _selectedTab = 0;
   String _searchQuery = '';
 
-  final List<String> _tabs = [
-    'All Jobs',
-    'Remote',
-    'Full-Time',
-    'High Salary',
-    'Engineering',
-    'Sales',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<JobsController>()) {
+      JobsBinding().dependencies();
+    }
+    _jobsController = Get.find<JobsController>();
 
-  final List<JobListingItem> _allJobs = [
-    JobListingItem(
-      id: 101,
-      logoColor: const Color(0xFF1400FF),
-      title: 'Senior Flutter Developer',
-      company: 'TechMatrix Solutions',
-      imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200&auto=format&fit=crop&q=80',
-      location: 'Bangalore / Remote',
-      jobType: 'Full-Time',
-      salary: '₹ 80,000 - ₹ 1,20,000 / mo',
-      experience: '3-5 yrs',
-      category: 'Engineering',
-      postedAgo: 'Just now',
-      bookmarked: false,
-    ),
-    JobListingItem(
-      id: 102,
-      logoColor: const Color(0xFF10B981),
-      title: 'Digital Marketing Specialist',
-      company: 'GrowthPulse Agency',
-      imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=200&auto=format&fit=crop&q=80',
-      location: 'Mumbai, MH',
-      jobType: 'Full-Time',
-      salary: '₹ 45,000 - ₹ 65,000 / mo',
-      experience: '2-4 yrs',
-      category: 'Sales',
-      postedAgo: '2 hours ago',
-      bookmarked: true,
-    ),
-    JobListingItem(
-      id: 103,
-      logoColor: const Color(0xFFF59E0B),
-      title: 'UI/UX Product Designer',
-      company: 'Creative Labs India',
-      imageUrl: 'https://images.unsplash.com/photo-1581291518655-9523c932694b?w=200&auto=format&fit=crop&q=80',
-      location: 'Remote',
-      jobType: 'Remote',
-      salary: '₹ 60,000 - ₹ 90,000 / mo',
-      experience: '2-5 yrs',
-      category: 'Engineering',
-      postedAgo: '1 day ago',
-      bookmarked: false,
-    ),
-    JobListingItem(
-      id: 104,
-      logoColor: const Color(0xFF6366F1),
-      title: 'Operations & Branch Manager',
-      company: 'Apex Logistics Hub',
-      imageUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=200&auto=format&fit=crop&q=80',
-      location: 'Pune, MH',
-      jobType: 'Full-Time',
-      salary: '₹ 50,000 - ₹ 75,000 / mo',
-      experience: '4-7 yrs',
-      category: 'Sales',
-      postedAgo: '2 days ago',
-      bookmarked: false,
-    ),
-    JobListingItem(
-      id: 105,
-      logoColor: const Color(0xFF0EA5E9),
-      title: 'Backend Python Architect',
-      company: 'CloudNext Systems',
-      imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=200&auto=format&fit=crop&q=80',
-      location: 'Hyderabad, TS',
-      jobType: 'Remote',
-      salary: '₹ 1,10,000 - ₹ 1,60,000 / mo',
-      experience: '5+ yrs',
-      category: 'Engineering',
-      postedAgo: '3 days ago',
-      bookmarked: false,
-    ),
-    JobListingItem(
-      id: 106,
-      logoColor: const Color(0xFFEC4899),
-      title: 'Business Development Executive',
-      company: 'Rozgar Enterprise Solutions',
-      imageUrl: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=200&auto=format&fit=crop&q=80',
-      location: 'Delhi NCR',
-      jobType: 'Full-Time',
-      salary: '₹ 35,000 - ₹ 55,000 / mo',
-      experience: '1-3 yrs',
-      category: 'Sales',
-      postedAgo: '4 days ago',
-      bookmarked: false,
-    ),
-  ];
+    _loadJobs();
+  }
 
   @override
   void dispose() {
@@ -168,33 +58,145 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
     super.dispose();
   }
 
-  List<JobListingItem> get _filteredJobs {
+  Future<void> _loadJobs() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      if (_jobsController.categories.isEmpty) {
+        await _jobsController.fetchCategories();
+      }
+      final repository = Get.find<JobsRepository>();
+      final result = await repository.getLatestJobs();
+      result.fold(
+        (failure) {
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+              _errorMessage = failure.message;
+              _allJobs = [];
+            });
+          }
+        },
+        (jobs) {
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+              _errorMessage = null;
+              _allJobs = jobs;
+            });
+          }
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = e.toString();
+          _allJobs = [];
+        });
+      }
+    }
+  }
+
+  List<String> _getTabs() {
+    final defaultTabs = ['All Jobs', 'Remote', 'Full-Time', 'Part-Time'];
+    final categoryNames = _jobsController.categories
+        .map((c) => c.name.trim())
+        .where((name) => name.isNotEmpty)
+        .take(5)
+        .toList();
+
+    return [...defaultTabs, ...categoryNames];
+  }
+
+  String _getJobImageUrl(AvailableJob job) {
+    try {
+      final category = _jobsController.categories.firstWhereOrNull(
+        (c) => c.id == job.categoryId,
+      );
+      if (category != null && category.imageUrl.trim().isNotEmpty) {
+        return category.imageUrl.trim();
+      }
+    } catch (_) {}
+    return '';
+  }
+
+  String _getJobCategoryName(AvailableJob job) {
+    try {
+      final category = _jobsController.categories.firstWhereOrNull(
+        (c) => c.id == job.categoryId,
+      );
+      if (category != null && category.name.trim().isNotEmpty) {
+        return category.name.trim();
+      }
+    } catch (_) {}
+    return '';
+  }
+
+  String _formatPostedAgo(DateTime createdAt) {
+    final now = DateTime.now();
+    final diff = now.difference(createdAt);
+    if (diff.inMinutes < 1) {
+      return 'Just now';
+    } else if (diff.inHours < 1) {
+      return '${diff.inMinutes}m ago';
+    } else if (diff.inDays < 1) {
+      return '${diff.inHours}h ago';
+    } else if (diff.inDays < 7) {
+      return '${diff.inDays}d ago';
+    } else if (diff.inDays < 30) {
+      final weeks = (diff.inDays / 7).floor();
+      return '${weeks}w ago';
+    } else {
+      final months = (diff.inDays / 30).floor();
+      return '${months}mo ago';
+    }
+  }
+
+  List<AvailableJob> get _filteredJobs {
+    final tabs = _getTabs();
+    final selectedTabName = _selectedTab < tabs.length ? tabs[_selectedTab] : 'All Jobs';
+
     return _allJobs.where((job) {
       // Tab filtering
-      if (_selectedTab == 1 && !job.jobType.toLowerCase().contains('remote') && !job.location.toLowerCase().contains('remote')) {
-        return false;
-      }
-      if (_selectedTab == 2 && !job.jobType.toLowerCase().contains('full-time')) {
-        return false;
-      }
-      if (_selectedTab == 3 && !job.salary.contains('80,000') && !job.salary.contains('1,10,000') && !job.salary.contains('60,000')) {
-        return false;
-      }
-      if (_selectedTab == 4 && job.category != 'Engineering') {
-        return false;
-      }
-      if (_selectedTab == 5 && job.category != 'Sales') {
-        return false;
+      if (selectedTabName == 'Remote') {
+        final isRemote = job.workLocationType.toLowerCase().contains('remote') ||
+            job.jobType.toLowerCase().contains('remote') ||
+            job.stateName.toLowerCase().contains('remote') ||
+            job.addressLine1.toLowerCase().contains('remote');
+        if (!isRemote) return false;
+      } else if (selectedTabName == 'Full-Time') {
+        if (!job.jobType.toLowerCase().contains('full')) {
+          return false;
+        }
+      } else if (selectedTabName == 'Part-Time') {
+        if (!job.jobType.toLowerCase().contains('part')) {
+          return false;
+        }
+      } else if (selectedTabName != 'All Jobs') {
+        // Category tab filter
+        final matchedCategory = _jobsController.categories.firstWhereOrNull(
+          (c) => c.name.toLowerCase().trim() == selectedTabName.toLowerCase().trim(),
+        );
+        if (matchedCategory != null && job.categoryId != matchedCategory.id) {
+          return false;
+        }
       }
 
       // Search query filtering
       if (_searchQuery.isNotEmpty) {
         final q = _searchQuery.toLowerCase();
         final matchTitle = job.title.toLowerCase().contains(q);
-        final matchCompany = job.company.toLowerCase().contains(q);
-        final matchLocation = job.location.toLowerCase().contains(q);
-        final matchCategory = job.category.toLowerCase().contains(q);
-        return matchTitle || matchCompany || matchLocation || matchCategory;
+        final matchState = job.stateName.toLowerCase().contains(q);
+        final matchAddress = job.addressLine1.toLowerCase().contains(q);
+        final matchType = job.jobTypeLabel.toLowerCase().contains(q);
+        final matchCategory = _getJobCategoryName(job).toLowerCase().contains(q);
+        final matchSkills = job.skills.any((s) => s.toLowerCase().contains(q));
+
+        return matchTitle || matchState || matchAddress || matchType || matchCategory || matchSkills;
       }
 
       return true;
@@ -205,6 +207,11 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final displayedJobs = _filteredJobs;
+    final tabs = _getTabs();
+
+    if (_selectedTab >= tabs.length) {
+      _selectedTab = 0;
+    }
 
     return PopScope(
       canPop: true,
@@ -236,11 +243,19 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
           centerTitle: false,
           actions: [
             IconButton(
-              tooltip: 'Search Jobs',
+              tooltip: 'Refresh',
+              icon: const Icon(Icons.refresh_rounded, color: _C.darkText, size: 22),
+              onPressed: _loadJobs,
+            ),
+            IconButton(
+              tooltip: 'Clear Filters',
               icon: const Icon(Icons.tune_rounded, color: _C.darkText, size: 22),
               onPressed: () {
                 _searchCtrl.clear();
-                setState(() => _searchQuery = '');
+                setState(() {
+                  _searchQuery = '';
+                  _selectedTab = 0;
+                });
               },
             ),
             const SizedBox(width: 4),
@@ -269,6 +284,11 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                     child: TextField(
                       controller: _searchCtrl,
                       onChanged: (v) => setState(() => _searchQuery = v.trim()),
+                      onSubmitted: (v) {
+                        if (v.trim().isNotEmpty) {
+                          MetaAnalyticsService.instance.logSearch(query: v.trim(), contentType: 'jobs');
+                        }
+                      },
                       style: const TextStyle(
                         color: _C.darkText,
                         fontSize: 14,
@@ -277,7 +297,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                       decoration: InputDecoration(
                         hintText: l10n.text('careerhub_search_hint').isNotEmpty
                             ? l10n.text('careerhub_search_hint')
-                            : 'Search roles, skills, companies...',
+                            : 'Search roles, skills, locations...',
                         hintStyle: const TextStyle(color: _C.greyText, fontSize: 13.5),
                         prefixIcon: const Icon(Icons.search_rounded, color: _C.primary, size: 20),
                         suffixIcon: _searchQuery.isNotEmpty
@@ -301,7 +321,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                     height: 36,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      itemCount: _tabs.length,
+                      itemCount: tabs.length,
                       separatorBuilder: (_, __) => const SizedBox(width: 8),
                       itemBuilder: (_, i) {
                         final isActive = i == _selectedTab;
@@ -318,7 +338,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                               ),
                             ),
                             child: Text(
-                              _tabs[i],
+                              tabs[i],
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
@@ -337,63 +357,7 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
 
             // ── Jobs List ────────────────────────────────────────────
             Expanded(
-              child: displayedJobs.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(18),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1400FF).withValues(alpha: 0.08),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.work_off_outlined, color: _C.primary, size: 40),
-                          ),
-                          const SizedBox(height: 14),
-                          const Text(
-                            'No jobs matching your filter',
-                            style: TextStyle(
-                              color: _C.darkText,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Try changing your search term or category filters',
-                            style: TextStyle(color: _C.greyText, fontSize: 13),
-                          ),
-                          const SizedBox(height: 16),
-                          OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: _C.primary,
-                              side: const BorderSide(color: _C.primary),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            onPressed: () {
-                              _searchCtrl.clear();
-                              setState(() {
-                                _searchQuery = '';
-                                _selectedTab = 0;
-                              });
-                            },
-                            child: const Text('Reset All Filters', style: TextStyle(fontWeight: FontWeight.w700)),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 30),
-                      itemCount: displayedJobs.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 14),
-                      itemBuilder: (context, i) {
-                        final job = displayedJobs[i];
-                        return _buildJobCard(context, job);
-                      },
-                    ),
+              child: _buildContent(displayedJobs),
             ),
           ],
         ),
@@ -401,7 +365,138 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
     );
   }
 
-  Widget _buildJobCard(BuildContext context, JobListingItem job) {
+  Widget _buildContent(List<AvailableJob> displayedJobs) {
+    if (_isLoading) {
+      return const FastListSkeleton(itemCount: 6, cardHeight: 150.0);
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.error_outline_rounded, color: Colors.red, size: 40),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                _errorMessage!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: _C.darkText,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _C.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                ),
+                onPressed: _loadJobs,
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: const Text('Retry', style: TextStyle(fontWeight: FontWeight.w700)),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (displayedJobs.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: _loadJobs,
+        color: _C.primary,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(height: MediaQuery.of(context).size.height * 0.15),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1400FF).withValues(alpha: 0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.work_off_outlined, color: _C.primary, size: 40),
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'No jobs matching your filter',
+                    style: TextStyle(
+                      color: _C.darkText,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Try changing your search term or category filters',
+                    style: TextStyle(color: _C.greyText, fontSize: 13),
+                  ),
+                  const SizedBox(height: 16),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: _C.primary,
+                      side: const BorderSide(color: _C.primary),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: () {
+                      _searchCtrl.clear();
+                      setState(() {
+                        _searchQuery = '';
+                        _selectedTab = 0;
+                      });
+                    },
+                    child: const Text('Reset All Filters', style: TextStyle(fontWeight: FontWeight.w700)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadJobs,
+      color: _C.primary,
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 30),
+        itemCount: displayedJobs.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 14),
+        itemBuilder: (context, i) {
+          final job = displayedJobs[i];
+          return _buildJobCard(context, job);
+        },
+      ),
+    );
+  }
+
+  Widget _buildJobCard(BuildContext context, AvailableJob job) {
+    final imageUrl = _getJobImageUrl(job);
+    final categoryName = _getJobCategoryName(job);
+    final isBookmarked = _bookmarkedJobIds.contains(job.id);
+    final postedAgo = _formatPostedAgo(job.createdAt);
+    final locationText = job.stateName.isNotEmpty
+        ? (job.addressLine1.isNotEmpty ? '${job.addressLine1}, ${job.stateName}' : job.stateName)
+        : (job.addressLine1.isNotEmpty ? job.addressLine1 : 'India');
+
     return Container(
       decoration: BoxDecoration(
         color: _C.cardBg,
@@ -423,13 +518,9 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => JobDetailScreen.placeholder(
-                  jobId: job.id,
-                  jobTitle: job.title,
-                  company: job.company,
-                  location: job.location,
-                  salary: job.salary,
-                  jobType: job.jobType,
+                builder: (context) => JobDetailScreen(
+                  job: job,
+                  imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
                 ),
               ),
             );
@@ -464,26 +555,41 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(13),
-                        child: NetworkImageService(
-                          imageUrl: job.validImageUrl,
-                          width: 52,
-                          height: 52,
-                          fit: BoxFit.cover,
-                          errorWidget: Container(
-                            color: const Color(0xFFEEF2FF),
-                            padding: const EdgeInsets.all(8),
-                            alignment: Alignment.center,
-                            child: Image.asset(
-                              'assets/icons/logo.png',
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) => Icon(
-                                Icons.business_rounded,
-                                color: job.logoColor,
-                                size: 26,
+                        child: imageUrl.isNotEmpty
+                            ? NetworkImageService(
+                                imageUrl: imageUrl,
+                                width: 52,
+                                height: 52,
+                                fit: BoxFit.cover,
+                                errorWidget: Container(
+                                  color: const Color(0xFFEEF2FF),
+                                  padding: const EdgeInsets.all(8),
+                                  alignment: Alignment.center,
+                                  child: Image.asset(
+                                    'assets/icons/logo.png',
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) => const Icon(
+                                      Icons.work_outline_rounded,
+                                      color: _C.primary,
+                                      size: 26,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                color: const Color(0xFFEEF2FF),
+                                padding: const EdgeInsets.all(8),
+                                alignment: Alignment.center,
+                                child: Image.asset(
+                                  'assets/icons/logo.png',
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) => const Icon(
+                                    Icons.work_outline_rounded,
+                                    color: _C.primary,
+                                    size: 26,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -502,7 +608,9 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            job.company,
+                            job.contactPerson != null && job.contactPerson!.trim().isNotEmpty
+                                ? job.contactPerson!.trim()
+                                : (categoryName.isNotEmpty ? categoryName : 'Rozgar verified vacancy'),
                             style: const TextStyle(
                               fontSize: 13,
                               color: _C.greyText,
@@ -515,12 +623,16 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          job.bookmarked = !job.bookmarked;
+                          if (isBookmarked) {
+                            _bookmarkedJobIds.remove(job.id);
+                          } else {
+                            _bookmarkedJobIds.add(job.id);
+                          }
                         });
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              job.bookmarked ? 'Job Saved to Bookmarks' : 'Removed from Bookmarks',
+                              !isBookmarked ? 'Job Saved to Bookmarks' : 'Removed from Bookmarks',
                               style: const TextStyle(fontWeight: FontWeight.w600),
                             ),
                             duration: const Duration(seconds: 1),
@@ -536,8 +648,8 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
-                          job.bookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                          color: job.bookmarked ? _C.primary : _C.greyText,
+                          isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                          color: isBookmarked ? _C.primary : _C.greyText,
                           size: 22,
                         ),
                       ),
@@ -551,15 +663,19 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                   children: [
                     const Icon(Icons.location_on_outlined, size: 14, color: _C.greyText),
                     const SizedBox(width: 4),
-                    Text(
-                      job.location,
-                      style: const TextStyle(color: _C.greyText, fontSize: 12.5),
+                    Expanded(
+                      child: Text(
+                        locationText,
+                        style: const TextStyle(color: _C.greyText, fontSize: 12.5),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     const Icon(Icons.access_time_rounded, size: 14, color: _C.greyText),
                     const SizedBox(width: 4),
                     Text(
-                      job.postedAgo,
+                      postedAgo,
                       style: const TextStyle(color: _C.greyText, fontSize: 12.5),
                     ),
                   ],
@@ -571,9 +687,10 @@ class _CareerHubScreenState extends State<CareerHubScreen> {
                   spacing: 8,
                   runSpacing: 6,
                   children: [
-                    _buildPill(job.jobType, isHighlight: true),
-                    _buildPill(job.experience, isHighlight: false),
-                    _buildPill(job.salary, isHighlight: false, isSalary: true),
+                    _buildPill(job.jobTypeLabel, isHighlight: true),
+                    if (job.experienceLevel.isNotEmpty)
+                      _buildPill(job.experienceLabel, isHighlight: false),
+                    _buildPill(job.salaryDisplay, isHighlight: false, isSalary: true),
                   ],
                 ),
                 const SizedBox(height: 14),
