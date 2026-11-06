@@ -21,6 +21,12 @@ class ApiRoutes {
   static String get employerJobs => _buildUrl('emp/jobs');
   static String get postJob => _buildUrl('emp/post-job');
   static String get employerStatus => _buildUrl('emp/status');
+  // PayU Payment Endpoints
+  static String get initiatePayment => _buildUrl('emp/payment/initiate');
+  static String get generatePayUHash => _buildUrl('emp/payment/generate-hash');
+  static String get verifyPayment => _buildUrl('emp/payment/verify');
+  static String get jobPricingPlans => _buildUrl('emp/job_pricing_plans');
+  static String get employerPlans => jobPricingPlans;
   static String employerApplications(int jobId) =>
       _buildUrl('emp/applications/$jobId');
   static String employerApplicationDetails(int applicationId) =>

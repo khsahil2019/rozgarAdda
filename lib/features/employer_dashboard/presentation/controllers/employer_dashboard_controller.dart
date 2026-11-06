@@ -285,7 +285,15 @@ class EmployerDashboardController extends GetxController {
     return postedJobs.fold(0, (sum, job) => sum + job.viewsCount);
   }
 
-  Future<void> postNewJob(AvailableJob newJob) async {
+  Future<void> postNewJob(
+    AvailableJob newJob, {
+    int planId = 2,
+    String? transactionId,
+    String? paymentId,
+    String? paymentStatus,
+    String? transactionStatus,
+    Map<String, dynamic>? paymentData,
+  }) async {
     isLoading.value = true;
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -306,7 +314,15 @@ class EmployerDashboardController extends GetxController {
         'education_level': newJob.educationLevel,
         'english_level': newJob.englishLevel,
         'experience_level': newJob.experienceLevel,
-        'plan_id': 2,
+        'plan_id': planId,
+        'payment_status': paymentStatus ?? (planId == 10 ? 'free' : 'success'),
+        'transaction_status':
+            transactionStatus ?? (planId == 10 ? 'free' : 'completed'),
+        if (paymentData != null) 'payment': paymentData,
+        if (transactionId != null && transactionId.isNotEmpty)
+          'transaction_id': transactionId,
+        if (paymentId != null && paymentId.isNotEmpty)
+          'payment_id': paymentId,
         'skills': newJob.skills,
         'languages': newJob.languages,
         'perks': newJob.perks,

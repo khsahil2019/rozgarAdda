@@ -27,6 +27,7 @@ dependencies:
   dio: ^5.9.2
   flutter_screenutil: ^5.9.3
   fpdart: ^1.2.0
+  crypto: ^3.0.6
   url_launcher: ^6.3.0
   cached_network_image: ^3.4.1
   geolocator: ^14.0.2
@@ -39,6 +40,7 @@ dependencies:
   video_player: ^2.11.1
   chewie: ^1.8.5
   facebook_app_events: ^0.19.4
+  payu_checkoutpro_flutter: ^1.4.5
 
 dev_dependencies:
   flutter_test:

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/exceptions/exceptions.dart';
 import '../../../../core/network/api_routes.dart';
 import '../../../../core/network/api_services.dart';
 import '../../../../core/widgets/app_back_button.dart';
 import '../../../jobs/domain/entities/available_job_entity.dart';
 import '../controllers/employer_dashboard_controller.dart';
+import '../widgets/job_posting_plan_sheet.dart';
 import '../../../auth/data/data_source/model/dropdown_item.dart';
 
 class PostJobFormScreen extends StatefulWidget {
@@ -389,7 +389,10 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Continue Editing', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Continue Editing',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -400,9 +403,14 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-            child: const Text('Discard', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Discard',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -431,7 +439,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
       return true;
     } else if (_currentStep == 1) {
       if (_payType == 'fixed') {
-        if (_minSalaryCtrl.text.trim().isEmpty || _maxSalaryCtrl.text.trim().isEmpty) {
+        if (_minSalaryCtrl.text.trim().isEmpty ||
+            _maxSalaryCtrl.text.trim().isEmpty) {
           _showValidationToast('Please enter both minimum and maximum salary');
           return false;
         }
@@ -518,7 +527,9 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
 
     final selectedOptionsCount = _selectedContactOptionsCount;
     if (selectedOptionsCount == 0) {
-      _showValidationToast('Please select at least 1 contact method for applicants');
+      _showValidationToast(
+        'Please select at least 1 contact method for applicants',
+      );
       return;
     }
     if (selectedOptionsCount > 2) {
@@ -526,7 +537,9 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
       return;
     }
     if (_enableCall && _contactPhoneCtrl.text.trim().length != 10) {
-      _showValidationToast('Please provide a valid 10-digit phone number for calls');
+      _showValidationToast(
+        'Please provide a valid 10-digit phone number for calls',
+      );
       return;
     }
     if (_enableChat && _contactWhatsappCtrl.text.trim().length != 10) {
@@ -571,18 +584,22 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
       workLocationType: _workLocationType,
       stateName: stateNameSelected,
       addressLine1: _workLocationType != 'home' ? _addressCtrl.text.trim() : '',
-      addressLine2:
-          _workLocationType != 'home' ? _address2Ctrl.text.trim() : '',
+      addressLine2: _workLocationType != 'home'
+          ? _address2Ctrl.text.trim()
+          : '',
       pincode: _workLocationType != 'home' ? _pincodeCtrl.text.trim() : '',
       payType: _payType,
-      fixedSalary:
-          _payType == 'fixed_inc' ? _fixedSalaryCtrl.text.trim() : null,
+      fixedSalary: _payType == 'fixed_inc'
+          ? _fixedSalaryCtrl.text.trim()
+          : null,
       minSalary: _payType == 'fixed' ? _minSalaryCtrl.text.trim() : null,
       maxSalary: _payType == 'fixed' ? _maxSalaryCtrl.text.trim() : null,
-      avgIncentive:
-          _payType == 'fixed_inc' ? _avgIncentiveCtrl.text.trim() : null,
-      estimatedIncentive:
-          _payType == 'inc_only' ? _estimatedIncentiveCtrl.text.trim() : null,
+      avgIncentive: _payType == 'fixed_inc'
+          ? _avgIncentiveCtrl.text.trim()
+          : null,
+      estimatedIncentive: _payType == 'inc_only'
+          ? _estimatedIncentiveCtrl.text.trim()
+          : null,
       perks: perksList,
       educationLevel: _educationLevel,
       englishLevel: _englishLevel,
@@ -605,43 +622,25 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
       applicationsCount: 0,
       status: 'active',
       createdAt: DateTime.now(),
+
       stateId: _selectedStateId,
       districtId: _selectedDistrictId,
       localiteId: _selectedLocalityId,
+      
       whatsappNumber: _enableChat ? _contactWhatsappCtrl.text.trim() : null,
       applyOnly: _applyOnly,
       enableCall: _enableCall,
       enableChat: _enableChat,
     );
 
-    setState(() => _isSubmitting = true);
-
-    try {
-      await controller.postNewJob(newJob);
-      Get.back();
-      Get.snackbar(
-        'Job Published Successfully',
-        'Your job opening is now live for verified candidates to apply.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: successGreen,
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 4),
-      );
-    } catch (error) {
-      Get.snackbar(
-        'Failed to Post Job',
-        error is Failure ? error.message : error.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
-    }
+    // Open the PayU Plan Selection & Payment Gateway Sheet
+    JobPostingPlanSheet.show(
+      context: context,
+      newJob: newJob,
+      onJobPublished: () {
+        Get.back(); // Close post job screen back to dashboard
+      },
+    );
   }
 
   @override
@@ -739,7 +738,9 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                     }
                   },
                   child: Container(
-                    margin: EdgeInsets.only(right: index == _totalSteps - 1 ? 0 : 6),
+                    margin: EdgeInsets.only(
+                      right: index == _totalSteps - 1 ? 0 : 6,
+                    ),
                     height: 5,
                     decoration: BoxDecoration(
                       color: isCompleted
@@ -807,13 +808,21 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               _buildModalSelector(
                 hint: 'Select Industry Category',
                 valueText:
-                    _categories.firstWhereOrNull(
-                      (c) => c['id'] == _selectedCategoryId,
-                    )?['name']?.toString() ?? '',
+                    _categories
+                        .firstWhereOrNull(
+                          (c) => c['id'] == _selectedCategoryId,
+                        )?['name']
+                        ?.toString() ??
+                    '',
                 icon: Icons.category_rounded,
                 onTap: () {
                   final items = _categories
-                      .map((c) => MapEntry(c['id'] as int, (c['name'] ?? '').toString()))
+                      .map(
+                        (c) => MapEntry(
+                          c['id'] as int,
+                          (c['name'] ?? '').toString(),
+                        ),
+                      )
                       .toList();
                   _showSearchBottomSheet(
                     title: 'Select Job Category',
@@ -908,12 +917,25 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                       _buildDropdown<String>(
                         value: _selectedShift,
                         items: const [
-                          DropdownMenuItem(value: 'day', child: Text('☀️ Day Shift')),
-                          DropdownMenuItem(value: 'night', child: Text('🌙 Night Shift')),
-                          DropdownMenuItem(value: 'rotational', child: Text('🔄 Rotational')),
-                          DropdownMenuItem(value: 'flexible', child: Text('⏰ Flexible')),
+                          DropdownMenuItem(
+                            value: 'day',
+                            child: Text('☀️ Day Shift'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'night',
+                            child: Text('🌙 Night Shift'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'rotational',
+                            child: Text('🔄 Rotational'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'flexible',
+                            child: Text('⏰ Flexible'),
+                          ),
                         ],
-                        onChanged: (val) => setState(() => _selectedShift = val!),
+                        onChanged: (val) =>
+                            setState(() => _selectedShift = val!),
                       ),
                     ],
                   ),
@@ -1077,16 +1099,23 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               if (_isStatesLoading)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Center(child: CircularProgressIndicator(color: primary)),
+                  child: Center(
+                    child: CircularProgressIndicator(color: primary),
+                  ),
                 )
               else
                 _buildModalSelector(
                   hint: 'Select State',
                   valueText:
-                      _states.firstWhereOrNull((s) => s.id == _selectedStateId)?.name ?? '',
+                      _states
+                          .firstWhereOrNull((s) => s.id == _selectedStateId)
+                          ?.name ??
+                      '',
                   icon: Icons.map_rounded,
                   onTap: () {
-                    final items = _states.map((s) => MapEntry(s.id, s.name)).toList();
+                    final items = _states
+                        .map((s) => MapEntry(s.id, s.name))
+                        .toList();
                     _showSearchBottomSheet(
                       title: 'Select State',
                       items: items,
@@ -1104,7 +1133,9 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               if (_isDistrictsLoading)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Center(child: CircularProgressIndicator(color: primary)),
+                  child: Center(
+                    child: CircularProgressIndicator(color: primary),
+                  ),
                 )
               else if (_districts.isNotEmpty) ...[
                 _buildLabel('District / City *'),
@@ -1129,7 +1160,9 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               if (_isLocalitiesLoading)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Center(child: CircularProgressIndicator(color: primary)),
+                  child: Center(
+                    child: CircularProgressIndicator(color: primary),
+                  ),
                 )
               else if (_localities.isNotEmpty) ...[
                 _buildLabel('Locality / Area *'),
@@ -1208,7 +1241,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
         _buildCardSection(
           icon: Icons.school_rounded,
           title: 'Candidate Qualifications',
-          subtitle: 'Required education, experience, language skills, and duties',
+          subtitle:
+              'Required education, experience, language skills, and duties',
           children: [
             Row(
               children: [
@@ -1220,13 +1254,29 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                       _buildDropdown<String>(
                         value: _educationLevel,
                         items: const [
-                          DropdownMenuItem(value: 'Below 10th', child: Text('Below 10th')),
-                          DropdownMenuItem(value: '10th Pass', child: Text('10th Pass')),
-                          DropdownMenuItem(value: '12th Pass', child: Text('12th Pass')),
-                          DropdownMenuItem(value: 'Graduate', child: Text('Graduate')),
-                          DropdownMenuItem(value: 'Post Graduate', child: Text('Post Graduate')),
+                          DropdownMenuItem(
+                            value: 'Below 10th',
+                            child: Text('Below 10th'),
+                          ),
+                          DropdownMenuItem(
+                            value: '10th Pass',
+                            child: Text('10th Pass'),
+                          ),
+                          DropdownMenuItem(
+                            value: '12th Pass',
+                            child: Text('12th Pass'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Graduate',
+                            child: Text('Graduate'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Post Graduate',
+                            child: Text('Post Graduate'),
+                          ),
                         ],
-                        onChanged: (val) => setState(() => _educationLevel = val!),
+                        onChanged: (val) =>
+                            setState(() => _educationLevel = val!),
                       ),
                     ],
                   ),
@@ -1240,13 +1290,17 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                       _buildDropdown<String>(
                         value: _experienceLevel,
                         items: const [
-                          DropdownMenuItem(value: 'fresher', child: Text('Fresher')),
+                          DropdownMenuItem(
+                            value: 'fresher',
+                            child: Text('Fresher'),
+                          ),
                           DropdownMenuItem(value: '1', child: Text('1+ Years')),
                           DropdownMenuItem(value: '2', child: Text('2+ Years')),
                           DropdownMenuItem(value: '3', child: Text('3+ Years')),
                           DropdownMenuItem(value: '5', child: Text('5+ Years')),
                         ],
-                        onChanged: (val) => setState(() => _experienceLevel = val!),
+                        onChanged: (val) =>
+                            setState(() => _experienceLevel = val!),
                       ),
                     ],
                   ),
@@ -1405,7 +1459,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               _buildLabel('Walk-in Venue Address *'),
               _buildTextInput(
                 controller: _walkinVenueCtrl,
-                hint: 'Complete office address with landmark for walk-in candidates',
+                hint:
+                    'Complete office address with landmark for walk-in candidates',
                 prefixIcon: Icons.place_rounded,
                 maxLines: 2,
               ),
@@ -1419,7 +1474,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
         _buildCardSection(
           icon: Icons.connect_without_contact_rounded,
           title: 'Applicant Contact Channels',
-          subtitle: 'Choose how candidates can connect with you (Select 1 or 2 options)',
+          subtitle:
+              'Choose how candidates can connect with you (Select 1 or 2 options)',
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -1431,7 +1487,11 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded, size: 16, color: warningOrange),
+                  const Icon(
+                    Icons.info_outline_rounded,
+                    size: 16,
+                    color: warningOrange,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -1450,7 +1510,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
             // In-App Applications
             _buildContactCard(
               title: 'In-App Applications',
-              subtitle: 'Candidates submit profiles directly through Rozgar Adda portal.',
+              subtitle:
+                  'Candidates submit profiles directly through Rozgar Adda portal.',
               icon: Icons.assignment_turned_in_rounded,
               value: _applyOnly,
               onChanged: (val) {
@@ -1477,7 +1538,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
             // Direct Phone Calls
             _buildContactCard(
               title: 'Direct Phone Calls',
-              subtitle: 'Qualified candidates can call your recruitment contact number.',
+              subtitle:
+                  'Qualified candidates can call your recruitment contact number.',
               icon: Icons.phone_in_talk_rounded,
               value: _enableCall,
               onChanged: (val) {
@@ -1515,7 +1577,8 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
             // WhatsApp Chat
             _buildContactCard(
               title: 'WhatsApp Chat',
-              subtitle: 'Candidates can message directly to your recruitment WhatsApp number.',
+              subtitle:
+                  'Candidates can message directly to your recruitment WhatsApp number.',
               icon: Icons.chat_rounded,
               value: _enableChat,
               onChanged: (val) {
@@ -1607,16 +1670,16 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                     )
                   : Icon(
                       isLastStep
-                          ? Icons.rocket_launch_rounded
+                          ? Icons.payment_rounded
                           : Icons.arrow_forward_rounded,
                       size: 18,
                     ),
               label: Text(
                 _isSubmitting
-                    ? 'Publishing...'
+                    ? 'Processing...'
                     : (isLastStep
-                        ? 'Publish Job Opening'
-                        : 'Continue to Step ${_currentStep + 2}'),
+                          ? 'Select Plan & Pay'
+                          : 'Continue to Step ${_currentStep + 2}'),
                 style: const TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w800,
@@ -1660,8 +1723,13 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: darkText,
                   side: const BorderSide(color: borderGrey, width: 1.2),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 13,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -1681,7 +1749,9 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: (isLastStep ? successGreen : primary).withValues(alpha: 0.3),
+                      color: (isLastStep ? successGreen : primary).withValues(
+                        alpha: 0.3,
+                      ),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -1694,7 +1764,9 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                     shadowColor: Colors.transparent,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                   child: _isSubmitting
                       ? const SizedBox(
@@ -1710,7 +1782,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                           children: [
                             Text(
                               isLastStep
-                                  ? 'Publish Job Opening'
+                                  ? 'Select Plan & Pay'
                                   : 'Continue to Step ${_currentStep + 2}',
                               style: const TextStyle(
                                 fontSize: 14.5,
@@ -1721,7 +1793,7 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                             const SizedBox(width: 8),
                             Icon(
                               isLastStep
-                                  ? Icons.check_circle_rounded
+                                  ? Icons.payment_rounded
                                   : Icons.arrow_forward_rounded,
                               size: 18,
                             ),
@@ -2168,8 +2240,15 @@ class _PostJobFormScreenState extends State<PostJobFormScreen> {
                       style: const TextStyle(fontSize: 14),
                       decoration: const InputDecoration(
                         hintText: 'Search items...',
-                        hintStyle: TextStyle(color: lightGreyText, fontSize: 13),
-                        prefixIcon: Icon(Icons.search_rounded, color: greyText, size: 20),
+                        hintStyle: TextStyle(
+                          color: lightGreyText,
+                          fontSize: 13,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search_rounded,
+                          color: greyText,
+                          size: 20,
+                        ),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 12),
                       ),

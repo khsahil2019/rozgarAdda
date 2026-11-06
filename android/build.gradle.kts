@@ -2,6 +2,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://artifactory.payu.in/artifactory/libs-release-local") }
     }
 }
 
@@ -14,8 +15,11 @@ subprojects {
     afterEvaluate {
         if (project.hasProperty("android")) {
             val android = project.extensions.findByType(com.android.build.gradle.BaseExtension::class.java)
-            if (android != null && android.namespace == null) {
-                android.namespace = project.group.toString()
+            if (android != null) {
+                if (android.namespace == null) {
+                    android.namespace = project.group.toString()
+                }
+                android.compileSdkVersion(36)
             }
         }
     }
