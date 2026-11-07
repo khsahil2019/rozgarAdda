@@ -74,16 +74,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
           ),
         ),
-        title: Obx(() => Text(
-              controller.productDetail.value?.title ?? 'Product Details',
-              style: const TextStyle(
-                color: Color(0xFF0F172A),
-                fontWeight: FontWeight.w800,
-                fontSize: 17,
-                letterSpacing: -0.3,
-              ),
-              overflow: TextOverflow.ellipsis,
-            )),
+        title: Obx(
+          () => Text(
+            controller.productDetail.value?.title ?? 'Product Details',
+            style: const TextStyle(
+              color: Color(0xFF0F172A),
+              fontWeight: FontWeight.w800,
+              fontSize: 17,
+              letterSpacing: -0.3,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         actions: [
           Obx(() {
             final product = controller.productDetail.value;
@@ -144,7 +146,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Widget _buildBottomBar(BuildContext context, BuyProduct product) {
     return Container(
-      padding: EdgeInsets.fromLTRB(16, 12, 16, MediaQuery.of(context).padding.bottom + 12),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        12,
+        16,
+        MediaQuery.of(context).padding.bottom + 12,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -217,7 +224,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  icon: const Icon(Icons.shopping_bag_rounded, size: 18, color: Colors.white),
+                  icon: const Icon(
+                    Icons.shopping_bag_rounded,
+                    size: 18,
+                    color: Colors.white,
+                  ),
                   label: const Text(
                     'Enquire Now',
                     style: TextStyle(
@@ -237,7 +248,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Widget _buildBody() {
     if (controller.isLoadingDetail.value) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFF4F46E5)));
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFF4F46E5)),
+      );
     }
 
     if (controller.detailError.value != null) {
@@ -284,8 +297,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final images = product.allImages;
     final currentImage =
         images.isNotEmpty && controller.selectedImageIndex.value < images.length
-            ? images[controller.selectedImageIndex.value]
-            : null;
+        ? images[controller.selectedImageIndex.value]
+        : null;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -343,10 +356,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFF1F5F9), width: 1),
+                    border: Border.all(
+                      color: const Color(0xFFF1F5F9),
+                      width: 1,
+                    ),
                   ),
                   child: Text(
-                    product.description.isNotEmpty ? product.description : 'High quality product available directly from verified seller.',
+                    product.description.isNotEmpty
+                        ? product.description
+                        : 'High quality product available directly from verified seller.',
                     style: const TextStyle(
                       color: Color(0xFF334155),
                       fontSize: 13.5,
@@ -372,11 +390,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     (f) => Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFECFDF5),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFA7F3D0), width: 1),
+                          border: Border.all(
+                            color: const Color(0xFFA7F3D0),
+                            width: 1,
+                          ),
                         ),
                         child: Row(
                           children: [
@@ -426,8 +450,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             _RelatedProductsGrid(
               products: controller.relatedProducts,
               onProductTap: (id) {
-                Get.off(() => ProductDetailScreen(productId: id),
-                    preventDuplicates: false);
+                Get.off(
+                  () => ProductDetailScreen(productId: id),
+                  preventDuplicates: false,
+                );
               },
             ),
             const SizedBox(height: 30),
