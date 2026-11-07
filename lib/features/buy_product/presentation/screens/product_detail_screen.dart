@@ -4,21 +4,19 @@ import '../../../chat/presentation/controller/chat_controller.dart';
 import '../../../chat/presentation/bindings/chat_binding.dart';
 import '../../domain/entities/buy_product_entities.dart';
 import '../controller/buy_product_controller.dart';
+import '../../../wishlist/presentation/controller/wishlist_controller.dart';
 
 // ─────────────────────────────────────────────
 // COLORS
 // ─────────────────────────────────────────────
 class _DC {
   static const Color primary = Color(0xFF1400FF);
-  static const Color scaffoldBg = Color(0xFFF5F6FA);
   static const Color cardBg = Color(0xFFFFFFFF);
   static const Color darkText = Color(0xFF1A1A2E);
   static const Color greyText = Color(0xFF8A8FA3);
   static const Color strikePrice = Color(0xFF9A9A9A);
   static const Color saveBadgeBg = Color(0xFFDD0000);
   static const Color offBadgeBg = Color(0xFFDD0000);
-  static const Color divider = Color(0xFFEEEFF5);
-  static const Color greenCheck = Color(0xFF1E9E5E);
   static const Color priceGreen = Color(0xFF1E9E5E);
 }
 
@@ -86,6 +84,48 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
               overflow: TextOverflow.ellipsis,
             )),
+        actions: [
+          Obx(() {
+            final product = controller.productDetail.value;
+            if (product == null) return const SizedBox.shrink();
+            final isLiked = WishlistController.to.isWishlisted(product.id);
+            return Padding(
+              padding: const EdgeInsets.only(right: 14),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => WishlistController.to.toggleWishlist(product),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: isLiked
+                          ? const Color(0xFFFEE2E2)
+                          : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isLiked
+                            ? const Color(0xFFFECACA)
+                            : const Color(0xFFE2E8F0),
+                        width: 1,
+                      ),
+                    ),
+                    child: Icon(
+                      isLiked
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
+                      color: isLiked
+                          ? const Color(0xFFEF4444)
+                          : const Color(0xFF0F172A),
+                      size: 19,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        ],
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
           child: Divider(color: Color(0xFFE2E8F0), height: 1),

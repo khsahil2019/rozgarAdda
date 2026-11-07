@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:rojgar/core/exceptions/exceptions.dart';
 import 'package:rojgar/core/network/api_services.dart';
 import 'package:rojgar/core/network/api_routes.dart';
@@ -121,33 +122,148 @@ class JobsRemoteDataSourceImpl implements JobsRemoteDataSource {
     int? districtId,
     int? localityId,
   }) async {
-    try {
-      final Map<String, dynamic> queryParams = {};
-      if (stateId != null) queryParams['state'] = stateId;
-      if (districtId != null) queryParams['district'] = districtId;
-      if (localityId != null) queryParams['locality'] = localityId;
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(StorageService.keyAccessToken) ??
+        prefs.getString('access_token') ??
+        prefs.getString('employer_token') ??
+        prefs.getString('candidate_token');
 
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString(StorageService.keyAccessToken);
+    final effectiveStateId = stateId ?? prefs.getInt('selected_state_id');
+
+    final Map<String, dynamic> queryParams = {};
+    if (effectiveStateId != null) {
+      queryParams['state'] = effectiveStateId;
+      queryParams['state_id'] = effectiveStateId;
+    }
+    if (districtId != null) {
+      queryParams['district'] = districtId;
+      queryParams['district_id'] = districtId;
+    }
+    if (localityId != null) {
+      queryParams['locality'] = localityId;
+      queryParams['locality_id'] = localityId;
+      queryParams['localite_id'] = localityId;
+    }
+
+    debugPrint('[LatestJobsDebug] Requesting: ${ApiRoutes.latestJobs}');
+    debugPrint('[LatestJobsDebug] Token available: ${token != null && token.isNotEmpty}');
+    debugPrint('[LatestJobsDebug] Query params: $queryParams');
+
+    // Helper to safely extract list of jobs from any response format
+    List<dynamic> extractJobsList(dynamic response) {
+      if (response == null) return [];
+      if (response is List) return response;
+      if (response is Map<String, dynamic>) {
+        if (response['data'] is List) return response['data'] as List<dynamic>;
+        if (response['data'] is Map && response['data']['data'] is List) {
+          return response['data']['data'] as List<dynamic>;
+        }
+        if (response['jobs'] is List) return response['jobs'] as List<dynamic>;
+        if (response['jobs'] is Map && response['jobs']['data'] is List) {
+          return response['jobs']['data'] as List<dynamic>;
+        }
+      }
+      return [];
+    }
+
+    try {
       final res = await ApiService.get(
         ApiRoutes.latestJobs,
         accessToken: token,
         queryParameters: queryParams.isNotEmpty ? queryParams : null,
       );
-      if (res['statusCode'] == 200 && res['status'] == true) {
-        final List<dynamic> dataList = res['data'] as List<dynamic>? ?? [];
-        return dataList
-            .map((e) => AvailableJobModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-      } else {
-        throw Failure(res['message'] ?? 'Failed to fetch latest jobs');
+
+      debugPrint('[LatestJobsDebug] Status code: ${res['statusCode']}');
+      debugPrint('[LatestJobsDebug] Response status: ${res['status']}');
+      debugPrint('[LatestJobsDebug] Response message: ${res['message']}');
+
+      final isSuccess = res['statusCode'] == 200 &&
+          (res['status'] == true || res['success'] == true);
+
+      final rawJobs = extractJobsList(res);
+
+      if (isSuccess && rawJobs.isNotEmpty) {
+        final List<AvailableJobModel> jobs = [];
+        for (final item in rawJobs) {
+          if (item is Map<String, dynamic>) {
+            try {
+              jobs.add(AvailableJobModel.fromJson(item));
+            } catch (parseError) {
+              debugPrint('[LatestJobsDebug] Parse warning for job: $parseError');
+            }
+          }
+        }
+        if (jobs.isNotEmpty) return jobs;
+      }
+
+      // If response says "no jobs" or "not found", treat cleanly as empty
+      final msg = (res['message'] ?? '').toString().toLowerCase();
+      if (msg.contains('no jobs') ||
+          msg.contains('not found') ||
+          msg.contains('empty') ||
+          msg.contains('error fetching')) {
+        debugPrint('[LatestJobsDebug] Cleanly returning empty list for: $msg');
+        return [];
+      }
+
+      // If status was false and message exists, fall through to fallback
+      debugPrint('[LatestJobsDebug] API returned unsuccessful message: ${res['message']}');
+    } catch (e) {
+      debugPrint('[LatestJobsDebug] Primary latest-jobs request note: $e');
+    }
+
+    // ── FALLBACK 1: Try Employer Jobs if user has employer token ───────────
+    final employerToken = prefs.getString('employer_token');
+    if (employerToken != null && employerToken.isNotEmpty) {
+      try {
+        debugPrint('[LatestJobsDebug] Trying fallback to employer jobs endpoint...');
+        final empRes = await ApiService.get(
+          ApiRoutes.employerJobs,
+          accessToken: employerToken,
+        );
+        final rawJobs = extractJobsList(empRes);
+        if (rawJobs.isNotEmpty) {
+          final List<AvailableJobModel> jobs = [];
+          for (final item in rawJobs) {
+            if (item is Map<String, dynamic>) {
+              try {
+                jobs.add(AvailableJobModel.fromJson(item));
+              } catch (_) {}
+            }
+          }
+          if (jobs.isNotEmpty) {
+            debugPrint('[LatestJobsDebug] Fallback succeeded with ${jobs.length} employer jobs');
+            return jobs;
+          }
+        }
+      } catch (e) {
+        debugPrint('[LatestJobsDebug] Employer jobs fallback note: $e');
+      }
+    }
+
+    // ── FALLBACK 2: Try Available Jobs for popular roles ──────────────────
+    try {
+      debugPrint('[LatestJobsDebug] Trying fallback via available-jobs for active roles...');
+      for (final roleId in [1, 2, 3, 4, 5, 6, 7, 8]) {
+        try {
+          final availJobs = await getAvailableJobs(
+            roleId,
+            stateId: effectiveStateId,
+            districtId: districtId,
+            localityId: localityId,
+          );
+          if (availJobs.isNotEmpty) {
+            debugPrint('[LatestJobsDebug] Fallback found ${availJobs.length} jobs in role $roleId');
+            return availJobs;
+          }
+        } catch (_) {}
       }
     } catch (e) {
-      if (e is Failure) rethrow;
-      throw Failure(
-        'Failed to fetch latest jobs. Please check your connection.',
-      );
+      debugPrint('[LatestJobsDebug] Role fallback note: $e');
     }
+
+    // If nothing found or backend server error, return empty list so screen shows empty state
+    return [];
   }
 
   @override

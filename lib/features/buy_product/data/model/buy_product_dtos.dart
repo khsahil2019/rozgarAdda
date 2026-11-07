@@ -75,6 +75,13 @@ class BuyProductModel extends BuyProduct {
     double parseDouble(dynamic v) =>
         v == null ? 0.0 : double.tryParse(v.toString()) ?? 0.0;
 
+    final rawId = json['id'];
+    final parsedId = rawId is int
+        ? rawId
+        : (rawId is num
+            ? rawId.toInt()
+            : int.tryParse(rawId?.toString() ?? '') ?? 0);
+
     final rawGallery = json['gallery_images'];
     final List<String> gallery = rawGallery is List
         ? rawGallery
@@ -84,14 +91,14 @@ class BuyProductModel extends BuyProduct {
         : [];
 
     return BuyProductModel(
-      id: (json['id'] as num).toInt(),
-      title: (json['title'] ?? '').toString(),
+      id: parsedId,
+      title: (json['title'] ?? json['name'] ?? json['product_name'] ?? '').toString(),
       description: (json['description'] ?? '').toString(),
-      metaImage: (json['meta_image'] ?? '').toString(),
+      metaImage: (json['meta_image'] ?? json['image'] ?? json['image_url'] ?? json['photo'] ?? '').toString(),
       galleryImages: gallery,
       price: parseDouble(json['price']),
       discount: parseDouble(json['discount']),
-      totalCost: parseDouble(json['total_cost']),
+      totalCost: parseDouble(json['total_cost'] ?? json['price']),
       features: (json['features'] ?? '').toString(),
       warranty: (json['warranty'] ?? '').toString(),
       capacity: (json['capacity'] ?? '').toString(),

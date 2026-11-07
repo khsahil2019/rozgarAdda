@@ -169,9 +169,10 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
         : (widget.newJob.contactPhone ?? '9999999999');
 
     try {
+      final totalPayable = _selectedPlan.totalPayable;
       final result = await PayUPaymentService.instance.openCheckout(
         txnId: txnId,
-        amount: _selectedPlan.price,
+        amount: totalPayable,
         productInfo:
             'Rozgar Adda Job Post: ${_selectedPlan.name} (${_selectedLevel == PackageLevel.district ? 'District' : 'State'})',
         firstName: firstName,
@@ -183,7 +184,8 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
               _selectedLevel == PackageLevel.district ? 'district' : 'state',
           PayUAdditionalParamKeys.udf3: controller.employerId.value.toString(),
           PayUAdditionalParamKeys.udf4: widget.newJob.title,
-          PayUAdditionalParamKeys.udf5: '',
+          PayUAdditionalParamKeys.udf5:
+              'Base: ${_selectedPlan.formattedBasePrice} | GST(18%): ${_selectedPlan.formattedGstAmount} | Total: ${_selectedPlan.formattedTotalPayable}',
         },
       );
 
@@ -196,6 +198,11 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
           else
             'id': _selectedPlan.id,
           'status': 'success',
+          'amount': _selectedPlan.totalPayable,
+          'base_price': _selectedPlan.price,
+          'gst_amount': _selectedPlan.gstAmount,
+          'gst_rate': '18%',
+          'total_payable': _selectedPlan.totalPayable,
           'mihpayid':
               result.mihpayid ?? result.paymentId ?? (result.txnId ?? txnId),
           'bank_ref_num': result.bankRefNum ?? (result.txnId ?? txnId),
@@ -291,12 +298,18 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
                       'Selected Plan',
                       '${_selectedPlan.name} (${_selectedLevel == PackageLevel.district ? 'District' : 'State'})',
                     ),
+                    if (!_selectedPlan.isFree) ...[
+                      const SizedBox(height: 8),
+                      _buildReceiptRow('Base Price', _selectedPlan.formattedBasePrice),
+                      const SizedBox(height: 8),
+                      _buildReceiptRow('GST (18%)', '+${_selectedPlan.formattedGstAmount}'),
+                    ],
                     const SizedBox(height: 8),
                     _buildReceiptRow(
-                      'Amount Paid',
+                      'Total Paid',
                       _selectedPlan.isFree
                           ? 'FREE'
-                          : '₹${_selectedPlan.price.toStringAsFixed(2)}',
+                          : '${_selectedPlan.formattedTotalPayable} (Incl. GST)',
                     ),
                     const SizedBox(height: 8),
                     _buildReceiptRow('Transaction ID', txnId),
@@ -459,6 +472,9 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
               else ...[
                 // Plans List
                 ..._currentPlans.map((plan) => _buildPlanCard(plan)),
+
+                // Billing & Tax Breakdown (18% GST)
+                if (!_selectedPlan.isFree) _buildBillingBreakdownCard(),
               ],
 
               // Error Message
@@ -533,14 +549,25 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
                     Text(
                       _selectedPlan.isFree
                           ? 'FREE'
-                          : '₹${_selectedPlan.price.toStringAsFixed(2)}',
+                          : _selectedPlan.formattedTotalPayable,
                       style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: 20,
                         fontWeight: FontWeight.w800,
                         color: darkText,
                         letterSpacing: -0.5,
                       ),
                     ),
+                    if (!_selectedPlan.isFree) ...[
+                      const SizedBox(height: 1),
+                      const Text(
+                        '(Incl. 18% GST)',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: greyText,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -582,10 +609,10 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
                                 child: Text(
                                   _selectedPlan.isFree
                                       ? 'Post Job (Free)'
-                                      : 'Pay ₹${_selectedPlan.price.toInt()} with PayU',
+                                      : 'Pay ${_selectedPlan.formattedTotalPayable} with PayU',
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
-                                    fontSize: 14.5,
+                                    fontSize: 13.5,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
                                   ),
@@ -883,20 +910,35 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
                 // Price Tag matching web portal yellow style
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: plan.isFree ? const Color(0xFFF1F5F9) : accentAmber,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    plan.isFree
-                        ? '₹0.00'
-                        : '₹${plan.price.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      color: plan.isFree ? darkText : Colors.white,
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        plan.isFree
+                            ? '₹0.00'
+                            : '₹${plan.price.toStringAsFixed(0)}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: plan.isFree ? darkText : Colors.white,
+                        ),
+                      ),
+                      if (!plan.isFree)
+                        Text(
+                          '+18% GST',
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white.withValues(alpha: 0.95),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],
@@ -949,6 +991,138 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBillingBreakdownCard() {
+    return Container(
+      margin: const EdgeInsets.only(top: 4, bottom: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderGrey, width: 1.1),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.receipt_long_rounded, color: primary, size: 18),
+                  SizedBox(width: 8),
+                  Text(
+                    'Bill & Tax Details',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: darkText,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  '18% GST Added',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: borderGrey),
+          const SizedBox(height: 10),
+
+          // Base Price
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  '${_selectedPlan.name} Plan (${_selectedPlan.durationDays} Days)',
+                  style: const TextStyle(fontSize: 12.5, color: greyText),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _selectedPlan.formattedBasePrice,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: darkText,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // GST 18%
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'GST (18%)',
+                style: TextStyle(fontSize: 12.5, color: greyText),
+              ),
+              Text(
+                '+${_selectedPlan.formattedGstAmount}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: accentAmber,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Divider(height: 1, color: borderGrey),
+          const SizedBox(height: 10),
+
+          // Total Payable
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Total Amount Payable',
+                style: TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w800,
+                  color: darkText,
+                ),
+              ),
+              Text(
+                _selectedPlan.formattedTotalPayable,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  color: primary,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

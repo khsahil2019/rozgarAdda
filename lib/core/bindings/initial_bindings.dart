@@ -15,6 +15,8 @@ import '../../features/employer_auth/presentation/bindings/employer_auth_binding
 import '../../features/employer_dashboard/presentation/bindings/employer_dashboard_binding.dart';
 import '../../features/missing_person/presentation/bindings/missing_person_binding.dart';
 import '../../features/profile/presentation/bindings/profile_binding.dart';
+import '../../features/wishlist/presentation/bindings/wishlist_binding.dart';
+import '../../features/wishlist/presentation/controller/wishlist_controller.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -53,11 +55,17 @@ class InitialBinding extends Bindings {
     // Register profile dependencies
     ProfileBinding().dependencies();
 
+    // Register wishlist dependencies
+    WishlistBinding().dependencies();
+
     // Always alive — global controllers
     Get.put(AppController(), permanent: true);
 
     // Promote AuthController to permanent
     Get.put<AuthController>(Get.find<AuthController>(), permanent: true);
+
+    // Promote WishlistController to permanent
+    Get.put<WishlistController>(Get.find<WishlistController>(), permanent: true);
   }
 }
 

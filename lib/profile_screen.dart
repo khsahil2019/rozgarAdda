@@ -12,6 +12,8 @@ import 'features/profile/presentation/screens/edit_profile_screen.dart';
 import 'features/profile/presentation/screens/help_support_screen.dart';
 import 'features/profile/presentation/screens/my_applications_screen.dart';
 import 'features/profile/presentation/screens/my_products_screen.dart';
+import 'features/wishlist/presentation/controller/wishlist_controller.dart';
+import 'features/wishlist/presentation/screens/wishlist_screen.dart';
 import 'localization/app_localizations.dart';
 import 'main.dart';
 
@@ -371,6 +373,21 @@ class ProfileScreen extends StatelessWidget {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const MyProductsScreen()),
+                  ),
+                ),
+                _GroupedTileData(
+                  icon: Icons.favorite_border_rounded,
+                  label: 'My Wishlist',
+                  defaultLabel: 'My Wishlist & Saved Products',
+                  iconBg: const Color(0xFFFEE2E2),
+                  iconColor: const Color(0xFFEF4444),
+                  badge: WishlistController.to.itemCount > 0
+                      ? '${WishlistController.to.itemCount} ITEMS'
+                      : null,
+                  badgeBg: const Color(0xFFEF4444),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const WishlistScreen()),
                   ),
                 ),
               ]),

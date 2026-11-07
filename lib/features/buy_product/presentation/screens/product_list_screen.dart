@@ -4,6 +4,8 @@ import '../controller/buy_product_controller.dart';
 import '../../domain/entities/buy_product_entities.dart';
 import 'product_detail_screen.dart';
 import '../../../../core/widgets/fast_loader.dart';
+import '../../../wishlist/presentation/controller/wishlist_controller.dart';
+import '../../../wishlist/presentation/screens/wishlist_screen.dart';
 
 
 // ─────────────────────────────────────────────
@@ -100,6 +102,66 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 )),
           ],
         ),
+        actions: [
+          Obx(() {
+            final count = WishlistController.to.itemCount;
+            return IconButton(
+              tooltip: 'Wishlist',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const WishlistScreen()),
+                );
+              },
+              icon: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                    ),
+                    child: const Icon(
+                      Icons.favorite_outline_rounded,
+                      color: Color(0xFF0F172A),
+                      size: 18,
+                    ),
+                  ),
+                  if (count > 0)
+                    Positioned(
+                      right: -3,
+                      top: -3,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFEF4444),
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$count',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              height: 1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }),
+          const SizedBox(width: 8),
+        ],
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
           child: Divider(color: Color(0xFFE2E8F0), height: 1),
@@ -319,8 +381,6 @@ class _ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<_ProductCard> {
-  bool _isLiked = false;
-
   String _formatPrice(double price) {
     return '₹${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}';
   }
@@ -399,35 +459,37 @@ class _ProductCardState extends State<_ProductCard> {
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() => _isLiked = !_isLiked);
-                        Get.snackbar(
-                          _isLiked ? 'Saved to Favorites' : 'Removed from Favorites',
-                          _isLiked ? '${product.title} saved to wishlist' : 'Removed from wishlist',
-                          snackPosition: SnackPosition.BOTTOM,
-                          duration: const Duration(seconds: 2),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.9),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 6,
-                            ),
-                          ],
+                    child: Obx(() {
+                      final isLiked =
+                          WishlistController.to.isWishlisted(product.id);
+                      return GestureDetector(
+                        onTap: () {
+                          WishlistController.to.toggleWishlist(product);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.92),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.12),
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            isLiked
+                                ? Icons.favorite_rounded
+                                : Icons.favorite_border_rounded,
+                            color: isLiked
+                                ? const Color(0xFFEF4444)
+                                : const Color(0xFF475569),
+                            size: 16,
+                          ),
                         ),
-                        child: Icon(
-                          _isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                          color: _isLiked ? const Color(0xFFEF4444) : const Color(0xFF475569),
-                          size: 16,
-                        ),
-                      ),
-                    ),
+                      );
+                    }),
                   ),
                 ],
               ),

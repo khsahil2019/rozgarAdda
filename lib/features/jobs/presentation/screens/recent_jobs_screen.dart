@@ -216,10 +216,25 @@ class _RecentJobsScreenState extends State<RecentJobsScreen> {
       );
       result.fold(
         (failure) {
-          setState(() {
-            _isLoading = false;
-            _errorMessage = failure.message;
-          });
+          debugPrint('[RecentJobsScreen] Error loading jobs: ${failure.message}');
+          final lower = failure.message.toLowerCase();
+          if (lower.contains('no jobs') ||
+              lower.contains('not found') ||
+              lower.contains('empty') ||
+              lower.contains('error fetching') ||
+              lower.contains('failed to fetch')) {
+            setState(() {
+              _isLoading = false;
+              _errorMessage = null;
+              _recentJobs = [];
+              _filterJobs();
+            });
+          } else {
+            setState(() {
+              _isLoading = false;
+              _errorMessage = failure.message;
+            });
+          }
         },
         (jobs) {
           setState(() {

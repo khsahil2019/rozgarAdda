@@ -30,6 +30,32 @@ class JobPostingPlan {
     this.excludedFeatures = const ['Database Access'],
   });
 
+  /// Base price of the package before GST
+  double get basePrice => price;
+
+  /// GST Rate for job posting packages (18%)
+  double get gstRate => 0.18;
+
+  /// 18% GST Amount rounded to 2 decimal places
+  double get gstAmount =>
+      isFree ? 0.0 : double.parse((price * 0.18).toStringAsFixed(2));
+
+  /// Final total payable amount including 18% GST
+  double get totalPayable =>
+      isFree ? 0.0 : double.parse((price + gstAmount).toStringAsFixed(2));
+
+  /// Display string for base package price
+  String get formattedBasePrice =>
+      isFree ? '₹0.00' : '₹${price.toStringAsFixed(2)}';
+
+  /// Display string for 18% GST amount
+  String get formattedGstAmount =>
+      isFree ? '₹0.00' : '₹${gstAmount.toStringAsFixed(2)}';
+
+  /// Display string for total payable
+  String get formattedTotalPayable =>
+      isFree ? 'FREE' : '₹${totalPayable.toStringAsFixed(2)}';
+
   factory JobPostingPlan.fromJson(Map<String, dynamic> json) {
     final typeStr = (json['plan_type'] ?? 'district').toString().toLowerCase();
     final level = typeStr == 'state' ? PackageLevel.state : PackageLevel.district;

@@ -62,6 +62,12 @@ class ApiRoutes {
   static String productDetails(int productId) =>
       _buildUrl('product-details/$productId');
 
+  // Wishlist
+  static String get wishlist => _buildUrl('candidate/wishlist');
+  static String get toggleWishlist => _buildUrl('candidate/wishlist/toggle');
+  static String get addWishlist => _buildUrl('candidate/wishlist/toggle');
+  static String get removeWishlist => _buildUrl('candidate/wishlist/remove');
+
   // Jobs
   static String get dashboard => _buildUrl('candidate/dashboard');
   static String get jobRoles => _buildUrl('candidate/job-roles');
