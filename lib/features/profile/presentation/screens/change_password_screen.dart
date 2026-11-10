@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/core/widgets/app_back_button.dart';
+import '../bindings/profile_binding.dart';
 import '../controller/profile_controller.dart';
 
 // Unified Rozgar Brand Color Tokens
@@ -39,6 +40,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   void initState() {
     super.initState();
+    if (!Get.isRegistered<ProfileController>()) {
+      ProfileBinding().dependencies();
+    }
     _ctrl = Get.find<ProfileController>();
   }
 

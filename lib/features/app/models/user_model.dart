@@ -29,18 +29,24 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    int parseId(dynamic val) {
+      if (val is int) return val;
+      if (val is String) return int.tryParse(val) ?? 0;
+      return 0;
+    }
+
     return UserModel(
-      id: json['id'] ?? 0,
-      username: json['username'] ?? '',
-      name: json['name'] ?? '',
-      email: json['email'] ?? '',
-      phone: json['phone'] ?? '',
-      address: json['address'] ?? '',
-      city: json['city'] ?? '',
-      state: json['state'] ?? '',
-      country: json['country'] ?? '',
-      zipCode: json['zip_code'] ?? '',
-      profileImage: json['profile_image'] ?? '',
+      id: parseId(json['id'] ?? json['candidate_id'] ?? json['user_id']),
+      username: json['username']?.toString() ?? '',
+      name: (json['name'] ?? json['full_name'])?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      phone: (json['phone'] ?? json['mobile'])?.toString() ?? '',
+      address: json['address']?.toString() ?? '',
+      city: json['city']?.toString() ?? '',
+      state: json['state']?.toString() ?? '',
+      country: json['country']?.toString() ?? '',
+      zipCode: (json['zip_code'] ?? json['pincode'])?.toString() ?? '',
+      profileImage: (json['profile_image'] ?? json['profile_photo'] ?? json['photo'])?.toString() ?? '',
     );
   }
 

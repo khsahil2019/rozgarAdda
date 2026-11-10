@@ -65,7 +65,7 @@ class LoginController extends GetxController {
           // Persist user properties and update AppController state
           try {
             if (Get.isRegistered<AppController>()) {
-              AppController.to.login(result);
+              await AppController.to.login(result);
             } else {
               final prefs = await SharedPreferences.getInstance();
               await prefs.setInt('candidate_id', result.id);

@@ -51,6 +51,12 @@ class StorageService {
     return _prefs.setString(keySelectedStateName, name);
   }
 
+  Future<bool> clearCandidateSession() async {
+    final r1 = await _prefs.remove(keyCandidateId);
+    final r2 = await _prefs.remove(keyAccessToken);
+    return r1 && r2;
+  }
+
   Future<bool> clear() {
     return _prefs.clear();
   }

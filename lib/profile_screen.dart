@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'core/widgets/network_image_service.dart';
 import 'features/app/app_controller.dart';
 import 'features/kyc/presentation/screens/edit_kyc_screen.dart';
+import 'features/profile/presentation/bindings/profile_binding.dart';
+import 'features/profile/presentation/controller/profile_controller.dart';
 import 'features/profile/presentation/screens/change_password_screen.dart';
 import 'features/profile/presentation/screens/edit_profile_screen.dart';
 import 'features/profile/presentation/screens/help_support_screen.dart';
@@ -316,10 +318,15 @@ class ProfileScreen extends StatelessWidget {
                   defaultLabel: 'Personal Information & Resume',
                   iconBg: const Color(0xFFEFF6FF),
                   iconColor: const Color(0xFF2563EB),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const EditProfileScreen()),
-                  ),
+                  onTap: () {
+                    if (!Get.isRegistered<ProfileController>()) {
+                      ProfileBinding().dependencies();
+                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                    );
+                  },
                 ),
                 _GroupedTileData(
                   icon: Icons.verified_user_outlined,
@@ -489,48 +496,51 @@ class ProfileScreen extends StatelessWidget {
           ),
           Row(
             children: [
-              // Profile Avatar
-              Stack(
-                alignment: Alignment.bottomRight,
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.25),
-                      border: Border.all(color: Colors.white, width: 2.5),
+              // Profile Avatar (Clicking whole avatar or pencil opens EditProfile)
+              GestureDetector(
+                onTap: () {
+                  if (!Get.isRegistered<ProfileController>()) {
+                    ProfileBinding().dependencies();
+                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const EditProfileScreen(),
                     ),
-                    child: ClipOval(
-                      child: avatarUrl != null && avatarUrl.isNotEmpty
-                          ? NetworkImageService(
-                              imageUrl: avatarUrl,
-                              width: 64,
-                              height: 64,
-                              fit: BoxFit.cover,
-                            )
-                          : Center(
-                              child: Text(
-                                initial,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w900,
+                  );
+                },
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: 0.25),
+                        border: Border.all(color: Colors.white, width: 2.5),
+                      ),
+                      child: ClipOval(
+                        child: avatarUrl != null && avatarUrl.isNotEmpty
+                            ? NetworkImageService(
+                                imageUrl: avatarUrl,
+                                width: 64,
+                                height: 64,
+                                fit: BoxFit.cover,
+                              )
+                            : Center(
+                                child: Text(
+                                  initial,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w900,
+                                  ),
                                 ),
                               ),
-                            ),
+                      ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const EditProfileScreen(),
-                        ),
-                      );
-                    },
-                    child: Container(
+                    Container(
                       padding: const EdgeInsets.all(4.5),
                       decoration: const BoxDecoration(
                         color: Color(0xFF10B981),
@@ -548,8 +558,8 @@ class ProfileScreen extends StatelessWidget {
                         size: 12,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(width: 14),
 

@@ -70,10 +70,13 @@ class SellProductRemoteDataSourceImpl implements SellProductRemoteDataSource {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString(StorageService.keyAccessToken) ??
+          prefs.getString('access_token') ??
+          prefs.getString('candidate_token') ??
+          prefs.getString('employer_token') ??
           '1|y1EzlPQqrGADDxsCP3upGTTFT0cTIlfIB1bAMEZNb65f5911';
 
       final dioInstance = dio.Dio();
-      final formData = dio.FormData.fromMap({
+      final formDataMap = <String, dynamic>{
         'category_id': request.categoryId.toString(),
         'subcategory_id': request.subCategoryId.toString(),
         'title': request.title,
@@ -84,7 +87,23 @@ class SellProductRemoteDataSourceImpl implements SellProductRemoteDataSource {
         'capacity': request.capacity,
         'warranty': request.warranty,
         'status': request.isActive ? '1' : '0',
-      });
+      };
+
+      if (request.planId != null) {
+        formDataMap['plan_id'] = request.planId.toString();
+      }
+      if (request.transactionId != null && request.transactionId!.isNotEmpty) {
+        formDataMap['transaction_id'] = request.transactionId!;
+        formDataMap['txn_id'] = request.transactionId!;
+      }
+      if (request.paymentId != null && request.paymentId!.isNotEmpty) {
+        formDataMap['payment_id'] = request.paymentId!;
+      }
+      if (request.paymentStatus != null && request.paymentStatus!.isNotEmpty) {
+        formDataMap['payment_status'] = request.paymentStatus!;
+      }
+
+      final formData = dio.FormData.fromMap(formDataMap);
 
       if (request.mainImagePath.isNotEmpty) {
         formData.files.add(

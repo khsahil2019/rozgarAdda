@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/network/api_routes.dart';
+import '../../../../core/widgets/network_image_service.dart';
 import '../../../chat/presentation/controller/chat_controller.dart';
 import '../../../chat/presentation/bindings/chat_binding.dart';
 import '../../domain/entities/buy_product_entities.dart';
+import '../bindings/buy_product_binding.dart';
 import '../controller/buy_product_controller.dart';
+import '../theme/buy_product_theme.dart';
 import '../../../wishlist/presentation/controller/wishlist_controller.dart';
 
 // ─────────────────────────────────────────────
 // COLORS
 // ─────────────────────────────────────────────
 class _DC {
-  static const Color primary = Color(0xFF1400FF);
+  static const Color primary = BuyProductTheme.primaryMaroon;
   static const Color cardBg = Color(0xFFFFFFFF);
   static const Color darkText = Color(0xFF1A1A2E);
   static const Color greyText = Color(0xFF8A8FA3);
   static const Color strikePrice = Color(0xFF9A9A9A);
   static const Color saveBadgeBg = Color(0xFFDD0000);
   static const Color offBadgeBg = Color(0xFFDD0000);
-  static const Color priceGreen = Color(0xFF1E9E5E);
 }
 
 // ─────────────────────────────────────────────
@@ -25,19 +28,34 @@ class _DC {
 // ─────────────────────────────────────────────
 class ProductDetailScreen extends StatefulWidget {
   final int productId;
+  final BuyProduct? initialProduct;
 
-  const ProductDetailScreen({super.key, required this.productId});
+  const ProductDetailScreen({
+    super.key,
+    required this.productId,
+    this.initialProduct,
+  });
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  final BuyProductController controller = Get.find<BuyProductController>();
+  late final BuyProductController controller;
 
   @override
   void initState() {
     super.initState();
+    if (!Get.isRegistered<BuyProductController>()) {
+      BuyProductBinding().dependencies();
+    }
+    controller = Get.find<BuyProductController>();
+
+    if (widget.initialProduct != null) {
+      controller.productDetail.value = widget.initialProduct;
+      controller.selectedImageIndex.value = 0;
+    }
+
     controller.fetchProductDetails(widget.productId);
   }
 
@@ -75,20 +93,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ),
         title: Obx(
-          () => Text(
-            controller.productDetail.value?.title ?? 'Product Details',
-            style: const TextStyle(
-              color: Color(0xFF0F172A),
-              fontWeight: FontWeight.w800,
-              fontSize: 17,
-              letterSpacing: -0.3,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
+          () {
+            final product =
+                controller.productDetail.value ?? widget.initialProduct;
+            return Text(
+              product?.title ?? 'Product Details',
+              style: const TextStyle(
+                color: Color(0xFF0F172A),
+                fontWeight: FontWeight.w800,
+                fontSize: 17,
+                letterSpacing: -0.3,
+              ),
+              overflow: TextOverflow.ellipsis,
+            );
+          },
         ),
         actions: [
           Obx(() {
-            final product = controller.productDetail.value;
+            final product =
+                controller.productDetail.value ?? widget.initialProduct;
             if (product == null) return const SizedBox.shrink();
             final isLiked = WishlistController.to.isWishlisted(product.id);
             return Padding(
@@ -135,8 +158,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
       body: Obx(() => _buildBody()),
       bottomNavigationBar: Obx(() {
-        final product = controller.productDetail.value;
-        if (product == null || controller.isLoadingDetail.value) {
+        final product =
+            controller.productDetail.value ?? widget.initialProduct;
+        if (product == null) {
           return const SizedBox.shrink();
         }
         return _buildBottomBar(context, product);
@@ -247,13 +271,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   Widget _buildBody() {
-    if (controller.isLoadingDetail.value) {
+    final product = controller.productDetail.value ?? widget.initialProduct;
+
+    if (controller.isLoadingDetail.value && product == null) {
       return const Center(
         child: CircularProgressIndicator(color: Color(0xFF4F46E5)),
       );
     }
 
-    if (controller.detailError.value != null) {
+    if (controller.detailError.value != null && product == null) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -291,14 +317,49 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       );
     }
 
-    final product = controller.productDetail.value;
-    if (product == null) return const SizedBox.shrink();
+    if (product == null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.inventory_2_outlined,
+                size: 52,
+                color: Color(0xFF94A3B8),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Product details not found or unavailable.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: () =>
+                    controller.fetchProductDetails(widget.productId),
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Retry'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4F46E5),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     final images = product.allImages;
     final currentImage =
         images.isNotEmpty && controller.selectedImageIndex.value < images.length
         ? images[controller.selectedImageIndex.value]
-        : null;
+        : (images.isNotEmpty ? images.first : null);
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -473,6 +534,10 @@ class _MainImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final resolvedUrl = imageUrl != null && imageUrl!.isNotEmpty
+        ? ApiRoutes.absoluteUrl(imageUrl!)
+        : '';
+
     return Container(
       width: double.infinity,
       height: 220,
@@ -482,11 +547,13 @@ class _MainImage extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE0E0EE)),
       ),
       clipBehavior: Clip.antiAlias,
-      child: imageUrl != null && imageUrl!.isNotEmpty
-          ? Image.network(
-              imageUrl!,
+      child: resolvedUrl.isNotEmpty
+          ? NetworkImageService(
+              imageUrl: resolvedUrl,
+              width: double.infinity,
+              height: 220,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _placeholder(),
+              errorWidget: _placeholder(),
             )
           : _placeholder(),
     );
@@ -495,8 +562,8 @@ class _MainImage extends StatelessWidget {
   Widget _placeholder() {
     return const Center(
       child: Icon(
-        Icons.directions_car_filled_rounded,
-        size: 64,
+        Icons.inventory_2_outlined,
+        size: 54,
         color: Color(0xFFBBBBDD),
       ),
     );
@@ -524,6 +591,7 @@ class _ThumbnailRow extends StatelessWidget {
       child: Row(
         children: List.generate(images.length, (i) {
           final isSelected = selectedIndex == i;
+          final resolvedUrl = ApiRoutes.absoluteUrl(images[i]);
           return GestureDetector(
             onTap: () => onTap(i),
             child: AnimatedContainer(
@@ -540,10 +608,12 @@ class _ThumbnailRow extends StatelessWidget {
                 ),
               ),
               clipBehavior: Clip.antiAlias,
-              child: Image.network(
-                images[i],
+              child: NetworkImageService(
+                imageUrl: resolvedUrl,
+                width: 72,
+                height: 58,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(
+                errorWidget: const Icon(
                   Icons.image_outlined,
                   size: 24,
                   color: Color(0xFFBBBBCC),
@@ -755,10 +825,10 @@ class _RelatedProductsGrid extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14),
       itemCount: products.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 14,
-        crossAxisSpacing: 14,
-        childAspectRatio: 0.68,
+        crossAxisCount: 3,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.58,
       ),
       itemBuilder: (context, i) {
         final p = products[i];
@@ -767,12 +837,16 @@ class _RelatedProductsGrid extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               color: _DC.cardBg,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: const [
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: BuyProductTheme.borderMaroon,
+                width: 1.25,
+              ),
+              boxShadow: [
                 BoxShadow(
-                  color: Color(0x10000000),
-                  blurRadius: 12,
-                  offset: Offset(0, 4),
+                  color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.07),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
@@ -780,119 +854,90 @@ class _RelatedProductsGrid extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Image with OFF badge
-                Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(16),
-                      ),
-                      child: Container(
-                        height: 120,
-                        width: double.infinity,
-                        color: const Color(0xFFEEEFF8),
-                        child: p.metaImage.isNotEmpty
-                            ? Image.network(
-                                p.metaImage,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => const Icon(
-                                  Icons.directions_car_filled_rounded,
-                                  size: 48,
-                                  color: Color(0xFFBBBBDD),
-                                ),
-                              )
-                            : const Icon(
-                                Icons.directions_car_filled_rounded,
-                                size: 48,
-                                color: Color(0xFFBBBBDD),
-                              ),
-                      ),
-                    ),
-                    if (p.discount > 0)
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 7,
-                            vertical: 3,
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(12),
                           ),
-                          decoration: BoxDecoration(
-                            color: _DC.offBadgeBg,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            '${p.discount.toStringAsFixed(0)}% OFF',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                            ),
+                          child: Container(
+                            color: BuyProductTheme.lightMaroonBg,
+                            child: p.metaImage.isNotEmpty
+                                ? NetworkImageService(
+                                    imageUrl: ApiRoutes.absoluteUrl(p.metaImage),
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorWidget: const Icon(
+                                      Icons.inventory_2_outlined,
+                                      size: 30,
+                                      color: BuyProductTheme.primaryMaroon,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.inventory_2_outlined,
+                                    size: 30,
+                                    color: BuyProductTheme.primaryMaroon,
+                                  ),
                           ),
                         ),
                       ),
-                  ],
+                      if (p.discount > 0)
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _DC.offBadgeBg,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              '${p.discount.toStringAsFixed(0)}%',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
 
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          p.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: _DC.darkText,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _fmt(p.totalCost),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: BuyProductTheme.primaryMaroon,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          p.description,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: _DC.greyText,
-                            fontSize: 12,
-                          ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        p.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: _DC.darkText,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
                         ),
-                        const Spacer(),
-                        if (p.discount > 0)
-                          Text(
-                            _fmt(p.price),
-                            style: const TextStyle(
-                              color: _DC.strikePrice,
-                              fontSize: 12,
-                              decoration: TextDecoration.lineThrough,
-                            ),
-                          ),
-                        const SizedBox(height: 2),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _fmt(p.totalCost),
-                              style: const TextStyle(
-                                color: _DC.priceGreen,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const Text(
-                              'View',
-                              style: TextStyle(
-                                color: _DC.primary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],

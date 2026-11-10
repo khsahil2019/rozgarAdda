@@ -7,14 +7,19 @@ import '../controller/profile_controller.dart';
 class ProfileBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<ProfileRemoteDataSource>(() => ProfileRemoteDataSourceImpl());
+    Get.lazyPut<ProfileRemoteDataSource>(
+      () => ProfileRemoteDataSourceImpl(),
+      fenix: true,
+    );
     Get.lazyPut<ProfileRepository>(
       () => ProfileRepositoryImpl(
         remoteDataSource: Get.find<ProfileRemoteDataSource>(),
       ),
+      fenix: true,
     );
     Get.lazyPut<ProfileController>(
       () => ProfileController(repository: Get.find<ProfileRepository>()),
+      fenix: true,
     );
   }
 }

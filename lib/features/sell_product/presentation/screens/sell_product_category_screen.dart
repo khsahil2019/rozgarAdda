@@ -8,8 +8,8 @@ import '../widgets/sell_product_step_indicator.dart';
 import 'sell_product_subcategory_screen.dart';
 
 class _C {
-  static const Color primaryBlue = Color(0xFF1400FF);
-  static const Color primaryLight = Color(0xFF4F46E5);
+  static const Color primaryBlue = Color(0xFF801438); // Aligned with marketplace theme
+  static const Color primaryLight = Color(0xFF9E1B46);
   static const Color darkText = Color(0xFF0F172A);
   static const Color greyText = Color(0xFF64748B);
   static const Color borderGrey = Color(0xFFE2E8F0);
@@ -17,10 +17,17 @@ class _C {
   static const Color cardBg = Color(0xFFFFFFFF);
 }
 
-class SellProductCategoryScreen extends GetView<SellProductController> {
+class SellProductCategoryScreen extends StatefulWidget {
   const SellProductCategoryScreen({super.key});
 
   @override
+  State<SellProductCategoryScreen> createState() => _SellProductCategoryScreenState();
+}
+
+class _SellProductCategoryScreenState extends State<SellProductCategoryScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
   SellProductController get controller {
     if (!Get.isRegistered<SellProductController>()) {
       SellProductBinding().dependencies();
@@ -29,15 +36,26 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     if (!Get.isRegistered<SellProductController>()) {
       SellProductBinding().dependencies();
     }
-    // Refresh categories when this screen is opened
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.fetchCategories();
+      if (controller.categories.isEmpty && !controller.isLoadingCategories.value) {
+        controller.fetchCategories();
+      }
     });
+  }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
     return PopScope(
@@ -84,6 +102,48 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
         body: Column(
           children: [
             const SellProductStepIndicator(currentStep: 1),
+
+            // 🔍 Live Search Bar
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: _C.primaryBlue, width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _C.primaryBlue.withValues(alpha: 0.06),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                  style: const TextStyle(fontSize: 13.5, color: _C.darkText, fontWeight: FontWeight.w600),
+                  decoration: InputDecoration(
+                    hintText: 'Search categories (e.g. Mobile, Cars)...',
+                    hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontWeight: FontWeight.w500),
+                    prefixIcon: const Icon(Icons.search_rounded, color: _C.primaryBlue, size: 20),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, color: _C.greyText, size: 18),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ),
+
             Expanded(
               child: Obx(() {
                 if (controller.isLoadingCategories.value) {
@@ -92,7 +152,7 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                   );
                 }
 
-                if (controller.categoriesError.value != null) {
+                if (controller.categoriesError.value != null && controller.categories.isEmpty) {
                   return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
@@ -145,7 +205,11 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                   );
                 }
 
-                if (controller.categories.isEmpty) {
+                final filteredList = controller.categories.where((cat) {
+                  return cat.name.toLowerCase().contains(_searchQuery.toLowerCase());
+                }).toList();
+
+                if (filteredList.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -153,8 +217,10 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                         Icon(Icons.inventory_2_outlined, size: 48, color: _C.greyText.withValues(alpha: 0.5)),
                         const SizedBox(height: 12),
                         Text(
-                          l10n.text('sell_no_categories'),
-                          style: const TextStyle(color: _C.greyText, fontSize: 15, fontWeight: FontWeight.w600),
+                          _searchQuery.isNotEmpty
+                              ? 'No categories matching "$_searchQuery"'
+                              : l10n.text('sell_no_categories'),
+                          style: const TextStyle(color: _C.greyText, fontSize: 14, fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
@@ -162,12 +228,12 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
-                  itemCount: controller.categories.length + 1,
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+                  itemCount: filteredList.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
+                        padding: const EdgeInsets.only(bottom: 12.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -175,17 +241,17 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                               l10n.text('sell_choose_category'),
                               style: const TextStyle(
                                 color: _C.darkText,
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: -0.3,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
-                              'Select the category that best matches your product',
-                              style: TextStyle(
+                            Text(
+                              'Select the category that best matches your product (${filteredList.length} options)',
+                              style: const TextStyle(
                                 color: _C.greyText,
-                                fontSize: 13,
+                                fontSize: 12.5,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -194,15 +260,15 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                       );
                     }
 
-                    final itemIndex = index - 1;
-                    final category = controller.categories[itemIndex];
+                    final catItem = filteredList[index - 1];
+                    final originalIndex = controller.categories.indexOf(catItem);
 
                     return Obx(() {
-                      final isSelected = controller.selectedCategoryIndex.value == itemIndex;
+                      final isSelected = controller.selectedCategoryIndex.value == originalIndex;
 
                       return GestureDetector(
                         onTap: () {
-                          controller.selectCategory(itemIndex);
+                          controller.selectCategory(originalIndex);
                           Future.delayed(const Duration(milliseconds: 180), () {
                             if (context.mounted) {
                               Get.to(() => const SellProductSubCategoryScreen());
@@ -215,7 +281,7 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? const Color(0xFF1400FF).withValues(alpha: 0.04)
+                                ? _C.primaryBlue.withValues(alpha: 0.05)
                                 : _C.cardBg,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
@@ -233,38 +299,38 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
                           child: Row(
                             children: [
                               Container(
-                                width: 48,
-                                height: 48,
+                                width: 44,
+                                height: 44,
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? const Color(0xFF1400FF).withValues(alpha: 0.12)
+                                      ? _C.primaryBlue.withValues(alpha: 0.12)
                                       : const Color(0xFFF1F5F9),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 clipBehavior: Clip.antiAlias,
-                                child: category.imageUrl.isNotEmpty
+                                child: catItem.imageUrl.isNotEmpty
                                     ? Image.network(
-                                        category.imageUrl,
+                                        catItem.imageUrl,
                                         fit: BoxFit.cover,
                                         errorBuilder: (_, __, ___) => Icon(
                                           Icons.category_rounded,
                                           color: isSelected ? _C.primaryBlue : _C.greyText,
-                                          size: 24,
+                                          size: 22,
                                         ),
                                       )
                                     : Icon(
                                         Icons.category_rounded,
                                         color: isSelected ? _C.primaryBlue : _C.greyText,
-                                        size: 24,
+                                        size: 22,
                                       ),
                               ),
                               const SizedBox(width: 14),
                               Expanded(
                                 child: Text(
-                                  category.name,
+                                  catItem.name,
                                   style: TextStyle(
                                     color: isSelected ? _C.primaryBlue : _C.darkText,
-                                    fontSize: 15,
+                                    fontSize: 14.5,
                                     fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                                     letterSpacing: -0.2,
                                   ),
@@ -297,76 +363,6 @@ class SellProductCategoryScreen extends GetView<SellProductController> {
             ),
           ],
         ),
-        bottomSheet: Obx(() {
-          final hasSelection = controller.selectedCategoryIndex.value != null;
-          return Container(
-            padding: EdgeInsets.fromLTRB(
-              16,
-              12,
-              16,
-              MediaQuery.of(context).padding.bottom + 14,
-            ),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                top: BorderSide(color: _C.borderGrey, width: 1),
-              ),
-            ),
-            child: Container(
-              width: double.infinity,
-              height: 52,
-              decoration: BoxDecoration(
-                gradient: hasSelection
-                    ? const LinearGradient(
-                        colors: [_C.primaryBlue, _C.primaryLight],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      )
-                    : null,
-                color: hasSelection ? null : const Color(0xFFCBD5E1),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: hasSelection
-                    ? [
-                        BoxShadow(
-                          color: _C.primaryBlue.withValues(alpha: 0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                onPressed: hasSelection && controller.categories.isNotEmpty
-                    ? () => Get.to(() => const SellProductSubCategoryScreen())
-                    : null,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.text('sell_next'),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.arrow_forward_rounded, size: 18),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
       ),
     );
   }

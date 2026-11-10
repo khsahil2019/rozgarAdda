@@ -36,11 +36,14 @@ Future<void> main() async {
   final storageService = Get.put(StorageService(prefs), permanent: true);
 
   final savedCode = storageService.getLanguageCode() ?? 'en';
-  final bool isCandidateLoggedIn = storageService.getCandidateId() != null;
+  final candidateId = storageService.getCandidateId() ?? prefs.getInt('candidate_id');
+  final token = storageService.getAccessToken() ?? prefs.getString('access_token');
+  final bool isCandidateLoggedIn =
+      candidateId != null && candidateId > 0 && token != null && token.isNotEmpty;
   final bool isEmployerLoggedIn = prefs.getInt('employer_id') != null;
 
-  if (isCandidateLoggedIn && storageService.getCandidateId() != null) {
-    MetaAnalyticsService.instance.setUserId(storageService.getCandidateId().toString());
+  if (isCandidateLoggedIn) {
+    MetaAnalyticsService.instance.setUserId(candidateId.toString());
   } else if (isEmployerLoggedIn && prefs.getInt('employer_id') != null) {
     MetaAnalyticsService.instance.setUserId(prefs.getInt('employer_id').toString());
   }

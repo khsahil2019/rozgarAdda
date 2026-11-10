@@ -35,6 +35,11 @@ class SellProductRequest {
   final bool isActive;
   final String mainImagePath;
   final List<String> galleryImagePaths;
+  final int? planId;
+  final String? transactionId;
+  final String? paymentId;
+  final String? paymentStatus;
+  final Map<String, dynamic>? paymentData;
 
   const SellProductRequest({
     required this.categoryId,
@@ -49,5 +54,10 @@ class SellProductRequest {
     required this.isActive,
     required this.mainImagePath,
     required this.galleryImagePaths,
+    this.planId,
+    this.transactionId,
+    this.paymentId,
+    this.paymentStatus,
+    this.paymentData,
   });
 }

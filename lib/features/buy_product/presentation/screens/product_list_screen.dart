@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/network/api_routes.dart';
+import '../../../../core/widgets/network_image_service.dart';
 import '../controller/buy_product_controller.dart';
 import '../../domain/entities/buy_product_entities.dart';
+import '../theme/buy_product_theme.dart';
 import 'product_detail_screen.dart';
 import '../../../../core/widgets/fast_loader.dart';
 import '../../../wishlist/presentation/controller/wishlist_controller.dart';
 import '../../../wishlist/presentation/screens/wishlist_screen.dart';
-
 
 // ─────────────────────────────────────────────
 // SCREEN
@@ -15,12 +17,14 @@ class ProductListScreen extends StatefulWidget {
   final String? title;
   final int? categoryId;
   final int? subcategoryId;
+  final String? initialSearchQuery;
 
   const ProductListScreen({
     super.key,
     this.title,
     this.categoryId,
     this.subcategoryId,
+    this.initialSearchQuery,
   });
 
   @override
@@ -29,10 +33,24 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListScreenState extends State<ProductListScreen> {
   final BuyProductController controller = Get.find<BuyProductController>();
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
+    if (widget.initialSearchQuery != null && widget.initialSearchQuery!.isNotEmpty) {
+      _searchController.text = widget.initialSearchQuery!;
+      _searchQuery = widget.initialSearchQuery!.trim().toLowerCase();
+    }
+
+    _searchController.addListener(() {
+      final text = _searchController.text.trim().toLowerCase();
+      if (text != _searchQuery) {
+        setState(() => _searchQuery = text);
+      }
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Initialize filter state and fetch products + subcategories
       controller.selectedSubCategoryId.value = widget.subcategoryId;
@@ -44,9 +62,15 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: BuyProductTheme.scaffoldBg,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -63,13 +87,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: BuyProductTheme.scaffoldBg,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                  border: Border.all(color: BuyProductTheme.subtleBorder, width: 1),
                 ),
                 child: const Icon(
                   Icons.arrow_back_ios_new_rounded,
-                  color: Color(0xFF0F172A),
+                  color: BuyProductTheme.darkText,
                   size: 17,
                 ),
               ),
@@ -83,9 +107,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
             Text(
               widget.title ?? 'Buy Products',
               style: const TextStyle(
-                color: Color(0xFF0F172A),
+                color: BuyProductTheme.darkText,
                 fontWeight: FontWeight.w800,
-                fontSize: 18,
+                fontSize: 17,
                 letterSpacing: -0.3,
               ),
               maxLines: 1,
@@ -97,7 +121,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF64748B),
+                    color: BuyProductTheme.greyText,
                   ),
                 )),
           ],
@@ -119,13 +143,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
+                      color: BuyProductTheme.scaffoldBg,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                      border: Border.all(color: BuyProductTheme.subtleBorder, width: 1),
                     ),
                     child: const Icon(
                       Icons.favorite_outline_rounded,
-                      color: Color(0xFF0F172A),
+                      color: BuyProductTheme.primaryMaroon,
                       size: 18,
                     ),
                   ),
@@ -164,18 +188,18 @@ class _ProductListScreenState extends State<ProductListScreen> {
         ],
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(color: Color(0xFFE2E8F0), height: 1),
+          child: Divider(color: BuyProductTheme.subtleBorder, height: 1),
         ),
       ),
       body: Column(
         children: [
-          // 🔍 Decorative Search bar on top
+          // 🔍 Interactive Search Bar (Old Qart theme styled)
           _buildSearchBar(),
 
           // 🎛️ Subcategory Filter Chips
           if (widget.categoryId != null) _buildFilterChips(),
 
-          // 📦 Main Feed
+          // 📦 Main Feed (3 Items Per Row Grid with Maroon Border)
           Expanded(child: _buildBody()),
         ],
       ),
@@ -185,23 +209,54 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget _buildSearchBar() {
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFF1F5F9),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: BuyProductTheme.borderMaroon,
+            width: 1.6,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: TextField(
-          readOnly: true,
-          decoration: InputDecoration(
-            hintText: 'Search in ${widget.title ?? "Products"}...',
-            hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontWeight: FontWeight.w500),
-            prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF4F46E5), size: 20),
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+          controller: _searchController,
+          style: const TextStyle(
+            fontSize: 13,
+            color: BuyProductTheme.darkText,
+            fontWeight: FontWeight.w600,
           ),
-          onTap: () {},
+          decoration: InputDecoration(
+            hintText: 'Search in ${widget.title ?? "cars, phones, items"}...',
+            hintStyle: const TextStyle(
+              color: BuyProductTheme.lightGreyText,
+              fontSize: 12.5,
+              fontWeight: FontWeight.w500,
+            ),
+            prefixIcon: const Icon(
+              Icons.search_rounded,
+              color: BuyProductTheme.primaryMaroon,
+              size: 21,
+            ),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear_rounded, color: BuyProductTheme.greyText, size: 18),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() => _searchQuery = '');
+                    },
+                  )
+                : null,
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 11, horizontal: 4),
+          ),
         ),
       ),
     );
@@ -211,12 +266,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return Obx(() {
       if (controller.isLoadingSubCategories.value && controller.subCategories.isEmpty) {
         return const SizedBox(
-          height: 50,
+          height: 46,
           child: Center(
             child: SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4F46E5)),
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2, color: BuyProductTheme.primaryMaroon),
             ),
           ),
         );
@@ -228,11 +283,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
       return Container(
         color: Colors.white,
-        height: 48,
-        padding: const EdgeInsets.only(bottom: 10),
+        height: 46,
+        padding: const EdgeInsets.only(bottom: 8),
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           itemCount: controller.subCategories.length + 1,
           itemBuilder: (context, index) {
             final isAll = index == 0;
@@ -245,21 +300,21 @@ class _ProductListScreenState extends State<ProductListScreen> {
             final subId = isAll ? null : controller.subCategories[index - 1].id;
 
             return Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: 6),
               child: ChoiceChip(
                 label: Text(label),
                 selected: isSelected,
                 labelStyle: TextStyle(
-                  color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF334155),
+                  color: isSelected ? BuyProductTheme.primaryMaroon : const Color(0xFF334155),
                   fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                  fontSize: 12,
+                  fontSize: 11.5,
                 ),
-                selectedColor: const Color(0xFFEEF2FF),
-                backgroundColor: const Color(0xFFF8FAFC),
+                selectedColor: BuyProductTheme.chipMaroonBg,
+                backgroundColor: BuyProductTheme.scaffoldBg,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(
-                    color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
+                    color: isSelected ? BuyProductTheme.borderMaroon : BuyProductTheme.subtleBorder,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -282,8 +337,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return Obx(() {
       if (controller.isLoadingProducts.value) {
         return const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: FastGridSkeleton(itemCount: 6),
+          padding: EdgeInsets.all(12.0),
+          child: FastGridSkeleton(itemCount: 9),
         );
       }
 
@@ -297,13 +352,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 const Icon(
                   Icons.wifi_off_rounded,
                   size: 52,
-                  color: Color(0xFF94A3B8),
+                  color: BuyProductTheme.lightGreyText,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   controller.productsError.value!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                  style: const TextStyle(color: BuyProductTheme.greyText, fontSize: 14),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
@@ -314,7 +369,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   icon: const Icon(Icons.refresh_rounded),
                   label: const Text('Retry'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F46E5),
+                    backgroundColor: BuyProductTheme.primaryMaroon,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -334,12 +389,55 @@ class _ProductListScreenState extends State<ProductListScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.shopping_bag_outlined, size: 52, color: Color(0xFF94A3B8)),
+                Icon(Icons.shopping_bag_outlined, size: 52, color: BuyProductTheme.lightGreyText),
                 SizedBox(height: 12),
                 Text(
                   'No products available in this category.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Color(0xFF64748B), fontSize: 14, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: BuyProductTheme.greyText, fontSize: 14, fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      // Filter products based on active search query
+      final filteredList = controller.products.where((p) {
+        if (_searchQuery.isEmpty) return true;
+        final q = _searchQuery.toLowerCase();
+        final titleMatch = p.title.toLowerCase().contains(q);
+        final descMatch = p.description.toLowerCase().contains(q);
+        final featuresMatch = p.features.toLowerCase().contains(q);
+        final priceMatch = p.price.toString().contains(q) || p.totalCost.toString().contains(q);
+        return titleMatch || descMatch || featuresMatch || priceMatch;
+      }).toList();
+
+      if (filteredList.isEmpty) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.search_off_rounded, size: 52, color: BuyProductTheme.lightGreyText),
+                const SizedBox(height: 12),
+                Text(
+                  'No products matching "$_searchQuery"',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: BuyProductTheme.greyText, fontSize: 14, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 12),
+                TextButton.icon(
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() => _searchQuery = '');
+                  },
+                  icon: const Icon(Icons.refresh_rounded, color: BuyProductTheme.primaryMaroon),
+                  label: const Text(
+                    'Clear Search',
+                    style: TextStyle(color: BuyProductTheme.primaryMaroon, fontWeight: FontWeight.w700),
+                  ),
                 ),
               ],
             ),
@@ -348,21 +446,42 @@ class _ProductListScreenState extends State<ProductListScreen> {
       }
 
       return RefreshIndicator(
+        color: BuyProductTheme.primaryMaroon,
         onRefresh: () => controller.fetchProducts(
           widget.categoryId,
           controller.selectedSubCategoryId.value,
         ),
-        child: GridView.builder(
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
-          itemCount: controller.products.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 14,
-            crossAxisSpacing: 14,
-            childAspectRatio: 0.68,
-          ),
-          itemBuilder: (context, i) =>
-              _ProductCard(product: controller.products[i]),
+        child: Column(
+          children: [
+            if (_searchQuery.isNotEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                color: BuyProductTheme.lightMaroonBg,
+                child: Text(
+                  'Showing ${filteredList.length} results for "$_searchQuery"',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: BuyProductTheme.primaryMaroon,
+                  ),
+                ),
+              ),
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 24),
+                itemCount: filteredList.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, // EXACTLY 3 ITEMS PER ROW
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 0.58,
+                ),
+                itemBuilder: (context, i) =>
+                    _ProductCard(product: filteredList[i]),
+              ),
+            ),
+          ],
         ),
       );
     });
@@ -370,7 +489,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 }
 
 // ─────────────────────────────────────────────
-// PRODUCT CARD (High-end Marketplace Style)
+// PRODUCT CARD (3 ITEMS PER ROW WITH MAROON BORDER)
 // ─────────────────────────────────────────────
 class _ProductCard extends StatefulWidget {
   final BuyProduct product;
@@ -382,11 +501,19 @@ class _ProductCard extends StatefulWidget {
 
 class _ProductCardState extends State<_ProductCard> {
   String _formatPrice(double price) {
+    if (price >= 100000) {
+      return '₹${(price / 100000).toStringAsFixed(1)}L';
+    }
     return '₹${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}';
   }
 
   void _openDetail(BuildContext context) {
-    Get.to(() => ProductDetailScreen(productId: widget.product.id));
+    Get.to(
+      () => ProductDetailScreen(
+        productId: widget.product.id,
+        initialProduct: widget.product,
+      ),
+    );
   }
 
   @override
@@ -399,18 +526,19 @@ class _ProductCardState extends State<_ProductCard> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14),
+          // User requested: "use the product in boder of same color"
+          border: Border.all(
+            color: BuyProductTheme.borderMaroon,
+            width: 1.3,
+          ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF0F172A).withValues(alpha: 0.04),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
+              color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
             ),
           ],
-          border: Border.all(
-            color: const Color(0xFFE2E8F0),
-            width: 1.2,
-          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -422,43 +550,43 @@ class _ProductCardState extends State<_ProductCard> {
                   Positioned.fill(
                     child: ClipRRect(
                       borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(17),
+                        top: Radius.circular(12),
                       ),
                       child: product.metaImage.isNotEmpty
-                          ? Image.network(
-                              product.metaImage,
+                          ? NetworkImageService(
+                              imageUrl: ApiRoutes.absoluteUrl(product.metaImage),
+                              width: double.infinity,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => _PlaceholderImage(),
+                              errorWidget: _PlaceholderImage(),
                             )
                           : _PlaceholderImage(),
                     ),
                   ),
-                  // FEATURED Badge
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFEF3C7),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFFCD34D), width: 1),
-                      ),
-                      child: const Text(
-                        'FEATURED',
-                        style: TextStyle(
-                          color: Color(0xFFD97706),
-                          fontSize: 9,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.3,
+                  // Discount badge if available
+                  if (hasDiscount)
+                    Positioned(
+                      top: 4,
+                      left: 4,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '${product.discount.toStringAsFixed(0)}%',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  // Heart Icon (Favorite)
+                  // Heart Icon (Wishlist toggle)
                   Positioned(
-                    top: 8,
-                    right: 8,
+                    top: 4,
+                    right: 4,
                     child: Obx(() {
                       final isLiked =
                           WishlistController.to.isWishlisted(product.id);
@@ -467,14 +595,14 @@ class _ProductCardState extends State<_ProductCard> {
                           WishlistController.to.toggleWishlist(product);
                         },
                         child: Container(
-                          padding: const EdgeInsets.all(6),
+                          padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.92),
+                            color: Colors.white.withValues(alpha: 0.94),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.12),
-                                blurRadius: 6,
+                                color: Colors.black.withValues(alpha: 0.15),
+                                blurRadius: 4,
                               ),
                             ],
                           ),
@@ -484,8 +612,8 @@ class _ProductCardState extends State<_ProductCard> {
                                 : Icons.favorite_border_rounded,
                             color: isLiked
                                 ? const Color(0xFFEF4444)
-                                : const Color(0xFF475569),
-                            size: 16,
+                                : BuyProductTheme.primaryMaroon,
+                            size: 13,
                           ),
                         ),
                       );
@@ -495,48 +623,26 @@ class _ProductCardState extends State<_ProductCard> {
               ),
             ),
 
-            // ── Content ───────────────────────────────
+            // ── Content Area (Scaled for 3 columns) ──
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(6, 6, 6, 7),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Price row with discount badge
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _formatPrice(product.totalCost),
-                          style: const TextStyle(
-                            color: Color(0xFF0F172A),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.3,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (hasDiscount)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFEF2F2),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: const Color(0xFFFCA5A5), width: 1),
-                          ),
-                          child: Text(
-                            '${product.discount.toStringAsFixed(0)}% OFF',
-                            style: const TextStyle(
-                              color: Color(0xFFDC2626),
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                    ],
+                  // Price
+                  Text(
+                    _formatPrice(product.totalCost),
+                    style: const TextStyle(
+                      color: BuyProductTheme.primaryMaroon,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.2,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
 
                   // Title
                   Text(
@@ -544,46 +650,34 @@ class _ProductCardState extends State<_ProductCard> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: Color(0xFF1E293B),
-                      fontSize: 13,
+                      color: BuyProductTheme.darkText,
+                      fontSize: 10.5,
                       fontWeight: FontWeight.w700,
+                      height: 1.15,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
 
-                  // Description snippet
-                  Text(
-                    product.description,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0xFF64748B),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Divider(color: Color(0xFFF1F5F9), height: 1),
-                  const SizedBox(height: 6),
-
-                  // Location Footer
-                  const Row(
+                  // Subtitle / Verified badge
+                  Row(
                     children: [
-                      Icon(
-                        Icons.location_on_rounded,
-                        color: Color(0xFFEF4444),
-                        size: 13,
+                      const Icon(
+                        Icons.verified_outlined,
+                        color: BuyProductTheme.primaryMaroon,
+                        size: 10,
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 3),
                       Expanded(
                         child: Text(
-                          'Verified Seller',
+                          product.warranty.isNotEmpty
+                              ? product.warranty
+                              : (product.capacity.isNotEmpty ? product.capacity : 'Verified'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Color(0xFF475569),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
+                          style: const TextStyle(
+                            color: BuyProductTheme.greyText,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
@@ -599,18 +693,17 @@ class _ProductCardState extends State<_ProductCard> {
   }
 }
 
-// ─────────────────────────────────────────────
-// PLACEHOLDER IMAGE
-// ─────────────────────────────────────────────
 class _PlaceholderImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFEEEFF5),
-      child: const Icon(
-        Icons.image_outlined,
-        size: 36,
-        color: Color(0xFFBBBBCC),
+      color: BuyProductTheme.lightMaroonBg,
+      child: Center(
+        child: Icon(
+          Icons.shopping_bag_outlined,
+          color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.35),
+          size: 26,
+        ),
       ),
     );
   }

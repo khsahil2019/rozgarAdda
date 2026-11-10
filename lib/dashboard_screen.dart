@@ -4,7 +4,9 @@ import 'package:rojgar/careear_hub.dart';
 import 'package:rojgar/features/app/app_controller.dart';
 import 'package:rojgar/features/jobs/presentation/bindings/jobs_binding.dart';
 import 'package:rojgar/features/jobs/presentation/screens/select_category_screen.dart';
+import 'package:rojgar/features/profile/presentation/bindings/profile_binding.dart';
 import 'package:rojgar/features/profile/presentation/screens/help_support_screen.dart';
+import 'package:rojgar/features/state_selection/presentation/bindings/state_selection_binding.dart';
 import 'package:rojgar/features/state_selection/presentation/screens/select_state_screen.dart';
 import 'package:rojgar/floating_navbar.dart';
 import 'package:rojgar/localization/app_localizations.dart';
@@ -616,7 +618,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 8),
                         ),
-                        onPressed: () => Get.to(() => const HelpSupportScreen()),
+                        onPressed: () => Get.to(
+                          () => const HelpSupportScreen(),
+                          binding: ProfileBinding(),
+                        ),
                         icon: const Icon(Icons.help_outline_rounded, size: 15, color: Color(0xFF1400FF)),
                         label: const Text(
                           'Helpdesk & FAQ',
@@ -715,16 +720,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showLocationBottomSheet(BuildContext context) {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: const SelectStateScreen(),
-      ),
-      isScrollControlled: true,
+    Get.to(
+      () => const SelectStateScreen(fromDashboard: true),
+      binding: StateSelectionBinding(),
     );
   }
 

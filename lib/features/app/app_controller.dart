@@ -7,6 +7,7 @@ import 'package:rojgar/features/auth/data/data_source/model/auth_response.dart';
 import 'package:rojgar/features/kyc/domain/repository/kyc_repository.dart';
 import 'package:rojgar/services/storage_service.dart';
 import 'package:rojgar/splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // authtoken  178|jILugiYXhdVYfazigTidaBcBgsnGXAZm8bbNT253b5dfdc40
 class AppController extends GetxController {
@@ -72,7 +73,7 @@ class AppController extends GetxController {
   void _checkLoginState() {
     final candidateId = _storageService.getCandidateId();
     final token = _storageService.getAccessToken();
-    if (candidateId != null && token != null) {
+    if (candidateId != null && candidateId > 0 && token != null && token.isNotEmpty) {
       _isLoggedIn.value = true;
       _user.value = UserEntity(
         id: candidateId,
@@ -92,7 +93,7 @@ class AppController extends GetxController {
 
   Future<void> fetchAndSyncUserData() async {
     final candidateId = _storageService.getCandidateId();
-    if (candidateId == null) return;
+    if (candidateId == null || candidateId <= 0) return;
 
     try {
       isUserDataLoading.value = true;
@@ -115,7 +116,7 @@ class AppController extends GetxController {
             state: candidate.stateId?.toString() ?? '',
             country: 'India',
             zipCode: candidate.pincode,
-            profileImage: '',
+            profileImage: _user.value?.profileImage ?? '',
           );
         },
       );
@@ -126,16 +127,23 @@ class AppController extends GetxController {
     }
   }
 
-  void login(AuthResponse authResponse) {
-    _storageService.saveCandidateId(authResponse.id);
-    _storageService.saveAccessToken(authResponse.token);
+  Future<void> login(AuthResponse authResponse) async {
+    final prefs = await SharedPreferences.getInstance();
+    await _storageService.saveCandidateId(authResponse.id);
+    await _storageService.saveAccessToken(authResponse.token);
+    await prefs.setInt('candidate_id', authResponse.id);
+    await prefs.setString('access_token', authResponse.token);
     _isLoggedIn.value = true;
     _user.value = authResponse.user.toEntity();
-    fetchAndSyncUserData();
+    await fetchAndSyncUserData();
   }
 
-  void logout() {
-    _storageService.clear();
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('candidate_id');
+    await prefs.remove('access_token');
+    await prefs.remove('candidate_token');
+    await _storageService.clearCandidateSession();
     _isLoggedIn.value = false;
     _user.value = null;
     Get.offAll(() => const SplashScreen());
@@ -148,7 +156,8 @@ class AppController extends GetxController {
           onRequest: (options, handler) {
             final token = _storageService.getAccessToken();
             if (token != null && token.isNotEmpty) {
-              if (!options.headers.containsKey('Authorization')) {
+              if (!options.headers.containsKey('Authorization') &&
+                  !options.headers.containsKey('authorization')) {
                 options.headers['Authorization'] = 'Bearer $token';
               }
             }

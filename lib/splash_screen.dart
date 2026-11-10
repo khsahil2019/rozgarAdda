@@ -22,6 +22,24 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final candidateId = prefs.getInt('candidate_id');
+        final token = prefs.getString('access_token');
+        final employerId = prefs.getInt('employer_id');
+        if (candidateId != null && candidateId > 0 && token != null && token.isNotEmpty) {
+          Get.offAll(() => const FloatingNavbarScreen());
+        } else if (employerId != null && employerId > 0) {
+          Get.offAll(() => const EmployerDashboardScreen());
+        }
+      } catch (_) {}
+    });
+  }
+
   Future<void> _navigateWithAuthCheck({
     required BuildContext context,
     required Widget loggedInScreen,

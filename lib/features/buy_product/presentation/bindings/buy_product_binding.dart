@@ -9,12 +9,15 @@ class BuyProductBinding extends Bindings {
   void dependencies() {
     Get.lazyPut<BuyProductRemoteDataSource>(
       () => BuyProductRemoteDataSourceImpl(),
+      fenix: true,
     );
     Get.lazyPut<BuyProductRepository>(
       () => BuyProductRepositoryImpl(remoteDataSource: Get.find()),
+      fenix: true,
     );
     Get.lazyPut<BuyProductController>(
       () => BuyProductController(repository: Get.find()),
+      fenix: true,
     );
   }
 }

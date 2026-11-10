@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rojgar/core/exceptions/exceptions.dart';
+import 'package:rojgar/features/app/app_controller.dart';
 import 'package:rojgar/features/auth/presentation/controller/login_controller.dart';
 import 'package:rojgar/features/auth/presentation/screens/registration_screen.dart';
 import 'package:rojgar/features/state_selection/presentation/bindings/state_selection_binding.dart';
 import 'package:rojgar/features/state_selection/presentation/screens/select_state_screen.dart';
+import 'package:rojgar/floating_navbar.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/splash_screen.dart';
 
@@ -34,10 +36,19 @@ class LoginScreen extends GetView<LoginController> {
     try {
       await controller.login();
       if (!context.mounted) return;
-      Get.off(
-        () => SelectStateScreen(successMessage: username),
-        binding: StateSelectionBinding(),
-      );
+
+      final savedStateId = AppController.to.selectedStateId;
+      if (savedStateId != null && savedStateId > 0) {
+        Get.offAll(() => const FloatingNavbarScreen());
+      } else {
+        Get.off(
+          () => SelectStateScreen(
+            successMessage: username,
+            fromDashboard: false,
+          ),
+          binding: StateSelectionBinding(),
+        );
+      }
     } catch (e) {
       if (!context.mounted) return;
       final errorMessage = e is Failure

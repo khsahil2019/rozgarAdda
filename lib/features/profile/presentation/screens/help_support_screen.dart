@@ -4,6 +4,7 @@ import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:rojgar/features/app/app_controller.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../bindings/profile_binding.dart';
 import '../controller/profile_controller.dart';
 
 class _C {
@@ -49,6 +50,9 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
   @override
   void initState() {
     super.initState();
+    if (!Get.isRegistered<ProfileController>()) {
+      ProfileBinding().dependencies();
+    }
     _ctrl = Get.find<ProfileController>();
     final user = AppController.to.user;
     _nameCtrl = TextEditingController(text: user?.name ?? '');

@@ -3,9 +3,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rojgar/core/network/api_routes.dart';
 import 'package:rojgar/core/widgets/app_back_button.dart';
+import 'package:rojgar/core/widgets/network_image_service.dart';
 import 'package:rojgar/features/app/app_controller.dart';
 import 'package:rojgar/localization/app_localizations.dart';
+import '../bindings/profile_binding.dart';
 import '../controller/profile_controller.dart';
 
 class _C {
@@ -49,6 +52,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
+    if (!Get.isRegistered<ProfileController>()) {
+      ProfileBinding().dependencies();
+    }
     _ctrl = Get.find<ProfileController>();
     final user = AppController.to.user;
 
@@ -294,10 +300,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       fit: BoxFit.cover,
                                     )
                                   : (user?.profileImage != null && user!.profileImage.isNotEmpty
-                                      ? Image.network(
-                                          user.profileImage,
+                                      ? NetworkImageService(
+                                          imageUrl: ApiRoutes.absoluteUrl(user.profileImage),
+                                          width: 96,
+                                          height: 96,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) => _buildAvatarFallback(user.name),
+                                          errorWidget: _buildAvatarFallback(user.name),
                                         )
                                       : _buildAvatarFallback(user?.name ?? '')),
                             ),

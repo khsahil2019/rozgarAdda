@@ -347,7 +347,10 @@ class _WishlistScreenState extends State<WishlistScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => ProductDetailScreen(productId: product.id),
+                builder: (_) => ProductDetailScreen(
+                  productId: product.id,
+                  initialProduct: product,
+                ),
               ),
             ).then((_) => controller.fetchWishlist(silent: true));
           },
@@ -573,7 +576,10 @@ class _WishlistScreenState extends State<WishlistScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ProductDetailScreen(productId: product.id),
+                    builder: (_) => ProductDetailScreen(
+                      productId: product.id,
+                      initialProduct: product,
+                    ),
                   ),
                 ).then((_) => controller.fetchWishlist(silent: true));
               },

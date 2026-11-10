@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:rojgar/core/widgets/app_back_button.dart';
 import 'package:rojgar/core/widgets/empty_state_widget.dart';
+import '../bindings/profile_binding.dart';
 import '../controller/profile_controller.dart';
 
 // Unified Rozgar Brand Color Tokens
@@ -32,6 +33,9 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> {
   @override
   void initState() {
     super.initState();
+    if (!Get.isRegistered<ProfileController>()) {
+      ProfileBinding().dependencies();
+    }
     _ctrl = Get.find<ProfileController>();
     _ctrl.loadApplications();
   }

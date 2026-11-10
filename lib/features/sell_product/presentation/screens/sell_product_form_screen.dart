@@ -5,9 +5,10 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/widgets/app_back_button.dart';
 import '../../../../localization/app_localizations.dart';
+import '../bindings/sell_product_binding.dart';
 import '../controller/sell_product_controller.dart';
 import '../widgets/sell_product_step_indicator.dart';
-import 'sell_product_review_screen.dart';
+import 'ad_posting_plan_screen.dart';
 
 class _C {
   static const Color primaryBlue = Color(0xFF1400FF);
@@ -19,8 +20,25 @@ class _C {
   static const Color cardBg = Color(0xFFFFFFFF);
 }
 
-class SellProductFormScreen extends GetView<SellProductController> {
+class SellProductFormScreen extends StatefulWidget {
   const SellProductFormScreen({super.key});
+
+  @override
+  State<SellProductFormScreen> createState() => _SellProductFormScreenState();
+}
+
+class _SellProductFormScreenState extends State<SellProductFormScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late final SellProductController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<SellProductController>()) {
+      SellProductBinding().dependencies();
+    }
+    controller = Get.find<SellProductController>();
+  }
 
   void _showSnackBar(
     BuildContext context,
@@ -37,15 +55,40 @@ class SellProductFormScreen extends GetView<SellProductController> {
     );
   }
 
+  void _handleProceedToPayment(BuildContext context, AppLocalizations l10n) {
+    // Unfocus keyboard
+    FocusScope.of(context).unfocus();
+
+    if (!_formKey.currentState!.validate()) {
+      _showSnackBar(
+        context,
+        'Please fill all required fields correctly.',
+        backgroundColor: const Color(0xFFEF4444),
+      );
+      return;
+    }
+
+    if (controller.mainImage.value == null) {
+      _showSnackBar(
+        context,
+        l10n.text('sell_select_main_image'),
+        backgroundColor: const Color(0xFFEF4444),
+      );
+      return;
+    }
+
+    // Open Ad Posting Plans & PayU Payment Gateway
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AdPostingPlanScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
     final l10n = AppLocalizations.of(context);
-
-    // Clear form when opening
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.resetForm();
-    });
 
     return PopScope(
       canPop: true,
@@ -93,8 +136,9 @@ class SellProductFormScreen extends GetView<SellProductController> {
             const SellProductStepIndicator(currentStep: 3),
             Expanded(
               child: Form(
-                key: formKey,
+                key: _formKey,
                 child: SingleChildScrollView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 110),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,7 +293,6 @@ class SellProductFormScreen extends GetView<SellProductController> {
                                       inputFormatters: [
                                         FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
                                       ],
-                                      onChanged: (_) => controller.priceCtrl.text = controller.priceCtrl.text,
                                     ),
                                   ],
                                 ),
@@ -266,7 +309,6 @@ class SellProductFormScreen extends GetView<SellProductController> {
                                       suffixText: '%',
                                       keyboardType: TextInputType.number,
                                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                      onChanged: (_) => controller.discountCtrl.text = controller.discountCtrl.text,
                                     ),
                                   ],
                                 ),
@@ -401,117 +443,78 @@ class SellProductFormScreen extends GetView<SellProductController> {
             ),
           ],
         ),
-        bottomSheet: Obx(() {
-          return Container(
-            padding: EdgeInsets.fromLTRB(
-              16,
-              12,
-              16,
-              MediaQuery.of(context).padding.bottom + 14,
+        bottomSheet: Container(
+          padding: EdgeInsets.fromLTRB(
+            16,
+            12,
+            16,
+            MediaQuery.of(context).padding.bottom + 14,
+          ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              top: BorderSide(color: _C.borderGrey, width: 1),
             ),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                top: BorderSide(color: _C.borderGrey, width: 1),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: _C.darkText,
+                    side: const BorderSide(color: _C.borderGrey, width: 1.2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    minimumSize: const Size.fromHeight(52),
+                  ),
+                  onPressed: () => Get.back(),
+                  child: Text(
+                    l10n.text('cancel'),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: _C.darkText,
-                      side: const BorderSide(color: _C.borderGrey, width: 1.2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      minimumSize: const Size.fromHeight(52),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 2,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _C.primaryBlue,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    onPressed: () => Get.back(),
-                    child: Text(
-                      l10n.text('cancel'),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
+                    minimumSize: const Size.fromHeight(52),
+                  ),
+                  onPressed: () => _handleProceedToPayment(context, l10n),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.payment_rounded, size: 18),
+                      SizedBox(width: 8),
+                      Text(
+                        'Proceed to Payment',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
+                        ),
                       ),
-                    ),
+                      SizedBox(width: 6),
+                      Icon(Icons.arrow_forward_rounded, size: 16),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 2,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _C.primaryBlue,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      minimumSize: const Size.fromHeight(52),
-                    ),
-                    onPressed: controller.isSaving.value
-                        ? null
-                        : () async {
-                            if (!formKey.currentState!.validate()) return;
-                            if (controller.mainImage.value == null) {
-                              _showSnackBar(
-                                context,
-                                l10n.text('sell_select_main_image'),
-                                backgroundColor: const Color(0xFFEF4444),
-                              );
-                              return;
-                            }
-
-                            final messenger = ScaffoldMessenger.of(context);
-                            final success = await controller.saveProduct();
-                            if (success) {
-                              Get.off(() => const SellProductReviewScreen());
-                            } else {
-                              final errMsg = controller.savingError.value ?? l10n.text('sell_error_saving');
-                              messenger.showSnackBar(
-                                SnackBar(
-                                  content: Text(errMsg),
-                                  backgroundColor: const Color(0xFFEF4444),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                    child: controller.isSaving.value
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2.5,
-                            ),
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                l10n.text('sell_save_product'),
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.arrow_forward_rounded, size: 18),
-                            ],
-                          ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -596,7 +599,6 @@ class _InputField extends StatelessWidget {
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final String? Function(String?)? validator;
-  final void Function(String)? onChanged;
   final IconData? prefixIcon;
   final String? prefixText;
   final String? suffixText;
@@ -608,7 +610,6 @@ class _InputField extends StatelessWidget {
     this.keyboardType,
     this.inputFormatters,
     this.validator,
-    this.onChanged,
     this.prefixIcon,
     this.prefixText,
     this.suffixText,
@@ -622,7 +623,6 @@ class _InputField extends StatelessWidget {
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       validator: validator,
-      onChanged: onChanged,
       style: const TextStyle(
         color: _C.darkText,
         fontSize: 14,
@@ -700,26 +700,28 @@ class _MainImagePickerTile extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: _C.darkText,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1400FF).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: _C.borderGrey),
                   ),
                   child: Text(
                     chooseFileText,
                     style: const TextStyle(
                       color: _C.primaryBlue,
                       fontSize: 12,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -731,35 +733,11 @@ class _MainImagePickerTile extends StatelessWidget {
           const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Stack(
-              children: [
-                Image.file(
-                  previewFile!,
-                  height: 160,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: _C.primaryBlue,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      'MAIN PHOTO',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            child: Image.file(
+              previewFile!,
+              height: 130,
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
           ),
         ],
@@ -805,7 +783,7 @@ class _GalleryPickerTile extends StatelessWidget {
                   child: Text(
                     images.isEmpty
                         ? maxImagesText
-                        : '${images.length} image${images.length > 1 ? 's' : ''} selected',
+                        : '${images.length} images selected',
                     style: const TextStyle(
                       color: _C.darkText,
                       fontSize: 13,
@@ -814,17 +792,18 @@ class _GalleryPickerTile extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1400FF).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: _C.borderGrey),
                   ),
                   child: Text(
                     chooseFileText,
                     style: const TextStyle(
                       color: _C.primaryBlue,
                       fontSize: 12,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -835,44 +814,45 @@ class _GalleryPickerTile extends StatelessWidget {
         if (images.isNotEmpty) ...[
           const SizedBox(height: 10),
           SizedBox(
-            height: 84,
+            height: 70,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: images.length,
               separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (_, i) => Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.file(
-                      File(images[i].path),
-                      width: 84,
-                      height: 84,
-                      fit: BoxFit.cover,
+              itemBuilder: (context, i) {
+                return Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.file(
+                        File(images[i].path),
+                        width: 70,
+                        height: 70,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: GestureDetector(
-                      onTap: () => onRemove(i),
-                      child: Container(
-                        width: 22,
-                        height: 22,
-                        decoration: const BoxDecoration(
-                          color: Colors.black87,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close_rounded,
-                          color: Colors.white,
-                          size: 14,
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () => onRemove(i),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.black54,
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(2),
+                          child: const Icon(
+                            Icons.close_rounded,
+                            size: 14,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              },
             ),
           ),
         ],

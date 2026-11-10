@@ -7,12 +7,17 @@ import '../controller/select_state_controller.dart';
 class StateSelectionBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<StateRemoteDataSource>(() => StateRemoteDataSourceImpl());
+    Get.lazyPut<StateRemoteDataSource>(
+      () => StateRemoteDataSourceImpl(),
+      fenix: true,
+    );
     Get.lazyPut<StateRepository>(
       () => StateRepositoryImpl(remoteDataSource: Get.find<StateRemoteDataSource>()),
+      fenix: true,
     );
     Get.lazyPut<SelectStateController>(
       () => SelectStateController(Get.find<StateRepository>()),
+      fenix: true,
     );
   }
 }

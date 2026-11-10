@@ -118,19 +118,36 @@ class BuyProductRemoteDataSourceImpl implements BuyProductRemoteDataSource {
         method: 'GET',
         url: ApiRoutes.productDetails(productId),
       );
-      if (res['statusCode'] == 200 && res['success'] == true) {
-        final productData = res['data'];
+      final isSuccess = res['statusCode'] == 200 &&
+          (res['success'] == true ||
+              res['status'] == true ||
+              res['status'] == 1 ||
+              res['status'] == 'success');
+
+      if (isSuccess) {
+        Map<String, dynamic>? productData;
+        if (res['data'] is Map<String, dynamic>) {
+          final dataMap = res['data'] as Map<String, dynamic>;
+          if (dataMap['product'] is Map<String, dynamic>) {
+            productData = dataMap['product'] as Map<String, dynamic>;
+          } else {
+            productData = dataMap;
+          }
+        } else if (res['product'] is Map<String, dynamic>) {
+          productData = res['product'] as Map<String, dynamic>;
+        }
+
         if (productData == null) {
           throw Failure('Product not found');
         }
-        final product =
-            BuyProductModel.fromJson(productData as Map<String, dynamic>);
+        final product = BuyProductModel.fromJson(productData);
 
-        final rawRelated = res['related_products'];
+        final rawRelated = res['related_products'] ??
+            (res['data'] is Map ? res['data']['related_products'] : null);
         final List<BuyProductModel> related = rawRelated is List
             ? rawRelated
-                .map((e) =>
-                    BuyProductModel.fromJson(e as Map<String, dynamic>))
+                .whereType<Map<String, dynamic>>()
+                .map((e) => BuyProductModel.fromJson(e))
                 .toList()
             : [];
         return BuyProductDetailResponse(

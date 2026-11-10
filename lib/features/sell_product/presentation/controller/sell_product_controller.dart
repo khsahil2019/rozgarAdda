@@ -181,7 +181,13 @@ class SellProductController extends GetxController {
   }
 
   // Save the product
-  Future<bool> saveProduct() async {
+  Future<bool> saveProduct({
+    int? planId,
+    String? transactionId,
+    String? paymentId,
+    String? paymentStatus,
+    Map<String, dynamic>? paymentData,
+  }) async {
     if (selectedCategoryIndex.value == null || selectedSubCategoryIndex.value == null) {
       savingError.value = 'Please select both Category and Sub Category';
       return false;
@@ -211,6 +217,11 @@ class SellProductController extends GetxController {
         isActive: isActive.value,
         mainImagePath: mainImage.value!.path,
         galleryImagePaths: galleryImages.map((e) => e.path).toList(),
+        planId: planId,
+        transactionId: transactionId,
+        paymentId: paymentId,
+        paymentStatus: paymentStatus,
+        paymentData: paymentData,
       );
 
       final result = await repository.saveProduct(request);

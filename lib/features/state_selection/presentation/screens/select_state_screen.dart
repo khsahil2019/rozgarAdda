@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:rojgar/floating_navbar.dart';
 import 'package:rojgar/localization/app_localizations.dart';
 import 'package:rojgar/main.dart';
+import 'package:rojgar/services/storage_service.dart';
 import '../../domain/entities/state_entity.dart';
+import '../bindings/state_selection_binding.dart';
 import '../controller/select_state_controller.dart';
 
 class AC {
@@ -41,6 +43,9 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
   @override
   void initState() {
     super.initState();
+    if (!Get.isRegistered<SelectStateController>()) {
+      StateSelectionBinding().dependencies();
+    }
     controller = Get.find<SelectStateController>();
     if (widget.successMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -323,12 +328,32 @@ class _SelectStateScreenState extends State<SelectStateScreen> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(30),
                   onTap: () {
-                    _showLanguageDialogAndContinue(
-                      context,
-                      controller.selectedStateId,
-                      widget.fromDashboard,
-                      controller,
-                    );
+                    final stateId = controller.selectedStateId;
+                    if (stateId != null) {
+                      final selectedState = controller.states
+                          .firstWhereOrNull((s) => s.id == stateId);
+                      if (selectedState != null) {
+                        controller.saveSelection(stateId, selectedState.name);
+                      }
+                    }
+                    if (widget.fromDashboard) {
+                      Navigator.of(context).pop();
+                    } else {
+                      final prefs = Get.isRegistered<StorageService>()
+                          ? Get.find<StorageService>()
+                          : null;
+                      final savedLang = prefs?.getLanguageCode();
+                      if (savedLang != null && savedLang.isNotEmpty) {
+                        Get.offAll(() => const FloatingNavbarScreen());
+                      } else {
+                        _showLanguageDialogAndContinue(
+                          context,
+                          controller.selectedStateId,
+                          widget.fromDashboard,
+                          controller,
+                        );
+                      }
+                    }
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
