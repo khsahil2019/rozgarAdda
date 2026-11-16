@@ -8,6 +8,7 @@ import '../../../../core/services/payu_payment_service.dart';
 import '../../../../core/widgets/app_back_button.dart';
 import '../../../app/app_controller.dart';
 import '../../domain/entities/ad_posting_plan.dart';
+import '../../../buy_product/presentation/theme/buy_product_theme.dart';
 import '../controller/sell_product_controller.dart';
 import 'sell_product_review_screen.dart';
 
@@ -37,8 +38,8 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
   bool _isLoadingPlans = false;
   String? _errorMessage;
 
-  static const Color primary = Color(0xFF1400FF);
-  static const Color accentAmber = Color(0xFFF59E0B);
+  static const Color primary = BuyProductTheme.primaryMaroon;
+  static const Color accentAmber = BuyProductTheme.goldAccent;
   static const Color darkText = Color(0xFF0F172A);
   static const Color mediumText = Color(0xFF334155);
   static const Color greyText = Color(0xFF64748B);
@@ -200,6 +201,50 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
       final totalPayable = _selectedPlan.totalPayable;
       final adTitle = controller.titleCtrl.text.trim();
 
+      // Free plan (₹0.00) - skip payment gateway and submit directly
+      if (_selectedPlan.isFree || totalPayable <= 0.0) {
+        final freePayload = <String, dynamic>{
+          'plan_id': _selectedPlan.id,
+          'plan_name': _selectedPlan.name,
+          'total_payable': 0.0,
+          'mihpayid': 'FREE_$now',
+          'bank_ref_num': 'FREE_PROMO',
+          'paid_at': DateTime.now().toUtc().toIso8601String(),
+          'payment_response': 'free_plan',
+        };
+
+        final success = await controller.saveProduct(
+          planId: _selectedPlan.id,
+          selectedPlan: _selectedPlan.toJson(),
+          transactionId: 'FREE_$now',
+          paymentId: 'FREE_PROMO',
+          paymentStatus: 'success',
+          paymentData: freePayload,
+        );
+
+        if (success) {
+          if (!mounted) return;
+          await _showReceiptDialog(
+            txnId: 'FREE_$now',
+            planName: _selectedPlan.name,
+            basePrice: '₹0.00',
+            gstAmount: '₹0.00',
+            totalPaid: 'FREE',
+          );
+          if (widget.onAdPublished != null) {
+            widget.onAdPublished!();
+          } else {
+            Get.offAll(() => const SellProductReviewScreen());
+          }
+        } else {
+          setState(() {
+            _errorMessage = controller.savingError.value ??
+                'Failed to publish ad. Please try again.';
+          });
+        }
+        return;
+      }
+
       debugPrint('[PayUAd] Launching checkout for $adTitle - Amount: $totalPayable');
 
       final result = await PayUPaymentService.instance.openCheckout(
@@ -242,6 +287,7 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
         // Submit product ad with payment attribution
         final success = await controller.saveProduct(
           planId: _selectedPlan.id,
+          selectedPlan: _selectedPlan.toJson(),
           transactionId: result.txnId ?? txnId,
           paymentId: result.paymentId ?? '',
           paymentStatus: 'success',
@@ -355,12 +401,24 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            SizedBox(
+            Container(
               width: double.infinity,
               height: 48,
+              decoration: BoxDecoration(
+                gradient: BuyProductTheme.headerGradient,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primary,
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
@@ -393,13 +451,19 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
           label,
           style: const TextStyle(color: greyText, fontSize: 12.5),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            color: isBold ? primary : darkText,
-            fontSize: isBold ? 14 : 12.5,
-            fontWeight: isBold ? FontWeight.w900 : FontWeight.w700,
-            fontFamily: isMono ? 'monospace' : null,
+        const SizedBox(width: 10),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: isBold ? primary : darkText,
+              fontSize: isBold ? 14 : 12.5,
+              fontWeight: isBold ? FontWeight.w900 : FontWeight.w700,
+              fontFamily: isMono ? 'monospace' : null,
+            ),
           ),
         ),
       ],
@@ -566,7 +630,10 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderGrey),
+        border: Border.all(
+          color: BuyProductTheme.borderMaroon.withValues(alpha: 0.35),
+          width: 1.2,
+        ),
       ),
       child: Row(
         children: [
@@ -574,7 +641,7 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFEEF2FF),
+              color: BuyProductTheme.chipMaroonBg,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.sell_rounded, color: primary, size: 22),
@@ -651,7 +718,7 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(11),
@@ -669,6 +736,9 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
           children: [
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: isSelected ? primary : mediumText,
                 fontSize: 13,
@@ -678,6 +748,9 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
             const SizedBox(height: 2),
             Text(
               subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: isSelected ? greyText : const Color(0xFF94A3B8),
                 fontSize: 10.5,
@@ -700,16 +773,18 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
         margin: const EdgeInsets.only(bottom: 14),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFBFBFF) : Colors.white,
+          color: isSelected ? BuyProductTheme.lightMaroonBg : Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isSelected ? primary : borderGrey,
-            width: isSelected ? 2 : 1,
+            color: isSelected
+                ? primary
+                : BuyProductTheme.borderMaroon.withValues(alpha: 0.45),
+            width: isSelected ? 2.2 : 1.5,
           ),
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? primary.withValues(alpha: 0.08)
+                  ? primary.withValues(alpha: 0.1)
                   : Colors.black.withValues(alpha: 0.02),
               blurRadius: 10,
               offset: const Offset(0, 3),
@@ -725,12 +800,16 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
                 Expanded(
                   child: Row(
                     children: [
-                      Text(
-                        plan.name,
-                        style: const TextStyle(
-                          color: darkText,
-                          fontSize: 15.5,
-                          fontWeight: FontWeight.w800,
+                      Flexible(
+                        child: Text(
+                          plan.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: darkText,
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                       if (plan.isPopular) ...[
@@ -765,6 +844,7 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   width: 22,
                   height: 22,
@@ -787,34 +867,67 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Pricing Tag with 18% GST note
+            // Pricing Tag with Discount badge & GST note
             Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  plan.formattedBasePrice,
-                  style: const TextStyle(
-                    color: primary,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
+                Expanded(
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 6,
+                    runSpacing: 2,
+                    children: [
+                      Text(
+                        plan.formattedEffectivePrice,
+                        style: const TextStyle(
+                          color: primary,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      if (plan.hasDiscount) ...[
+                        Text(
+                          plan.formattedBasePrice,
+                          style: const TextStyle(
+                            color: greyText,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDC2626),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            plan.formattedDiscountBadge,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ],
+                      Text(
+                        '+${plan.gstPer.toStringAsFixed(0)}% GST',
+                        style: const TextStyle(
+                          color: greyText,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 6),
-                const Text(
-                  '+18% GST',
-                  style: TextStyle(
-                    color: greyText,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEEF2FF),
+                    color: BuyProductTheme.chipMaroonBg,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -868,7 +981,10 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderGrey),
+        border: Border.all(
+          color: BuyProductTheme.borderMaroon.withValues(alpha: 0.35),
+          width: 1.2,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -877,20 +993,37 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
             children: [
               Icon(Icons.receipt_long_rounded, color: primary, size: 18),
               SizedBox(width: 8),
-              Text(
-                'Price & GST Breakdown',
-                style: TextStyle(
-                  color: darkText,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 14,
+              Expanded(
+                child: Text(
+                  'Price & GST Breakdown',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: darkText,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          _buildBreakdownRow('Package Price', _selectedPlan.formattedBasePrice),
-          const SizedBox(height: 8),
-          _buildBreakdownRow('GST (18%)', _selectedPlan.formattedGstAmount),
+          if (_selectedPlan.hasDiscount) ...[
+            _buildBreakdownRow('Original Price', _selectedPlan.formattedBasePrice),
+            const SizedBox(height: 8),
+            _buildBreakdownRow(
+              'Discount (${_selectedPlan.formattedDiscountBadge})',
+              '-₹${(_selectedPlan.price - _selectedPlan.effectiveBasePrice).toStringAsFixed(2)}',
+              valueColor: successGreen,
+            ),
+            const SizedBox(height: 8),
+            _buildBreakdownRow('Net Package Price', _selectedPlan.formattedEffectivePrice),
+            const SizedBox(height: 8),
+          ] else ...[
+            _buildBreakdownRow('Package Price', _selectedPlan.formattedBasePrice),
+            const SizedBox(height: 8),
+          ],
+          _buildBreakdownRow('GST (${_selectedPlan.gstPer.toStringAsFixed(0)}%)', _selectedPlan.formattedGstAmount),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: Divider(color: borderGrey, height: 1),
@@ -898,20 +1031,29 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Total Payable Amount',
-                style: TextStyle(
-                  color: darkText,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 13.5,
+              const Expanded(
+                child: Text(
+                  'Total Payable Amount',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: darkText,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13.5,
+                  ),
                 ),
               ),
-              Text(
-                _selectedPlan.formattedTotalPayable,
-                style: const TextStyle(
-                  color: primary,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  _selectedPlan.formattedTotalPayable,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: primary,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],
@@ -921,20 +1063,29 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
     );
   }
 
-  Widget _buildBreakdownRow(String label, String value) {
+  Widget _buildBreakdownRow(String label, String value, {Color? valueColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: const TextStyle(color: greyText, fontSize: 12.5),
+        Expanded(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: greyText, fontSize: 12.5),
+          ),
         ),
-        Text(
-          value,
-          style: const TextStyle(
-            color: darkText,
-            fontWeight: FontWeight.w700,
-            fontSize: 13,
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: valueColor ?? darkText,
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
           ),
         ),
       ],
@@ -969,6 +1120,8 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
               children: [
                 const Text(
                   'TOTAL PAYABLE',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: greyText,
                     fontSize: 10,
@@ -976,19 +1129,26 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
                     letterSpacing: 0.5,
                   ),
                 ),
-                Text(
-                  _selectedPlan.formattedTotalPayable,
-                  style: const TextStyle(
-                    color: darkText,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.3,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    _selectedPlan.formattedTotalPayable,
+                    maxLines: 1,
+                    style: const TextStyle(
+                      color: darkText,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.3,
+                    ),
                   ),
                 ),
                 const Text(
                   '(Incl. 18% GST)',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Color(0xFF6366F1),
+                    color: primary,
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
                   ),
@@ -996,30 +1156,55 @@ class _AdPostingPlanScreenState extends State<AdPostingPlanScreen> {
               ],
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12),
           Expanded(
             flex: 2,
-            child: SizedBox(
+            child: Container(
               height: 52,
-              child: ElevatedButton.icon(
+              decoration: BoxDecoration(
+                gradient: BuyProductTheme.headerGradient,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.28),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primary,
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                 ),
                 onPressed: _isProcessing ? null : _handlePayment,
-                icon: const Icon(Icons.lock_rounded, size: 16),
-                label: const Text(
-                  'Pay & Post Ad',
-                  style: TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.4,
-                  ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.lock_rounded, size: 16),
+                    SizedBox(width: 7),
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'Pay & Post Ad',
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

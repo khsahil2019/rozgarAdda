@@ -40,6 +40,7 @@ class SellProductRequest {
   final String? paymentId;
   final String? paymentStatus;
   final Map<String, dynamic>? paymentData;
+  final Map<String, dynamic>? selectedPlan;
 
   const SellProductRequest({
     required this.categoryId,
@@ -59,5 +60,6 @@ class SellProductRequest {
     this.paymentId,
     this.paymentStatus,
     this.paymentData,
+    this.selectedPlan,
   });
 }

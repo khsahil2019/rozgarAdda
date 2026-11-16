@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Centralized color palette and visual tokens for the Buy Product / Marketplace module.
-/// Modeled faithfully after the "OLD QART" wine-maroon reference theme.
+/// Centralized color palette and visual tokens for the Buy & Sell Marketplace module.
+/// Unified Rozgar Wine-Maroon palette.
 class BuyProductTheme {
   // ── Core Wine / Burgundy Maroon Palette ─────────────────
   static const Color primaryMaroon = Color(0xFF801438);

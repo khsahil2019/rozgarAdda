@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rojgar/features/buy_product/presentation/bindings/buy_product_binding.dart';
+import 'package:rojgar/features/buy_product/presentation/screens/product_category_list_screen.dart';
 import 'package:rojgar/features/jobs/presentation/bindings/jobs_binding.dart';
 import 'package:rojgar/features/jobs/presentation/screens/recent_jobs_screen.dart';
 import 'package:rojgar/features/jobs/presentation/screens/select_category_screen.dart';
@@ -114,6 +116,11 @@ class QuickLinkCard extends StatelessWidget {
                           ),
                           duration: const Duration(seconds: 2),
                         ),
+                      );
+                    } else if (link.label == 'Buy Products' || link.label == 'Buy Product') {
+                      Get.to(
+                        () => const ProductCategoryListScreen(),
+                        binding: BuyProductBinding(),
                       );
                     } else if (link.label == 'KYC Status') {
                       Get.to(() => EditKycScreen());

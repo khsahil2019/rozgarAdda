@@ -123,7 +123,7 @@ class _DashboardDrawerState extends State<DashboardDrawer> {
                     ),
                     _buildMenuItem(
                       context,
-                      icon: Icons.sell_rounded,
+                      icon: Icons.camera_alt_rounded,
                       labelKey: 'sell_products',
                       defaultLabel: 'Sell Products',
                       iconBg: const Color(0xFFFFF7ED),

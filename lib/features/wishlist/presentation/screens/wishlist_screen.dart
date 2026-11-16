@@ -6,6 +6,7 @@ import '../../../../core/widgets/network_image_service.dart';
 import '../../../buy_product/domain/entities/buy_product_entities.dart';
 import '../../../buy_product/presentation/screens/product_category_list_screen.dart';
 import '../../../buy_product/presentation/screens/product_detail_screen.dart';
+import '../../../buy_product/presentation/theme/buy_product_theme.dart';
 import '../controller/wishlist_controller.dart';
 
 class WishlistScreen extends StatefulWidget {
@@ -176,7 +177,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       body: Obx(() {
         if (controller.isLoading.value && controller.wishlistItems.isEmpty) {
           return const Center(
-            child: CircularProgressIndicator(color: Color(0xFF1400FF)),
+            child: CircularProgressIndicator(color: BuyProductTheme.primaryMaroon),
           );
         }
 
@@ -185,7 +186,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         }
 
         return RefreshIndicator(
-          color: const Color(0xFF1400FF),
+          color: BuyProductTheme.primaryMaroon,
           onRefresh: () => controller.fetchWishlist(),
           child: Column(
             children: [
@@ -215,24 +216,31 @@ class _WishlistScreenState extends State<WishlistScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.favorite_rounded,
-                color: Color(0xFFEF4444),
-                size: 16,
-              ),
-              const SizedBox(width: 6),
-              Obx(() => Text(
-                    '${controller.itemCount} Products in your wishlist',
-                    style: const TextStyle(
-                      color: Color(0xFF334155),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12.5,
-                    ),
-                  )),
-            ],
+          Expanded(
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.favorite_rounded,
+                  color: Color(0xFFEF4444),
+                  size: 16,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Obx(() => Text(
+                        '${controller.itemCount} Products in your wishlist',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF334155),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12.5,
+                        ),
+                      )),
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
           // Grid / List Toggle
           Container(
             padding: const EdgeInsets.all(3),
@@ -263,7 +271,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                       Icons.grid_view_rounded,
                       size: 16,
                       color: _isGridView
-                          ? const Color(0xFF1400FF)
+                          ? BuyProductTheme.primaryMaroon
                           : const Color(0xFF94A3B8),
                     ),
                   ),
@@ -288,7 +296,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                       Icons.view_list_rounded,
                       size: 16,
                       color: !_isGridView
-                          ? const Color(0xFF1400FF)
+                          ? BuyProductTheme.primaryMaroon
                           : const Color(0xFF94A3B8),
                     ),
                   ),
@@ -330,10 +338,13 @@ class _WishlistScreenState extends State<WishlistScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(
+          color: BuyProductTheme.borderMaroon,
+          width: 1.8,
+        ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF64748B).withValues(alpha: 0.06),
+            color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.07),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -473,12 +484,16 @@ class _WishlistScreenState extends State<WishlistScreen> {
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             textBaseline: TextBaseline.alphabetic,
                             children: [
-                              Text(
-                                '₹${product.totalCost > 0 ? product.totalCost.toStringAsFixed(0) : product.price.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  color: Color(0xFF1400FF),
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 14.5,
+                              Flexible(
+                                child: Text(
+                                  '₹${product.totalCost > 0 ? product.totalCost.toStringAsFixed(0) : product.price.toStringAsFixed(0)}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: BuyProductTheme.primaryMaroon,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 14.5,
+                                  ),
                                 ),
                               ),
                               if (hasDiscount && product.price > 0) ...[
@@ -503,27 +518,32 @@ class _WishlistScreenState extends State<WishlistScreen> {
                           // View Details chip
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEEF2FF),
+                              color: BuyProductTheme.chipMaroonBg,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  'View Details',
-                                  style: TextStyle(
-                                    color: Color(0xFF1400FF),
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 10.5,
+                                Flexible(
+                                  child: Text(
+                                    'View Details',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: BuyProductTheme.primaryMaroon,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10.5,
+                                    ),
                                   ),
                                 ),
                                 SizedBox(width: 3),
                                 Icon(
                                   Icons.arrow_forward_ios_rounded,
                                   size: 9,
-                                  color: Color(0xFF1400FF),
+                                  color: BuyProductTheme.primaryMaroon,
                                 ),
                               ],
                             ),
@@ -559,10 +579,13 @@ class _WishlistScreenState extends State<WishlistScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+            border: Border.all(
+              color: BuyProductTheme.borderMaroon,
+              width: 1.8,
+            ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF64748B).withValues(alpha: 0.05),
+                color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.06),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -652,23 +675,31 @@ class _WishlistScreenState extends State<WishlistScreen> {
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             textBaseline: TextBaseline.alphabetic,
                             children: [
-                              Text(
-                                '₹${product.totalCost > 0 ? product.totalCost.toStringAsFixed(0) : product.price.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  color: Color(0xFF1400FF),
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 15,
+                              Flexible(
+                                child: Text(
+                                  '₹${product.totalCost > 0 ? product.totalCost.toStringAsFixed(0) : product.price.toStringAsFixed(0)}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: BuyProductTheme.primaryMaroon,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ),
                               if (hasDiscount && product.price > 0) ...[
                                 const SizedBox(width: 6),
-                                Text(
-                                  '₹${product.price.toStringAsFixed(0)}',
-                                  style: const TextStyle(
-                                    decoration: TextDecoration.lineThrough,
-                                    color: Color(0xFF94A3B8),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
+                                Flexible(
+                                  child: Text(
+                                    '₹${product.price.toStringAsFixed(0)}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      decoration: TextDecoration.lineThrough,
+                                      color: Color(0xFF94A3B8),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -724,7 +755,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   width: 120,
                   height: 120,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1400FF).withValues(alpha: 0.05),
+                    color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.06),
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -770,12 +801,13 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
             // Explore Products Button
             SizedBox(
-              width: 200,
+              width: 210,
               child: AppGradientButton(
                 text: 'Explore Products',
                 icon: Icons.storefront_rounded,
                 height: 48,
                 borderRadius: 14,
+                gradient: BuyProductTheme.headerGradient,
                 onPressed: () {
                   Navigator.push(
                     context,

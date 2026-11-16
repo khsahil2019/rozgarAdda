@@ -3,12 +3,12 @@ import 'package:get/get.dart';
 import '../../../../core/widgets/app_back_button.dart';
 import '../../../../floating_navbar.dart';
 import '../../../../localization/app_localizations.dart';
+import '../../../buy_product/presentation/theme/buy_product_theme.dart';
 import '../../../profile/presentation/screens/my_products_screen.dart';
 import '../widgets/sell_product_step_indicator.dart';
 
 class _C {
-  static const Color primaryBlue = Color(0xFF1400FF);
-  static const Color primaryLight = Color(0xFF4F46E5);
+  static const Color primaryBlue = BuyProductTheme.primaryMaroon;
   static const Color darkText = Color(0xFF0F172A);
   static const Color mediumText = Color(0xFF334155);
   static const Color greyText = Color(0xFF64748B);
@@ -83,12 +83,15 @@ class SellProductReviewScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: _C.cardBg,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: _C.borderGrey),
+                        border: Border.all(
+                          color: BuyProductTheme.borderMaroon.withValues(alpha: 0.45),
+                          width: 1.5,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF0F172A).withValues(alpha: 0.04),
-                            blurRadius: 14,
-                            offset: const Offset(0, 4),
+                            color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.08),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
@@ -100,11 +103,7 @@ class SellProductReviewScreen extends StatelessWidget {
                             height: 76,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient: const LinearGradient(
-                                colors: [_C.primaryBlue, Color(0xFF4F46E5)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
+                              gradient: BuyProductTheme.headerGradient,
                               boxShadow: [
                                 BoxShadow(
                                   color: _C.primaryBlue.withValues(alpha: 0.28),
@@ -128,7 +127,7 @@ class SellProductReviewScreen extends StatelessWidget {
                               color: const Color(0xFFFFFBEB),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: _C.warningOrange.withValues(alpha: 0.3),
+                                color: _C.warningOrange.withValues(alpha: 0.35),
                               ),
                             ),
                             child: Row(
@@ -143,13 +142,17 @@ class SellProductReviewScreen extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 6),
-                                const Text(
-                                  'PENDING APPROVAL',
-                                  style: TextStyle(
-                                    color: _C.warningOrange,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.6,
+                                const Flexible(
+                                  child: Text(
+                                    'PENDING APPROVAL',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: _C.warningOrange,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.6,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -210,11 +213,7 @@ class SellProductReviewScreen extends StatelessWidget {
                       width: double.infinity,
                       height: 52,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [_C.primaryBlue, _C.primaryLight],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        gradient: BuyProductTheme.headerGradient,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
@@ -230,6 +229,7 @@ class SellProductReviewScreen extends StatelessWidget {
                           shadowColor: Colors.transparent,
                           foregroundColor: Colors.white,
                           elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -239,15 +239,22 @@ class SellProductReviewScreen extends StatelessWidget {
                         },
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.inventory_rounded, size: 18),
                             SizedBox(width: 8),
-                            Text(
-                              'VIEW MY PRODUCTS',
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.8,
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'VIEW MY PRODUCTS',
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -262,8 +269,13 @@ class SellProductReviewScreen extends StatelessWidget {
                       height: 52,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: _C.darkText,
-                          side: const BorderSide(color: _C.borderGrey, width: 1.2),
+                          backgroundColor: BuyProductTheme.lightMaroonBg,
+                          foregroundColor: _C.primaryBlue,
+                          side: const BorderSide(
+                            color: BuyProductTheme.borderMaroon,
+                            width: 1.5,
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -271,12 +283,16 @@ class SellProductReviewScreen extends StatelessWidget {
                         onPressed: () {
                           Get.offAll(() => const FloatingNavbarScreen());
                         },
-                        child: Text(
-                          l10n.text('sell_go_dashboard'),
-                          style: const TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.8,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            l10n.text('sell_go_dashboard'),
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                            ),
                           ),
                         ),
                       ),

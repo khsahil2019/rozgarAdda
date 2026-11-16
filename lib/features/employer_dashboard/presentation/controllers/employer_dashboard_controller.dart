@@ -12,6 +12,7 @@ import '../../../../splash_screen.dart';
 import '../../../jobs/data/model/available_job_model.dart';
 import '../../../jobs/domain/entities/available_job_entity.dart';
 import '../../domain/entities/job_application_entity.dart';
+import '../../domain/entities/job_posting_plan.dart';
 import '../../domain/repository/employer_dashboard_repository.dart';
 
 class EmployerDashboardController extends GetxController {
@@ -288,6 +289,7 @@ class EmployerDashboardController extends GetxController {
   Future<void> postNewJob(
     AvailableJob newJob, {
     int planId = 2,
+    JobPostingPlan? selectedPlan,
     String? transactionId,
     String? paymentId,
     String? paymentStatus,
@@ -315,6 +317,8 @@ class EmployerDashboardController extends GetxController {
         'english_level': newJob.englishLevel,
         'experience_level': newJob.experienceLevel,
         'plan_id': planId,
+        if (selectedPlan != null) 'selectedPlan': selectedPlan.toJson(),
+        if (selectedPlan != null) 'selected_plan': selectedPlan.toJson(),
         'payment_status': paymentStatus ?? (planId == 10 ? 'free' : 'success'),
         'transaction_status':
             transactionStatus ?? (planId == 10 ? 'free' : 'completed'),

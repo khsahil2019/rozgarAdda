@@ -124,10 +124,10 @@ class SellProductController extends GetxController {
   }
 
   // Image Picking
-  Future<void> pickMainImage() async {
+  Future<void> pickMainImage({ImageSource source = ImageSource.gallery}) async {
     try {
       final picker = ImagePicker();
-      final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+      final picked = await picker.pickImage(source: source, imageQuality: 85);
       if (picked != null) {
         mainImage.value = picked;
       }
@@ -136,12 +136,24 @@ class SellProductController extends GetxController {
     }
   }
 
-  Future<void> pickGalleryImages() async {
+  Future<void> pickGalleryImages({ImageSource source = ImageSource.gallery}) async {
     try {
       final picker = ImagePicker();
-      final picked = await picker.pickMultiImage(limit: 5);
-      if (picked.isNotEmpty) {
-        galleryImages.assignAll(picked.take(5));
+      if (source == ImageSource.camera) {
+        final picked = await picker.pickImage(source: ImageSource.camera, imageQuality: 85);
+        if (picked != null && galleryImages.length < 5) {
+          galleryImages.add(picked);
+        }
+      } else {
+        final remaining = 5 - galleryImages.length;
+        if (remaining <= 0) {
+          Get.snackbar('Limit Reached', 'You can upload maximum 5 gallery images');
+          return;
+        }
+        final picked = await picker.pickMultiImage(limit: remaining);
+        if (picked.isNotEmpty) {
+          galleryImages.addAll(picked.take(remaining));
+        }
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to pick gallery images');
@@ -187,6 +199,7 @@ class SellProductController extends GetxController {
     String? paymentId,
     String? paymentStatus,
     Map<String, dynamic>? paymentData,
+    Map<String, dynamic>? selectedPlan,
   }) async {
     if (selectedCategoryIndex.value == null || selectedSubCategoryIndex.value == null) {
       savingError.value = 'Please select both Category and Sub Category';
@@ -222,6 +235,7 @@ class SellProductController extends GetxController {
         paymentId: paymentId,
         paymentStatus: paymentStatus,
         paymentData: paymentData,
+        selectedPlan: selectedPlan,
       );
 
       final result = await repository.saveProduct(request);

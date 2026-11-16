@@ -8,10 +8,11 @@ import '../../../../localization/app_localizations.dart';
 import '../bindings/sell_product_binding.dart';
 import '../controller/sell_product_controller.dart';
 import '../widgets/sell_product_step_indicator.dart';
+import '../../../buy_product/presentation/theme/buy_product_theme.dart';
 import 'ad_posting_plan_screen.dart';
 
 class _C {
-  static const Color primaryBlue = Color(0xFF1400FF);
+  static const Color primaryBlue = BuyProductTheme.primaryMaroon;
   static const Color darkText = Color(0xFF0F172A);
   static const Color greyText = Color(0xFF64748B);
   static const Color borderGrey = Color(0xFFE2E8F0);
@@ -158,10 +159,11 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
                         return Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1400FF).withValues(alpha: 0.05),
+                            color: BuyProductTheme.lightMaroonBg,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: const Color(0xFF1400FF).withValues(alpha: 0.15),
+                              color: BuyProductTheme.borderMaroon.withValues(alpha: 0.35),
+                              width: 1.5,
                             ),
                           ),
                           child: Row(
@@ -169,7 +171,7 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF1400FF).withValues(alpha: 0.12),
+                                  color: BuyProductTheme.chipMaroonBg,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: const Icon(Icons.sell_outlined, color: _C.primaryBlue, size: 20),
@@ -181,6 +183,8 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
                                   children: [
                                     Text(
                                       '$catName  •  $subCatName',
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         color: _C.darkText,
                                         fontSize: 14,
@@ -242,7 +246,7 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
                       // Card 2: Photos & Media
                       _buildSectionCard(
                         title: 'Product Images',
-                        icon: Icons.photo_camera_outlined,
+                        icon: Icons.photo_camera_rounded,
                         children: [
                           _FieldLabel(l10n.text('sell_main_image')),
                           Obx(() {
@@ -251,7 +255,11 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
                               label: mainImg == null
                                   ? l10n.text('sell_no_file')
                                   : mainImg.name,
-                              onTap: controller.pickMainImage,
+                              onTap: () => _showImageSourceDialog(
+                                context,
+                                onCamera: () => controller.pickMainImage(source: ImageSource.camera),
+                                onGallery: () => controller.pickMainImage(source: ImageSource.gallery),
+                              ),
                               previewFile: mainImg != null ? File(mainImg.path) : null,
                               chooseFileText: l10n.text('sell_choose_file'),
                             );
@@ -262,7 +270,11 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
                           Obx(() {
                             return _GalleryPickerTile(
                               images: controller.galleryImages.toList(),
-                              onPickTap: controller.pickGalleryImages,
+                              onPickTap: () => _showImageSourceDialog(
+                                context,
+                                onCamera: () => controller.pickGalleryImages(source: ImageSource.camera),
+                                onGallery: () => controller.pickGalleryImages(source: ImageSource.gallery),
+                              ),
                               onRemove: controller.removeGalleryImage,
                               maxImagesText: l10n.text('sell_max_images'),
                               chooseFileText: l10n.text('sell_choose_file'),
@@ -322,32 +334,42 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF1F5F9),
+                              color: BuyProductTheme.lightMaroonBg,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: _C.borderGrey),
+                              border: Border.all(
+                                color: BuyProductTheme.borderMaroon.withValues(alpha: 0.35),
+                              ),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.receipt_long_outlined, color: _C.greyText, size: 18),
+                                const Icon(Icons.receipt_long_outlined, color: _C.primaryBlue, size: 18),
                                 const SizedBox(width: 8),
-                                Text(
-                                  '${l10n.text('sell_total_cost')}: ',
-                                  style: const TextStyle(
-                                    color: _C.greyText,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
+                                Flexible(
+                                  child: Text(
+                                    '${l10n.text('sell_total_cost')}: ',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: _C.greyText,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                                 Obx(() {
                                   final total = controller.totalCostObx.value;
-                                  return Text(
-                                    controller.priceCtrl.text.isEmpty
-                                        ? '₹ 0.00'
-                                        : '₹ ${total.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      color: _C.primaryBlue,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w900,
+                                  return Flexible(
+                                    child: Text(
+                                      controller.priceCtrl.text.isEmpty
+                                          ? '₹ 0.00'
+                                          : '₹ ${total.toStringAsFixed(2)}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: _C.primaryBlue,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w900,
+                                      ),
                                     ),
                                   );
                                 }),
@@ -461,20 +483,28 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
               Expanded(
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: _C.darkText,
-                    side: const BorderSide(color: _C.borderGrey, width: 1.2),
+                    foregroundColor: _C.primaryBlue,
+                    side: BorderSide(
+                      color: BuyProductTheme.borderMaroon.withValues(alpha: 0.6),
+                      width: 1.4,
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     minimumSize: const Size.fromHeight(52),
                   ),
                   onPressed: () => Get.back(),
-                  child: Text(
-                    l10n.text('cancel'),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      l10n.text('cancel'),
+                      maxLines: 1,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                 ),
@@ -482,33 +512,56 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
               const SizedBox(width: 12),
               Expanded(
                 flex: 2,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _C.primaryBlue,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    minimumSize: const Size.fromHeight(52),
-                  ),
-                  onPressed: () => _handleProceedToPayment(context, l10n),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.payment_rounded, size: 18),
-                      SizedBox(width: 8),
-                      Text(
-                        'Proceed to Payment',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                        ),
+                child: Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    gradient: BuyProductTheme.headerGradient,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.28),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                      SizedBox(width: 6),
-                      Icon(Icons.arrow_forward_rounded, size: 16),
                     ],
+                  ),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      minimumSize: const Size.fromHeight(52),
+                    ),
+                    onPressed: () => _handleProceedToPayment(context, l10n),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.payment_rounded, size: 17),
+                        SizedBox(width: 6),
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Proceed to Payment',
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 5),
+                        Icon(Icons.arrow_forward_rounded, size: 16),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -530,7 +583,10 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
       decoration: BoxDecoration(
         color: _C.cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _C.borderGrey),
+        border: Border.all(
+          color: BuyProductTheme.borderMaroon.withValues(alpha: 0.3),
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF0F172A).withValues(alpha: 0.02),
@@ -547,19 +603,23 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1400FF).withValues(alpha: 0.08),
+                  color: BuyProductTheme.chipMaroonBg,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: _C.primaryBlue, size: 16),
               ),
               const SizedBox(width: 10),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: _C.darkText,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.2,
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: _C.darkText,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2,
+                  ),
                 ),
               ),
             ],
@@ -568,6 +628,98 @@ class _SellProductFormScreenState extends State<SellProductFormScreen> {
           ...children,
         ],
       ),
+    );
+  }
+
+  void _showImageSourceDialog(
+    BuildContext context, {
+    required VoidCallback onCamera,
+    required VoidCallback onGallery,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFCBD5E1),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Select Photo Source',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: _C.darkText,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: const BoxDecoration(
+                      color: BuyProductTheme.chipMaroonBg,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.camera_alt_rounded, color: _C.primaryBlue, size: 22),
+                  ),
+                  title: const Text(
+                    'Take Photo with Camera',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: _C.darkText),
+                  ),
+                  subtitle: const Text(
+                    'Capture product image directly',
+                    style: TextStyle(fontSize: 12, color: _C.greyText),
+                  ),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    onCamera();
+                  },
+                ),
+                const SizedBox(height: 6),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: const BoxDecoration(
+                      color: BuyProductTheme.chipMaroonBg,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.photo_library_rounded, color: _C.primaryBlue, size: 22),
+                  ),
+                  title: const Text(
+                    'Choose from Gallery',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: _C.darkText),
+                  ),
+                  subtitle: const Text(
+                    'Select photos from your device',
+                    style: TextStyle(fontSize: 12, color: _C.greyText),
+                  ),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    onGallery();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -643,15 +795,21 @@ class _InputField extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _C.borderGrey, width: 1),
+          borderSide: BorderSide(
+            color: BuyProductTheme.borderMaroon.withValues(alpha: 0.35),
+            width: 1.2,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _C.borderGrey, width: 1),
+          borderSide: BorderSide(
+            color: BuyProductTheme.borderMaroon.withValues(alpha: 0.35),
+            width: 1.2,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _C.primaryBlue, width: 1.5),
+          borderSide: const BorderSide(color: _C.primaryBlue, width: 1.8),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -690,12 +848,15 @@ class _MainImagePickerTile extends StatelessWidget {
             decoration: BoxDecoration(
               color: _C.fieldBg,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: _C.borderGrey, width: 1),
+              border: Border.all(
+                color: BuyProductTheme.borderMaroon.withValues(alpha: 0.45),
+                width: 1.2,
+              ),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               children: [
-                const Icon(Icons.add_photo_alternate_outlined, color: _C.primaryBlue, size: 20),
+                const Icon(Icons.camera_alt_rounded, color: _C.primaryBlue, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -709,15 +870,20 @@ class _MainImagePickerTile extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: BuyProductTheme.chipMaroonBg,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: _C.borderGrey),
+                    border: Border.all(
+                      color: BuyProductTheme.borderMaroon.withValues(alpha: 0.45),
+                    ),
                   ),
                   child: Text(
                     chooseFileText,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: _C.primaryBlue,
                       fontSize: 12,
@@ -772,18 +938,23 @@ class _GalleryPickerTile extends StatelessWidget {
             decoration: BoxDecoration(
               color: _C.fieldBg,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: _C.borderGrey, width: 1),
+              border: Border.all(
+                color: BuyProductTheme.borderMaroon.withValues(alpha: 0.45),
+                width: 1.2,
+              ),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               children: [
-                const Icon(Icons.collections_outlined, color: _C.primaryBlue, size: 20),
+                const Icon(Icons.photo_camera_back_rounded, color: _C.primaryBlue, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     images.isEmpty
                         ? maxImagesText
                         : '${images.length} images selected',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: _C.darkText,
                       fontSize: 13,
@@ -791,15 +962,20 @@ class _GalleryPickerTile extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: BuyProductTheme.chipMaroonBg,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: _C.borderGrey),
+                    border: Border.all(
+                      color: BuyProductTheme.borderMaroon.withValues(alpha: 0.45),
+                    ),
                   ),
                   child: Text(
                     chooseFileText,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: _C.primaryBlue,
                       fontSize: 12,

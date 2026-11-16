@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/widgets/app_back_button.dart';
 import '../../../../localization/app_localizations.dart';
+import '../../../buy_product/presentation/widgets/marketplace_search_bar.dart';
 import '../controller/sell_product_controller.dart';
 import '../widgets/sell_product_step_indicator.dart';
 import 'sell_product_form_screen.dart';
 
 class _C {
   static const Color primaryBlue = Color(0xFF801438);
-  static const Color primaryLight = Color(0xFF9E1B46);
   static const Color darkText = Color(0xFF0F172A);
   static const Color greyText = Color(0xFF64748B);
   static const Color borderGrey = Color(0xFFE2E8F0);
@@ -172,41 +172,16 @@ class _SellProductSubCategoryScreenState extends State<SellProductSubCategoryScr
                       ),
                       const SizedBox(height: 14),
 
-                      // 🔍 Live Search Bar for Subcategories
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: _C.primaryBlue, width: 1.5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: _C.primaryBlue.withValues(alpha: 0.06),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: (val) => setState(() => _searchQuery = val.trim()),
-                          style: const TextStyle(fontSize: 13.5, color: _C.darkText, fontWeight: FontWeight.w600),
-                          decoration: InputDecoration(
-                            hintText: 'Search subcategories...',
-                            hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontWeight: FontWeight.w500),
-                            prefixIcon: const Icon(Icons.search_rounded, color: _C.primaryBlue, size: 20),
-                            suffixIcon: _searchQuery.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.clear_rounded, color: _C.greyText, size: 18),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      setState(() => _searchQuery = '');
-                                    },
-                                  )
-                                : null,
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
+                      // 🔍 Live Search Bar with 4-Side Reddish Border
+                      MarketplaceSearchBar(
+                        controller: _searchController,
+                        hintText: 'Search subcategories...',
+                        searchQuery: _searchQuery,
+                        onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                        onClear: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
                       ),
                       const SizedBox(height: 18),
 
@@ -254,10 +229,10 @@ class _SellProductSubCategoryScreenState extends State<SellProductSubCategoryScr
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: filteredSubCats.length,
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 0.95,
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.88,
                           ),
                           itemBuilder: (context, i) {
                             final subCat = filteredSubCats[i];
@@ -281,18 +256,23 @@ class _SellProductSubCategoryScreenState extends State<SellProductSubCategoryScr
                                     color: isSelected
                                         ? _C.primaryBlue.withValues(alpha: 0.04)
                                         : _C.cardBg,
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: isSelected ? _C.primaryBlue : _C.borderGrey,
-                                      width: isSelected ? 2 : 1,
-                                    ),
+                                    borderRadius: BorderRadius.circular(14),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF0F172A).withValues(alpha: isSelected ? 0.06 : 0.02),
-                                        blurRadius: isSelected ? 12 : 4,
+                                        color: const Color(0xFF0F172A).withValues(alpha: isSelected ? 0.08 : 0.03),
+                                        blurRadius: isSelected ? 10 : 5,
                                         offset: const Offset(0, 2),
                                       ),
                                     ],
+                                  ),
+                                  foregroundDecoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? _C.primaryBlue
+                                          : _C.primaryBlue.withValues(alpha: 0.55),
+                                      width: isSelected ? 2.4 : 1.6,
+                                    ),
                                   ),
                                   clipBehavior: Clip.antiAlias,
                                   child: Column(

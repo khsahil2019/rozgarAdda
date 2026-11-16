@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../core/network/api_routes.dart';
-import '../../../../core/widgets/network_image_service.dart';
 import '../controller/buy_product_controller.dart';
-import '../../domain/entities/buy_product_entities.dart';
 import '../theme/buy_product_theme.dart';
-import 'product_detail_screen.dart';
+import '../widgets/marketplace_product_card.dart';
+import '../widgets/marketplace_search_bar.dart';
 import '../../../../core/widgets/fast_loader.dart';
 import '../../../wishlist/presentation/controller/wishlist_controller.dart';
 import '../../../wishlist/presentation/screens/wishlist_screen.dart';
@@ -193,7 +191,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
       ),
       body: Column(
         children: [
-          // 🔍 Interactive Search Bar (Old Qart theme styled)
+          // 🔍 Interactive Search Bar (Wine-Maroon theme styled)
           _buildSearchBar(),
 
           // 🎛️ Subcategory Filter Chips
@@ -210,54 +208,15 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: BuyProductTheme.borderMaroon,
-            width: 1.6,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: TextField(
-          controller: _searchController,
-          style: const TextStyle(
-            fontSize: 13,
-            color: BuyProductTheme.darkText,
-            fontWeight: FontWeight.w600,
-          ),
-          decoration: InputDecoration(
-            hintText: 'Search in ${widget.title ?? "cars, phones, items"}...',
-            hintStyle: const TextStyle(
-              color: BuyProductTheme.lightGreyText,
-              fontSize: 12.5,
-              fontWeight: FontWeight.w500,
-            ),
-            prefixIcon: const Icon(
-              Icons.search_rounded,
-              color: BuyProductTheme.primaryMaroon,
-              size: 21,
-            ),
-            suffixIcon: _searchQuery.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear_rounded, color: BuyProductTheme.greyText, size: 18),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() => _searchQuery = '');
-                    },
-                  )
-                : null,
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 11, horizontal: 4),
-          ),
-        ),
+      child: MarketplaceSearchBar(
+        controller: _searchController,
+        hintText: 'Search in ${widget.title ?? "cars, phones, items"}...',
+        searchQuery: _searchQuery,
+        onChanged: (val) => setState(() => _searchQuery = val.trim().toLowerCase()),
+        onClear: () {
+          _searchController.clear();
+          setState(() => _searchQuery = '');
+        },
       ),
     );
   }
@@ -471,240 +430,19 @@ class _ProductListScreenState extends State<ProductListScreen> {
               child: GridView.builder(
                 padding: const EdgeInsets.fromLTRB(10, 10, 10, 24),
                 itemCount: filteredList.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // EXACTLY 3 ITEMS PER ROW
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: (widget.title?.toLowerCase().contains('recommended') == true) ? 2 : 3,
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
-                  childAspectRatio: 0.58,
+                  childAspectRatio: (widget.title?.toLowerCase().contains('recommended') == true) ? 0.72 : 0.58,
                 ),
                 itemBuilder: (context, i) =>
-                    _ProductCard(product: filteredList[i]),
+                    MarketplaceProductCard(product: filteredList[i]),
               ),
             ),
           ],
         ),
       );
     });
-  }
-}
-
-// ─────────────────────────────────────────────
-// PRODUCT CARD (3 ITEMS PER ROW WITH MAROON BORDER)
-// ─────────────────────────────────────────────
-class _ProductCard extends StatefulWidget {
-  final BuyProduct product;
-  const _ProductCard({required this.product});
-
-  @override
-  State<_ProductCard> createState() => _ProductCardState();
-}
-
-class _ProductCardState extends State<_ProductCard> {
-  String _formatPrice(double price) {
-    if (price >= 100000) {
-      return '₹${(price / 100000).toStringAsFixed(1)}L';
-    }
-    return '₹${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}';
-  }
-
-  void _openDetail(BuildContext context) {
-    Get.to(
-      () => ProductDetailScreen(
-        productId: widget.product.id,
-        initialProduct: widget.product,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final product = widget.product;
-    final hasDiscount = product.discount > 0;
-
-    return GestureDetector(
-      onTap: () => _openDetail(context),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          // User requested: "use the product in boder of same color"
-          border: Border.all(
-            color: BuyProductTheme.borderMaroon,
-            width: 1.3,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Image area ────────────────────────────
-            Expanded(
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(12),
-                      ),
-                      child: product.metaImage.isNotEmpty
-                          ? NetworkImageService(
-                              imageUrl: ApiRoutes.absoluteUrl(product.metaImage),
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorWidget: _PlaceholderImage(),
-                            )
-                          : _PlaceholderImage(),
-                    ),
-                  ),
-                  // Discount badge if available
-                  if (hasDiscount)
-                    Positioned(
-                      top: 4,
-                      left: 4,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEF4444),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          '${product.discount.toStringAsFixed(0)}%',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                    ),
-                  // Heart Icon (Wishlist toggle)
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: Obx(() {
-                      final isLiked =
-                          WishlistController.to.isWishlisted(product.id);
-                      return GestureDetector(
-                        onTap: () {
-                          WishlistController.to.toggleWishlist(product);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.94),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.15),
-                                blurRadius: 4,
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            isLiked
-                                ? Icons.favorite_rounded
-                                : Icons.favorite_border_rounded,
-                            color: isLiked
-                                ? const Color(0xFFEF4444)
-                                : BuyProductTheme.primaryMaroon,
-                            size: 13,
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                ],
-              ),
-            ),
-
-            // ── Content Area (Scaled for 3 columns) ──
-            Padding(
-              padding: const EdgeInsets.fromLTRB(6, 6, 6, 7),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Price
-                  Text(
-                    _formatPrice(product.totalCost),
-                    style: const TextStyle(
-                      color: BuyProductTheme.primaryMaroon,
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.2,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 2),
-
-                  // Title
-                  Text(
-                    product.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: BuyProductTheme.darkText,
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
-                      height: 1.15,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-
-                  // Subtitle / Verified badge
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.verified_outlined,
-                        color: BuyProductTheme.primaryMaroon,
-                        size: 10,
-                      ),
-                      const SizedBox(width: 3),
-                      Expanded(
-                        child: Text(
-                          product.warranty.isNotEmpty
-                              ? product.warranty
-                              : (product.capacity.isNotEmpty ? product.capacity : 'Verified'),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: BuyProductTheme.greyText,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PlaceholderImage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: BuyProductTheme.lightMaroonBg,
-      child: Center(
-        child: Icon(
-          Icons.shopping_bag_outlined,
-          color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.35),
-          size: 26,
-        ),
-      ),
-    );
   }
 }

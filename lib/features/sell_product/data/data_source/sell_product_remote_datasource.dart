@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart' as dio;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -91,6 +92,10 @@ class SellProductRemoteDataSourceImpl implements SellProductRemoteDataSource {
 
       if (request.planId != null) {
         formDataMap['plan_id'] = request.planId.toString();
+      }
+      if (request.selectedPlan != null) {
+        formDataMap['selectedPlan'] = jsonEncode(request.selectedPlan);
+        formDataMap['selected_plan'] = jsonEncode(request.selectedPlan);
       }
       if (request.transactionId != null && request.transactionId!.isNotEmpty) {
         formDataMap['transaction_id'] = request.transactionId!;

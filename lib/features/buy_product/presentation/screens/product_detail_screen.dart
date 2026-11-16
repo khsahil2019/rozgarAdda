@@ -8,6 +8,7 @@ import '../../domain/entities/buy_product_entities.dart';
 import '../bindings/buy_product_binding.dart';
 import '../controller/buy_product_controller.dart';
 import '../theme/buy_product_theme.dart';
+import '../widgets/marketplace_product_card.dart';
 import '../../../wishlist/presentation/controller/wishlist_controller.dart';
 
 // ─────────────────────────────────────────────
@@ -15,12 +16,10 @@ import '../../../wishlist/presentation/controller/wishlist_controller.dart';
 // ─────────────────────────────────────────────
 class _DC {
   static const Color primary = BuyProductTheme.primaryMaroon;
-  static const Color cardBg = Color(0xFFFFFFFF);
   static const Color darkText = Color(0xFF1A1A2E);
   static const Color greyText = Color(0xFF8A8FA3);
   static const Color strikePrice = Color(0xFF9A9A9A);
   static const Color saveBadgeBg = Color(0xFFDD0000);
-  static const Color offBadgeBg = Color(0xFFDD0000);
 }
 
 // ─────────────────────────────────────────────
@@ -191,7 +190,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Expanded(
             child: SizedBox(
               height: 48,
-              child: OutlinedButton.icon(
+              child: OutlinedButton(
                 onPressed: () {
                   if (!Get.isRegistered<ChatController>()) {
                     ChatBinding().dependencies();
@@ -199,16 +198,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   Get.find<ChatController>().initiateChat(product.id);
                 },
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFF4F46E5), width: 1.5),
+                  backgroundColor: BuyProductTheme.lightMaroonBg,
+                  side: const BorderSide(color: BuyProductTheme.borderMaroon, width: 1.5),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  foregroundColor: const Color(0xFF4F46E5),
+                  foregroundColor: BuyProductTheme.primaryMaroon,
                 ),
-                icon: const Icon(Icons.chat_bubble_rounded, size: 18),
-                label: const Text(
-                  'Chat with Seller',
-                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.chat_bubble_rounded, size: 17),
+                    SizedBox(width: 6),
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'Chat with Seller',
+                          maxLines: 1,
+                          style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -219,19 +233,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               height: 48,
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1400FF), Color(0xFF4F46E5)],
-                  ),
+                  gradient: BuyProductTheme.headerGradient,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF1400FF).withValues(alpha: 0.25),
+                      color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.25),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
                   ],
                 ),
-                child: ElevatedButton.icon(
+                child: ElevatedButton(
                   onPressed: () {
                     Get.snackbar(
                       'Enquiry Sent',
@@ -244,22 +256,36 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     backgroundColor: Colors.transparent,
                     shadowColor: Colors.transparent,
                     foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  icon: const Icon(
-                    Icons.shopping_bag_rounded,
-                    size: 18,
-                    color: Colors.white,
-                  ),
-                  label: const Text(
-                    'Enquire Now',
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.shopping_bag_rounded,
+                        size: 17,
+                        color: Colors.white,
+                      ),
+                      SizedBox(width: 6),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            'Enquire Now',
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -275,7 +301,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     if (controller.isLoadingDetail.value && product == null) {
       return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF4F46E5)),
+        child: CircularProgressIndicator(color: _DC.primary),
       );
     }
 
@@ -304,7 +330,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('Retry'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
+                  backgroundColor: _DC.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -342,7 +368,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('Retry'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
+                  backgroundColor: _DC.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -542,9 +568,12 @@ class _MainImage extends StatelessWidget {
       width: double.infinity,
       height: 220,
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F0F5),
+        color: BuyProductTheme.lightMaroonBg,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE0E0EE)),
+        border: Border.all(
+          color: BuyProductTheme.borderMaroon.withValues(alpha: 0.45),
+          width: 1.5,
+        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: resolvedUrl.isNotEmpty
@@ -600,10 +629,12 @@ class _ThumbnailRow extends StatelessWidget {
               height: 58,
               margin: EdgeInsets.only(right: i < images.length - 1 ? 10 : 0),
               decoration: BoxDecoration(
-                color: const Color(0xFFF0F0F5),
+                color: BuyProductTheme.lightMaroonBg,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: isSelected ? _DC.primary : const Color(0xFFDDDDEE),
+                  color: isSelected
+                      ? _DC.primary
+                      : BuyProductTheme.borderMaroon.withValues(alpha: 0.35),
                   width: isSelected ? 2 : 1,
                 ),
               ),
@@ -720,52 +751,57 @@ class _SpecsRow extends StatelessWidget {
     if (specs.isEmpty) return const SizedBox.shrink();
 
     return Row(
-      children: specs
-          .map(
-            (s) => Expanded(
-              child: Container(
-                margin: const EdgeInsets.only(right: 10),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F6FF),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFDDDFFF)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(s.icon, size: 18, color: _DC.primary),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            s.label,
-                            style: const TextStyle(
-                              color: _DC.greyText,
-                              fontSize: 10,
-                            ),
-                          ),
-                          Text(
-                            s.value,
-                            style: const TextStyle(
-                              color: _DC.darkText,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+      children: List.generate(specs.length, (i) {
+        final s = specs[i];
+        return Expanded(
+          child: Container(
+            margin: EdgeInsets.only(right: i < specs.length - 1 ? 10 : 0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
+            decoration: BoxDecoration(
+              color: BuyProductTheme.lightMaroonBg,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: BuyProductTheme.borderMaroon.withValues(alpha: 0.4),
               ),
             ),
-          )
-          .toList(),
+            child: Row(
+              children: [
+                Icon(s.icon, size: 18, color: _DC.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        s.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: _DC.greyText,
+                          fontSize: 10,
+                        ),
+                      ),
+                      Text(
+                        s.value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: _DC.darkText,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }),
     );
   }
 }
@@ -813,10 +849,6 @@ class _RelatedProductsGrid extends StatelessWidget {
     required this.onProductTap,
   });
 
-  String _fmt(double price) {
-    return '₹${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}';
-  }
-
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
@@ -832,117 +864,10 @@ class _RelatedProductsGrid extends StatelessWidget {
       ),
       itemBuilder: (context, i) {
         final p = products[i];
-        return GestureDetector(
+        return MarketplaceProductCard(
+          product: p,
+          showWishlistButton: false,
           onTap: () => onProductTap(p.id),
-          child: Container(
-            decoration: BoxDecoration(
-              color: _DC.cardBg,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: BuyProductTheme.borderMaroon,
-                width: 1.25,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.07),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Image with OFF badge
-                Expanded(
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(12),
-                          ),
-                          child: Container(
-                            color: BuyProductTheme.lightMaroonBg,
-                            child: p.metaImage.isNotEmpty
-                                ? NetworkImageService(
-                                    imageUrl: ApiRoutes.absoluteUrl(p.metaImage),
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorWidget: const Icon(
-                                      Icons.inventory_2_outlined,
-                                      size: 30,
-                                      color: BuyProductTheme.primaryMaroon,
-                                    ),
-                                  )
-                                : const Icon(
-                                    Icons.inventory_2_outlined,
-                                    size: 30,
-                                    color: BuyProductTheme.primaryMaroon,
-                                  ),
-                          ),
-                        ),
-                      ),
-                      if (p.discount > 0)
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _DC.offBadgeBg,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '${p.discount.toStringAsFixed(0)}%',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _fmt(p.totalCost),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: BuyProductTheme.primaryMaroon,
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        p.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: _DC.darkText,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
         );
       },
     );

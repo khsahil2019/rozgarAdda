@@ -5,6 +5,7 @@ import '../../../../core/widgets/network_image_service.dart';
 import '../controller/buy_product_controller.dart';
 import '../../domain/entities/buy_product_entities.dart';
 import '../theme/buy_product_theme.dart';
+import '../widgets/marketplace_search_bar.dart';
 import 'product_list_screen.dart';
 
 class ProductSubCategorySelectionScreen extends StatefulWidget {
@@ -133,8 +134,17 @@ class _ProductSubCategorySelectionScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 🔍 Live Search Bar
-                _buildSearchBar(),
+                // 🔍 Live Search Bar with 4-Side Reddish Border
+                MarketplaceSearchBar(
+                  controller: _searchController,
+                  hintText: 'Search subcategories...',
+                  searchQuery: _searchQuery,
+                  onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                  onClear: () {
+                    _searchController.clear();
+                    setState(() => _searchQuery = '');
+                  },
+                ),
                 const SizedBox(height: 14),
 
                 // 🎫 "View All Products" Card
@@ -145,15 +155,20 @@ class _ProductSubCategorySelectionScreenState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Select Subcategory',
-                      style: TextStyle(
-                        color: BuyProductTheme.darkText,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.3,
+                    const Expanded(
+                      child: Text(
+                        'Select Subcategory',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: BuyProductTheme.darkText,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.3,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
@@ -196,10 +211,10 @@ class _ProductSubCategorySelectionScreenState
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: filteredSubCats.length,
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, // EXACTLY 3 ITEMS PER ROW
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                      childAspectRatio: 0.82,
+                      crossAxisCount: 4,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      mainAxisExtent: 84,
                     ),
                     itemBuilder: (context, index) {
                       final subCategory = filteredSubCats[index];
@@ -222,59 +237,6 @@ class _ProductSubCategorySelectionScreenState
           ),
         );
       }),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: BuyProductTheme.borderMaroon,
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: _searchController,
-        onChanged: (val) => setState(() => _searchQuery = val.trim()),
-        style: const TextStyle(
-          color: BuyProductTheme.darkText,
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: InputDecoration(
-          hintText: 'Search subcategories...',
-          hintStyle: const TextStyle(
-            color: BuyProductTheme.lightGreyText,
-            fontSize: 12.5,
-            fontWeight: FontWeight.w500,
-          ),
-          prefixIcon: const Icon(
-            Icons.search_rounded,
-            color: BuyProductTheme.primaryMaroon,
-            size: 20,
-          ),
-          suffixIcon: _searchQuery.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear_rounded, color: BuyProductTheme.greyText, size: 16),
-                  onPressed: () {
-                    _searchController.clear();
-                    setState(() => _searchQuery = '');
-                  },
-                )
-              : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 11, horizontal: 8),
-        ),
-      ),
     );
   }
 
@@ -406,7 +368,7 @@ class _ProductSubCategorySelectionScreenState
 }
 
 // ─────────────────────────────────────────────
-// SUBCATEGORY GRID ITEM (3 PER ROW WITH MAROON BORDER)
+// COMPACT SUBCATEGORY GRID ITEM (4 PER ROW WITH BOLD MAROON BORDER)
 // ─────────────────────────────────────────────
 class _SubCategoryGridItem extends StatelessWidget {
   final BuyProductSubCategory subCategory;
@@ -424,48 +386,45 @@ class _SubCategoryGridItem extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          // User requested: "use the product in boder of same color"
-          border: Border.all(
-            color: BuyProductTheme.borderMaroon,
-            width: 1.25,
-          ),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.07),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+              color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.08),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
+        foregroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: BuyProductTheme.borderMaroon,
+            width: 1.8,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Image / Icon
             Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                child: Container(
-                  color: BuyProductTheme.lightMaroonBg,
-                  child: subCategory.imageUrl.isNotEmpty
-                      ? NetworkImageService(
-                          imageUrl: ApiRoutes.absoluteUrl(subCategory.imageUrl),
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorWidget: _buildFallbackIcon(),
-                        )
-                      : _buildFallbackIcon(),
-                ),
+              child: Container(
+                color: BuyProductTheme.lightMaroonBg,
+                child: subCategory.imageUrl.isNotEmpty
+                    ? NetworkImageService(
+                        imageUrl: ApiRoutes.absoluteUrl(subCategory.imageUrl),
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorWidget: _buildFallbackIcon(),
+                      )
+                    : _buildFallbackIcon(),
               ),
             ),
 
             // Title
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              color: Colors.white,
               child: Text(
                 subCategory.name,
                 maxLines: 1,
@@ -473,8 +432,8 @@ class _SubCategoryGridItem extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: BuyProductTheme.darkText,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
                   letterSpacing: -0.2,
                 ),
               ),
@@ -494,7 +453,7 @@ class _SubCategoryGridItem extends StatelessWidget {
         child: Icon(
           Icons.category_outlined,
           color: Colors.white,
-          size: 26,
+          size: 22,
         ),
       ),
     );

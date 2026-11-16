@@ -135,6 +135,7 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
         await controller.postNewJob(
           widget.newJob,
           planId: _selectedPlan.id,
+          selectedPlan: _selectedPlan,
           paymentStatus: 'success',
           transactionStatus: 'completed',
           paymentData: freePaymentData,
@@ -213,6 +214,7 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
         await controller.postNewJob(
           widget.newJob,
           planId: _selectedPlan.id,
+          selectedPlan: _selectedPlan,
           transactionId: result.txnId ?? txnId,
           paymentId: result.paymentId ?? '',
           paymentStatus: 'success',
@@ -907,10 +909,10 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
                 ),
                 const SizedBox(width: 8),
 
-                // Price Tag matching web portal yellow style
+                // Price Tag matching web portal yellow style with discount support
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color: plan.isFree ? const Color(0xFFF1F5F9) : accentAmber,
                     borderRadius: BorderRadius.circular(12),
@@ -919,19 +921,53 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(
-                        plan.isFree
-                            ? '₹0.00'
-                            : '₹${plan.price.toStringAsFixed(0)}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: plan.isFree ? darkText : Colors.white,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (plan.hasDiscount) ...[
+                            Text(
+                              '₹${plan.price.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withValues(alpha: 0.75),
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                          ],
+                          Text(
+                            plan.isFree
+                                ? '₹0.00'
+                                : '₹${plan.effectiveBasePrice.toStringAsFixed(0)}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              color: plan.isFree ? darkText : Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
+                      if (plan.hasDiscount)
+                        Container(
+                          margin: const EdgeInsets.only(top: 2, bottom: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDC2626),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            plan.formattedDiscountBadge,
+                            style: const TextStyle(
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       if (!plan.isFree)
                         Text(
-                          '+18% GST',
+                          '+${plan.gstPer.toStringAsFixed(0)}% GST',
                           style: TextStyle(
                             fontSize: 9.5,
                             fontWeight: FontWeight.w700,
@@ -1053,38 +1089,100 @@ class _JobPostingPlanScreenState extends State<JobPostingPlanScreen> {
           const Divider(height: 1, color: borderGrey),
           const SizedBox(height: 10),
 
-          // Base Price
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  '${_selectedPlan.name} Plan (${_selectedPlan.durationDays} Days)',
-                  style: const TextStyle(fontSize: 12.5, color: greyText),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+          // Pricing breakdown
+          if (_selectedPlan.hasDiscount) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    '${_selectedPlan.name} Original Price',
+                    style: const TextStyle(fontSize: 12.5, color: greyText),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                _selectedPlan.formattedBasePrice,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: darkText,
+                const SizedBox(width: 8),
+                Text(
+                  _selectedPlan.formattedBasePrice,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: darkText,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Discount (${_selectedPlan.formattedDiscountBadge})',
+                  style: const TextStyle(fontSize: 12.5, color: successGreen, fontWeight: FontWeight.w700),
+                ),
+                Text(
+                  '-₹${(_selectedPlan.price - _selectedPlan.effectiveBasePrice).toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: successGreen,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Net Package Price',
+                  style: TextStyle(fontSize: 12.5, color: greyText),
+                ),
+                Text(
+                  _selectedPlan.formattedEffectivePrice,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: darkText,
+                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            // Base Price
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    '${_selectedPlan.name} Plan (${_selectedPlan.durationDays} Days)',
+                    style: const TextStyle(fontSize: 12.5, color: greyText),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  _selectedPlan.formattedBasePrice,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: darkText,
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 8),
 
-          // GST 18%
+          // GST
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'GST (18%)',
-                style: TextStyle(fontSize: 12.5, color: greyText),
+              Text(
+                'GST (${_selectedPlan.gstPer.toStringAsFixed(0)}%)',
+                style: const TextStyle(fontSize: 12.5, color: greyText),
               ),
               Text(
                 '+${_selectedPlan.formattedGstAmount}',

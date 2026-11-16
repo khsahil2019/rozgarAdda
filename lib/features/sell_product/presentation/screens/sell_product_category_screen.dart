@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/network/api_routes.dart';
 import '../../../../core/widgets/app_back_button.dart';
+import '../../../../core/widgets/network_image_service.dart';
 import '../../../../localization/app_localizations.dart';
+import '../../../buy_product/presentation/theme/buy_product_theme.dart';
+import '../../../buy_product/presentation/widgets/marketplace_search_bar.dart';
 import '../bindings/sell_product_binding.dart';
 import '../controller/sell_product_controller.dart';
 import '../widgets/sell_product_step_indicator.dart';
@@ -9,12 +13,10 @@ import 'sell_product_subcategory_screen.dart';
 
 class _C {
   static const Color primaryBlue = Color(0xFF801438); // Aligned with marketplace theme
-  static const Color primaryLight = Color(0xFF9E1B46);
   static const Color darkText = Color(0xFF0F172A);
   static const Color greyText = Color(0xFF64748B);
   static const Color borderGrey = Color(0xFFE2E8F0);
   static const Color scaffoldBg = Color(0xFFF8FAFC);
-  static const Color cardBg = Color(0xFFFFFFFF);
 }
 
 class SellProductCategoryScreen extends StatefulWidget {
@@ -103,44 +105,19 @@ class _SellProductCategoryScreenState extends State<SellProductCategoryScreen> {
           children: [
             const SellProductStepIndicator(currentStep: 1),
 
-            // 🔍 Live Search Bar
+            // 🔍 Live Search Bar with 4-Side Reddish Border
             Container(
               color: Colors.white,
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: _C.primaryBlue, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _C.primaryBlue.withValues(alpha: 0.06),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (val) => setState(() => _searchQuery = val.trim()),
-                  style: const TextStyle(fontSize: 13.5, color: _C.darkText, fontWeight: FontWeight.w600),
-                  decoration: InputDecoration(
-                    hintText: 'Search categories (e.g. Mobile, Cars)...',
-                    hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontWeight: FontWeight.w500),
-                    prefixIcon: const Icon(Icons.search_rounded, color: _C.primaryBlue, size: 20),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, color: _C.greyText, size: 18),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _searchQuery = '');
-                            },
-                          )
-                        : null,
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
+              child: MarketplaceSearchBar(
+                controller: _searchController,
+                hintText: 'Search categories (e.g. Mobile, Cars)...',
+                searchQuery: _searchQuery,
+                onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                onClear: () {
+                  _searchController.clear();
+                  setState(() => _searchQuery = '');
+                },
               ),
             ),
 
@@ -227,137 +204,164 @@ class _SellProductCategoryScreenState extends State<SellProductCategoryScreen> {
                   );
                 }
 
-                return ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-                  itemCount: filteredList.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Category Header: Choose Category & Count Chip ──
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
                               l10n.text('sell_choose_category'),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                color: _C.darkText,
-                                fontSize: 17,
-                                fontWeight: FontWeight.w900,
+                                color: BuyProductTheme.darkText,
+                                fontSize: 16.5,
+                                fontWeight: FontWeight.w800,
                                 letterSpacing: -0.3,
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Select the category that best matches your product (${filteredList.length} options)',
-                              style: const TextStyle(
-                                color: _C.greyText,
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    final catItem = filteredList[index - 1];
-                    final originalIndex = controller.categories.indexOf(catItem);
-
-                    return Obx(() {
-                      final isSelected = controller.selectedCategoryIndex.value == originalIndex;
-
-                      return GestureDetector(
-                        onTap: () {
-                          controller.selectCategory(originalIndex);
-                          Future.delayed(const Duration(milliseconds: 180), () {
-                            if (context.mounted) {
-                              Get.to(() => const SellProductSubCategoryScreen());
-                            }
-                          });
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? _C.primaryBlue.withValues(alpha: 0.05)
-                                : _C.cardBg,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isSelected ? _C.primaryBlue : _C.borderGrey,
-                              width: isSelected ? 2 : 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF0F172A).withValues(alpha: isSelected ? 0.06 : 0.02),
-                                blurRadius: isSelected ? 12 : 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
                           ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 44,
-                                height: 44,
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: BuyProductTheme.chipMaroonBg,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${filteredList.length} Categories',
+                              style: const TextStyle(
+                                color: BuyProductTheme.primaryMaroon,
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // ── Category Grid (Matching Buy Product Style) ──
+                    Expanded(
+                      child: GridView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 28),
+                        itemCount: filteredList.length,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                          mainAxisExtent: 84,
+                        ),
+                        itemBuilder: (context, index) {
+                          final catItem = filteredList[index];
+                          final originalIndex = controller.categories.indexOf(catItem);
+
+                          return Obx(() {
+                            final isSelected = controller.selectedCategoryIndex.value == originalIndex;
+
+                            return GestureDetector(
+                              onTap: () {
+                                controller.selectCategory(originalIndex);
+                                Future.delayed(const Duration(milliseconds: 180), () {
+                                  if (context.mounted) {
+                                    Get.to(() => const SellProductSubCategoryScreen());
+                                  }
+                                });
+                              },
+                              child: Container(
                                 decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? _C.primaryBlue.withValues(alpha: 0.12)
-                                      : const Color(0xFFF1F5F9),
+                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: BuyProductTheme.primaryMaroon.withValues(alpha: isSelected ? 0.16 : 0.08),
+                                      blurRadius: isSelected ? 8 : 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                foregroundDecoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? BuyProductTheme.primaryMaroon
+                                        : BuyProductTheme.borderMaroon,
+                                    width: isSelected ? 2.2 : 1.8,
+                                  ),
                                 ),
                                 clipBehavior: Clip.antiAlias,
-                                child: catItem.imageUrl.isNotEmpty
-                                    ? Image.network(
-                                        catItem.imageUrl,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => Icon(
-                                          Icons.category_rounded,
-                                          color: isSelected ? _C.primaryBlue : _C.greyText,
-                                          size: 22,
+                                child: Stack(
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        // Category Image
+                                        Expanded(
+                                          child: Container(
+                                            color: BuyProductTheme.lightMaroonBg,
+                                            child: catItem.imageUrl.isNotEmpty
+                                                ? NetworkImageService(
+                                                    imageUrl: ApiRoutes.absoluteUrl(catItem.imageUrl),
+                                                    width: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                    errorWidget: _buildCategoryIconFallback(catItem.name),
+                                                  )
+                                                : _buildCategoryIconFallback(catItem.name),
+                                          ),
                                         ),
-                                      )
-                                    : Icon(
-                                        Icons.category_rounded,
-                                        color: isSelected ? _C.primaryBlue : _C.greyText,
-                                        size: 22,
+
+                                        // Category Title
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                                          color: isSelected ? BuyProductTheme.chipMaroonBg : Colors.white,
+                                          child: Text(
+                                            catItem.name,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: isSelected
+                                                  ? BuyProductTheme.primaryMaroon
+                                                  : BuyProductTheme.darkText,
+                                              fontSize: 9.5,
+                                              fontWeight: FontWeight.w800,
+                                              letterSpacing: -0.2,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    if (isSelected)
+                                      Positioned(
+                                        top: 4,
+                                        right: 4,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(2.5),
+                                          decoration: const BoxDecoration(
+                                            color: BuyProductTheme.primaryMaroon,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.check_rounded,
+                                            color: Colors.white,
+                                            size: 10,
+                                          ),
+                                        ),
                                       ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Text(
-                                  catItem.name,
-                                  style: TextStyle(
-                                    color: isSelected ? _C.primaryBlue : _C.darkText,
-                                    fontSize: 14.5,
-                                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                                    letterSpacing: -0.2,
-                                  ),
+                                  ],
                                 ),
                               ),
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 180),
-                                width: 28,
-                                height: 28,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: isSelected ? _C.primaryBlue : Colors.transparent,
-                                  border: Border.all(
-                                    color: isSelected ? _C.primaryBlue : _C.borderGrey,
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: isSelected
-                                    ? const Icon(Icons.check_rounded, color: Colors.white, size: 16)
-                                    : const Icon(Icons.chevron_right_rounded, color: _C.greyText, size: 18),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    });
-                  },
+                            );
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                 );
               }),
             ),
@@ -365,5 +369,55 @@ class _SellProductCategoryScreenState extends State<SellProductCategoryScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildCategoryIconFallback(String name) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: BuyProductTheme.categoryCardGradient,
+      ),
+      child: Center(
+        child: Icon(
+          _guessCategoryIcon(name),
+          color: Colors.white,
+          size: 22,
+        ),
+      ),
+    );
+  }
+
+  IconData _guessCategoryIcon(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('car') || lower.contains('vehicle') || lower.contains('auto')) {
+      return Icons.directions_car_rounded;
+    }
+    if (lower.contains('phone') || lower.contains('mobile')) {
+      return Icons.phone_android_rounded;
+    }
+    if (lower.contains('cloth') || lower.contains('fashion')) {
+      return Icons.checkroom_rounded;
+    }
+    if (lower.contains('electronic') || lower.contains('gadget')) {
+      return Icons.headphones_rounded;
+    }
+    if (lower.contains('furnitur') || lower.contains('home')) {
+      return Icons.chair_rounded;
+    }
+    if (lower.contains('propert') || lower.contains('real') || lower.contains('house')) {
+      return Icons.apartment_rounded;
+    }
+    if (lower.contains('job')) {
+      return Icons.business_center_rounded;
+    }
+    if (lower.contains('health') || lower.contains('beauty')) {
+      return Icons.healing_rounded;
+    }
+    if (lower.contains('book') || lower.contains('stationery')) {
+      return Icons.menu_book_rounded;
+    }
+    if (lower.contains('pet') || lower.contains('animal')) {
+      return Icons.pets_rounded;
+    }
+    return Icons.category_rounded;
   }
 }

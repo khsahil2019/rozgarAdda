@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../localization/app_localizations.dart';
+import '../../../buy_product/presentation/theme/buy_product_theme.dart';
 
 class SellProductStepIndicator extends StatelessWidget {
   final int currentStep; // 1, 2, or 3
@@ -66,7 +67,7 @@ class SellProductStepIndicator extends StatelessWidget {
         textWeight = FontWeight.w700;
         break;
       case _StepState.active:
-        circleBg = const Color(0xFF1400FF);
+        circleBg = BuyProductTheme.primaryMaroon;
         innerContent = Text(
           '$number',
           style: const TextStyle(
@@ -75,7 +76,7 @@ class SellProductStepIndicator extends StatelessWidget {
             fontSize: 13,
           ),
         );
-        textColor = const Color(0xFF1400FF);
+        textColor = BuyProductTheme.primaryMaroon;
         textWeight = FontWeight.w900;
         break;
       case _StepState.upcoming:
@@ -93,40 +94,45 @@ class SellProductStepIndicator extends StatelessWidget {
         break;
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 240),
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: circleBg,
-            boxShadow: stepState == _StepState.active
-                ? [
-                    BoxShadow(
-                      color: const Color(0xFF1400FF).withValues(alpha: 0.25),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ]
-                : null,
+    return Flexible(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 240),
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: circleBg,
+              boxShadow: stepState == _StepState.active
+                  ? [
+                      BoxShadow(
+                        color: BuyProductTheme.primaryMaroon.withValues(alpha: 0.25),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ]
+                  : null,
+            ),
+            alignment: Alignment.center,
+            child: innerContent,
           ),
-          alignment: Alignment.center,
-          child: innerContent,
-        ),
-        const SizedBox(height: 5),
-        Text(
-          label,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 10,
-            fontWeight: textWeight,
-            letterSpacing: 0.3,
+          const SizedBox(height: 5),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 10,
+              fontWeight: textWeight,
+              letterSpacing: 0.3,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -136,7 +142,7 @@ class SellProductStepIndicator extends StatelessWidget {
         height: 2,
         margin: const EdgeInsets.only(bottom: 18, left: 6, right: 6),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF1400FF) : const Color(0xFFE2E8F0),
+          color: active ? BuyProductTheme.primaryMaroon : const Color(0xFFE2E8F0),
           borderRadius: BorderRadius.circular(2),
         ),
       ),

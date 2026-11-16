@@ -28,6 +28,13 @@ class BuyProductController extends GetxController {
   final RxBool isLoadingProducts = false.obs;
   final RxnString productsError = RxnString();
 
+  // ── Recommended Products State ──────────────────────
+  final RxList<BuyProduct> recommendedProducts = <BuyProduct>[].obs;
+  final RxBool isLoadingRecommended = false.obs;
+  final RxnString recommendedError = RxnString();
+  bool _hasLoadedRecommended = false;
+  Future<void>? _recommendedLoadFuture;
+
   // ── Product Details State ───────────────────────────
   final Rxn<BuyProduct> productDetail = Rxn<BuyProduct>();
   final RxList<BuyProduct> relatedProducts = <BuyProduct>[].obs;
@@ -38,7 +45,12 @@ class BuyProductController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchCategories();
+    _initHomeData();
+  }
+
+  Future<void> _initHomeData() async {
+    await fetchCategories();
+    await fetchRecommendedProducts();
   }
 
   // Fetch Categories
@@ -101,7 +113,120 @@ class BuyProductController extends GetxController {
     }
   }
 
-  // Fetch products by category / subcategory
+  // Fetch products across all categories/subcategories for "Recommended Items" & global search
+  Future<void> fetchRecommendedProducts({bool forceRefresh = false}) async {
+    if (_recommendedLoadFuture != null && !forceRefresh) {
+      return _recommendedLoadFuture;
+    }
+    if (_hasLoadedRecommended && recommendedProducts.isNotEmpty && !forceRefresh) {
+      return;
+    }
+
+    final future = _loadRecommendedProductsInternal(forceRefresh: forceRefresh);
+    _recommendedLoadFuture = future;
+    try {
+      await future;
+    } finally {
+      if (identical(_recommendedLoadFuture, future)) {
+        _recommendedLoadFuture = null;
+      }
+    }
+  }
+
+  Future<void> _fetchSubCategoryBatchProducts(
+    List<int> subIds,
+    String lang,
+    Map<int, BuyProduct> collected, {
+    void Function(List<BuyProduct> sorted)? onBatch,
+  }) async {
+    const prodBatchSize = 6;
+    for (var j = 0; j < subIds.length; j += prodBatchSize) {
+      final subSlice = subIds.skip(j).take(prodBatchSize).toList();
+      final prodLists = await Future.wait(
+        subSlice.map((subId) async {
+          final res = await repository.getProducts(
+            subcategoryId: subId,
+            lang: lang,
+          );
+          return res.fold((_) => <BuyProduct>[], (list) => list);
+        }),
+      );
+
+      bool updated = false;
+      for (final list in prodLists) {
+        for (final product in list) {
+          collected[product.id] = product;
+          updated = true;
+        }
+      }
+      if (updated && onBatch != null) {
+        final sorted = collected.values.toList()
+          ..sort((a, b) => b.id.compareTo(a.id));
+        onBatch(sorted);
+      }
+    }
+  }
+
+  Future<void> _loadRecommendedProductsInternal({required bool forceRefresh}) async {
+    try {
+      isLoadingRecommended.value = true;
+      recommendedError.value = null;
+      final lang = Get.locale?.languageCode ?? 'en';
+
+      if (categories.isEmpty) {
+        await fetchCategories();
+      }
+      if (categories.isEmpty) {
+        recommendedError.value = categoriesError.value ?? 'Failed to load items';
+        return;
+      }
+
+      final Map<int, BuyProduct> collected = {};
+      if (!forceRefresh) {
+        for (final p in recommendedProducts) {
+          collected[p.id] = p;
+        }
+      }
+
+      // Fetch subcategories for all categories in parallel batches
+      const catBatchSize = 5;
+      for (var i = 0; i < categories.length; i += catBatchSize) {
+        final catBatch = categories.skip(i).take(catBatchSize).toList();
+        final subLists = await Future.wait(
+          catBatch.map((cat) async {
+            if (_subCategoryCache.containsKey(cat.id)) {
+              return _subCategoryCache[cat.id]!;
+            }
+            final res = await repository.getSubCategories(cat.id, lang);
+            return res.fold((_) => <BuyProductSubCategory>[], (list) {
+              _subCategoryCache[cat.id] = list;
+              return list;
+            });
+          }),
+        );
+
+        final batchSubIds = subLists.expand((l) => l).map((s) => s.id).toList();
+        if (batchSubIds.isEmpty) continue;
+
+        await _fetchSubCategoryBatchProducts(
+          batchSubIds,
+          lang,
+          collected,
+          onBatch: (sorted) => recommendedProducts.assignAll(sorted),
+        );
+      }
+
+      _hasLoadedRecommended = true;
+    } catch (e) {
+      if (recommendedProducts.isEmpty) {
+        recommendedError.value = 'Failed to load recommended items';
+      }
+    } finally {
+      isLoadingRecommended.value = false;
+    }
+  }
+
+  // Fetch products by category / subcategory (or all products when both are null)
   Future<void> fetchProducts(int? categoryId, int? subcategoryId) async {
     try {
       isLoadingProducts.value = true;
@@ -109,16 +234,63 @@ class BuyProductController extends GetxController {
       products.clear();
       final lang = Get.locale?.languageCode ?? 'en';
 
-      final result = await repository.getProducts(
-        categoryId: categoryId,
-        subcategoryId: subcategoryId,
-        lang: lang,
-      );
+      if (subcategoryId != null) {
+        final result = await repository.getProducts(
+          categoryId: categoryId,
+          subcategoryId: subcategoryId,
+          lang: lang,
+        );
+        result.fold(
+          (failure) => productsError.value = failure.message,
+          (data) => products.assignAll(data),
+        );
+        return;
+      }
 
-      result.fold(
-        (failure) => productsError.value = failure.message,
-        (data) => products.assignAll(data),
-      );
+      if (categoryId != null) {
+        List<BuyProductSubCategory> subs = _subCategoryCache[categoryId] ?? [];
+        if (subs.isEmpty) {
+          final subRes = await repository.getSubCategories(categoryId, lang);
+          subs = subRes.fold((_) => [], (list) {
+            _subCategoryCache[categoryId] = list;
+            return list;
+          });
+          subCategories.assignAll(subs);
+        }
+
+        if (subs.isEmpty) {
+          final result = await repository.getProducts(
+            categoryId: categoryId,
+            lang: lang,
+          );
+          result.fold(
+            (failure) => productsError.value = failure.message,
+            (data) => products.assignAll(data),
+          );
+          return;
+        }
+
+        final Map<int, BuyProduct> collected = {};
+        await _fetchSubCategoryBatchProducts(
+          subs.map((s) => s.id).toList(),
+          lang,
+          collected,
+          onBatch: (sorted) => products.assignAll(sorted),
+        );
+        return;
+      }
+
+      // Global search / "All Products": reuse or fetch recommended products
+      if (recommendedProducts.isNotEmpty) {
+        products.assignAll(recommendedProducts);
+        isLoadingProducts.value = false;
+      }
+      await fetchRecommendedProducts(forceRefresh: recommendedProducts.isEmpty);
+      if (recommendedProducts.isNotEmpty) {
+        products.assignAll(recommendedProducts);
+      } else if (recommendedError.value != null) {
+        productsError.value = recommendedError.value;
+      }
     } catch (e) {
       productsError.value = 'Failed to load products';
     } finally {

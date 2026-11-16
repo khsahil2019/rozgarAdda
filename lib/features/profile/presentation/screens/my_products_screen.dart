@@ -6,12 +6,13 @@ import 'package:rojgar/core/network/api_services.dart';
 import 'package:rojgar/core/widgets/app_back_button.dart';
 import '../../../buy_product/presentation/bindings/buy_product_binding.dart';
 import '../../../buy_product/presentation/screens/product_detail_screen.dart';
+import '../../../buy_product/presentation/theme/buy_product_theme.dart';
 import '../../../sell_product/presentation/screens/sell_product_category_screen.dart';
 import '../../data/model/my_product_model.dart';
 
-// Unified Rozgar Brand Color Tokens
+// Unified Rozgar Marketplace Brand Color Tokens
 class _PC {
-  static const Color primary = Color(0xFF1400FF);
+  static const Color primary = BuyProductTheme.primaryMaroon;
   static const Color darkText = Color(0xFF0F172A);
   static const Color mediumText = Color(0xFF334155);
   static const Color greyText = Color(0xFF64748B);
@@ -103,7 +104,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
           elevation: 4,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           onPressed: () => Get.to(() => const SellProductCategoryScreen()),
-          icon: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
+          icon: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 20),
           label: const Text(
             'Sell Product',
             style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.white),
@@ -525,27 +526,35 @@ class _ProductCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.alphabetic,
                         children: [
-                          Text(
-                            _formatCurrency(product.totalCost),
-                            style: const TextStyle(
-                              fontSize: 15.5,
-                              fontWeight: FontWeight.w900,
-                              color: _PC.primary,
+                          Flexible(
+                            child: Text(
+                              _formatCurrency(product.totalCost),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w900,
+                                color: _PC.primary,
+                              ),
                             ),
                           ),
                           if (hasDiscount) ...[
                             const SizedBox(width: 6),
-                            Text(
-                              _formatCurrency(product.price),
-                              style: const TextStyle(
-                                fontSize: 11.5,
-                                decoration: TextDecoration.lineThrough,
-                                color: _PC.greyText,
+                            Flexible(
+                              child: Text(
+                                _formatCurrency(product.price),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  decoration: TextDecoration.lineThrough,
+                                  color: _PC.greyText,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              '${double.tryParse(product.discount)?.toInt()}% OFF',
+                              '${double.tryParse(product.discount)?.toInt() ?? 0}% OFF',
                               style: const TextStyle(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w800,
@@ -562,12 +571,16 @@ class _ProductCard extends StatelessWidget {
                         children: [
                           const Icon(Icons.question_answer_outlined, size: 13, color: _PC.greyText),
                           const SizedBox(width: 4),
-                          Text(
-                            'Enquiries: ${product.totalEnquiry}',
-                            style: const TextStyle(
-                              fontSize: 11.5,
-                              color: _PC.greyText,
-                              fontWeight: FontWeight.w600,
+                          Flexible(
+                            child: Text(
+                              'Enquiries: ${product.totalEnquiry}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                color: _PC.greyText,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                           if (product.unreadEnquiry > 0) ...[
