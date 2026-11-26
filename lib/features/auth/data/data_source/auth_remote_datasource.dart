@@ -1,6 +1,7 @@
 import 'package:rojgar/core/exceptions/exceptions.dart';
 import 'package:rojgar/core/network/api_routes.dart';
 import 'package:rojgar/core/network/api_services.dart';
+import 'package:rojgar/core/services/notification_service.dart';
 import 'package:rojgar/features/auth/data/data_source/model/auth_response.dart';
 import 'package:rojgar/features/auth/data/data_source/model/dropdown_item.dart';
 
@@ -36,9 +37,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthResponse> login(String email, String password) async {
     try {
+      String? deviceToken = NotificationService.instance.deviceToken;
+      if (deviceToken == null || deviceToken.isEmpty) {
+        deviceToken = await NotificationService.instance.fetchDeviceToken();
+      }
+
+      final body = <String, dynamic>{
+        "username": email,
+        "password": password,
+        "token_device": deviceToken ?? "",
+      };
+
       final res = await ApiService.post(
         ApiRoutes.login,
-        body: {"username": email, "password": password},
+        body: body,
       );
       if ((res['statusCode'] == 200 || res['statusCode'] == 201) &&
           res['status'] == true) {
@@ -69,6 +81,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String otp,
   }) async {
     try {
+      String? deviceToken = NotificationService.instance.deviceToken;
+      if (deviceToken == null || deviceToken.isEmpty) {
+        deviceToken = await NotificationService.instance.fetchDeviceToken();
+      }
+
       final fields = {
         'full_name': fullName,
         'phone': phone,
@@ -82,6 +99,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'address': address,
         "terms_accepted": termsAccepted,
         "otp": otp,
+        if (deviceToken != null && deviceToken.isNotEmpty)
+          'token_device': deviceToken,
       };
 
       Map<String, dynamic> res;

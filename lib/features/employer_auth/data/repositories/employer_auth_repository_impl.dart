@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/exceptions/exceptions.dart';
 import '../../../../core/network/api_routes.dart';
 import '../../../../core/network/api_services.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../domain/entities/employer_entity.dart';
 import '../../domain/repositories/employer_auth_repository.dart';
 import '../models/employer_model.dart';
@@ -14,11 +15,17 @@ class EmployerAuthRepositoryImpl implements EmployerAuthRepository {
   @override
   Future<Either<Failure, Employer>> login(String email, String password) async {
     try {
+      String? deviceToken = NotificationService.instance.deviceToken;
+      if (deviceToken == null || deviceToken.isEmpty) {
+        deviceToken = await NotificationService.instance.fetchDeviceToken();
+      }
+
       final res = await ApiService.post(
         ApiRoutes.employerLogin,
         body: {
           "email": email.trim(),
           "password": password,
+          "token_device": deviceToken ?? "",
         },
       );
 
