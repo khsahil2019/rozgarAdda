@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/exceptions/exceptions.dart';
@@ -19,6 +20,8 @@ class EmployerAuthRepositoryImpl implements EmployerAuthRepository {
       if (deviceToken == null || deviceToken.isEmpty) {
         deviceToken = await NotificationService.instance.fetchDeviceToken();
       }
+
+      debugPrint('🔑 [Employer Login] Sending payload with token_device: ${deviceToken ?? "(empty)"}');
 
       final res = await ApiService.post(
         ApiRoutes.employerLogin,
@@ -67,6 +70,11 @@ class EmployerAuthRepositoryImpl implements EmployerAuthRepository {
     String? identityProofPath,
   }) async {
     try {
+      String? deviceToken = NotificationService.instance.deviceToken;
+      if (deviceToken == null || deviceToken.isEmpty) {
+        deviceToken = await NotificationService.instance.fetchDeviceToken();
+      }
+
       final username = contactPerson.replaceAll(' ', '').toLowerCase();
       final fields = {
         'patient_name': companyName,
@@ -79,6 +87,8 @@ class EmployerAuthRepositoryImpl implements EmployerAuthRepository {
         'address': address,
         'username': username.isNotEmpty ? username : email.split('@').first,
         'password': password,
+        if (deviceToken != null && deviceToken.isNotEmpty)
+          'token_device': deviceToken,
       };
 
       final res = await ApiService.uploadFiles(

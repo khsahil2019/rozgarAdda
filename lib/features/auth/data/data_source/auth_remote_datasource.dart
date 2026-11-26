@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:rojgar/core/exceptions/exceptions.dart';
 import 'package:rojgar/core/network/api_routes.dart';
 import 'package:rojgar/core/network/api_services.dart';
@@ -47,6 +48,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         "password": password,
         "token_device": deviceToken ?? "",
       };
+
+      debugPrint('🔑 [Candidate Login] Sending payload with token_device: ${deviceToken ?? "(empty)"}');
 
       final res = await ApiService.post(
         ApiRoutes.login,
