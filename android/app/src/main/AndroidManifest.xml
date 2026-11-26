@@ -18,6 +18,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.front" android:required="false"/>
     <application
         android:label="Rozgar Adda"
         android:name="${applicationName}"
@@ -25,6 +27,10 @@
         android:usesCleartextTraffic="true"
         android:enableOnBackInvokedCallback="true"
         tools:replace="android:label">
+        <!-- Remove PayU OTP assist foreground service that causes Google Play FOREGROUND_SERVICE_DATA_SYNC requirements -->
+        <service
+            android:name="com.payu.otpassist.CheckTxnStatusForegroundService"
+            tools:node="remove" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
