@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "100000000000",
-    "project_id": "rozgar-adda-app",
-    "storage_bucket": "rozgar-adda-app.appspot.com"
+    "project_number": "558576363228",
+    "project_id": "rozgar-adda-7cd5d",
+    "storage_bucket": "rozgar-adda-7cd5d.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:100000000000:android:a1b2c3d4e5f6g7h8",
+        "mobilesdk_app_id": "1:558576363228:android:8ab76139c75e4b80ef3619",
         "android_client_info": {
           "package_name": "com.rozgaradda.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDummyKeyForGoogleServicesTemplate"
+          "current_key": "AIzaSyBE7VsZL5CdsGF3yP8KHRanVowyYzX7OsY"
         }
       ],
       "services": {

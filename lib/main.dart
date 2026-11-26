@@ -11,6 +11,7 @@ import 'package:rojgar/splash_screen.dart';
 import 'package:rojgar/services/storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:rojgar/features/employer_dashboard/presentation/screens/employer_dashboard_screen.dart';
 import 'package:rojgar/core/services/meta_analytics_service.dart';
 import 'package:rojgar/core/services/notification_service.dart';
@@ -20,6 +21,13 @@ import 'dart:ui';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase Core
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('⚠️ [Firebase] initializeApp: $e');
+  }
 
   // Initialize Notification Service (FCM & Local Notifications)
   await NotificationService.instance.init();

@@ -23,7 +23,7 @@ class NotificationService {
   static const String channelDescription =
       'Notifications for jobs, candidate applications and updates';
 
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  FirebaseMessaging? _firebaseMessaging;
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
@@ -96,9 +96,11 @@ class NotificationService {
       // Initialize Firebase App
       await Firebase.initializeApp();
       _isFirebaseReady = true;
+      _firebaseMessaging = FirebaseMessaging.instance;
+      final messaging = _firebaseMessaging!;
 
       // Request runtime notification permission (Android 13+ & iOS)
-      final settings = await _firebaseMessaging.requestPermission(
+      final settings = await messaging.requestPermission(
         alert: true,
         announcement: false,
         badge: true,
@@ -111,7 +113,7 @@ class NotificationService {
       debugPrint('🔔 [FCM Permission] Authorization Status: ${settings.authorizationStatus}');
 
       // Set foreground notification presentation
-      await _firebaseMessaging.setForegroundNotificationPresentationOptions(
+      await messaging.setForegroundNotificationPresentationOptions(
         alert: true,
         badge: true,
         sound: true,
@@ -124,7 +126,7 @@ class NotificationService {
       await fetchDeviceToken();
 
       // Listen for token refreshes
-      _firebaseMessaging.onTokenRefresh.listen((newToken) async {
+      messaging.onTokenRefresh.listen((newToken) async {
         _deviceToken = newToken;
         debugPrint('🔔 [FCM Token Refreshed]: $newToken');
         final prefs = await SharedPreferences.getInstance();
@@ -150,7 +152,7 @@ class NotificationService {
       });
 
       // Handle Cold Start from Notification
-      final initialMessage = await _firebaseMessaging.getInitialMessage();
+      final initialMessage = await messaging.getInitialMessage();
       if (initialMessage != null) {
         debugPrint('🔔 [FCM InitialMessage] Cold start: ${initialMessage.data}');
       }
@@ -164,7 +166,12 @@ class NotificationService {
   /// Retrieves the FCM Device Token, caches it, and prints it clearly.
   Future<String?> fetchDeviceToken() async {
     try {
-      final token = await _firebaseMessaging.getToken();
+      if (_firebaseMessaging == null) {
+        await Firebase.initializeApp();
+        _firebaseMessaging = FirebaseMessaging.instance;
+        _isFirebaseReady = true;
+      }
+      final token = await _firebaseMessaging?.getToken();
       _deviceToken = token;
 
       if (token != null && token.isNotEmpty) {
