@@ -17,6 +17,7 @@ import 'features/profile/presentation/screens/my_products_screen.dart';
 import 'features/wishlist/presentation/controller/wishlist_controller.dart';
 import 'features/wishlist/presentation/screens/wishlist_screen.dart';
 import 'localization/app_localizations.dart';
+import 'core/services/notification_service.dart';
 import 'main.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -412,6 +413,14 @@ class ProfileScreen extends StatelessWidget {
                   iconBg: const Color(0xFFEEF2FF),
                   iconColor: const Color(0xFF1400FF),
                   onTap: () => _showLanguageBottomSheet(context),
+                ),
+                _GroupedTileData(
+                  icon: Icons.notifications_active_outlined,
+                  label: 'Notifications & Device Token',
+                  defaultLabel: 'Notifications & Device Token',
+                  iconBg: const Color(0xFFFDF2F8),
+                  iconColor: const Color(0xFF801438),
+                  onTap: () => NotificationService.instance.showDeviceTokenDialog(context),
                 ),
                 _GroupedTileData(
                   icon: Icons.help_outline_rounded,

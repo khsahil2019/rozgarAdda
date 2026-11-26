@@ -6,6 +6,7 @@ class StorageService {
   static const String keyLanguageCode = 'language_code';
   static const String keySelectedStateId = 'selected_state_id';
   static const String keySelectedStateName = 'selected_state_name';
+  static const String keyFcmDeviceToken = 'fcm_device_token';
 
   final SharedPreferences _prefs;
 
@@ -49,6 +50,14 @@ class StorageService {
 
   Future<bool> saveSelectedStateName(String name) {
     return _prefs.setString(keySelectedStateName, name);
+  }
+
+  String? getFcmDeviceToken() {
+    return _prefs.getString(keyFcmDeviceToken);
+  }
+
+  Future<bool> saveFcmDeviceToken(String token) {
+    return _prefs.setString(keyFcmDeviceToken, token);
   }
 
   Future<bool> clearCandidateSession() async {

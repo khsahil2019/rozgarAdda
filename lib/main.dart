@@ -13,12 +13,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:rojgar/features/employer_dashboard/presentation/screens/employer_dashboard_screen.dart';
 import 'package:rojgar/core/services/meta_analytics_service.dart';
+import 'package:rojgar/core/services/notification_service.dart';
 import 'package:rojgar/core/utils/app_navigator_observer.dart';
 
 import 'dart:ui';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Notification Service (FCM & Local Notifications)
+  await NotificationService.instance.init();
 
   // Initialize Meta (Facebook) App Events SDK
   await MetaAnalyticsService.instance.init();
